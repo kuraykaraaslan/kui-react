@@ -1,10 +1,11 @@
 import { ImageResponse } from "next/og";
+import { SHOWCASE_BRAND } from "@/libs/config/showcase.config";
 
 export const runtime = "edge";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const title = searchParams.get("title") || "KUIreact";
+  const title = searchParams.get("title") || SHOWCASE_BRAND.name;
 
   return new ImageResponse(
     (
@@ -24,7 +25,7 @@ export async function GET(req: Request) {
       >
         <div>{title}</div>
         <div style={{ fontSize: 24, opacity: 0.7 }}>
-          Composable UI System
+          {SHOWCASE_BRAND.tagline}
         </div>
       </div>
     ),

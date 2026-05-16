@@ -3,20 +3,20 @@ import type { SafeUser } from '@/modules/domains/common/types';
 
 export const BLOG_AUTHORS: SafeUser[] = [
   {
-    userId: 'u-kuray-1',
-    email: 'info@kuray.dev',
+    userId: 'u-author-1',
+    email: 'john.nolan@example.com',
     userRole: 'AUTHOR',
     userStatus: 'ACTIVE',
     userProfile: {
-      name: 'Kuray Karaaslan',
-      username: 'kuraykaraaslan',
-      biography: 'Ex-Structural Engineer, Now Software Engineer.',
-      profilePicture: 'https://kuray.dev/_next/image?url=%2Fassets%2Fimg%2Fkuraykaraaslan.jpg&w=2048&q=75',
+      name: 'John Nolan',
+      username: 'jnolan',
+      biography: 'Late-career rookie. Notes from the field on systems, teams, and craft.',
+      profilePicture: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=240&q=80',
     },
   },
   {
-    userId: 'u-kuray-2',
-    email: 'oscar@kuray.studio',
+    userId: 'u-author-2',
+    email: 'oscar@example.com',
     userRole: 'AUTHOR',
     userStatus: 'ACTIVE',
     userProfile: {

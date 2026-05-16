@@ -20,7 +20,7 @@ export function ChatMessage({ message, className }: ChatMessageProps) {
         <div className="max-w-[80%] rounded-3xl bg-surface-overlay px-5 py-3 text-sm leading-relaxed text-text-primary whitespace-pre-wrap">
           {message.content}
         </div>
-        <Avatar name="Kuray Karaaslan" size="sm" />
+        <Avatar name="John Nolan" size="sm" />
       </div>
     );
   }

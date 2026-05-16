@@ -7,6 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faNodeJs, faCss3Alt, faJs } from '@fortawesome/free-brands-svg-icons';
 import { GithubButton } from './GithubButton';
+import { SHOWCASE_BRAND, SHOWCASE_LINKS } from '@/libs/config/showcase.config';
 
 const stack = [
   { icon: faNodeJs,  brand: true,  label: 'Next.js',    value: '16.2.4' },
@@ -52,11 +53,11 @@ export function HomePanel() {
             className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-fg text-lg font-bold shrink-0"
             aria-hidden="true"
           >
-            K
+            {SHOWCASE_BRAND.initial}
           </span>
           <div>
-            <h1 className="text-2xl font-bold text-text-primary leading-tight">KUIreact</h1>
-            <p className="text-sm text-text-secondary">Composable UI System for Real Products</p>
+            <h1 className="text-2xl font-bold text-text-primary leading-tight">{SHOWCASE_BRAND.name}</h1>
+            <p className="text-sm text-text-secondary">{SHOWCASE_BRAND.tagline}</p>
           </div>
         </div>
         <p className="text-sm text-text-secondary max-w-2xl leading-relaxed">
@@ -192,12 +193,12 @@ export function HomePanel() {
         <p className="text-xs text-text-secondary">
           Built by{' '}
           <a
-            href="https://kuray.dev"
+            href={SHOWCASE_LINKS.author.url}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
           >
-            Kuray Karaaslan
+            {SHOWCASE_LINKS.author.name}
           </a>
           {' '}&middot; Licensed under 0BSD
         </p>

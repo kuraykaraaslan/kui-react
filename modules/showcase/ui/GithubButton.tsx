@@ -1,10 +1,11 @@
 import { Button } from "@/modules/ui/Button";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { SHOWCASE_LINKS } from "@/libs/config/showcase.config";
 
 export function GithubButton() {
     function onClick() {
-        window.open("https://github.com/kuraykaraaslan/next_js_components", "_blank");
+        window.open(SHOWCASE_LINKS.github, "_blank");
     }
 
     return (

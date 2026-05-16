@@ -62,8 +62,8 @@ export function ChatConversationSidebar({
       onSelect={onSelectSession}
       footer={
         <div className="flex items-center gap-2.5 px-2 py-2 w-full">
-          <Avatar name="Kuray Karaaslan" size="sm" />
-          <span className="flex-1 truncate text-sm text-text-primary">kuraykaraaslan</span>
+          <Avatar name="John Nolan" size="sm" />
+          <span className="flex-1 truncate text-sm text-text-primary">jnolan</span>
           <Button variant="ghost" size="xs" iconOnly aria-label="User options">
             <FontAwesomeIcon icon={faEllipsisVertical} className="w-3.5 h-3.5" aria-hidden="true" />
           </Button>

@@ -62,12 +62,12 @@ export default function MyTicketsPage() {
             {/* user info */}
             <div className="flex items-center gap-4">
               <div className="h-14 w-14 rounded-full bg-primary-fg/20 border-2 border-primary-fg/30 flex items-center justify-center text-2xl font-black text-primary-fg shrink-0">
-                K
+                J
               </div>
               <div>
                 <p className="text-sm text-primary-fg/70 font-medium">Merhaba,</p>
-                <h1 className="text-xl font-black text-primary-fg">Kuray Karaaslan</h1>
-                <p className="text-xs text-primary-fg/60 mt-0.5">kuraykaraaslan@gmail.com</p>
+                <h1 className="text-xl font-black text-primary-fg">John Nolan</h1>
+                <p className="text-xs text-primary-fg/60 mt-0.5">john.nolan@example.com</p>
               </div>
             </div>
 

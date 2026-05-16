@@ -41,10 +41,10 @@ export default function BlogDomainLayout({ children }: { children: React.ReactNo
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="flex items-center gap-4 py-4">
               <a href="/domains/blog" className="group inline-flex items-center gap-3">
-                <BrandLogo className="h-11 w-11 text-base font-semibold">K</BrandLogo>
+                <BrandLogo className="h-11 w-11 text-base font-semibold">N</BrandLogo>
                 <div className="leading-tight">
                   <div className="flex items-center gap-2">
-                    <span className="text-base font-semibold text-text-primary">Kuray Blog</span>
+                    <span className="text-base font-semibold text-text-primary">Nolan Editorial</span>
                     <Badge variant="neutral" size="sm">Issue 24</Badge>
                   </div>
                   <span className="text-xs text-text-secondary">Editorial studio + engineering notes</span>
@@ -109,7 +109,7 @@ export default function BlogDomainLayout({ children }: { children: React.ReactNo
 
       <div className="mx-auto w-full max-w-6xl px-6 pb-12">
         <AppFooter
-          logo={<span className="text-sm font-semibold text-text-primary">Kuray Blog</span>}
+          logo={<span className="text-sm font-semibold text-text-primary">Nolan Editorial</span>}
           version="2026.04"
           status="operational"
           nav={(
@@ -138,7 +138,7 @@ export default function BlogDomainLayout({ children }: { children: React.ReactNo
               ))}
             </div>
           )}
-          copyright="(c) 2026 Kuray Blog"
+          copyright="(c) 2026 Nolan Editorial"
         />
       </div>
     </div>

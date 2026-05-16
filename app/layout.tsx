@@ -1,6 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import {
+  SHOWCASE_BRAND,
+  SHOWCASE_LINKS,
+  buildShowcaseColorCss,
+} from "@/libs/config/showcase.config";
 
 /* =========================================================
    FONTS
@@ -20,13 +25,11 @@ const geistMono = Geist_Mono({
    SITE CONFIG (PRODUCT POSITIONING)
 ========================================================= */
 
-const SITE_NAME = "KUIreact";
-const SITE_TITLE = "KUIreact — Composable UI System for Real Products";
-const SITE_DESCRIPTION =
-  "KUIreact is a production-ready UI system built with Next.js. A composable design system and storefront-ready component architecture for real-world applications.";
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  "https://next-js-components.kuray.dev";
+const SITE_NAME = SHOWCASE_BRAND.name;
+const SITE_TITLE = `${SHOWCASE_BRAND.name} — ${SHOWCASE_BRAND.tagline}`;
+const SITE_DESCRIPTION = SHOWCASE_BRAND.description;
+const SITE_URL = SHOWCASE_LINKS.siteUrl;
+const OG_TITLE = encodeURIComponent(SHOWCASE_BRAND.name);
 
 const SITE_KEYWORDS = [
   "React UI components",
@@ -54,7 +57,7 @@ export const metadata: Metadata = {
 
   title: {
     default: SITE_TITLE,
-    template: "%s | KUIreact",
+    template: `%s | ${SITE_NAME}`,
   },
 
   description: SITE_DESCRIPTION,
@@ -62,12 +65,12 @@ export const metadata: Metadata = {
 
   authors: [
     {
-      name: "Kuray Karaaslan",
-      url: "https://kuray.dev",
+      name: SHOWCASE_LINKS.author.name,
+      url: SHOWCASE_LINKS.author.url,
     },
   ],
 
-  creator: "Kuray Karaaslan",
+  creator: SHOWCASE_LINKS.author.name,
   publisher: SITE_NAME,
 
   keywords: SITE_KEYWORDS,
@@ -90,10 +93,10 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     images: [
       {
-        url: `${SITE_URL}/api/og?title=KUIreact`,
+        url: `${SITE_URL}/api/og?title=${OG_TITLE}`,
         width: 1200,
         height: 630,
-        alt: "KUIreact Preview",
+        alt: `${SITE_NAME} Preview`,
       },
     ],
     type: "website",
@@ -103,7 +106,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: [`${SITE_URL}/api/og?title=KUIreact`],
+    images: [`${SITE_URL}/api/og?title=${OG_TITLE}`],
   },
 
   robots: {
@@ -135,8 +138,8 @@ const structuredData = {
 
     {
       "@type": "Person",
-      name: "Kuray Karaaslan",
-      url: "https://kuray.dev",
+      name: SHOWCASE_LINKS.author.name,
+      url: SHOWCASE_LINKS.author.url,
     },
 
     {
@@ -158,7 +161,7 @@ const structuredData = {
       url: SITE_URL,
       creator: {
         "@type": "Person",
-        name: "Kuray Karaaslan",
+        name: SHOWCASE_LINKS.author.name,
       },
     },
   ],
@@ -167,6 +170,8 @@ const structuredData = {
 /* =========================================================
    ROOT LAYOUT
 ========================================================= */
+
+const colorOverrideCss = buildShowcaseColorCss();
 
 export default function RootLayout({
   children,
@@ -179,6 +184,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+        {colorOverrideCss && (
+          <style
+            id="showcase-color-overrides"
+            dangerouslySetInnerHTML={{ __html: colorOverrideCss }}
+          />
+        )}
+
         {/* APP SHELL (OPTIONAL) */}
         <main className="flex-1">{children}</main>
 
