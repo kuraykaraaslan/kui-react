@@ -1,4 +1,3 @@
-'use client';
 import { Avatar } from '@/modules/ui/Avatar';
 import { Button } from '@/modules/ui/Button';
 import { PostCard } from '@/modules/domains/social/post/PostCard';

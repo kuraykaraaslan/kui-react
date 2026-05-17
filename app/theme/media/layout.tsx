@@ -12,14 +12,18 @@ import {
   faFilm,
   faUsers,
   faHouse,
+  faChartLine,
+  faList,
 } from '@fortawesome/free-solid-svg-icons';
 import { faXTwitter as faXTwitterBrand, faYoutube as faYoutubeBrand, faGithub as faGithubBrand } from '@fortawesome/free-brands-svg-icons';
 
 const NAV_ITEMS = [
-  { label: 'Home',     href: '/theme/media',          icon: faHouse },
-  { label: 'Videos',   href: '/theme/media/videos',   icon: faFilm },
-  { label: 'Channels', href: '/theme/media/channels', icon: faUsers },
-  { label: 'Trending', href: '/theme/media/videos',   icon: faFire },
+  { label: 'Home',      href: '/theme/media',          icon: faHouse },
+  { label: 'Videos',    href: '/theme/media/videos',   icon: faFilm },
+  { label: 'Channels',  href: '/theme/media/channels', icon: faUsers },
+  { label: 'Trending',  href: '/theme/media/videos',   icon: faFire },
+  { label: 'Studio',    href: '/theme/media/studio',   icon: faChartLine },
+  { label: 'Playlists', href: '/theme/media/playlists/cozy-italian-cooking-essentials', icon: faList },
 ];
 
 const FOOTER_COLUMNS = [
@@ -39,7 +43,7 @@ const FOOTER_COLUMNS = [
     links: [
       { label: 'All Channels',  href: '/theme/media/channels' },
       { label: 'Upload Video',  href: '/theme/media' },
-      { label: 'Creator Studio',href: '/theme/media' },
+      { label: 'Creator Studio',href: '/theme/media/studio' },
       { label: 'Analytics',     href: '/theme/media' },
       { label: 'Monetisation',  href: '/theme/media' },
       { label: 'Creator Tips',  href: '/theme/media' },

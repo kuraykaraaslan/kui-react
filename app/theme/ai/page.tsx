@@ -1,4 +1,3 @@
-'use client';
 import { Button } from '@/modules/ui/Button';
 import { ChatInputBar } from '@/modules/domains/ai/chat/ChatInputBar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

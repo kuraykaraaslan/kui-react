@@ -24,14 +24,20 @@ const NAV_ITEMS = [
   { label: 'Cart',        href: '/theme/food/cart',         icon: faCartShopping },
 ];
 
+const CUISINE_LINKS = [
+  { label: 'Italian',  href: '/theme/food/cuisines/italian' },
+  { label: 'Japanese', href: '/theme/food/cuisines/japanese' },
+  { label: 'Turkish',  href: '/theme/food/cuisines/turkish' },
+];
+
 const FOOTER_COLUMNS = [
   {
     heading: 'Discover',
     links: [
       { label: 'All Restaurants', href: '/theme/food/restaurants' },
-      { label: 'Italian',         href: '/theme/food/restaurants' },
-      { label: 'Japanese',        href: '/theme/food/restaurants' },
-      { label: 'Indian',          href: '/theme/food/restaurants' },
+      { label: 'Italian',         href: '/theme/food/cuisines/italian' },
+      { label: 'Japanese',        href: '/theme/food/cuisines/japanese' },
+      { label: 'Turkish',         href: '/theme/food/cuisines/turkish' },
       { label: 'Vegan Options',   href: '/theme/food/restaurants' },
     ],
   },
@@ -168,10 +174,47 @@ export default function FoodThemeLayout({ children }: { children: React.ReactNod
                           </a>
                         ))}
                       </nav>
+
+                      <div className="pt-3 border-t border-border">
+                        <p className="px-2 mb-2 text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                          Cuisines
+                        </p>
+                        <nav className="flex flex-col" aria-label="Mobile cuisines">
+                          {CUISINE_LINKS.map((c) => (
+                            <a
+                              key={c.label}
+                              href={c.href}
+                              className="flex items-center gap-3 px-2 py-2.5 text-sm font-medium text-text-primary hover:bg-surface-overlay rounded-lg transition-colors"
+                            >
+                              {c.label}
+                            </a>
+                          ))}
+                        </nav>
+                      </div>
                     </div>
                   </NavDrawer>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Cuisine quick-links */}
+          <div className="hidden md:block border-t border-border bg-surface-raised">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6">
+              <nav className="flex items-center gap-1 py-2 overflow-x-auto" aria-label="Cuisine quick links">
+                <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary mr-3 shrink-0">
+                  Cuisines
+                </span>
+                {CUISINE_LINKS.map((c) => (
+                  <a
+                    key={c.label}
+                    href={c.href}
+                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-primary hover:bg-primary-subtle rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus whitespace-nowrap"
+                  >
+                    {c.label}
+                  </a>
+                ))}
+              </nav>
             </div>
           </div>
         </div>

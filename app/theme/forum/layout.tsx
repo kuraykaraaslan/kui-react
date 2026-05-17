@@ -11,14 +11,15 @@ import {
   faCircleUser,
   faChartBar,
   faShield,
+  faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { BOARD_STATS } from './forum.data';
 
 const NAV_ITEMS = [
-  { label: 'Board index', href: '/theme/forum',            icon: faHouse },
-  { label: 'FAQ',         href: '/theme/forum',            icon: faCircleQuestion },
-  { label: 'Members',     href: '/theme/forum',            icon: faUsers },
-  { label: 'Search',      href: '/theme/forum',            icon: faMagnifyingGlass },
+  { label: 'Board index', href: '/theme/forum',                    icon: faHouse },
+  { label: 'FAQ',         href: '/theme/forum',                    icon: faCircleQuestion },
+  { label: 'Members',     href: '/theme/forum/users/mod_jane',     icon: faUsers },
+  { label: 'Search',      href: '/theme/forum',                    icon: faMagnifyingGlass },
 ];
 
 export default function ForumThemeLayout({ children }: { children: React.ReactNode }) {
@@ -60,6 +61,15 @@ export default function ForumThemeLayout({ children }: { children: React.ReactNo
             ))}
 
             <div className="ml-auto flex items-center gap-1">
+              <Button
+                as="a"
+                href="/theme/forum/topics/new"
+                variant="primary"
+                size="xs"
+                iconLeft={<FontAwesomeIcon icon={faPlus} className="w-3 h-3" aria-hidden="true" />}
+              >
+                New topic
+              </Button>
               <Button as="a" href="/theme/forum" variant="ghost" size="xs">
                 Login
               </Button>

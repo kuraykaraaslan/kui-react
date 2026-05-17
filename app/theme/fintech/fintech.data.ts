@@ -1,4 +1,4 @@
-import type { Wallet, Transaction } from '@/modules/domains/fintech/types';
+import type { Wallet, Transaction, Currency } from '@/modules/domains/fintech/types';
 
 /* ── Chart data ── */
 
@@ -323,5 +323,104 @@ export const TRANSACTIONS: Transaction[] = [
     reference: 'FX-CRYPTO-20260507',
     description: 'ETH to USD conversion',
     createdAt: new Date('2026-05-07T16:00:00Z'),
+  },
+];
+
+/* =========================================================
+   PORTFOLIO HOLDINGS (for /portfolio)
+========================================================= */
+
+export type PortfolioHolding = {
+  symbol: string;
+  name: string;
+  amount: number;
+  currency: Currency;
+  usdValue: number;
+  costBasis: number;
+  dayChangePct: number;
+};
+
+export const PORTFOLIO_HOLDINGS: PortfolioHolding[] = [
+  { symbol: 'BTC',  name: 'Bitcoin',           amount: 0.05,    currency: 'BTC', usdValue: 3421, costBasis: 2980, dayChangePct: 2.34 },
+  { symbol: 'ETH',  name: 'Ethereum',          amount: 1.46,    currency: 'ETH', usdValue: 4611, costBasis: 5120, dayChangePct: -1.18 },
+  { symbol: 'USD',  name: 'US Dollar Reserve', amount: 3420.00, currency: 'USD', usdValue: 3420, costBasis: 3420, dayChangePct: 0    },
+  { symbol: 'EUR',  name: 'Euro Holdings',     amount: 1180.50, currency: 'EUR', usdValue: 1298, costBasis: 1212, dayChangePct: 0.42 },
+  { symbol: 'TRY',  name: 'Turkish Lira',      amount: 23420.00, currency: 'TRY', usdValue: 766,  costBasis: 880,  dayChangePct: -0.55 },
+];
+
+export const PORTFOLIO_PERFORMANCE_SERIES = [
+  10840, 10980, 11100, 11240, 11380, 11320, 11460, 11550, 11680, 11516,
+];
+
+/* =========================================================
+   PAYMENT CARDS (for /cards)
+========================================================= */
+
+export type PaymentCardData = {
+  cardId: string;
+  nickname: string;
+  scheme: 'visa' | 'mastercard' | 'amex';
+  kind: 'virtual' | 'physical';
+  status: 'active' | 'frozen' | 'expired';
+  last4: string;
+  expiry: string;
+  cardholderName: string;
+  monthlySpent: number;
+  monthlyLimit: number;
+  currency: string;
+};
+
+export const PAYMENT_CARDS: PaymentCardData[] = [
+  {
+    cardId: 'card-01',
+    nickname: 'Daily spend',
+    scheme: 'visa',
+    kind: 'physical',
+    status: 'active',
+    last4: '4291',
+    expiry: '11/28',
+    cardholderName: 'Alex Carter',
+    monthlySpent: 1820,
+    monthlyLimit: 3000,
+    currency: 'USD',
+  },
+  {
+    cardId: 'card-02',
+    nickname: 'Subscriptions only',
+    scheme: 'mastercard',
+    kind: 'virtual',
+    status: 'active',
+    last4: '8104',
+    expiry: '07/27',
+    cardholderName: 'Alex Carter',
+    monthlySpent: 92,
+    monthlyLimit: 250,
+    currency: 'USD',
+  },
+  {
+    cardId: 'card-03',
+    nickname: 'Travel backup',
+    scheme: 'amex',
+    kind: 'physical',
+    status: 'frozen',
+    last4: '7350',
+    expiry: '03/29',
+    cardholderName: 'Alex Carter',
+    monthlySpent: 0,
+    monthlyLimit: 5000,
+    currency: 'USD',
+  },
+  {
+    cardId: 'card-04',
+    nickname: 'Old gift card',
+    scheme: 'visa',
+    kind: 'virtual',
+    status: 'expired',
+    last4: '0019',
+    expiry: '01/24',
+    cardholderName: 'Alex Carter',
+    monthlySpent: 0,
+    monthlyLimit: 500,
+    currency: 'USD',
   },
 ];

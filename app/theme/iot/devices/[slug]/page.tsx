@@ -8,6 +8,7 @@ import {
   faCodeBranch,
   faTag,
   faArrowLeft,
+  faChartLine,
 } from '@fortawesome/free-solid-svg-icons';
 import { DeviceStatusBadge } from '@/modules/domains/iot/device/DeviceStatusBadge';
 import { DeviceTypeBadge } from '@/modules/domains/iot/device/DeviceTypeBadge';
@@ -57,7 +58,16 @@ export default async function DeviceDetailPage({ params }: { params: Promise<{ s
             <p className="text-sm text-text-secondary font-mono">{device.deviceId}</p>
           </div>
         </div>
-        <DeviceStatusBadge status={device.status} size="md" />
+        <div className="flex items-center gap-3">
+          <a
+            href={`/theme/iot/devices/${device.slug}/metrics`}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface-base px-3 py-1.5 text-sm font-medium text-text-primary hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+          >
+            <FontAwesomeIcon icon={faChartLine} className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
+            View metrics
+          </a>
+          <DeviceStatusBadge status={device.status} size="md" />
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

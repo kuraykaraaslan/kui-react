@@ -15,6 +15,7 @@ import {
   faChartLine,
   faShieldHalved,
   faLock,
+  faCreditCard,
 } from '@fortawesome/free-solid-svg-icons';
 import { faXTwitter as faXTwitterBrand, faLinkedin as faLinkedinBrand, faInstagram as faInstagramBrand } from '@fortawesome/free-brands-svg-icons';
 
@@ -23,6 +24,8 @@ const NAV_ITEMS = [
   { label: 'Send & Request',   href: '/theme/fintech/transfer',     icon: faPaperPlane },
   { label: 'Wallet',           href: '/theme/fintech/wallets',      icon: faWallet },
   { label: 'Activity',         href: '/theme/fintech/transactions', icon: faArrowRightArrowLeft },
+  { label: 'Portfolio',        href: '/theme/fintech/portfolio',    icon: faChartLine },
+  { label: 'Cards',            href: '/theme/fintech/cards',        icon: faCreditCard },
 ];
 
 const FOOTER_COLUMNS = [

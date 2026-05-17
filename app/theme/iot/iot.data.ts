@@ -1,4 +1,6 @@
 import type { Device, CloudWorkspace, Alert, TelemetryReading, RuleChain } from '@/modules/domains/iot/types';
+import type { AlertEvent } from '@/modules/domains/iot/alert/AlertEventTimeline';
+import type { LogLevel } from '@/modules/domains/iot/telemetry/LogStreamRow';
 
 /* ─── Cloud Workspaces ─── */
 
@@ -393,3 +395,104 @@ export const RULE_CHAINS: RuleChain[] = [
     updatedAt: new Date('2026-05-11'),
   },
 ];
+
+/* ─── Telemetry metrics & logs (for /devices/[slug]/metrics) ─── */
+
+export type DeviceMetricsBundle = {
+  deviceId: string;
+  labels: string[];
+  vibration: number[];
+  temperature: number[];
+  rpm: number[];
+  sparklines: {
+    cpu: number[];
+    memory: number[];
+    network: number[];
+  };
+  currentValues: {
+    cpuPct: number;
+    memoryPct: number;
+    networkKbps: number;
+    temperatureC: number;
+  };
+  logs: {
+    timestamp: string;
+    level: LogLevel;
+    source: string;
+    message: string;
+  }[];
+};
+
+export const DEVICE_METRICS: Record<string, DeviceMetricsBundle> = {
+  'press-line-sensor-a1': {
+    deviceId: 'dev-001',
+    labels: ['12:00', '12:05', '12:10', '12:15', '12:20', '12:25', '12:30', '12:35'],
+    vibration:   [0.9, 1.1, 1.0, 1.2, 1.4, 1.3, 1.5, 1.2],
+    temperature: [62, 63, 64, 66, 68, 67, 69, 66],
+    rpm:         [1410, 1430, 1450, 1470, 1490, 1480, 1500, 1460],
+    sparklines: {
+      cpu:     [28, 30, 33, 31, 36, 38, 35, 34, 37, 36],
+      memory:  [58, 60, 61, 62, 60, 63, 64, 62, 61, 63],
+      network: [120, 130, 110, 140, 138, 142, 150, 144, 150, 148],
+    },
+    currentValues: {
+      cpuPct: 36,
+      memoryPct: 63,
+      networkKbps: 148,
+      temperatureC: 66,
+    },
+    logs: [
+      { timestamp: new Date(Date.now() - 1000).toISOString(),    level: 'info',  source: 'mqtt.client',    message: 'Published telemetry payload (4 fields, 218 bytes)' },
+      { timestamp: new Date(Date.now() - 4500).toISOString(),    level: 'debug', source: 'sensor.driver',  message: 'Read cycle 0x9F2 — within tolerance' },
+      { timestamp: new Date(Date.now() - 8200).toISOString(),    level: 'warn',  source: 'rule.engine',    message: 'Vibration trending up — re-check at next sample' },
+      { timestamp: new Date(Date.now() - 12500).toISOString(),   level: 'info',  source: 'mqtt.client',    message: 'Published telemetry payload (4 fields, 218 bytes)' },
+      { timestamp: new Date(Date.now() - 16000).toISOString(),   level: 'error', source: 'firmware.watch', message: 'Calibration timer reset due to missed tick' },
+      { timestamp: new Date(Date.now() - 19500).toISOString(),   level: 'info',  source: 'system',         message: 'Heartbeat sent (uptime 14d 7h)' },
+      { timestamp: new Date(Date.now() - 23000).toISOString(),   level: 'debug', source: 'sensor.driver',  message: 'Read cycle 0x9F1 — within tolerance' },
+    ],
+  },
+};
+
+/* ─── Alert detail event log (for /alerts/[id]) ─── */
+
+export const ALERT_EVENTS: Record<string, AlertEvent[]> = {
+  'alert-001': [
+    {
+      eventId: 'evt-1',
+      kind: 'opened',
+      by: 'rule-engine',
+      at: new Date(Date.now() - 720_000).toISOString(),
+      note: 'Triggered by rule "Coolant > 85°C" (chain: Critical Temp Alarms).',
+    },
+    {
+      eventId: 'evt-2',
+      kind: 'automation',
+      by: 'paging-bot',
+      at: new Date(Date.now() - 700_000).toISOString(),
+      note: 'On-call rotation "EU-West / Production" paged via SMS + Slack.',
+    },
+    {
+      eventId: 'evt-3',
+      kind: 'note',
+      by: 'jane.k',
+      at: new Date(Date.now() - 540_000).toISOString(),
+      note: 'Investigating — coolant pump pressure looks normal. Possible sensor fault.',
+    },
+  ],
+  'alert-002': [
+    {
+      eventId: 'evt-1',
+      kind: 'opened',
+      by: 'rule-engine',
+      at: new Date(Date.now() - 3_600_000).toISOString(),
+      note: 'Vibration axis Z > 8.0 G — Press Line Sensor A1.',
+    },
+    {
+      eventId: 'evt-2',
+      kind: 'acknowledged',
+      by: 'mike.t',
+      at: new Date(Date.now() - 1_800_000).toISOString(),
+      note: 'Investigating; checking recalibration log.',
+    },
+  ],
+};

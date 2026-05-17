@@ -1,4 +1,8 @@
 import type { RestaurantStatus, MenuItemStatus } from '@/modules/domains/food/types';
+import type { OrderTrackingStep } from '@/modules/domains/food/order/OrderTrackingTimeline';
+import type { CuisineIconKey } from '@/modules/domains/food/cuisine/CuisineHeroBanner';
+import type { CourierVehicle } from '@/modules/domains/food/order/CourierCard';
+import type { Review, ReviewSummary } from '@/modules/domains/reviews/types';
 
 export const CUISINE_TYPES = [
   'Italian',
@@ -424,3 +428,386 @@ export const SAMPLE_ORDERS: OrderData[] = [
     createdAt: '2026-05-08T13:55:00Z',
   },
 ];
+
+/* =========================================================
+   ORDER TRACKING (live status detail page)
+========================================================= */
+
+export type OrderTrackingData = {
+  orderId: string;
+  steps: OrderTrackingStep[];
+  estimatedArrival: string;
+  destinationLabel: string;
+  courier: {
+    name: string;
+    avatarUrl?: string;
+    rating: number;
+    reviewCount: number;
+    vehicle: CourierVehicle;
+    vehicleLabel?: string;
+    online: boolean;
+  };
+};
+
+export const ORDER_TRACKINGS: Record<string, OrderTrackingData> = {
+  'ord-02': {
+    orderId: 'ord-02',
+    estimatedArrival: new Date(Date.now() + 14 * 60_000).toISOString(),
+    destinationLabel: '221B Baker St · Apt 4',
+    courier: {
+      name: 'Marco Bianchi',
+      rating: 4.92,
+      reviewCount: 1834,
+      vehicle: 'scooter',
+      vehicleLabel: 'Vespa · 124-AB-89',
+      online: true,
+    },
+    steps: [
+      {
+        key: 'PLACED',
+        label: 'Order placed',
+        description: 'We have received your order.',
+        occurredAt: '2026-05-08T12:10:00Z',
+      },
+      {
+        key: 'PREPARING',
+        label: 'Restaurant is preparing',
+        description: 'Sakura Bento accepted your order at 12:11.',
+        occurredAt: '2026-05-08T12:12:00Z',
+      },
+      {
+        key: 'READY',
+        label: 'Ready for pickup',
+        description: 'Marco is on his way to the restaurant.',
+        occurredAt: '2026-05-08T12:34:00Z',
+      },
+      {
+        key: 'ON_THE_WAY',
+        label: 'Out for delivery',
+        description: 'Your order is on the way.',
+        occurredAt: '2026-05-08T12:42:00Z',
+        isCurrent: true,
+      },
+      {
+        key: 'DELIVERED',
+        label: 'Delivered',
+      },
+    ],
+  },
+  'ord-04': {
+    orderId: 'ord-04',
+    estimatedArrival: new Date(Date.now() + 38 * 60_000).toISOString(),
+    destinationLabel: '99 Olive Ave',
+    courier: {
+      name: 'Lia Patel',
+      rating: 4.78,
+      reviewCount: 612,
+      vehicle: 'bike',
+      online: true,
+    },
+    steps: [
+      { key: 'PLACED', label: 'Order placed', occurredAt: '2026-05-08T13:55:00Z' },
+      {
+        key: 'PREPARING',
+        label: 'Restaurant is preparing',
+        description: 'Spice Garden accepted your order.',
+        occurredAt: '2026-05-08T13:57:00Z',
+        isCurrent: true,
+      },
+      { key: 'READY',      label: 'Ready for pickup' },
+      { key: 'ON_THE_WAY', label: 'Out for delivery' },
+      { key: 'DELIVERED',  label: 'Delivered' },
+    ],
+  },
+};
+
+/* =========================================================
+   CUISINES (for /cuisines/[slug] page)
+========================================================= */
+
+export type CuisineData = {
+  slug: string;
+  name: string;
+  icon: CuisineIconKey;
+  description: string;
+  imageUrl?: string;
+  cuisineFilter: string;
+  featuredDishIds: string[];
+};
+
+export const CUISINES: CuisineData[] = [
+  {
+    slug: 'italian',
+    name: 'Italian',
+    icon: 'pizza',
+    description: 'Wood-fired pizzas, fresh handmade pasta, and Mediterranean classics from the best Italian kitchens in town.',
+    imageUrl: 'https://picsum.photos/seed/cuisine-italian/1600/600',
+    cuisineFilter: 'Italian',
+    featuredDishIds: ['mi-01', 'mi-02'],
+  },
+  {
+    slug: 'japanese',
+    name: 'Japanese',
+    icon: 'bowl',
+    description: 'Sushi, sashimi, ramen, and seasonal specials made by chefs trained in traditional Japanese technique.',
+    imageUrl: 'https://picsum.photos/seed/cuisine-japanese/1600/600',
+    cuisineFilter: 'Japanese',
+    featuredDishIds: ['mi-03', 'mi-04'],
+  },
+  {
+    slug: 'turkish',
+    name: 'Turkish',
+    icon: 'grill',
+    description: 'Smoky kebabs, mezze plates, and stone-oven lavash — straight from Anatolian home kitchens.',
+    imageUrl: 'https://picsum.photos/seed/cuisine-turkish/1600/600',
+    cuisineFilter: 'Turkish',
+    featuredDishIds: ['mi-05'],
+  },
+  {
+    slug: 'indian',
+    name: 'Indian',
+    icon: 'pepper',
+    description: 'Aromatic curries, biryanis, and tandoori — hand-ground spice blends and chef-led flavor.',
+    imageUrl: 'https://picsum.photos/seed/cuisine-indian/1600/600',
+    cuisineFilter: 'Indian',
+    featuredDishIds: ['mi-07', 'mi-08'],
+  },
+  {
+    slug: 'american',
+    name: 'American',
+    icon: 'drumstick',
+    description: 'Smash burgers, loaded fries, thick milkshakes — the comfort-food classics, done right.',
+    imageUrl: 'https://picsum.photos/seed/cuisine-american/1600/600',
+    cuisineFilter: 'American',
+    featuredDishIds: ['mi-09', 'mi-10'],
+  },
+];
+
+export const FEATURED_DISH_IMAGES: Record<string, string> = {
+  'mi-01': 'https://picsum.photos/seed/dish-mi-01/800/600',
+  'mi-02': 'https://picsum.photos/seed/dish-mi-02/800/600',
+  'mi-03': 'https://picsum.photos/seed/dish-mi-03/800/600',
+  'mi-04': 'https://picsum.photos/seed/dish-mi-04/800/600',
+  'mi-05': 'https://picsum.photos/seed/dish-mi-05/800/600',
+  'mi-06': 'https://picsum.photos/seed/dish-mi-06/800/600',
+  'mi-07': 'https://picsum.photos/seed/dish-mi-07/800/600',
+  'mi-08': 'https://picsum.photos/seed/dish-mi-08/800/600',
+  'mi-09': 'https://picsum.photos/seed/dish-mi-09/800/600',
+  'mi-10': 'https://picsum.photos/seed/dish-mi-10/800/600',
+};
+
+/* =========================================================
+   RESTAURANT REVIEWS
+   Keyed by restaurant slug so the reviews page can do a
+   constant-time lookup.
+========================================================= */
+
+export const RESTAURANT_REVIEW_SUMMARIES: Record<string, ReviewSummary> = {
+  'bella-napoli': {
+    subjectId: 'r-01',
+    average: 4.8,
+    total: 312,
+    distribution: { 1: 4, 2: 6, 3: 18, 4: 64, 5: 220 },
+  },
+  'sakura-bento': {
+    subjectId: 'r-02',
+    average: 4.6,
+    total: 198,
+    distribution: { 1: 3, 2: 5, 3: 14, 4: 52, 5: 124 },
+  },
+  'istanbul-kebab-house': {
+    subjectId: 'r-03',
+    average: 4.5,
+    total: 241,
+    distribution: { 1: 6, 2: 9, 3: 22, 4: 78, 5: 126 },
+  },
+  'taco-loco': {
+    subjectId: 'r-04',
+    average: 4.3,
+    total: 175,
+    distribution: { 1: 5, 2: 9, 3: 24, 4: 60, 5: 77 },
+  },
+  'spice-garden': {
+    subjectId: 'r-05',
+    average: 4.7,
+    total: 289,
+    distribution: { 1: 4, 2: 7, 3: 18, 4: 70, 5: 190 },
+  },
+  'the-burger-joint': {
+    subjectId: 'r-06',
+    average: 4.4,
+    total: 430,
+    distribution: { 1: 10, 2: 18, 3: 52, 4: 140, 5: 210 },
+  },
+};
+
+export const RESTAURANT_REVIEWS: Record<string, Review[]> = {
+  'bella-napoli': [
+    {
+      reviewId: 'rev-bn-01',
+      subjectId: 'r-01',
+      author: { name: 'Maya P.', avatarUrl: 'https://i.pravatar.cc/64?img=47' },
+      rating: 5,
+      title: 'Best margherita in town',
+      body:
+        'Wood-fired crust was perfectly charred and the buffalo mozzarella tasted like it just arrived from Italy. The basil was fragrant — a clear sign of fresh ingredients. Arrived hot in 25 minutes.',
+      createdAt: '2026-04-12T10:30:00Z',
+      helpfulCount: 24,
+      verified: true,
+    },
+    {
+      reviewId: 'rev-bn-02',
+      subjectId: 'r-01',
+      author: { name: 'Daniel R.', avatarUrl: null },
+      rating: 4,
+      title: 'Solid pasta, slightly long wait',
+      body:
+        'The tagliatelle al ragù was rich and the portion size was generous. Took about 50 minutes on a Friday night which is a bit longer than the estimate, but worth it.',
+      createdAt: '2026-04-05T19:15:00Z',
+      helpfulCount: 9,
+      verified: true,
+    },
+    {
+      reviewId: 'rev-bn-03',
+      subjectId: 'r-01',
+      author: { name: 'Olivia K.', avatarUrl: 'https://i.pravatar.cc/64?img=12' },
+      rating: 5,
+      title: null,
+      body:
+        'Consistent favourite. Their gluten-free option is genuinely good — most places get it wrong, but the crust here actually has structure.',
+      createdAt: '2026-03-22T13:45:00Z',
+      helpfulCount: 18,
+      verified: false,
+    },
+    {
+      reviewId: 'rev-bn-04',
+      subjectId: 'r-01',
+      author: { name: 'Brandon T.', avatarUrl: null },
+      rating: 3,
+      title: 'Good food, packaging needs work',
+      body:
+        "Flavours were spot-on but the pizza box was a little flimsy and the crust got steam-soggy by the time it arrived. Would order again but maybe pick up instead.",
+      createdAt: '2026-03-08T20:20:00Z',
+      helpfulCount: 4,
+      verified: true,
+    },
+  ],
+  'sakura-bento': [
+    {
+      reviewId: 'rev-sb-01',
+      subjectId: 'r-02',
+      author: { name: 'Hannah S.', avatarUrl: 'https://i.pravatar.cc/64?img=32' },
+      rating: 5,
+      title: 'Ramen is unreal',
+      body:
+        'The tonkotsu broth has clearly been simmered for hours — deep, milky, and not at all greasy. The chashu was meltingly tender. A staple for cold nights.',
+      createdAt: '2026-04-18T11:00:00Z',
+      helpfulCount: 31,
+      verified: true,
+    },
+    {
+      reviewId: 'rev-sb-02',
+      subjectId: 'r-02',
+      author: { name: 'Yusuf A.', avatarUrl: null },
+      rating: 4,
+      title: 'Fresh sushi, packed neatly',
+      body:
+        'Salmon nigiri was beautifully fresh. One piece had a slightly thicker rice base than the others, but it was a minor thing. Will order again.',
+      createdAt: '2026-04-02T17:30:00Z',
+      helpfulCount: 6,
+      verified: false,
+    },
+  ],
+  'istanbul-kebab-house': [
+    {
+      reviewId: 'rev-ik-01',
+      subjectId: 'r-03',
+      author: { name: 'Eylül D.', avatarUrl: 'https://i.pravatar.cc/64?img=5' },
+      rating: 5,
+      title: 'Tastes like home',
+      body:
+        'The adana kebab was perfectly spiced and the lavash was clearly freshly baked. They even included extra pickles and onion — proper Istanbul style.',
+      createdAt: '2026-04-15T18:00:00Z',
+      helpfulCount: 22,
+      verified: true,
+    },
+    {
+      reviewId: 'rev-ik-02',
+      subjectId: 'r-03',
+      author: { name: 'Marcus L.', avatarUrl: null },
+      rating: 4,
+      title: null,
+      body:
+        'Generous portions and the lentil soup is a great starter. Delivery was on the faster side of the estimate, which was a nice surprise.',
+      createdAt: '2026-04-09T12:25:00Z',
+      helpfulCount: 11,
+      verified: true,
+    },
+  ],
+  'taco-loco': [
+    {
+      reviewId: 'rev-tl-01',
+      subjectId: 'r-04',
+      author: { name: 'Sofia M.', avatarUrl: 'https://i.pravatar.cc/64?img=23' },
+      rating: 4,
+      title: 'Salsa game on point',
+      body:
+        'Three different salsas, each with a distinct flavour. The carne asada tacos were tender. Would have been a 5 if the tortillas had been a touch warmer.',
+      createdAt: '2026-04-10T20:00:00Z',
+      helpfulCount: 14,
+      verified: true,
+    },
+    {
+      reviewId: 'rev-tl-02',
+      subjectId: 'r-04',
+      author: { name: 'Jordan B.', avatarUrl: null },
+      rating: 5,
+      title: null,
+      body:
+        'Loaded nachos are the move. Cheese, beans, jalapeños, lime crema — everything in balance. Cleaned the plate.',
+      createdAt: '2026-03-30T19:10:00Z',
+      helpfulCount: 8,
+      verified: false,
+    },
+  ],
+  'spice-garden': [
+    {
+      reviewId: 'rev-sg-01',
+      subjectId: 'r-05',
+      author: { name: 'Priya N.', avatarUrl: 'https://i.pravatar.cc/64?img=44' },
+      rating: 5,
+      title: 'Vegan biryani is fantastic',
+      body:
+        'The basmati was fragrant and each layer was packed with vegetables and saffron. They got the spice level exactly right — bold, not just hot.',
+      createdAt: '2026-04-17T13:30:00Z',
+      helpfulCount: 27,
+      verified: true,
+    },
+  ],
+  'the-burger-joint': [
+    {
+      reviewId: 'rev-bj-01',
+      subjectId: 'r-06',
+      author: { name: 'Tom W.', avatarUrl: null },
+      rating: 5,
+      title: 'Smash burger done right',
+      body:
+        'Thin, crispy edges, perfect melty cheese, soft brioche bun. Fries were crisp and seasoned well. Free delivery just sealed it.',
+      createdAt: '2026-04-19T20:45:00Z',
+      helpfulCount: 35,
+      verified: true,
+    },
+    {
+      reviewId: 'rev-bj-02',
+      subjectId: 'r-06',
+      author: { name: 'Aisha M.', avatarUrl: 'https://i.pravatar.cc/64?img=15' },
+      rating: 4,
+      title: 'Great milkshake',
+      body:
+        'Burger was solid and the vanilla milkshake was thick enough to need a spoon — exactly how it should be. Would love a small-side fries option.',
+      createdAt: '2026-04-11T21:05:00Z',
+      helpfulCount: 7,
+      verified: false,
+    },
+  ],
+};

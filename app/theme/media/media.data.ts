@@ -228,3 +228,79 @@ export const VIDEOS: MediaVideo[] = [
 export const CATEGORIES = ['Technology', 'Gaming', 'Cooking', 'Travel', 'Music', 'Education'];
 
 export const FEATURED_VIDEO = VIDEOS[3]; // Elden Ring speedrun — most views
+
+/* ─── Creator Studio sample data ─── */
+
+export type StudioVideoStat = {
+  videoId: string;
+  ctrPct: number;
+  watchTimeHours: number;
+  deltaPct: number;
+};
+
+export const STUDIO_VIDEO_STATS: StudioVideoStat[] = [
+  { videoId: 'v-01', ctrPct: 8.4, watchTimeHours: 12420, deltaPct: 12.3 },
+  { videoId: 'v-02', ctrPct: 6.1, watchTimeHours: 7510,  deltaPct: -3.4 },
+  { videoId: 'v-03', ctrPct: 5.7, watchTimeHours: 6200,  deltaPct: 2.1 },
+  { videoId: 'v-04', ctrPct: 11.2, watchTimeHours: 184_000, deltaPct: 24.8 },
+  { videoId: 'v-07', ctrPct: 9.5, watchTimeHours: 32_400, deltaPct: 5.7 },
+];
+
+export const STUDIO_WATCH_TIME: { date: string; hours: number }[] = [
+  { date: 'Apr 20', hours: 4120 },
+  { date: 'Apr 21', hours: 4560 },
+  { date: 'Apr 22', hours: 5230 },
+  { date: 'Apr 23', hours: 4980 },
+  { date: 'Apr 24', hours: 6310 },
+  { date: 'Apr 25', hours: 7240 },
+  { date: 'Apr 26', hours: 6920 },
+  { date: 'Apr 27', hours: 8410 },
+];
+
+export const STUDIO_CHANNEL_ID = 'ch-01';
+
+/* ─── Playlists ─── */
+
+export type MediaPlaylist = {
+  playlistId: string;
+  slug: string;
+  channelId: string;
+  title: string;
+  description: string;
+  coverUrl: string;
+  visibility: 'PUBLIC' | 'UNLISTED' | 'PRIVATE';
+  videoIds: string[];
+};
+
+export const PLAYLISTS: MediaPlaylist[] = [
+  {
+    playlistId: 'pl-01',
+    slug: 'modern-fullstack-with-nextjs',
+    channelId: 'ch-01',
+    title: 'Modern Full-Stack with Next.js',
+    description: 'Everything you need to ship a production-grade Next.js app: routing, data fetching, type safety, and deploy.',
+    coverUrl: 'https://picsum.photos/seed/playlist1/800/450',
+    visibility: 'PUBLIC',
+    videoIds: ['v-01', 'v-02', 'v-03'],
+  },
+  {
+    playlistId: 'pl-02',
+    slug: 'cozy-italian-cooking-essentials',
+    channelId: 'ch-03',
+    title: 'Cozy Italian Cooking Essentials',
+    description: 'A short masterclass on the techniques and sauces every home cook should know.',
+    coverUrl: 'https://picsum.photos/seed/playlist2/800/450',
+    visibility: 'PUBLIC',
+    videoIds: ['v-07', 'v-08', 'v-09'],
+  },
+  {
+    playlistId: 'pl-03',
+    slug: 'travel-smarter-not-pricier',
+    channelId: 'ch-04',
+    title: 'Travel Smarter, Not Pricier',
+    description: 'Budget guides and safety tips from 30+ countries — saved for later viewing.',
+    coverUrl: 'https://picsum.photos/seed/playlist3/800/450',
+    visibility: 'UNLISTED',
+    videoIds: ['v-10', 'v-11', 'v-12'],
+  },
+];

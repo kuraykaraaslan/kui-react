@@ -3,6 +3,8 @@ import { DataTable } from '@/modules/ui/DataTable';
 import type { TableColumn } from '@/modules/ui/DataTable';
 import { AlertSeverityBadge } from '@/modules/domains/iot/alert/AlertSeverityBadge';
 import { Badge } from '@/modules/ui/Badge';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { ALERTS } from '../iot.data';
 import type { Alert, AlertSeverity, AlertStatus } from '@/modules/domains/iot/types';
 
@@ -106,6 +108,21 @@ const columns: TableColumn<AlertRow>[] = [
       <span className="text-text-secondary whitespace-nowrap text-xs">
         {row.resolvedAt === '—' ? <span className="opacity-40">—</span> : row.resolvedAt}
       </span>
+    ),
+  },
+  {
+    key: 'actions',
+    header: 'Actions',
+    align: 'right',
+    render: (row) => (
+      <a
+        href={`/theme/iot/alerts/${row.alertId}`}
+        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-base px-2.5 py-1 text-xs font-medium text-text-primary hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+        aria-label={`Open alert ${row.title}`}
+      >
+        <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="w-3 h-3 text-primary" aria-hidden="true" />
+        Open
+      </a>
     ),
   },
 ];
