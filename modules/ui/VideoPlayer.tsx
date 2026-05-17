@@ -18,6 +18,7 @@ import {
   faChevronLeft,
   faCheck,
 } from '@fortawesome/free-solid-svg-icons';
+import { faChromecast } from '@fortawesome/free-brands-svg-icons';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -39,6 +40,57 @@ export type AudioTrackOption = { label: string; language?: string };
 type VideoSource = { src: string; type?: string };
 type SubtitleFontSize = 'sm' | 'md' | 'lg' | 'xl';
 type SettingsView = 'main' | 'quality' | 'speed' | 'subtitles' | 'subtitle-size' | 'language';
+
+// Minimal type surface for the Google Cast Sender SDK (loaded at runtime).
+type CastSession = {
+  getCastDevice: () => { friendlyName: string } | null;
+  loadMedia: (request: unknown) => Promise<void>;
+};
+type CastContextInstance = {
+  setOptions: (opts: { receiverApplicationId: string; autoJoinPolicy: string }) => void;
+  getCastState: () => string;
+  getCurrentSession: () => CastSession | null;
+  requestSession: () => Promise<void>;
+  endCurrentSession: (stopCasting: boolean) => void;
+  addEventListener: (event: string, handler: () => void) => void;
+  removeEventListener: (event: string, handler: () => void) => void;
+};
+type RemotePlayer = {
+  isPaused: boolean;
+  currentTime: number;
+  duration: number;
+  volumeLevel: number;
+  isMuted: boolean;
+  isConnected: boolean;
+};
+type RemotePlayerController = {
+  addEventListener: (event: string, handler: () => void) => void;
+  removeEventListener: (event: string, handler: () => void) => void;
+  playOrPause: () => void;
+  seek: () => void;
+  setVolumeLevel: () => void;
+  muteOrUnmute: () => void;
+  stop: () => void;
+};
+type CastFrameworkNs = {
+  CastContext: { getInstance: () => CastContextInstance };
+  CastContextEventType: { CAST_STATE_CHANGED: string };
+  RemotePlayer: new () => RemotePlayer;
+  RemotePlayerController: new (player: RemotePlayer) => RemotePlayerController;
+  RemotePlayerEventType: { ANY_CHANGE: string };
+};
+type ChromeCastNs = {
+  AutoJoinPolicy: { ORIGIN_SCOPED: string };
+  Image: new (url: string) => unknown;
+  media: {
+    DEFAULT_MEDIA_RECEIVER_APP_ID: string;
+    MediaInfo: new (contentId: string, contentType: string) => {
+      metadata?: unknown;
+    };
+    GenericMediaMetadata: new () => { title?: string; images?: unknown[] };
+    LoadRequest: new (mediaInfo: unknown) => { currentTime?: number };
+  };
+};
 
 // ─── constants ───────────────────────────────────────────────────────────────
 
@@ -85,6 +137,10 @@ type VideoPlayerProps = {
   autoHideControls?: boolean;
   /** Fired whenever the controls overlay visibility changes */
   onControlsVisibilityChange?: (visible: boolean) => void;
+  /** Enable Google Cast (Chromecast) integration. Loads the Cast SDK on mount. Default: true */
+  enableCast?: boolean;
+  /** Fired when cast session state changes */
+  onCastStateChange?: (state: 'unavailable' | 'available' | 'connecting' | 'connected') => void;
   className?: string;
 };
 
@@ -106,6 +162,8 @@ export function VideoPlayer({
   controlsVisible,
   autoHideControls = true,
   onControlsVisibilityChange,
+  enableCast = true,
+  onCastStateChange,
   className,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -113,6 +171,8 @@ export function VideoPlayer({
   const progressRef = useRef<HTMLDivElement>(null);
   const settingsPanelRef = useRef<HTMLDivElement>(null);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const remotePlayerRef = useRef<RemotePlayer | null>(null);
+  const remoteControllerRef = useRef<RemotePlayerController | null>(null);
 
   // playback
   const [playing, setPlaying] = useState(false);
@@ -139,6 +199,10 @@ export function VideoPlayer({
   const [settingsView, setSettingsView] = useState<SettingsView>('main');
   const [cueText, setCueText] = useState<string | null>(null);
 
+  // cast
+  const [castState, setCastState] = useState<'unavailable' | 'available' | 'connecting' | 'connected'>('unavailable');
+  const [castDeviceName, setCastDeviceName] = useState<string | null>(null);
+
   const sources = Array.isArray(src) ? src : [src];
 
   // ── controls visibility ──────────────────────────────────────────────────
@@ -146,7 +210,12 @@ export function VideoPlayer({
   // Controlled mode: controlsVisible prop overrides internal state entirely.
   // Uncontrolled mode: internal auto-hide logic runs (respects autoHideControls).
   const isControlled = controlsVisible !== undefined;
-  const effectiveControls = isControlled ? (controlsVisible as boolean) : showControls;
+  const isCasting = castState === 'connected';
+  const effectiveControls = isCasting
+    ? true
+    : isControlled
+      ? (controlsVisible as boolean)
+      : showControls;
 
   // Fire callback whenever effective visibility changes.
   useEffect(() => {
@@ -157,9 +226,10 @@ export function VideoPlayer({
     if (isControlled) return; // parent owns visibility
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
     setShowControls(true);
+    if (isCasting) return; // keep controls pinned while casting
     if (isPlaying && autoHideControls)
       hideTimerRef.current = setTimeout(() => setShowControls(false), 3000);
-  }, [isControlled, autoHideControls]);
+  }, [isControlled, autoHideControls, isCasting]);
 
   const resetHideTimer = useCallback(() => {
     scheduleHide(playing);
@@ -237,6 +307,133 @@ export function VideoPlayer({
     return () => track.removeEventListener('cuechange', onCueChange);
   }, [selectedSubtitle, subtitles]);
 
+  // ── Google Cast SDK ──────────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (!enableCast || typeof window === 'undefined') return;
+
+    const w = window as unknown as {
+      cast?: { framework?: CastFrameworkNs };
+      chrome?: { cast?: ChromeCastNs };
+      __onGCastApiAvailable?: (available: boolean) => void;
+    };
+
+    let cleanupListener: (() => void) | undefined;
+
+    const init = () => {
+      const framework = w.cast?.framework;
+      const chromeCast = w.chrome?.cast;
+      if (!framework || !chromeCast) return;
+
+      const context = framework.CastContext.getInstance();
+      context.setOptions({
+        receiverApplicationId: chromeCast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+        autoJoinPolicy: chromeCast.AutoJoinPolicy.ORIGIN_SCOPED,
+      });
+
+      const mapState = (s: string): 'unavailable' | 'available' | 'connecting' | 'connected' => {
+        if (s === 'CONNECTED') return 'connected';
+        if (s === 'CONNECTING') return 'connecting';
+        if (s === 'NO_DEVICES_AVAILABLE') return 'unavailable';
+        return 'available';
+      };
+
+      const sync = () => {
+        const next = mapState(context.getCastState());
+        setCastState(next);
+        const session = context.getCurrentSession();
+        setCastDeviceName(next === 'connected' ? session?.getCastDevice()?.friendlyName ?? null : null);
+      };
+
+      const handler = () => sync();
+      context.addEventListener(framework.CastContextEventType.CAST_STATE_CHANGED, handler);
+      sync();
+
+      // remote player — mirrors playback state of the cast session
+      const remotePlayer = new framework.RemotePlayer();
+      const remoteController = new framework.RemotePlayerController(remotePlayer);
+      remotePlayerRef.current = remotePlayer;
+      remoteControllerRef.current = remoteController;
+
+      const syncRemote = () => {
+        if (!remotePlayer.isConnected) return;
+        setPlaying(!remotePlayer.isPaused);
+        if (isFinite(remotePlayer.currentTime)) setCurrentTime(remotePlayer.currentTime);
+        if (remotePlayer.duration > 0) setDuration(remotePlayer.duration);
+        setVolume(remotePlayer.volumeLevel);
+        setMuted(remotePlayer.isMuted);
+      };
+      remoteController.addEventListener(framework.RemotePlayerEventType.ANY_CHANGE, syncRemote);
+
+      cleanupListener = () => {
+        context.removeEventListener(framework.CastContextEventType.CAST_STATE_CHANGED, handler);
+        remoteController.removeEventListener(framework.RemotePlayerEventType.ANY_CHANGE, syncRemote);
+      };
+    };
+
+    if (w.cast?.framework) {
+      init();
+    } else {
+      const SCRIPT_ID = 'google-cast-sdk';
+      w.__onGCastApiAvailable = (available: boolean) => { if (available) init(); };
+      if (!document.getElementById(SCRIPT_ID)) {
+        const script = document.createElement('script');
+        script.id = SCRIPT_ID;
+        script.src = 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';
+        script.async = true;
+        document.head.appendChild(script);
+      }
+    }
+
+    return () => { cleanupListener?.(); };
+  }, [enableCast]);
+
+  useEffect(() => {
+    onCastStateChange?.(castState);
+  }, [castState, onCastStateChange]);
+
+  const toggleCast = useCallback(async () => {
+    if (typeof window === 'undefined') return;
+    const w = window as unknown as {
+      cast?: { framework?: CastFrameworkNs };
+      chrome?: { cast?: ChromeCastNs };
+    };
+    const framework = w.cast?.framework;
+    const chromeCast = w.chrome?.cast;
+    if (!framework || !chromeCast) return;
+
+    const context = framework.CastContext.getInstance();
+
+    if (castState === 'connected') {
+      context.endCurrentSession(true);
+      return;
+    }
+
+    try {
+      await context.requestSession();
+      const session = context.getCurrentSession();
+      const v = videoRef.current;
+      if (!session || !v) return;
+
+      const first = Array.isArray(src) ? src[0] : src;
+      const videoSrc = v.currentSrc || (typeof first === 'string' ? first : first.src);
+      const contentType = typeof first === 'string' ? 'video/mp4' : first.type ?? 'video/mp4';
+
+      const mediaInfo = new chromeCast.media.MediaInfo(videoSrc, contentType);
+      const metadata = new chromeCast.media.GenericMediaMetadata();
+      if (title) metadata.title = title;
+      if (poster) metadata.images = [new chromeCast.Image(poster)];
+      mediaInfo.metadata = metadata;
+
+      const request = new chromeCast.media.LoadRequest(mediaInfo);
+      request.currentTime = v.currentTime;
+      await session.loadMedia(request);
+      v.pause();
+    } catch {
+      // user cancelled or no session
+    }
+  }, [castState, src, title, poster]);
+
   // ── close settings on outside click ─────────────────────────────────────
 
   useEffect(() => {
@@ -254,41 +451,71 @@ export function VideoPlayer({
   // ── playback handlers ────────────────────────────────────────────────────
 
   const togglePlay = useCallback(() => {
+    if (isCasting && remoteControllerRef.current) {
+      remoteControllerRef.current.playOrPause();
+      return;
+    }
     const v = videoRef.current;
     if (!v) return;
     if (v.paused) v.play(); else v.pause();
-  }, []);
+  }, [isCasting]);
 
   const seekBy = useCallback((delta: number) => {
+    if (isCasting && remotePlayerRef.current && remoteControllerRef.current) {
+      const rp = remotePlayerRef.current;
+      rp.currentTime = Math.max(0, Math.min(rp.duration || 0, rp.currentTime + delta));
+      remoteControllerRef.current.seek();
+      return;
+    }
     const v = videoRef.current;
     if (!v) return;
     v.currentTime = Math.max(0, Math.min(v.duration, v.currentTime + delta));
-  }, []);
+  }, [isCasting]);
 
   const toggleMute = useCallback(() => {
+    if (isCasting && remoteControllerRef.current) {
+      remoteControllerRef.current.muteOrUnmute();
+      return;
+    }
     const v = videoRef.current;
     if (!v) return;
     v.muted = !v.muted;
     setMuted(v.muted);
-  }, []);
+  }, [isCasting]);
 
   const handleVolumeChange = useCallback((val: number) => {
+    const c = Math.max(0, Math.min(1, val));
+    if (isCasting && remotePlayerRef.current && remoteControllerRef.current) {
+      remotePlayerRef.current.volumeLevel = c;
+      remoteControllerRef.current.setVolumeLevel();
+      setVolume(c);
+      setMuted(c === 0);
+      return;
+    }
     const v = videoRef.current;
     if (!v) return;
-    const c = Math.max(0, Math.min(1, val));
     v.volume = c;
     v.muted = c === 0;
     setVolume(c);
     setMuted(c === 0);
-  }, []);
+  }, [isCasting]);
 
   const handleSeek = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const v = videoRef.current;
     const bar = progressRef.current;
-    if (!v || !bar || !v.duration) return;
+    if (!bar) return;
     const rect = bar.getBoundingClientRect();
-    v.currentTime = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * v.duration;
-  }, []);
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    if (isCasting && remotePlayerRef.current && remoteControllerRef.current) {
+      const rp = remotePlayerRef.current;
+      if (!rp.duration) return;
+      rp.currentTime = ratio * rp.duration;
+      remoteControllerRef.current.seek();
+      return;
+    }
+    const v = videoRef.current;
+    if (!v || !v.duration) return;
+    v.currentTime = ratio * v.duration;
+  }, [isCasting]);
 
   const handleSeekMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const bar = progressRef.current;
@@ -423,6 +650,20 @@ export function VideoPlayer({
         ))}
       </video>
 
+      {/* ── casting overlay ── */}
+      {isCasting && (
+        <div
+          className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 gap-3 text-center px-6"
+          style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.75) 55%, rgba(0,0,0,0) 100%)' }}
+        >
+          <FontAwesomeIcon icon={faChromecast} className="text-white text-5xl drop-shadow-lg" aria-hidden="true" />
+          <p className="text-white/90 text-sm font-medium">
+            {castDeviceName ? `${castDeviceName} cihazına yayınlanıyor` : 'Cihaza yayınlanıyor'}
+          </p>
+          {title && <p className="text-white/60 text-xs max-w-[90%] truncate">{title}</p>}
+        </div>
+      )}
+
       {/* ── loading spinner ── */}
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
@@ -473,10 +714,10 @@ export function VideoPlayer({
       {/* ── controls layer ── */}
       <div
         className={cn(
-          'absolute inset-0 flex flex-col justify-end transition-opacity duration-300',
+          'absolute inset-0 flex flex-col justify-end transition-opacity duration-300 z-20',
           effectiveControls ? 'opacity-100' : 'opacity-0 pointer-events-none',
         )}
-        onClick={(e) => { if (e.target === e.currentTarget) togglePlay(); }}
+        onClick={(e) => { if (e.target === e.currentTarget && !isCasting) togglePlay(); }}
       >
         {/* vignette */}
         <div
@@ -665,6 +906,22 @@ export function VideoPlayer({
                 aria-hidden="true"
               />
             </CtrlBtn>
+
+            {/* cast */}
+            {enableCast && castState !== 'unavailable' && (
+              <CtrlBtn
+                onClick={toggleCast}
+                aria-label={castState === 'connected' ? 'Stop casting' : 'Cast to device'}
+                aria-pressed={castState === 'connected'}
+                active={castState === 'connected' || castState === 'connecting'}
+              >
+                <FontAwesomeIcon
+                  icon={faChromecast}
+                  className={cn('text-sm', castState === 'connecting' && 'animate-pulse')}
+                  aria-hidden="true"
+                />
+              </CtrlBtn>
+            )}
 
             {/* fullscreen */}
             <CtrlBtn onClick={toggleFullscreen} aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>
