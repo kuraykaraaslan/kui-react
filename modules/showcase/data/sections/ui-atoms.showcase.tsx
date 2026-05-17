@@ -6,6 +6,8 @@ import { buildSpinnerData } from './ui-atom-spinner.showcase';
 import { buildSkeletonData } from './ui-atom-skeleton.showcase';
 import { buildButtonGroupData } from './ui-atom-button-group.showcase';
 import { buildSkipLinkData } from './ui-atom-skip-link.showcase';
+import { buildBrandLogoData } from './ui-atom-brand-logo.showcase';
+import { buildStarRatingData } from './ui-atom-star-rating.showcase';
 import type { ShowcaseComponent } from '../showcase.types';
 
 export function buildAtomsData(): ShowcaseComponent[] {
@@ -17,5 +19,7 @@ export function buildAtomsData(): ShowcaseComponent[] {
     ...buildSkeletonData(),
     ...buildButtonGroupData(),
     ...buildSkipLinkData(),
+    ...buildBrandLogoData(),
+    ...buildStarRatingData(),
   ];
 }

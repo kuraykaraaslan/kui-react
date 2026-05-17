@@ -7,6 +7,8 @@ import { OrderStatusBadge } from '@/modules/domains/commerce/order/OrderStatusBa
 import { ProductCard } from '@/modules/domains/commerce/product/ProductCard';
 import { OrderCard } from '@/modules/domains/commerce/order/OrderCard';
 import { CartItem } from '@/modules/domains/commerce/cart/CartItem';
+import { WishlistItemCard } from '@/modules/domains/commerce/wishlist/WishlistItemCard';
+import { EmptyWishlistState } from '@/modules/domains/commerce/wishlist/EmptyWishlistState';
 import type { ProductStatus, ProductType, StockStatus, OrderStatus } from '@/modules/domains/commerce/types';
 
 /* ─── demo data ─── */
@@ -330,6 +332,104 @@ export function buildCommerceDomainData(): ShowcaseComponent[] {
             </div>
           ),
           code: `<CartItem item={{ ...item, quantity: 2 }} />`,
+        },
+      ],
+    },
+    {
+      id: 'commerce-wishlist-item-card',
+      title: 'WishlistItemCard',
+      category: 'Domain',
+      abbr: 'WI',
+      description: 'Wishlist row card: product image, current price, sale strikethrough, price-drop badge, move-to-cart and remove actions.',
+      filePath: 'modules/domains/commerce/wishlist/WishlistItemCard.tsx',
+      sourceCode: `import { WishlistItemCard } from '@/modules/domains/commerce/wishlist/WishlistItemCard';
+<WishlistItemCard item={item} onMoveToCart={…} onRemove={…} />`,
+      variants: [
+        {
+          title: 'On sale with price drop',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-2xl">
+              <WishlistItemCard
+                item={{
+                  productId: 'demo-1',
+                  title: 'Sony WH-1000XM5 Headphones',
+                  image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80',
+                  basePrice: 399,
+                  salePrice: 279,
+                  currency: 'USD',
+                  stockStatus: 'IN_STOCK',
+                  addedAt: new Date('2026-04-12'),
+                  priceWhenAdded: 349,
+                }}
+                onMoveToCart={() => {}}
+                onRemove={() => {}}
+              />
+            </div>
+          ),
+          code: `<WishlistItemCard item={{ …, salePrice: 279, priceWhenAdded: 349 }} onMoveToCart={…} onRemove={…} />`,
+        },
+        {
+          title: 'Out of stock',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-2xl">
+              <WishlistItemCard
+                item={{
+                  productId: 'demo-2',
+                  title: 'Limited Edition Sneakers',
+                  image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80',
+                  basePrice: 220,
+                  currency: 'USD',
+                  stockStatus: 'OUT_OF_STOCK',
+                  addedAt: new Date('2026-05-01'),
+                }}
+                onMoveToCart={() => {}}
+                onRemove={() => {}}
+              />
+            </div>
+          ),
+          code: `<WishlistItemCard item={{ …, stockStatus: 'OUT_OF_STOCK' }} onMoveToCart={…} onRemove={…} />`,
+        },
+      ],
+    },
+    {
+      id: 'commerce-empty-wishlist-state',
+      title: 'EmptyWishlistState',
+      category: 'Domain',
+      abbr: 'EW',
+      description: 'Empty state for an empty wishlist with an optional recommendations grid.',
+      filePath: 'modules/domains/commerce/wishlist/EmptyWishlistState.tsx',
+      sourceCode: `import { EmptyWishlistState } from '@/modules/domains/commerce/wishlist/EmptyWishlistState';
+<EmptyWishlistState browseHref="/products" recommendations={[…]} />`,
+      variants: [
+        {
+          title: 'With recommendations',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-2xl">
+              <EmptyWishlistState
+                browseHref="#"
+                recommendations={[
+                  { productId: 'r1', title: 'MacBook Pro', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300&q=80' },
+                  { productId: 'r2', title: 'Sony Headphones', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&q=80' },
+                  { productId: 'r3', title: 'Cotton T-Shirt', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&q=80' },
+                  { productId: 'r4', title: 'Coffee Beans', image: 'https://images.unsplash.com/photo-1442550528053-c431ecb55509?w=300&q=80' },
+                ]}
+              />
+            </div>
+          ),
+          code: `<EmptyWishlistState recommendations={[…]} />`,
+        },
+        {
+          title: 'Minimal',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-2xl">
+              <EmptyWishlistState browseHref="#" />
+            </div>
+          ),
+          code: `<EmptyWishlistState browseHref="/products" />`,
         },
       ],
     },

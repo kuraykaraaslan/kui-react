@@ -12,6 +12,9 @@ import { EndpointRow } from '@/modules/domains/api-doc/EndpointRow';
 import { ServerSelector } from '@/modules/domains/api-doc/ServerSelector';
 import { ApiTagSection } from '@/modules/domains/api-doc/ApiTagSection';
 import { OperationPanel } from '@/modules/domains/api-doc/OperationPanel';
+import { AuthSchemeCard } from '@/modules/domains/api-doc/AuthSchemeCard';
+import { OAuthFlowDiagram } from '@/modules/domains/api-doc/OAuthFlowDiagram';
+import { ApiKeyTokenCard } from '@/modules/domains/api-doc/ApiKeyTokenCard';
 import type { Operation, Parameter, ApiResponse, SchemaObject, ApiServer, ApiSpec } from '@/modules/domains/api-doc/types';
 
 /* ─── sample data ─── */
@@ -828,6 +831,148 @@ curl -H "Authorization: Bearer $TOKEN" https://api.example.com/v1/users`,
   responses: [...],
 }} />`,
           layout: 'stack',
+        },
+      ],
+    },
+    {
+      id: 'api-doc-auth-scheme-card',
+      title: 'AuthSchemeCard',
+      category: 'Domain',
+      abbr: 'AK',
+      description: 'Selectable card describing a single auth scheme (apiKey, http, oauth2, openIdConnect, mutualTLS).',
+      filePath: 'modules/domains/api-doc/AuthSchemeCard.tsx',
+      sourceCode: `import { AuthSchemeCard } from '@/modules/domains/api-doc/AuthSchemeCard';
+<AuthSchemeCard name="Bearer JWT" type="http" />`,
+      variants: [
+        {
+          title: 'OAuth recommended',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-md">
+              <AuthSchemeCard
+                name="OAuth 2.0"
+                type="oauth2"
+                description="Industry-standard authorisation framework. Suitable for third-party integrations."
+                recommended
+                metaItems={[
+                  { label: 'Header', value: 'Authorization' },
+                  { label: 'Flows', value: 'Authorization Code' },
+                ]}
+                href="#"
+              />
+            </div>
+          ),
+          code: `<AuthSchemeCard name="OAuth 2.0" type="oauth2" recommended description="…" href="/auth/oauth2" />`,
+        },
+        {
+          title: 'API key',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-md">
+              <AuthSchemeCard
+                name="X-API-Key"
+                type="apiKey"
+                description="Simple static-key authentication. Best for server-to-server use only."
+                metaItems={[
+                  { label: 'In', value: 'header' },
+                  { label: 'Name', value: 'X-API-Key' },
+                ]}
+              />
+            </div>
+          ),
+          code: `<AuthSchemeCard name="X-API-Key" type="apiKey" description="…" />`,
+        },
+      ],
+    },
+    {
+      id: 'api-doc-oauth-flow-diagram',
+      title: 'OAuthFlowDiagram',
+      category: 'Domain',
+      abbr: 'OF',
+      description: 'Visual walkthrough of an OAuth 2.0 flow with actors, numbered steps, endpoints, and scopes.',
+      filePath: 'modules/domains/api-doc/OAuthFlowDiagram.tsx',
+      sourceCode: `import { OAuthFlowDiagram } from '@/modules/domains/api-doc/OAuthFlowDiagram';
+<OAuthFlowDiagram flow="authorizationCode" tokenUrl="…" authorizationUrl="…" scopes={[…]} />`,
+      variants: [
+        {
+          title: 'Authorization Code',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-xl">
+              <OAuthFlowDiagram
+                flow="authorizationCode"
+                authorizationUrl="https://example.com/oauth/authorize"
+                tokenUrl="https://example.com/oauth/token"
+                refreshUrl="https://example.com/oauth/refresh"
+                scopes={[
+                  { name: 'read:users', description: 'Read user data' },
+                  { name: 'write:users', description: 'Create or update users' },
+                ]}
+              />
+            </div>
+          ),
+          code: `<OAuthFlowDiagram flow="authorizationCode" tokenUrl="…" authorizationUrl="…" scopes={[…]} />`,
+        },
+        {
+          title: 'Client Credentials (server-to-server)',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-xl">
+              <OAuthFlowDiagram
+                flow="clientCredentials"
+                tokenUrl="https://example.com/oauth/token"
+                scopes={[{ name: 'admin', description: 'Full administrative access' }]}
+              />
+            </div>
+          ),
+          code: `<OAuthFlowDiagram flow="clientCredentials" tokenUrl="…" />`,
+        },
+      ],
+    },
+    {
+      id: 'api-doc-api-key-token-card',
+      title: 'ApiKeyTokenCard',
+      category: 'Domain',
+      abbr: 'AT',
+      description: 'Card for a single API key — reveal/hide, copy-to-clipboard, env badge, last-used metadata.',
+      filePath: 'modules/domains/api-doc/ApiKeyTokenCard.tsx',
+      sourceCode: `import { ApiKeyTokenCard } from '@/modules/domains/api-doc/ApiKeyTokenCard';
+<ApiKeyTokenCard name="Production key" token="sk_live_…" environment="production" />`,
+      variants: [
+        {
+          title: 'Production key',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-md">
+              <ApiKeyTokenCard
+                name="Production key"
+                token="sk_live_5fXa92bc8eP1q7n2yKv8u9Hd"
+                environment="production"
+                createdAt={new Date('2026-03-12')}
+                lastUsedAt={new Date('2026-05-16')}
+                scopes={['users:read', 'users:write', 'webhooks:manage']}
+              />
+            </div>
+          ),
+          code: `<ApiKeyTokenCard name="Production key" token="sk_live_…" environment="production" scopes={[…]} />`,
+        },
+        {
+          title: 'Staging key with revoke',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-md">
+              <ApiKeyTokenCard
+                name="Staging key"
+                token="sk_test_9aaB2vKn7Lm9XpQrS5tUwYzC"
+                environment="staging"
+                createdAt={new Date('2026-04-01')}
+                lastUsedAt={null}
+                scopes={['users:read']}
+                onRevoke={() => {}}
+              />
+            </div>
+          ),
+          code: `<ApiKeyTokenCard name="Staging key" token="sk_test_…" environment="staging" onRevoke={…} />`,
         },
       ],
     },

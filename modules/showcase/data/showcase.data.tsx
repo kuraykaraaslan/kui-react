@@ -21,6 +21,8 @@ import { buildTravelDomainData } from './sections/domain-travel.showcase';
 import { buildAIDomainData } from './sections/domain-ai.showcase';
 import { buildSocialDomainData } from './sections/domain-social.showcase';
 import { buildIoTDomainData } from './sections/domain-iot.showcase';
+import { buildNftDomainData } from './sections/domain-nft.showcase';
+import { buildReviewsDomainData } from './sections/domain-reviews.showcase';
 
 export function buildShowcaseData() {
   return [
@@ -45,5 +47,7 @@ export function buildShowcaseData() {
     ...buildAIDomainData(),
     ...buildSocialDomainData(),
     ...buildIoTDomainData(),
+    ...buildNftDomainData(),
+    ...buildReviewsDomainData(),
   ];
 }

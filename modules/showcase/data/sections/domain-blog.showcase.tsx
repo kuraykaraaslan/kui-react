@@ -8,6 +8,9 @@ import { CategoryBadge } from '@/modules/domains/blog/category/CategoryBadge';
 import { CommentForm } from '@/modules/domains/blog/comment/CommentForm';
 import { CommentItem } from '@/modules/domains/blog/comment/CommentItem';
 import { CommentList } from '@/modules/domains/blog/comment/CommentList';
+import { AuthorBioCard } from '@/modules/domains/blog/author/AuthorBioCard';
+import { TopicCloud } from '@/modules/domains/blog/author/TopicCloud';
+import { AuthorStatsRow } from '@/modules/domains/blog/author/AuthorStatsRow';
 import type { PostWithData, Comment } from '@/modules/domains/blog/types';
 
 /* ─── demo data ─── */
@@ -442,6 +445,126 @@ import { CommentList } from '@/modules/domains/blog/comment/CommentList';
       variants: [
         { title: 'With comments', layout: 'stack', preview: <CommentListFullDemo />, code: `<CommentList comments={comments} postId={post.postId} onSubmitComment={handleSubmit} />` },
         { title: 'Empty state', layout: 'stack', preview: <CommentListEmptyDemo />, code: `<CommentList comments={[]} postId={post.postId} onSubmitComment={handleSubmit} />` },
+      ],
+    },
+    {
+      id: 'blog-author-bio-card',
+      title: 'AuthorBioCard',
+      category: 'Domain',
+      abbr: 'AB',
+      description: 'Author profile header with avatar, bio, role/verified badges, and social links.',
+      filePath: 'modules/domains/blog/author/AuthorBioCard.tsx',
+      sourceCode: `import { AuthorBioCard } from '@/modules/domains/blog/author/AuthorBioCard';
+<AuthorBioCard name="John Nolan" biography="…" socials={{ twitter: '…' }} />`,
+      variants: [
+        {
+          title: 'Verified author with socials',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-xl">
+              <AuthorBioCard
+                name="John Nolan"
+                username="jnolan"
+                biography="Late-career rookie. Notes from the field on systems, teams, and craft."
+                role="Senior Editor"
+                verified
+                joinedAt={new Date('2024-08-10')}
+                socials={{ twitter: 'https://x.com/jnolan', linkedin: 'https://linkedin.com/in/jnolan', github: 'https://github.com/jnolan', website: 'https://example.com' }}
+              />
+            </div>
+          ),
+          code: `<AuthorBioCard name="John Nolan" verified role="Senior Editor" socials={{ twitter, linkedin, github }} />`,
+        },
+        {
+          title: 'Minimal author with follow',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-xl">
+              <AuthorBioCard
+                name="Oscar Reed"
+                username="oscarreed"
+                biography="Design systems writer focused on rhythm, grids, and clarity."
+                isFollowing={false}
+                onFollow={() => {}}
+              />
+            </div>
+          ),
+          code: `<AuthorBioCard name="Oscar Reed" username="oscarreed" onFollow={…} />`,
+        },
+      ],
+    },
+    {
+      id: 'blog-topic-cloud',
+      title: 'TopicCloud',
+      category: 'Domain',
+      abbr: 'TC',
+      description: 'Weighted tag cloud where each topic is sized by its post count.',
+      filePath: 'modules/domains/blog/author/TopicCloud.tsx',
+      sourceCode: `import { TopicCloud } from '@/modules/domains/blog/author/TopicCloud';
+<TopicCloud topics={[{ label: 'React', count: 12 }, …]} />`,
+      variants: [
+        {
+          title: 'Mixed counts',
+          layout: 'stack',
+          preview: (
+            <TopicCloud
+              topics={[
+                { label: 'React', count: 24 },
+                { label: 'Design systems', count: 18 },
+                { label: 'Editorial', count: 12 },
+                { label: 'Strategy', count: 9 },
+                { label: 'Research', count: 6 },
+                { label: 'Typography', count: 4 },
+                { label: 'Accessibility', count: 3 },
+              ]}
+            />
+          ),
+          code: `<TopicCloud topics={topics} />`,
+        },
+        {
+          title: 'Compact range',
+          layout: 'stack',
+          preview: (
+            <TopicCloud
+              topics={[
+                { label: 'JavaScript', count: 8, href: '#' },
+                { label: 'TypeScript', count: 7, href: '#' },
+                { label: 'Next.js', count: 6, href: '#' },
+              ]}
+              minSize={0.85}
+              maxSize={1.1}
+            />
+          ),
+          code: `<TopicCloud topics={topics} minSize={0.85} maxSize={1.1} />`,
+        },
+      ],
+    },
+    {
+      id: 'blog-author-stats-row',
+      title: 'AuthorStatsRow',
+      category: 'Domain',
+      abbr: 'AS',
+      description: 'Horizontal stat strip for an author profile — posts, views, comments, likes, followers.',
+      filePath: 'modules/domains/blog/author/AuthorStatsRow.tsx',
+      sourceCode: `import { AuthorStatsRow } from '@/modules/domains/blog/author/AuthorStatsRow';
+<AuthorStatsRow stats={{ posts: 42, views: 18400 }} />`,
+      variants: [
+        {
+          title: 'All stats',
+          layout: 'stack',
+          preview: (
+            <AuthorStatsRow
+              stats={{ posts: 42, views: 18400, comments: 312, likes: 2640, followers: 1280 }}
+            />
+          ),
+          code: `<AuthorStatsRow stats={{ posts, views, comments, likes, followers }} />`,
+        },
+        {
+          title: 'Posts + followers',
+          layout: 'stack',
+          preview: <AuthorStatsRow stats={{ posts: 12, followers: 480 }} />,
+          code: `<AuthorStatsRow stats={{ posts: 12, followers: 480 }} />`,
+        },
       ],
     },
   ];

@@ -19,6 +19,20 @@ export type PlaygroundDef = {
   generateCode?: (props: Record<string, unknown>) => string;
 };
 
+export type WcagLevel = 'A' | 'AA' | 'AAA';
+
+export type KeyboardInteraction = {
+  keys: string;
+  action: string;
+};
+
+export type A11yMetadata = {
+  wcagLevel?: WcagLevel;
+  ariaPatterns?: string[];
+  keyboardInteractions?: KeyboardInteraction[];
+  notes?: string;
+};
+
 export type ShowcaseComponent = {
   id: string;
   title: string;
@@ -31,4 +45,14 @@ export type ShowcaseComponent = {
   status?: ComponentStatus;
   since?: string;
   playground?: PlaygroundDef;
+
+  // Optional AI-discoverability metadata. All optional so existing entries
+  // remain backward compatible. Surfaced via /api/registry and llms.txt.
+  whenToUse?: string;
+  whenNotToUse?: string;
+  composes?: string[];        // component IDs this depends on
+  relatedTo?: string[];       // sibling component IDs
+  a11y?: A11yMetadata;
+  designTokens?: string[];    // CSS variable names consumed
+  dependencies?: string[];    // npm packages required at runtime
 };

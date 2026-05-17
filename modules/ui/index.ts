@@ -15,6 +15,7 @@ export { Select } from './Select';
 export type { SelectOption } from './Select';
 export { SkipLink, LiveRegion, Announcer } from './SkipLink';
 export { Spinner } from './Spinner';
+export { StarRating } from './StarRating';
 export { StatCard } from './StatCard';
 export { Textarea } from './Textarea';
 export { Toggle } from './Toggle';

@@ -6,6 +6,11 @@ import { AlertSeverityBadge } from '@/modules/domains/iot/alert/AlertSeverityBad
 import { DeviceCard } from '@/modules/domains/iot/device/DeviceCard';
 import { CloudWorkspaceCard } from '@/modules/domains/iot/workspace/CloudWorkspaceCard';
 import { RulesetEditor } from '@/modules/domains/iot/ruleset/RulesetEditor';
+import { MetricSparklineCard } from '@/modules/domains/iot/telemetry/MetricSparklineCard';
+import { TelemetryTimeSeriesChart } from '@/modules/domains/iot/telemetry/TelemetryTimeSeriesChart';
+import { LogStreamRow } from '@/modules/domains/iot/telemetry/LogStreamRow';
+import { AlertDetailHeader } from '@/modules/domains/iot/alert/AlertDetailHeader';
+import { AlertEventTimeline } from '@/modules/domains/iot/alert/AlertEventTimeline';
 import type { Device, CloudWorkspace, RuleNode, RuleEdge } from '@/modules/domains/iot/types';
 
 /* ─── demo data ─── */
@@ -349,6 +354,172 @@ export function RulesetEditor({ initialNodes, initialEdges, readOnly, className 
             </div>
           ),
           code: `<RulesetEditor />`,
+        },
+      ],
+    },
+    {
+      id: 'iot-metric-sparkline-card',
+      title: 'MetricSparklineCard',
+      category: 'Domain',
+      abbr: 'MS',
+      description: 'KPI tile with current value, unit, delta-vs-prev, and an inline SVG sparkline. No deps.',
+      filePath: 'modules/domains/iot/telemetry/MetricSparklineCard.tsx',
+      sourceCode: `import { MetricSparklineCard } from '@/modules/domains/iot/telemetry/MetricSparklineCard';
+<MetricSparklineCard label="CPU" value={36} unit="%" series={[28,30,33,...]} deltaPct={5.2} goodWhen="down" />`,
+      variants: [
+        {
+          title: 'Four KPIs',
+          layout: 'stack',
+          preview: (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <MetricSparklineCard label="CPU"        value={36}  unit="%"   series={[28, 30, 33, 31, 36, 38, 35, 34, 37, 36]} deltaPct={5.2}  goodWhen="down" />
+              <MetricSparklineCard label="Memory"     value={63}  unit="%"   series={[58, 60, 61, 62, 60, 63, 64, 62, 61, 63]} deltaPct={1.8}  goodWhen="down" />
+              <MetricSparklineCard label="Network"    value={148} unit="kb/s" series={[120, 130, 110, 140, 138, 142, 150, 144, 150, 148]} deltaPct={-3.1} goodWhen="up" />
+              <MetricSparklineCard label="Temp"       value={66}  unit="°C"  series={[62, 63, 64, 66, 68, 67, 69, 66]} deltaPct={4.4} goodWhen="down" />
+            </div>
+          ),
+          code: `<MetricSparklineCard label="CPU" value={36} unit="%" series={[...]} deltaPct={5.2} goodWhen="down" />`,
+        },
+        {
+          title: 'No delta',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-xs">
+              <MetricSparklineCard label="Idle metric" value="—" series={[1, 1, 1, 1]} />
+            </div>
+          ),
+          code: `<MetricSparklineCard label="Idle metric" value="—" series={[1,1,1,1]} />`,
+        },
+      ],
+    },
+    {
+      id: 'iot-telemetry-time-series-chart',
+      title: 'TelemetryTimeSeriesChart',
+      category: 'Domain',
+      abbr: 'TS',
+      description: 'Multi-line time-series chart built on chart.js. Supports any number of series with custom colors.',
+      filePath: 'modules/domains/iot/telemetry/TelemetryTimeSeriesChart.tsx',
+      sourceCode: `import { TelemetryTimeSeriesChart } from '@/modules/domains/iot/telemetry/TelemetryTimeSeriesChart';
+<TelemetryTimeSeriesChart title="..." labels={['12:00', ...]} series={[{ label, color, data }]} />`,
+      variants: [
+        {
+          title: 'Vibration / Temp / RPM',
+          layout: 'stack',
+          preview: (
+            <TelemetryTimeSeriesChart
+              title="Vibration, temperature, RPM"
+              subtitle="Last 35 minutes · 5-minute resolution"
+              labels={['12:00', '12:05', '12:10', '12:15', '12:20', '12:25', '12:30', '12:35']}
+              series={[
+                { label: 'Vibration (G)',  color: 'rgba(239, 68, 68, 1)',  data: [0.9, 1.1, 1.0, 1.2, 1.4, 1.3, 1.5, 1.2] },
+                { label: 'Temperature (°C × 0.1)', color: 'rgba(245, 158, 11, 1)', data: [6.2, 6.3, 6.4, 6.6, 6.8, 6.7, 6.9, 6.6] },
+                { label: 'RPM (× 0.01)',   color: 'rgba(59, 130, 246, 1)', data: [14.1, 14.3, 14.5, 14.7, 14.9, 14.8, 15, 14.6] },
+              ]}
+            />
+          ),
+          code: `<TelemetryTimeSeriesChart title="..." labels={[...]} series={[{ label, color, data }, ...]} />`,
+        },
+      ],
+    },
+    {
+      id: 'iot-log-stream-row',
+      title: 'LogStreamRow',
+      category: 'Domain',
+      abbr: 'LS',
+      description: 'Monospace log entry: timestamp, level tag (DBG/INF/WRN/ERR/FTL), source, and message body.',
+      filePath: 'modules/domains/iot/telemetry/LogStreamRow.tsx',
+      sourceCode: `import { LogStreamRow } from '@/modules/domains/iot/telemetry/LogStreamRow';
+<LogStreamRow timestamp={date} level="info" source="mqtt.client" message="..." />`,
+      variants: [
+        {
+          title: 'All five levels',
+          layout: 'stack',
+          preview: (
+            <ol className="rounded-xl border border-border overflow-hidden bg-surface-base max-w-3xl">
+              <LogStreamRow timestamp={new Date()} level="debug" source="sensor.driver" message="Read cycle 0x9F1 — within tolerance" />
+              <LogStreamRow timestamp={new Date()} level="info"  source="mqtt.client"   message="Published telemetry payload (4 fields, 218 bytes)" />
+              <LogStreamRow timestamp={new Date()} level="warn"  source="rule.engine"   message='Vibration trending up — re-check at next sample' />
+              <LogStreamRow timestamp={new Date()} level="error" source="firmware.watch" message="Calibration timer reset due to missed tick" />
+              <LogStreamRow timestamp={new Date()} level="fatal" source="kernel"        message="Subsystem panic — restarting in 5s" />
+            </ol>
+          ),
+          code: `<LogStreamRow timestamp={date} level="warn" source="..." message="..." />`,
+        },
+      ],
+    },
+    {
+      id: 'iot-alert-detail-header',
+      title: 'AlertDetailHeader',
+      category: 'Domain',
+      abbr: 'AH',
+      description: 'Header for an alert detail page: severity + status badges, device link, opened timestamp, action buttons.',
+      filePath: 'modules/domains/iot/alert/AlertDetailHeader.tsx',
+      sourceCode: `import { AlertDetailHeader } from '@/modules/domains/iot/alert/AlertDetailHeader';
+<AlertDetailHeader title="..." severity="CRITICAL" status="OPEN" deviceName="..." openedAt={date} onAcknowledge={...} />`,
+      variants: [
+        {
+          title: 'Critical / open',
+          layout: 'stack',
+          preview: (
+            <AlertDetailHeader
+              title="Temperature threshold exceeded"
+              message="Coolant temperature reached 94°C — above the critical threshold of 85°C. Immediate inspection required."
+              severity="CRITICAL"
+              status="OPEN"
+              deviceName="Coolant Temp Monitor"
+              deviceHref="#"
+              openedAt={new Date(Date.now() - 720_000)}
+              onAcknowledge={() => undefined}
+              onResolve={() => undefined}
+              onOpenRunbook={() => undefined}
+            />
+          ),
+          code: `<AlertDetailHeader title="…" severity="CRITICAL" status="OPEN" deviceName="…" openedAt={date} />`,
+        },
+        {
+          title: 'Warning / acknowledged',
+          layout: 'stack',
+          preview: (
+            <AlertDetailHeader
+              title="Vibration spike detected"
+              message="Vibration reading exceeded 8.2 G on axis Z. Sensor A1 may require recalibration."
+              severity="WARNING"
+              status="ACKNOWLEDGED"
+              deviceName="Press Line Sensor A1"
+              openedAt={new Date(Date.now() - 3_600_000)}
+              onResolve={() => undefined}
+              onOpenRunbook={() => undefined}
+            />
+          ),
+          code: `<AlertDetailHeader severity="WARNING" status="ACKNOWLEDGED" />`,
+        },
+      ],
+    },
+    {
+      id: 'iot-alert-event-timeline',
+      title: 'AlertEventTimeline',
+      category: 'Domain',
+      abbr: 'AE',
+      description: 'Chronological event log for an alert: opened → acknowledged → resolved, with operator notes.',
+      filePath: 'modules/domains/iot/alert/AlertEventTimeline.tsx',
+      sourceCode: `import { AlertEventTimeline } from '@/modules/domains/iot/alert/AlertEventTimeline';
+<AlertEventTimeline events={[{ eventId, kind: 'opened', by, at, note }]} />`,
+      variants: [
+        {
+          title: 'Five event kinds',
+          layout: 'stack',
+          preview: (
+            <AlertEventTimeline
+              events={[
+                { eventId: 'e1', kind: 'opened',       by: 'rule-engine', at: new Date(Date.now() - 720_000), note: 'Triggered by rule "Coolant > 85°C".' },
+                { eventId: 'e2', kind: 'automation',   by: 'paging-bot',  at: new Date(Date.now() - 700_000), note: 'On-call paged via SMS + Slack.' },
+                { eventId: 'e3', kind: 'note',         by: 'jane.k',      at: new Date(Date.now() - 540_000), note: 'Investigating — coolant pump pressure normal.' },
+                { eventId: 'e4', kind: 'acknowledged', by: 'mike.t',      at: new Date(Date.now() - 300_000) },
+                { eventId: 'e5', kind: 'resolved',     by: 'mike.t',      at: new Date(Date.now() - 60_000),  note: 'Faulty sensor replaced.' },
+              ]}
+            />
+          ),
+          code: `<AlertEventTimeline events={[{ kind: 'opened', ... }, { kind: 'resolved', ... }]} />`,
         },
       ],
     },

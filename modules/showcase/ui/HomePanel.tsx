@@ -40,6 +40,8 @@ const themes: { label: string; href: string; desc: string; screenshot: string }[
   { label: 'Real Estate',     href: '/theme/real-estate', desc: 'Property listings & search',                screenshot: '/assets/img/screenshot-real-estate.png' },
   { label: 'Travel',          href: '/theme/travel',      desc: 'Flight & hotel booking',                    screenshot: '/assets/img/screenshot-travel.png' },
   { label: 'Social',          href: '/theme/social',      desc: 'Social network with feed, chat & marketplace', screenshot: '/assets/img/screenshot-social.png' },
+  { label: 'IoT Platform',    href: '/theme/iot',         desc: 'Device fleet, telemetry & rule engine',     screenshot: '/assets/img/screenshot-iot.png' },
+  { label: 'NFT Marketplace', href: '/theme/nft',         desc: 'Collections, auctions & wallet connect',    screenshot: '/assets/img/screenshot-nft.png' },
 ];
 
 export function HomePanel() {

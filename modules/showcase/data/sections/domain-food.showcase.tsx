@@ -5,6 +5,12 @@ import { OrderStatusBadge } from '@/modules/domains/food/order/OrderStatusBadge'
 import { DeliveryStatusBadge } from '@/modules/domains/food/order/DeliveryStatusBadge';
 import { RestaurantCard } from '@/modules/domains/food/restaurant/RestaurantCard';
 import { MenuItemCard } from '@/modules/domains/food/menu/MenuItemCard';
+import { OrderTrackingTimeline } from '@/modules/domains/food/order/OrderTrackingTimeline';
+import { CourierCard } from '@/modules/domains/food/order/CourierCard';
+import { EtaCountdownCard } from '@/modules/domains/food/order/EtaCountdownCard';
+import { CuisineHeroBanner } from '@/modules/domains/food/cuisine/CuisineHeroBanner';
+import { CuisineTagChip } from '@/modules/domains/food/cuisine/CuisineTagChip';
+import { FeaturedDishCard } from '@/modules/domains/food/menu/FeaturedDishCard';
 
 /* ─── demo data ─── */
 
@@ -258,6 +264,269 @@ export function buildFoodDomainData(): ShowcaseComponent[] {
             </div>
           ),
           code: `<MenuItemCard item={{ ...item, status: 'OUT_OF_STOCK' }} />`,
+        },
+      ],
+    },
+    {
+      id: 'food-order-tracking-timeline',
+      title: 'OrderTrackingTimeline',
+      category: 'Domain',
+      abbr: 'OT',
+      description: 'Vertical timeline of order milestones (placed → preparing → on the way → delivered) with timestamps.',
+      filePath: 'modules/domains/food/order/OrderTrackingTimeline.tsx',
+      sourceCode: `import { OrderTrackingTimeline } from '@/modules/domains/food/order/OrderTrackingTimeline';
+<OrderTrackingTimeline steps={[{ key: 'PLACED', label: 'Order placed', occurredAt: date }]} />`,
+      variants: [
+        {
+          title: 'In progress',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-md">
+              <OrderTrackingTimeline
+                steps={[
+                  { key: 'PLACED',     label: 'Order placed',           occurredAt: '2026-05-08T12:10:00Z' },
+                  { key: 'PREPARING',  label: 'Restaurant is preparing', occurredAt: '2026-05-08T12:12:00Z' },
+                  { key: 'READY',      label: 'Ready for pickup',        occurredAt: '2026-05-08T12:34:00Z' },
+                  { key: 'ON_THE_WAY', label: 'Out for delivery',        occurredAt: '2026-05-08T12:42:00Z', isCurrent: true },
+                  { key: 'DELIVERED',  label: 'Delivered' },
+                ]}
+              />
+            </div>
+          ),
+          code: `<OrderTrackingTimeline steps={[{ key: 'PLACED', ... }, { key: 'ON_THE_WAY', isCurrent: true }, { key: 'DELIVERED' }]} />`,
+        },
+        {
+          title: 'Cancelled',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-md">
+              <OrderTrackingTimeline
+                steps={[
+                  { key: 'PLACED',    label: 'Order placed',  occurredAt: '2026-05-06T20:45:00Z' },
+                  { key: 'CANCELLED', label: 'Order cancelled', description: 'Restaurant declined the order.', occurredAt: '2026-05-06T20:47:00Z' },
+                ]}
+              />
+            </div>
+          ),
+          code: `<OrderTrackingTimeline steps={[{ key: 'PLACED', ... }, { key: 'CANCELLED', occurredAt: date }]} />`,
+        },
+      ],
+    },
+    {
+      id: 'food-courier-card',
+      title: 'CourierCard',
+      category: 'Domain',
+      abbr: 'CR',
+      description: 'Delivery courier summary: avatar with online dot, vehicle, rating, and call / message actions.',
+      filePath: 'modules/domains/food/order/CourierCard.tsx',
+      sourceCode: `import { CourierCard } from '@/modules/domains/food/order/CourierCard';
+<CourierCard courier={{ name, vehicle, rating, online }} onCall={...} onMessage={...} />`,
+      variants: [
+        {
+          title: 'Scooter, online',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-md">
+              <CourierCard
+                courier={{
+                  name: 'Marco Bianchi',
+                  rating: 4.92,
+                  reviewCount: 1834,
+                  vehicle: 'scooter',
+                  vehicleLabel: 'Vespa · 124-AB-89',
+                  online: true,
+                }}
+                onCall={() => undefined}
+                onMessage={() => undefined}
+              />
+            </div>
+          ),
+          code: `<CourierCard courier={{ name, vehicle: 'scooter', rating: 4.9, online: true }} onCall={...} />`,
+        },
+        {
+          title: 'Bike, no actions',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-md">
+              <CourierCard
+                courier={{
+                  name: 'Lia Patel',
+                  rating: 4.78,
+                  reviewCount: 612,
+                  vehicle: 'bike',
+                  online: false,
+                }}
+              />
+            </div>
+          ),
+          code: `<CourierCard courier={{ name, vehicle: 'bike', rating: 4.78, online: false }} />`,
+        },
+      ],
+    },
+    {
+      id: 'food-eta-countdown-card',
+      title: 'EtaCountdownCard',
+      category: 'Domain',
+      abbr: 'EC',
+      description: 'Live ETA tile: shows minutes remaining and arrival clock time. Auto-refreshes every 30s.',
+      filePath: 'modules/domains/food/order/EtaCountdownCard.tsx',
+      sourceCode: `import { EtaCountdownCard } from '@/modules/domains/food/order/EtaCountdownCard';
+<EtaCountdownCard estimatedArrival={date} destinationLabel="..." />`,
+      variants: [
+        {
+          title: 'Default',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-xs">
+              <EtaCountdownCard
+                estimatedArrival={new Date(Date.now() + 14 * 60_000).toISOString()}
+                destinationLabel="221B Baker St · Apt 4"
+              />
+            </div>
+          ),
+          code: `<EtaCountdownCard estimatedArrival={isoString} destinationLabel="..." />`,
+        },
+        {
+          title: 'Urgent (≤ 5 min)',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-xs">
+              <EtaCountdownCard
+                estimatedArrival={new Date(Date.now() + 3 * 60_000).toISOString()}
+                destinationLabel="221B Baker St"
+              />
+            </div>
+          ),
+          code: `<EtaCountdownCard estimatedArrival={near} variant="urgent" />`,
+        },
+      ],
+    },
+    {
+      id: 'food-cuisine-hero-banner',
+      title: 'CuisineHeroBanner',
+      category: 'Domain',
+      abbr: 'CB',
+      description: 'Hero banner for a cuisine landing page: icon, headline, description, key stats over a tinted image.',
+      filePath: 'modules/domains/food/cuisine/CuisineHeroBanner.tsx',
+      sourceCode: `import { CuisineHeroBanner } from '@/modules/domains/food/cuisine/CuisineHeroBanner';
+<CuisineHeroBanner cuisine="Italian" description="…" icon="pizza" restaurantCount={5} averageRating={4.7} averageDeliveryMin={32} />`,
+      variants: [
+        {
+          title: 'Italian',
+          layout: 'stack',
+          preview: (
+            <CuisineHeroBanner
+              cuisine="Italian"
+              icon="pizza"
+              description="Wood-fired pizzas and fresh handmade pasta from the best Italian kitchens in town."
+              restaurantCount={12}
+              averageRating={4.7}
+              averageDeliveryMin={32}
+            />
+          ),
+          code: `<CuisineHeroBanner cuisine="Italian" icon="pizza" description="..." restaurantCount={12} averageRating={4.7} averageDeliveryMin={32} />`,
+        },
+        {
+          title: 'No image, gradient fallback',
+          layout: 'stack',
+          preview: (
+            <CuisineHeroBanner
+              cuisine="Japanese"
+              icon="bowl"
+              description="Sushi, sashimi, ramen, and seasonal specials made by chefs trained in traditional Japanese technique."
+            />
+          ),
+          code: `<CuisineHeroBanner cuisine="Japanese" icon="bowl" description="…" />`,
+        },
+      ],
+    },
+    {
+      id: 'food-cuisine-tag-chip',
+      title: 'CuisineTagChip',
+      category: 'Domain',
+      abbr: 'TC',
+      description: 'Pill button for cuisine filtering. Supports selected state and an optional result count badge.',
+      filePath: 'modules/domains/food/cuisine/CuisineTagChip.tsx',
+      sourceCode: `import { CuisineTagChip } from '@/modules/domains/food/cuisine/CuisineTagChip';
+<CuisineTagChip label="Italian" selected count={12} />`,
+      variants: [
+        {
+          title: 'Selected + neutral',
+          layout: 'stack',
+          preview: (
+            <div className="flex flex-wrap gap-2">
+              <CuisineTagChip label="Italian" selected count={12} />
+              <CuisineTagChip label="Japanese" count={8} />
+              <CuisineTagChip label="Turkish" count={5} />
+              <CuisineTagChip label="Indian" count={6} />
+              <CuisineTagChip label="American" count={9} />
+            </div>
+          ),
+          code: `<CuisineTagChip label="Italian" selected count={12} />`,
+        },
+        {
+          title: 'Without counts',
+          layout: 'stack',
+          preview: (
+            <div className="flex flex-wrap gap-2">
+              <CuisineTagChip label="Vegan" />
+              <CuisineTagChip label="Healthy" selected />
+              <CuisineTagChip label="Burgers" />
+            </div>
+          ),
+          code: `<CuisineTagChip label="Healthy" selected />`,
+        },
+      ],
+    },
+    {
+      id: 'food-featured-dish-card',
+      title: 'FeaturedDishCard',
+      category: 'Domain',
+      abbr: 'FD',
+      description: 'Featured/promoted dish tile: large image, restaurant attribution, rating, prep time, optional badges.',
+      filePath: 'modules/domains/food/menu/FeaturedDishCard.tsx',
+      sourceCode: `import { FeaturedDishCard } from '@/modules/domains/food/menu/FeaturedDishCard';
+<FeaturedDishCard name="..." restaurantName="..." price={14.5} currency="USD" rating={4.8} badge="Chef pick" />`,
+      variants: [
+        {
+          title: 'Chef pick',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-xs">
+              <FeaturedDishCard
+                name="Margherita Pizza"
+                restaurantName="Bella Napoli"
+                imageUrl="https://picsum.photos/seed/dish-mi-01/800/600"
+                price={14.5}
+                currency="USD"
+                rating={4.8}
+                reviewCount={312}
+                prepTimeMin={25}
+                badge="Chef pick"
+              />
+            </div>
+          ),
+          code: `<FeaturedDishCard name="Margherita Pizza" restaurantName="Bella Napoli" price={14.5} currency="USD" badge="Chef pick" />`,
+        },
+        {
+          title: 'Hot, no badge',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-xs">
+              <FeaturedDishCard
+                name="Spicy Tonkotsu Ramen"
+                restaurantName="Sakura Bento"
+                imageUrl="https://picsum.photos/seed/dish-mi-04/800/600"
+                price={15.5}
+                currency="USD"
+                rating={4.6}
+                reviewCount={198}
+                prepTimeMin={30}
+                hot
+              />
+            </div>
+          ),
+          code: `<FeaturedDishCard name="Spicy Tonkotsu Ramen" restaurantName="Sakura Bento" price={15.5} currency="USD" hot />`,
         },
       ],
     },

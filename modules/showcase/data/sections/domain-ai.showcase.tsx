@@ -6,6 +6,9 @@ import { ModelCard } from '@/modules/domains/ai/model/ModelCard';
 import { AIJobStatusBadge } from '@/modules/domains/ai/job/AIJobStatusBadge';
 import { ChatMessage } from '@/modules/domains/ai/chat/ChatMessage';
 import { UsageStatsCard } from '@/modules/domains/ai/usage/UsageStatsCard';
+import { ModelComparisonTable, type ModelComparisonRow } from '@/modules/domains/ai/compare/ModelComparisonTable';
+import { FeatureCheckCell } from '@/modules/domains/ai/compare/FeatureCheckCell';
+import { ModelScoreSparkline } from '@/modules/domains/ai/compare/ModelScoreSparkline';
 import type { AIModel, AIChatMessage, AIUsage } from '@/modules/domains/ai/types';
 
 /* ─── demo data ─── */
@@ -74,6 +77,47 @@ const DEMO_USAGE_CHEAP: AIUsage = {
   cost: 0.00056,
   createdAt: new Date(),
 };
+
+const DEMO_COMPARE_ROWS: ModelComparisonRow[] = [
+  {
+    model: DEMO_MODEL_TEXT,
+    benchmarkScores: [62, 68, 71, 78, 81, 84, 86, 88],
+    headlineScore: 88,
+    features: { vision: 'yes', tools: 'yes', json: 'yes', streaming: 'yes' },
+  },
+  {
+    model: {
+      modelId: 'claude-3.7',
+      provider: 'ANTHROPIC',
+      name: 'Claude 3.7 Sonnet',
+      type: 'TEXT',
+      contextWindow: 200000,
+      maxOutputTokens: 8192,
+      pricingPromptPer1k: 0.003,
+      pricingCompletionPer1k: 0.015,
+      active: true,
+    } as AIModel,
+    benchmarkScores: [60, 66, 70, 74, 77, 80, 85, 89],
+    headlineScore: 89,
+    features: { vision: 'yes', tools: 'yes', json: 'yes', streaming: 'yes' },
+  },
+  {
+    model: {
+      modelId: 'gemini-2.0',
+      provider: 'GOOGLE',
+      name: 'Gemini 2.0 Pro',
+      type: 'TEXT',
+      contextWindow: 1000000,
+      maxOutputTokens: 8192,
+      pricingPromptPer1k: 0.00125,
+      pricingCompletionPer1k: 0.005,
+      active: true,
+    } as AIModel,
+    benchmarkScores: [55, 62, 65, 71, 75, 78, 82, 85],
+    headlineScore: 85,
+    features: { vision: 'yes', tools: 'partial', json: 'yes', streaming: 'yes' },
+  },
+];
 
 /* ─── builder ─── */
 
@@ -252,6 +296,122 @@ export function buildAIDomainData(): ShowcaseComponent[] {
             </div>
           ),
           code: `<ChatMessage message={{ role: 'ASSISTANT', content: '...' }} />`,
+        },
+      ],
+    },
+    {
+      id: 'ai-feature-check-cell',
+      title: 'FeatureCheckCell',
+      category: 'Domain',
+      abbr: 'FK',
+      description: 'Pill-style indicator for feature-support cells in comparison tables (yes/no/partial/preview).',
+      filePath: 'modules/domains/ai/compare/FeatureCheckCell.tsx',
+      sourceCode: `import { FeatureCheckCell } from '@/modules/domains/ai/compare/FeatureCheckCell';
+<FeatureCheckCell value="yes" />`,
+      variants: [
+        {
+          title: 'All states',
+          layout: 'stack',
+          preview: (
+            <div className="flex flex-wrap gap-2">
+              <FeatureCheckCell value="yes" />
+              <FeatureCheckCell value="no" />
+              <FeatureCheckCell value="partial" />
+              <FeatureCheckCell value="preview" />
+            </div>
+          ),
+          code: `<FeatureCheckCell value="yes" />
+<FeatureCheckCell value="no" />
+<FeatureCheckCell value="partial" />
+<FeatureCheckCell value="preview" />`,
+        },
+        {
+          title: 'Custom labels',
+          layout: 'stack',
+          preview: (
+            <div className="flex flex-wrap gap-2">
+              <FeatureCheckCell value="yes" label="Supported" />
+              <FeatureCheckCell value="partial" label="Limited" />
+            </div>
+          ),
+          code: `<FeatureCheckCell value="yes" label="Supported" />`,
+        },
+      ],
+    },
+    {
+      id: 'ai-model-score-sparkline',
+      title: 'ModelScoreSparkline',
+      category: 'Domain',
+      abbr: 'SS',
+      description: 'Compact inline sparkline for AI model benchmark scores over time.',
+      filePath: 'modules/domains/ai/compare/ModelScoreSparkline.tsx',
+      sourceCode: `import { ModelScoreSparkline } from '@/modules/domains/ai/compare/ModelScoreSparkline';
+<ModelScoreSparkline scores={[62, 68, 71, 78, 81, 84, 86, 88]} />`,
+      variants: [
+        {
+          title: 'Upward trend',
+          layout: 'stack',
+          preview: <ModelScoreSparkline scores={[62, 68, 71, 78, 81, 84, 86, 88]} label="MMLU" />,
+          code: `<ModelScoreSparkline scores={[62, 68, 71, 78, 81, 84, 86, 88]} label="MMLU" />`,
+        },
+        {
+          title: 'Wider canvas',
+          layout: 'stack',
+          preview: (
+            <ModelScoreSparkline
+              scores={[40, 45, 48, 60, 65, 70, 73, 78, 81, 85]}
+              width={220}
+              height={48}
+              label="GSM8K"
+            />
+          ),
+          code: `<ModelScoreSparkline scores={[…]} width={220} height={48} label="GSM8K" />`,
+        },
+      ],
+    },
+    {
+      id: 'ai-model-comparison-table',
+      title: 'ModelComparisonTable',
+      category: 'Domain',
+      abbr: 'MX',
+      description: 'Side-by-side table comparing AI models across price, context, benchmarks, and feature support.',
+      filePath: 'modules/domains/ai/compare/ModelComparisonTable.tsx',
+      sourceCode: `import { ModelComparisonTable } from '@/modules/domains/ai/compare/ModelComparisonTable';
+<ModelComparisonTable rows={rows} featureKeys={featureKeys} />`,
+      variants: [
+        {
+          title: 'Three models compared',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-5xl w-full overflow-x-auto">
+              <ModelComparisonTable
+                rows={DEMO_COMPARE_ROWS}
+                featureKeys={[
+                  { key: 'vision', label: 'Vision' },
+                  { key: 'tools', label: 'Tools' },
+                  { key: 'json', label: 'JSON' },
+                  { key: 'streaming', label: 'Stream' },
+                ]}
+              />
+            </div>
+          ),
+          code: `<ModelComparisonTable rows={rows} featureKeys={featureKeys} />`,
+        },
+        {
+          title: 'Two models only',
+          layout: 'stack',
+          preview: (
+            <div className="max-w-3xl w-full overflow-x-auto">
+              <ModelComparisonTable
+                rows={DEMO_COMPARE_ROWS.slice(0, 2)}
+                featureKeys={[
+                  { key: 'vision', label: 'Vision' },
+                  { key: 'tools', label: 'Tools' },
+                ]}
+              />
+            </div>
+          ),
+          code: `<ModelComparisonTable rows={rows.slice(0, 2)} featureKeys={featureKeys} />`,
         },
       ],
     },
