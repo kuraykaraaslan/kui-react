@@ -22,7 +22,8 @@ const themes = [
   { name: 'real-estate', path: '/theme/real-estate' },
   { name: 'social',      path: '/theme/social' },
   { name: 'travel',      path: '/theme/travel' },
-  { name: 'social',      path: '/theme/social' },
+  { name: 'iot',         path: '/theme/iot' },
+  { name: 'nft',         path: '/theme/nft' },
 ];
 
 const BASE_URL   = process.env.BASE_URL   || 'http://localhost:3000';
