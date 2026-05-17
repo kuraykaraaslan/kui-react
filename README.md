@@ -49,7 +49,9 @@ import { cn } from '@/libs/utils/cn';
 
 ## AI agent quick reference
 
-This library ships a first-class machine-readable surface for AI tools:
+This library ships a first-class machine-readable surface for AI tools — HTTP endpoints, static snapshots, an MCP server, and editor rule files for every major AI coding assistant.
+
+### HTTP endpoints
 
 | Resource | URL / Path | Purpose |
 |---|---|---|
@@ -57,9 +59,33 @@ This library ships a first-class machine-readable surface for AI tools:
 | Full registry (JSON) | `GET /api/registry` | Every component with full source, variants, status, tokens |
 | Index registry (JSON) | `GET /api/registry?index=1` | Same data minus `source` — ~5x smaller for search |
 | Long-form markdown | `GET /llms-full.txt` | Flattened markdown of every component — paste into a context window |
+| JSON Schema | [`/schemas/registry-v1.json`](public/schemas/registry-v1.json) | Validate registry payloads or generate typed clients |
+| Offline JSON snapshot | [`/registry/components.json`](public/registry/components.json) | Pre-built static catalog — works without dev server (`npm run registry:snapshot`) |
+| Per-component markdown | `/components/<id>.md` | One file per component — chunk-friendly retrieval |
+| Component index | [`/components/_index.json`](public/components/_index.json) | id → filename map for the markdown chunks |
 | Registry source | [`modules/registry/registry.ts`](modules/registry/registry.ts) | Derives the catalog from showcase data |
 
 The registry includes for every component: id, layer, category, file path, description, status, since, full source, every variant, design tokens consumed, accessibility metadata, dependencies, and (where authored) when-to-use guidance.
+
+### MCP server (Claude Desktop / Cursor / Cline / Windsurf / Zed)
+
+Zero-dependency stdio MCP server defined in [`.mcp.json`](.mcp.json). Tools exposed:
+
+- `list_components` · `get_component` · `search_components`
+- `list_themes` · `get_conventions` · `list_design_tokens`
+- `read_file` (sandboxed to the repository root)
+
+The server reads `public/registry/components.json` so it works offline. Refresh with `npm run registry:snapshot`. Run standalone with `npm run mcp:server`.
+
+### Editor rule files (canonical: [`AGENTS.md`](AGENTS.md))
+
+| File | Tool |
+|---|---|
+| [`.cursor/rules/kui-react.mdc`](.cursor/rules/kui-react.mdc) | Cursor (modern) |
+| [`.cursorrules`](.cursorrules) | Cursor (legacy) |
+| [`.windsurfrules`](.windsurfrules) | Windsurf |
+| [`.github/copilot-instructions.md`](.github/copilot-instructions.md) | GitHub Copilot |
+| [`.clinerules`](.clinerules) | Cline / Continue.dev |
 
 ## Adding a component
 
@@ -77,11 +103,13 @@ See the **Adding a new theme** section in [`AGENTS.md`](AGENTS.md) for the requi
 ## Scripts
 
 ```bash
-npm run dev          # development server
-npm run build        # production build
-npm run start        # production server
-npm run lint         # ESLint
-npm run screenshots  # Puppeteer-based visual capture
+npm run dev                 # development server
+npm run build               # production build
+npm run start               # production server
+npm run lint                # ESLint
+npm run screenshots         # Puppeteer-based visual capture
+npm run registry:snapshot   # write offline JSON + per-component markdown to public/
+npm run mcp:server          # start the stdio MCP server (used by .mcp.json)
 ```
 
 ## Layout conventions

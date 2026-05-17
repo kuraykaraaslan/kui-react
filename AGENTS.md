@@ -16,10 +16,15 @@ If you are an AI assistant working in this repo, **read these first**:
 |---|---|---|
 | Machine-readable catalog (JSON) | `GET /api/registry` | Every component, theme, design token, and convention. Full source inlined. |
 | Lightweight index (JSON) | `GET /api/registry?index=1` | Same shape, no `source` field — ~5x smaller, fast for search. |
+| JSON Schema | `public/schemas/registry-v1.json` (served at `/schemas/registry-v1.json`) | Validate registry payloads or codegen typed clients. |
+| Offline snapshot (JSON) | `public/registry/components.json` (served at `/registry/components.json`) | Pre-built static catalog — works without a dev server. Refresh via `npm run registry:snapshot`. |
+| Per-component markdown | `public/components/<id>.md` (served at `/components/<id>.md`) | One file per component for chunk-friendly retrieval. Index at `/components/_index.json`. |
 | Concise overview | `public/llms.txt` (served at `/llms.txt`) | One-page TL;DR pointing here. |
 | Long-form markdown dump | `GET /llms-full.txt` | Flattened markdown of the entire catalog — paste into a context window. |
+| MCP server | `.mcp.json` + `scripts/mcp-server.mjs` | Zero-dep stdio MCP server exposing the registry to Claude Desktop, Cursor, Cline, Windsurf, Zed. Run with `npm run mcp:server`. |
+| Editor rule mirrors | `.cursor/rules/kui-react.mdc`, `.cursorrules`, `.windsurfrules`, `.github/copilot-instructions.md`, `.clinerules` | Per-tool views of this file so AI assistants behave consistently. AGENTS.md remains canonical when they drift. |
 | Registry source of truth | [modules/registry/registry.ts](modules/registry/registry.ts) | Derives the catalog from showcase data + menu. |
-| Type definitions | [modules/registry/registry.types.ts](modules/registry/registry.types.ts) | Schema for the registry JSON. |
+| Type definitions | [modules/registry/registry.types.ts](modules/registry/registry.types.ts) | TypeScript types for the registry JSON. |
 
 **Search recipe:**
 ```ts

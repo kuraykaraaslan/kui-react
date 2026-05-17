@@ -15,12 +15,41 @@ is served at the registry endpoint below.
 - **Full registry (JSON):** `/api/registry`
 - **Lightweight index (JSON, no source code):** `/api/registry?index=1`
 - **Long-form markdown dump:** `/llms-full.txt`
+- **JSON Schema for validation:** `/schemas/registry-v1.json`
+- **Offline static snapshot:** `/registry/components.json` (rebuild via `npm run registry:snapshot`)
+- **Per-component markdown chunks:** `/components/<id>.md` (one file per
+  component — fetch just what you need without bundling the full registry)
+- **Markdown chunk index:** `/components/_index.json`
 
 The registry JSON includes for every component: `id`, `name`, `layer`,
 `category`, `filePath`, `description`, `source` (full inline source), every
 `variant` with its code, `status`, `since`, design tokens consumed,
 accessibility metadata, and (where authored) `whenToUse` / `whenNotToUse` /
 `composes` / `relatedTo` / `usedBy`.
+
+## MCP server (Claude Desktop / Cursor / Cline / Windsurf / Zed)
+
+Zero-dependency stdio MCP server. Config in `.mcp.json` at the repo root.
+
+Tools:
+
+- `list_components` — filter by layer (`ui` | `app` | `domain` | `theme`) or category
+- `get_component` — by id, returns full source + variants + composes + a11y
+- `search_components` — substring search over name + description + filePath
+- `list_themes` — every full-page theme demo
+- `get_conventions` — boilerplate-wide authoring rules
+- `list_design_tokens` — every CSS variable token with light/dark/purpose
+- `read_file` — read any repo file (constrained to the repository root)
+
+Reads from `public/registry/components.json`. Refresh with `npm run registry:snapshot`.
+
+## Editor-native rule files (mirror of AGENTS.md)
+
+- `.cursor/rules/kui-react.mdc` — Cursor (modern)
+- `.cursorrules` — Cursor (legacy)
+- `.windsurfrules` — Windsurf
+- `.github/copilot-instructions.md` — GitHub Copilot
+- `.clinerules` — Cline / Continue.dev
 
 ## Module layers
 
