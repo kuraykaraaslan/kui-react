@@ -1,0 +1,86 @@
+# kui-react
+
+> A modular Next.js 16 / React 19 component library organised by atomic design
+> (atoms → molecules → organisms → app patterns → industry-vertical domains →
+> full-page theme demos). Every component is copy-paste-ready from the
+> showcase site; nothing is installed from npm.
+
+This file follows the llms.txt convention so AI agents can quickly understand
+what exists in this library without grepping the codebase. A full,
+machine-readable catalog of every component + variant + design token + theme
+is served at the registry endpoint below.
+
+## Machine-readable catalog
+
+- **Full registry (JSON):** `/api/registry`
+- **Lightweight index (JSON, no source code):** `/api/registry?index=1`
+- **Long-form markdown dump:** `/llms-full.txt`
+
+The registry JSON includes for every component: `id`, `name`, `layer`,
+`category`, `filePath`, `description`, `source` (full inline source), every
+`variant` with its code, `status`, `since`, design tokens consumed,
+accessibility metadata, and (where authored) `whenToUse` / `whenNotToUse` /
+`composes` / `relatedTo` / `usedBy`.
+
+## Module layers
+
+- `modules/ui/` — Primitive components (atoms + molecules). 47 components.
+  Stateless or locally-stateful, no business logic. Every file starts with
+  `'use client'` and imports `cn` from `@/libs/utils/cn`.
+- `modules/app/` — Application-level patterns: shells, navigation, forms,
+  detail headers, providers. 25 components. May own local state.
+- `modules/domains/<vertical>/` — Industry-vertical components that compose
+  ui/ + app/. 16 verticals: ai, api-doc, blog, commerce, common, event,
+  fintech, food, forum, iot, jobs, landing, media, real-estate, social,
+  travel. Each exports a barrel `index.ts` + `types.ts` (Zod schemas).
+- `app/theme/<vertical>/` — Full multi-page theme demos. 16 themes, one per
+  domain vertical.
+
+## Imports
+
+Always import via the path alias `@/`:
+
+```ts
+import { Button } from '@/modules/ui/Button';                       // direct
+import { ProductCard } from '@/modules/domains/commerce';           // barrel
+import { Commerce } from '@/modules/domains';                       // namespace
+import { AppShell, AppSidebar, ThemeSwitcher } from '@/modules/app';
+import { cn } from '@/libs/utils/cn';
+```
+
+## Conventions (must follow)
+
+- **Icons:** Font Awesome only, named imports. No inline SVG, no lucide /
+  heroicons / react-icons.
+- **Styling:** Tailwind 4 + CSS-variable tokens (`bg-primary`,
+  `text-text-secondary`, `border-border-focus`). Never raw hex.
+- **Components:** Named exports. Inline prop types. `cn()` for classNames.
+- **Accessibility:** `focus-visible:ring-2 focus-visible:ring-border-focus`
+  on interactive elements. ARIA attributes per pattern.
+- **'use client':** every file in `modules/ui/`, `modules/app/`, and
+  `modules/domains/`. Theme `layout.tsx` is client; `page.tsx` is server
+  unless it owns state.
+
+## Where to put new code
+
+- Single-purpose primitive → `modules/ui/`
+- Composed app pattern → `modules/app/`
+- Industry-specific component → `modules/domains/<vertical>/`
+- New industry vertical → new `modules/domains/<vertical>/` + matching
+  `modules/showcase/data/sections/domain-<vertical>.showcase.tsx` + entries
+  in `modules/showcase/data/showcase.menu.ts`.
+
+## How to use this library from an AI agent
+
+1. Fetch `/api/registry?index=1` for a fast scan of every component.
+2. Filter `components[]` by `layer` / `category` / `name` to find what you need.
+3. Fetch `/api/registry` (or read the matching `filePath`) for the full source.
+4. Copy the relevant variant code from the entry's `variants[].code` field.
+5. Follow `composes[]` to discover the dependency tree you also need to copy.
+
+## More
+
+- `AGENTS.md` — detailed authoring rules, design tokens, file naming.
+- `CLAUDE.md` — same content, alternate convention name.
+- `/llms-full.txt` — every component flattened into a single markdown file.
+- Live showcase site — interactive playground with copy buttons.

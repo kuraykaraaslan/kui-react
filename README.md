@@ -1,124 +1,101 @@
-# NextJS Components Showcase
+# kui-react
 
-Modern, reusable, and domain-driven component system.
+A modular Next.js 16 / React 19 component library organised by atomic design — atoms → molecules → organisms → app patterns → industry-vertical domains → full-page theme demos. Every component is **copy-paste-ready** from the live showcase; no npm install required.
 
-This repository is designed with a layered architecture that spans from UI atoms to full-page themes, enabling interface building blocks for multiple industries (blog, event, commerce, fintech, and more).
+> **AI assistants:** start at `/llms.txt` or fetch `/api/registry` for a machine-readable catalog of every component. See the [AI agent quick reference](#ai-agent-quick-reference) below.
 
-## Highlights
+## Stack
 
-- Next.js 16.2.4 + React 19 + TypeScript 5 + Tailwind CSS 4
-- App Router-based structure
-- Layered module architecture (ui -> app -> domains -> showcase)
-- Multiple themes and sample page flows
-- Font Awesome icon standard
-- Design token-driven styling approach
+Next.js 16.2.4 · React 19.2.4 · TypeScript 5 · Tailwind CSS 4 · App Router · ESLint 9 · Zustand · Zod · Leaflet · Chart.js · Font Awesome
 
-## Tech Stack
-
-- Next.js 16.2.4
-- React 19.2.4
-- TypeScript 5
-- Tailwind CSS 4
-- ESLint 9
-- Zustand, Zod, Leaflet, Font Awesome
-
-## Quick Start
-
-Requirements:
-
-- Node.js 20+
-- npm 10+
-
-Install:
+## Quick start
 
 ```bash
 npm install
+npm run dev          # http://localhost:3000
 ```
 
-Run the development server:
+## Module layers
 
-```bash
-npm run dev
+```
+modules/
+├── ui/          ← 47 primitive components (atoms + molecules)
+├── app/         ← 25 application patterns (shells, navigation, forms, states)
+├── domains/     ← 16 industry verticals (ai, blog, commerce, event, …)
+├── registry/    ← AI-discoverability layer — machine-readable catalog builder
+└── showcase/    ← Live preview site + interactive playground
+app/theme/       ← 16 full-page theme demos, one per domain vertical
+libs/utils/      ← Shared utilities (e.g. cn)
 ```
 
-The app runs on http://localhost:3000 by default.
+Every layer builds on the one above. Business logic stays in `domains/` / `app/`; `ui/` is pure presentation.
+
+## Using a component (copy-paste path)
+
+1. Browse the live showcase, pick a component.
+2. Open the variant you want, copy its source from the **Source** tab.
+3. Drop it into your project. If it imports `cn`, copy `libs/utils/cn.ts` too.
+4. Read the component's `composes[]` field in the registry to know what other components it needs.
+
+## Using a component (in-tree path)
+
+```ts
+import { Button, Card } from '@/modules/ui';                  // top-level barrel
+import { AppShell, AppSidebar } from '@/modules/app';
+import { ProductCard, OrderCard } from '@/modules/domains/commerce';
+import { Commerce, Blog } from '@/modules/domains';           // namespace barrel
+import { cn } from '@/libs/utils/cn';
+```
+
+## AI agent quick reference
+
+This library ships a first-class machine-readable surface for AI tools:
+
+| Resource | URL / Path | Purpose |
+|---|---|---|
+| Concise overview | [`/llms.txt`](public/llms.txt) | One-page TL;DR following the llms.txt convention |
+| Full registry (JSON) | `GET /api/registry` | Every component with full source, variants, status, tokens |
+| Index registry (JSON) | `GET /api/registry?index=1` | Same data minus `source` — ~5x smaller for search |
+| Long-form markdown | `GET /llms-full.txt` | Flattened markdown of every component — paste into a context window |
+| Registry source | [`modules/registry/registry.ts`](modules/registry/registry.ts) | Derives the catalog from showcase data |
+
+The registry includes for every component: id, layer, category, file path, description, status, since, full source, every variant, design tokens consumed, accessibility metadata, dependencies, and (where authored) when-to-use guidance.
+
+## Adding a component
+
+1. Choose the right layer (`ui/`, `app/`, or `domains/<vertical>/`).
+2. Author the file. Follow the rules in [`AGENTS.md`](AGENTS.md): `'use client'`, named export, `cn()` for classNames, design tokens not raw hex, ARIA + focus-visible ring.
+3. Add a showcase entry under `modules/showcase/data/sections/` with at least 2 variants.
+4. Wire the builder into `modules/showcase/data/showcase.data.tsx`.
+5. Register in `modules/showcase/data/showcase.menu.ts`.
+6. (If new domain vertical) update `modules/domains/<vertical>/index.ts` barrel and add to `modules/domains/index.ts` namespace export.
+
+## Adding a theme
+
+See the **Adding a new theme** section in [`AGENTS.md`](AGENTS.md) for the required step order.
 
 ## Scripts
 
 ```bash
-npm run dev     # development
-npm run build   # production build
-npm run start   # production server
-npm run lint    # lint checks
+npm run dev          # development server
+npm run build        # production build
+npm run start        # production server
+npm run lint         # ESLint
+npm run screenshots  # Puppeteer-based visual capture
 ```
 
-## Project Structure
+## Layout conventions
 
-Main directories:
-
-- app/: Next.js routes, themes, and pages
-- modules/ui/: atom and molecule-level UI components
-- modules/app/: application-level component compositions
-- modules/domains/: industry-specific domain components and types
-- modules/showcase/: component documentation and preview system
-- libs/utils/: shared utilities (e.g. cn)
-
-Layering model:
-
-1. modules/ui
-2. modules/app
-3. modules/domains
-4. modules/showcase
-
-Each layer provides building blocks for the next one. The goal is to keep business logic and data flow in domain/app layers while keeping the ui layer as pure as possible.
-
-## Theme Routes
-
-Existing theme examples are grouped under app/themes.
-
-- app/theme/blog
-- app/theme/common
-- app/theme/event
-
-This structure enables different product experiences on top of the same component foundation.
-
-## Development Principles
-
-- Use named exports in UI components.
-- Prefer libs/utils/cn for className merging.
-- Follow the design token approach for styling.
-- Use Font Awesome as the icon source.
-- Build components with accessibility in mind (ARIA, focus states).
-
-## Adding a New Component
-
-1. Choose the right layer (ui, app, or domains).
-2. Add the component to the relevant directory.
-3. Include it in showcase data when needed.
-4. Run linting and type checks.
-
-## Code Quality
-
-Run lint:
-
-```bash
-npm run lint
-```
-
-For larger changes, running a production build is recommended:
-
-```bash
-npm run build
-```
+- `modules/ui/*.tsx` and `modules/app/*.tsx` start with `'use client';`.
+- Domain files in `modules/domains/<vertical>/...` are client components too.
+- Theme `layout.tsx` is a Client Component; `page.tsx` is a Server Component unless it owns local state.
+- `<main id="main-content">` lives in `layout.tsx` for the skip-link accessibility pattern.
+- All icons come from Font Awesome — no inline SVG, no other icon libraries.
 
 ## Contributing
 
-Everyone can contribute as long as the project architecture and development order are followed.
-
-See the full guide in CONTRIBUTING.md.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) and the deeper authoring rules in [`AGENTS.md`](AGENTS.md). Pull requests should pass `npm run lint` and `tsc --noEmit`.
 
 ## License
 
-This project is licensed under 0BSD.
-
-See LICENSE for details.
+0BSD — see [`LICENSE`](LICENSE).

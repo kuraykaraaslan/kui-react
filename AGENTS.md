@@ -8,6 +8,36 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ---
 
+## AI agent quick reference
+
+If you are an AI assistant working in this repo, **read these first**:
+
+| Resource | Path | Purpose |
+|---|---|---|
+| Machine-readable catalog (JSON) | `GET /api/registry` | Every component, theme, design token, and convention. Full source inlined. |
+| Lightweight index (JSON) | `GET /api/registry?index=1` | Same shape, no `source` field — ~5x smaller, fast for search. |
+| Concise overview | `public/llms.txt` (served at `/llms.txt`) | One-page TL;DR pointing here. |
+| Long-form markdown dump | `GET /llms-full.txt` | Flattened markdown of the entire catalog — paste into a context window. |
+| Registry source of truth | [modules/registry/registry.ts](modules/registry/registry.ts) | Derives the catalog from showcase data + menu. |
+| Type definitions | [modules/registry/registry.types.ts](modules/registry/registry.types.ts) | Schema for the registry JSON. |
+
+**Search recipe:**
+```ts
+// "Find me every Card-like organism in commerce"
+const reg = await fetch('/api/registry?index=1').then(r => r.json());
+const matches = reg.components.filter(c =>
+  c.layer === 'domain' &&
+  c.filePath.includes('/commerce/') &&
+  c.name.toLowerCase().includes('card')
+);
+```
+
+**Dependency resolution:** the registry's `composes[]` lists every component ID a given entry depends on; `usedBy[]` is the inverse. Follow `composes[]` recursively to know what else to copy when porting a component.
+
+**Convention check before writing code:** every component file must follow the rules in `## Component Authoring Rules` below (`'use client'`, `cn()`, named export, token-only styling, focus-visible ring, ARIA attributes).
+
+---
+
 # Project Architecture
 
 **Stack:** Next.js 16.2.4 · React 19 · TypeScript 5 · Tailwind CSS 4 · App Router
@@ -18,10 +48,11 @@ The codebase is divided into four module layers. Every layer builds on the one a
 
 ```
 modules/
-├── ui/        ← Primitive UI components (atoms & molecules)
-├── app/       ← Application-level patterns (organisms & page shells)
-├── domain/    ← Industry-vertical components (compose ui/ + app/)
-└── showcase/  ← Documentation & live preview system
+├── ui/         ← Primitive UI components (atoms & molecules)
+├── app/        ← Application-level patterns (organisms & page shells)
+├── domains/    ← Industry-vertical components (compose ui/ + app/)
+├── registry/   ← Machine-readable catalog builder (AI-discoverability layer)
+└── showcase/   ← Documentation & live preview system
 ```
 
 ---
@@ -116,31 +147,30 @@ Full page-section components that combine multiple UI molecules into usable work
 
 ---
 
-## Layer 3 — `modules/domain/` (Industry Verticals)
+## Layer 3 — `modules/domains/` (Industry Verticals)
 
-Domain-specific components that compose UI + App layers for real-world use cases. Each vertical is a sub-directory.
+Domain-specific components that compose UI + App layers for real-world use cases. Each vertical is a sub-directory with its own `index.ts` barrel + `types.ts` (Zod schemas). Import via the barrel: `import { ProductCard } from '@/modules/domains/commerce'`.
 
-| Vertical | Directory | Example components |
+For the full and always-up-to-date list with every exported component, see the registry: `GET /api/registry` (filter by `layer === 'domain'`).
+
+| Vertical | Directory | Sample components |
 |----------|-----------|-------------------|
-| E-commerce | `ecommerce/` | `ProductCard`, `ProductVariantPicker`, `AddToCartPanel`, `CartSummary`, `CheckoutAddressStep` |
-| SaaS | `saas/` | Plan cards, usage meters, team management |
-| Fintech | `fintech/` | Transaction list, balance card, transfer form |
-| Health | `health/` | Appointment card, patient record, vitals chart |
-| Education | `education/` | Course card, progress tracker, quiz component |
-| Logistics | `logistics/` | Shipment tracker, delivery timeline, route map |
-| HR | `hr/` | Employee card, leave request, org chart |
-| Real estate | `realestate/` | Property card, mortgage calculator, map pin |
-| Travel | `travel/` | Flight card, hotel booking, itinerary view |
-| Content | `content/` | Article card, rich editor toolbar, media picker |
-| Manufacturing | `manufacturing/` | Work order card, production chart, equipment status |
-| News | `news/` | News card, breaking banner, category filter |
-| Restaurant | `restaurant/` | Menu item card, order builder, table status |
-| Event | `event/` | Event card, ticket selector, schedule grid |
-| Social | `social/` | Profile card, feed item, follow button |
-| Video | `video/` | Video card, player controls, playlist |
-| Energy | `energy/` | Usage chart, tariff selector, meter reading |
-| Legal | `legal/` | Document card, clause editor, signature block |
-| Government | `government/` | Service card, form submission, status tracker |
+| AI | `ai/` | `ModelCard`, `ChatMessage`, `ChatInputBar`, `UsageStatsCard` |
+| API documentation | `api-doc/` | `EndpointRow`, `OperationPanel`, `SchemaViewer`, `ParameterTable` |
+| Blog | `blog/` | `PostCard`, `PostContent`, `CommentForm`, `CategoryBadge` |
+| Commerce | `commerce/` | `ProductCard`, `OrderCard`, `CartItem`, `StockStatusBadge` |
+| Common (cross-domain) | `common/` | `LoginForm`, `UserMenu`, `PaymentMethodSelector`, `AddressForm` |
+| Event | `event/` | `EventCard`, `TicketCard`, `SeatMapPicker`, `VenueCard` |
+| Fintech | `fintech/` | `WalletCard`, `TransactionRow`, `CryptoPriceCard`, `PortfolioDonutChart` |
+| Food | `food/` | `RestaurantCard`, `MenuItemCard`, `DeliveryStatusBadge` |
+| Forum | `forum/` | `ForumCategoryCard`, `TopicRow`, `ReactionTypeBadge` |
+| IoT | `iot/` | `DeviceCard`, `CloudWorkspaceCard`, `RulesetEditor`, `AlertSeverityBadge` |
+| Jobs | `jobs/` | `JobCard`, `CompanyCard`, `JobMeta`, `ApplicationStatusBadge` |
+| Landing | `landing/` | `HeroSection`, `PricingGrid`, `FeatureCard`, `FaqAccordion` |
+| Media | `media/` | `VideoCard`, `ChannelCard`, `VideoStatusBadge` |
+| Real estate | `real-estate/` | `PropertyCard`, `AgentCard`, `MortgageCalculator` |
+| Social | `social/` | `PostCard`, `SocialProfileCard`, `MarketplaceListingCard` |
+| Travel | `travel/` | `FlightCard`, `HotelCard`, `FlightSeatPicker`, `BookingStatusBadge` |
 
 ---
 
@@ -241,11 +271,26 @@ Each theme typically covers:
 
 ### Existing themes
 
+One theme demo per domain vertical. For the live route + status of each, see the `themes[]` array in `/api/registry`.
+
 | Theme | Route | Domain layer used |
 |-------|-------|-------------------|
-| News site | `/theme/news/` | `modules/domain/news/` |
-| E-commerce shop | `/theme/shop/` | `modules/domain/ecommerce/` |
-| Vehicle rental (Moovy) | `/theme/rental/` | `modules/domain/mobility/` |
+| AI workspace | `/theme/ai/` | `modules/domains/ai/` |
+| API docs | `/theme/api-doc/` | `modules/domains/api-doc/` |
+| Blog | `/theme/blog/` | `modules/domains/blog/` |
+| Commerce | `/theme/commerce/` | `modules/domains/commerce/` |
+| Common (auth/account) | `/theme/common/` | `modules/domains/common/` |
+| Event tickets | `/theme/event/` | `modules/domains/event/` |
+| Fintech dashboard | `/theme/fintech/` | `modules/domains/fintech/` |
+| Food / restaurant | `/theme/food/` | `modules/domains/food/` |
+| Forum | `/theme/forum/` | `modules/domains/forum/` |
+| IoT platform | `/theme/iot/` | `modules/domains/iot/` |
+| Jobs board | `/theme/jobs/` | `modules/domains/jobs/` |
+| Landing page | `/theme/landing/` | `modules/domains/landing/` |
+| Media (video) | `/theme/media/` | `modules/domains/media/` |
+| Real estate | `/theme/real-estate/` | `modules/domains/real-estate/` |
+| Social feed | `/theme/social/` | `modules/domains/social/` |
+| Travel (flight + hotel) | `/theme/travel/` | `modules/domains/travel/` |
 
 ### Adding a new theme
 
@@ -430,9 +475,11 @@ export function MyComponent({
 | Alias | Resolves to |
 |-------|-------------|
 | `@/` | Project root |
-| `@/modules/ui/` | UI components |
-| `@/modules/app/` | App patterns |
-| `@/modules/domain/` | Domain components |
+| `@/modules/ui/` | UI components (atoms + molecules) |
+| `@/modules/app/` | App patterns (organisms + page shells) |
+| `@/modules/domains/` | Domain components (industry verticals) |
+| `@/modules/domains/<vertical>` | Single vertical's barrel — `import { ProductCard } from '@/modules/domains/commerce'` |
+| `@/modules/registry/registry` | Build the AI-facing machine-readable catalog |
 | `@/libs/utils/cn` | className utility |
 
 ---
@@ -444,6 +491,7 @@ export function MyComponent({
 | Single-purpose UI element (button, badge, input) | `modules/ui/` |
 | Composed UI widget (card, modal, table) | `modules/ui/` |
 | Full page section or layout shell | `modules/app/` |
-| Industry-specific component | `modules/domain/<vertical>/` |
-| New industry vertical | `modules/domain/<vertical>/` + new `sections/domain-<vertical>.showcase.tsx` |
+| Industry-specific component | `modules/domains/<vertical>/` |
+| New industry vertical | `modules/domains/<vertical>/` + new `sections/domain-<vertical>.showcase.tsx` + add to `modules/domains/index.ts` namespace export |
 | Showcase entry for existing component | `modules/showcase/data/sections/` matching file |
+| New design token | `app/globals.css` + add to `DESIGN_TOKENS` in `modules/registry/registry.ts` |

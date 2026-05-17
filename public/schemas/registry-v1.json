@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kui-react.dev/schemas/registry-v1.json",
+  "title": "kui-react component registry",
+  "description": "Machine-readable catalog of every component, theme, design token and convention in the kui-react boilerplate. Served at /api/registry. Consume from AI agents to discover what exists, where it lives, and how to use it.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "name",
+    "version",
+    "registryVersion",
+    "generatedAt",
+    "description",
+    "layers",
+    "conventions",
+    "designTokens",
+    "components",
+    "themes"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "format": "uri" },
+    "name": { "type": "string" },
+    "version": { "type": "string" },
+    "registryVersion": {
+      "type": "string",
+      "description": "Bumped on breaking changes to this JSON shape. Follows semver."
+    },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "description": { "type": "string" },
+    "layers": {
+      "type": "object",
+      "description": "Plain-English description per module layer.",
+      "properties": {
+        "ui": { "type": "string" },
+        "app": { "type": "string" },
+        "domain": { "type": "string" },
+        "theme": { "type": "string" }
+      },
+      "required": ["ui", "app", "domain", "theme"]
+    },
+    "conventions": {
+      "type": "object",
+      "required": ["icons", "styling", "types", "accessibility", "fileNaming", "pathAlias"],
+      "properties": {
+        "icons":         { "type": "string" },
+        "styling":       { "type": "string" },
+        "types":         { "type": "string" },
+        "accessibility": { "type": "string" },
+        "fileNaming":    { "type": "string" },
+        "pathAlias":     { "type": "string" }
+      }
+    },
+    "designTokens": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/DesignToken" }
+    },
+    "components": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Component" }
+    },
+    "themes": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Theme" }
+    }
+  },
+  "definitions": {
+    "DesignToken": {
+      "type": "object",
+      "required": ["name", "light", "purpose"],
+      "properties": {
+        "name":    { "type": "string", "pattern": "^--[a-z0-9-]+$" },
+        "light":   { "type": "string", "description": "CSS value in light mode." },
+        "dark":    { "type": "string", "description": "Value when overridden in dark mode." },
+        "purpose": { "type": "string" }
+      }
+    },
+    "Component": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "layer",
+        "category",
+        "filePath",
+        "abbr",
+        "description",
+        "variants",
+        "status"
+      ],
+      "properties": {
+        "id":          { "type": "string", "description": "Stable, URL-safe ID matching the showcase menu entry." },
+        "name":        { "type": "string" },
+        "layer":       { "type": "string", "enum": ["ui", "app", "domain", "theme"] },
+        "category":    { "type": "string", "enum": ["Atom", "Molecule", "Organism", "App", "Domain", "Theme"] },
+        "filePath":    { "type": "string", "description": "Repository-relative source file path." },
+        "abbr":        { "type": "string", "minLength": 1, "maxLength": 3 },
+        "description": { "type": "string" },
+        "source":      { "type": "string", "description": "Full inline source code. Omitted in /api/registry?index=1." },
+        "variantCount": { "type": "integer", "description": "Present in index-only mode in place of variants[]." },
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["title", "code"],
+            "properties": {
+              "title": { "type": "string" },
+              "code":  { "type": "string" }
+            }
+          }
+        },
+        "status":   { "type": "string", "enum": ["stable", "beta", "deprecated"] },
+        "since":    { "type": "string", "pattern": "^\\d{4}-\\d{2}$" },
+        "whenToUse":    { "type": "string" },
+        "whenNotToUse": { "type": "string" },
+        "composes":  { "type": "array", "items": { "type": "string" }, "description": "Component IDs this depends on." },
+        "relatedTo": { "type": "array", "items": { "type": "string" } },
+        "usedBy":    { "type": "array", "items": { "type": "string" }, "description": "Inverse of composes[]." },
+        "a11y": {
+          "type": "object",
+          "properties": {
+            "wcagLevel":    { "type": "string", "enum": ["A", "AA", "AAA"] },
+            "ariaPatterns": { "type": "array", "items": { "type": "string" } },
+            "keyboardInteractions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["keys", "action"],
+                "properties": {
+                  "keys":   { "type": "string" },
+                  "action": { "type": "string" }
+                }
+              }
+            },
+            "notes": { "type": "string" }
+          }
+        },
+        "designTokens": { "type": "array", "items": { "type": "string", "pattern": "^--[a-z0-9-]+$" } },
+        "dependencies": { "type": "array", "items": { "type": "string" }, "description": "npm packages required (excluding React + Next + this library)." }
+      }
+    },
+    "Theme": {
+      "type": "object",
+      "required": ["id", "title", "route", "consumesDomain", "status"],
+      "properties": {
+        "id":             { "type": "string" },
+        "title":          { "type": "string" },
+        "route":          { "type": "string", "pattern": "^/" },
+        "consumesDomain": { "type": "string" },
+        "since":          { "type": "string", "pattern": "^\\d{4}-\\d{2}$" },
+        "status":         { "type": "string", "enum": ["stable", "beta", "deprecated"] }
+      }
+    }
+  }
+}
