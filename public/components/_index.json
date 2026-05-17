@@ -1,0 +1,1718 @@
+{
+  "button": {
+    "name": "Button",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "button.md"
+  },
+  "badge": {
+    "name": "Badge",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "badge.md"
+  },
+  "avatar": {
+    "name": "Avatar",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "avatar.md"
+  },
+  "spinner": {
+    "name": "Spinner",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "spinner.md"
+  },
+  "skeleton": {
+    "name": "Skeleton",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "skeleton.md"
+  },
+  "button-group": {
+    "name": "ButtonGroup",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "button-group.md"
+  },
+  "skip-link": {
+    "name": "SkipLink + LiveRegion",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "skip-link.md"
+  },
+  "brand-logo": {
+    "name": "BrandLogo",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "brand-logo.md"
+  },
+  "star-rating": {
+    "name": "StarRating",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "star-rating.md"
+  },
+  "input": {
+    "name": "Input",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "input.md"
+  },
+  "textarea": {
+    "name": "Textarea",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "textarea.md"
+  },
+  "search-bar": {
+    "name": "SearchBar",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "search-bar.md"
+  },
+  "checkbox": {
+    "name": "Checkbox",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "checkbox.md"
+  },
+  "radio-group": {
+    "name": "RadioGroup",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "radio-group.md"
+  },
+  "toggle": {
+    "name": "Toggle",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "toggle.md"
+  },
+  "checkbox-group": {
+    "name": "CheckboxGroup",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "checkbox-group.md"
+  },
+  "select": {
+    "name": "Select",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "select.md"
+  },
+  "tag-input": {
+    "name": "TagInput",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "tag-input.md"
+  },
+  "multi-select": {
+    "name": "MultiSelect",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "multi-select.md"
+  },
+  "combo-box": {
+    "name": "ComboBox",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "combo-box.md"
+  },
+  "date-picker": {
+    "name": "DatePicker",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "date-picker.md"
+  },
+  "date-range-picker": {
+    "name": "DateRangePicker",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "date-range-picker.md"
+  },
+  "file-input": {
+    "name": "FileInput",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "file-input.md"
+  },
+  "card": {
+    "name": "Card",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "card.md"
+  },
+  "page-header": {
+    "name": "PageHeader",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "page-header.md"
+  },
+  "slider": {
+    "name": "Slider",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "slider.md"
+  },
+  "stat-card": {
+    "name": "StatCard",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "stat-card.md"
+  },
+  "alert-banner": {
+    "name": "AlertBanner",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "alert-banner.md"
+  },
+  "toast": {
+    "name": "Toast",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "toast.md"
+  },
+  "empty-state": {
+    "name": "EmptyState",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "empty-state.md"
+  },
+  "pagination": {
+    "name": "Pagination",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "pagination.md"
+  },
+  "tab-group": {
+    "name": "TabGroup",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "tab-group.md"
+  },
+  "breadcrumb": {
+    "name": "Breadcrumb",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "breadcrumb.md"
+  },
+  "stepper": {
+    "name": "Stepper",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "stepper.md"
+  },
+  "tree-view": {
+    "name": "TreeView",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "tree-view.md"
+  },
+  "tab-button": {
+    "name": "TabButton",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "tab-button.md"
+  },
+  "view-toggle": {
+    "name": "ViewToggle",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "view-toggle.md"
+  },
+  "modal": {
+    "name": "Modal",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "modal.md"
+  },
+  "drawer": {
+    "name": "Drawer",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "drawer.md"
+  },
+  "tooltip": {
+    "name": "Tooltip",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "tooltip.md"
+  },
+  "dropdown-menu": {
+    "name": "DropdownMenu",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "dropdown-menu.md"
+  },
+  "popover": {
+    "name": "Popover",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "popover.md"
+  },
+  "table": {
+    "name": "Table",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "table.md"
+  },
+  "data-table": {
+    "name": "DataTable",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "data-table.md"
+  },
+  "advanced-data-table": {
+    "name": "AdvancedDataTable",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "advanced-data-table.md"
+  },
+  "content-score-bar": {
+    "name": "ContentScoreBar",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "content-score-bar.md"
+  },
+  "video-player": {
+    "name": "VideoPlayer",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "video-player.md"
+  },
+  "app-shell": {
+    "name": "AppShell",
+    "layer": "app",
+    "category": "App",
+    "file": "app-shell.md"
+  },
+  "app-sidebar": {
+    "name": "AppSidebar",
+    "layer": "app",
+    "category": "App",
+    "file": "app-sidebar.md"
+  },
+  "app-top-bar": {
+    "name": "AppTopBar",
+    "layer": "app",
+    "category": "App",
+    "file": "app-top-bar.md"
+  },
+  "app-nav": {
+    "name": "AppNav",
+    "layer": "app",
+    "category": "App",
+    "file": "app-nav.md"
+  },
+  "nav-drawer": {
+    "name": "NavDrawer",
+    "layer": "app",
+    "category": "App",
+    "file": "nav-drawer.md"
+  },
+  "user-menu": {
+    "name": "UserMenu",
+    "layer": "app",
+    "category": "App",
+    "file": "user-menu.md"
+  },
+  "global-search": {
+    "name": "GlobalSearch",
+    "layer": "app",
+    "category": "App",
+    "file": "global-search.md"
+  },
+  "app-command-bar": {
+    "name": "AppCommandBar",
+    "layer": "app",
+    "category": "App",
+    "file": "app-command-bar.md"
+  },
+  "section-card": {
+    "name": "SectionCard",
+    "layer": "app",
+    "category": "App",
+    "file": "section-card.md"
+  },
+  "inline-alert": {
+    "name": "InlineAlert",
+    "layer": "app",
+    "category": "App",
+    "file": "inline-alert.md"
+  },
+  "step-shell": {
+    "name": "StepShell",
+    "layer": "app",
+    "category": "App",
+    "file": "step-shell.md"
+  },
+  "form": {
+    "name": "Form",
+    "layer": "app",
+    "category": "App",
+    "file": "form.md"
+  },
+  "filter-bar": {
+    "name": "FilterBar",
+    "layer": "app",
+    "category": "App",
+    "file": "filter-bar.md"
+  },
+  "detail-header": {
+    "name": "DetailHeader",
+    "layer": "app",
+    "category": "App",
+    "file": "detail-header.md"
+  },
+  "error-state": {
+    "name": "ErrorState",
+    "layer": "app",
+    "category": "App",
+    "file": "error-state.md"
+  },
+  "not-found-state": {
+    "name": "NotFoundState",
+    "layer": "app",
+    "category": "App",
+    "file": "not-found-state.md"
+  },
+  "loading-state": {
+    "name": "LoadingState",
+    "layer": "app",
+    "category": "App",
+    "file": "loading-state.md"
+  },
+  "splash-screen": {
+    "name": "SplashScreen",
+    "layer": "app",
+    "category": "App",
+    "file": "splash-screen.md"
+  },
+  "app-breadcrumbs": {
+    "name": "AppBreadcrumbs",
+    "layer": "app",
+    "category": "App",
+    "file": "app-breadcrumbs.md"
+  },
+  "app-footer": {
+    "name": "AppFooter",
+    "layer": "app",
+    "category": "App",
+    "file": "app-footer.md"
+  },
+  "theme-switcher": {
+    "name": "ThemeSwitcher",
+    "layer": "app",
+    "category": "App",
+    "file": "theme-switcher.md"
+  },
+  "common-login-form": {
+    "name": "LoginForm",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-login-form.md"
+  },
+  "common-register-form": {
+    "name": "RegisterForm",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-register-form.md"
+  },
+  "common-oauth-buttons": {
+    "name": "OAuthButtons",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-oauth-buttons.md"
+  },
+  "common-user-avatar": {
+    "name": "UserAvatar",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-user-avatar.md"
+  },
+  "common-user-role-badge": {
+    "name": "UserRoleBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-user-role-badge.md"
+  },
+  "common-user-status-badge": {
+    "name": "UserStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-user-status-badge.md"
+  },
+  "common-user-menu": {
+    "name": "UserMenu",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-user-menu.md"
+  },
+  "common-price-display": {
+    "name": "PriceDisplay",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-price-display.md"
+  },
+  "common-payment-status-badge": {
+    "name": "PaymentStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-payment-status-badge.md"
+  },
+  "common-address-form": {
+    "name": "AddressForm",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-address-form.md"
+  },
+  "common-address-card": {
+    "name": "AddressCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-address-card.md"
+  },
+  "common-order-totals-card": {
+    "name": "OrderTotalsCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-order-totals-card.md"
+  },
+  "common-publish-status-badge": {
+    "name": "PublishStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-publish-status-badge.md"
+  },
+  "common-visibility-badge": {
+    "name": "VisibilityBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-visibility-badge.md"
+  },
+  "common-language-switcher": {
+    "name": "LanguageSwitcher",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-language-switcher.md"
+  },
+  "common-change-password-form": {
+    "name": "ChangePasswordForm",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-change-password-form.md"
+  },
+  "common-user-profile-card": {
+    "name": "UserProfileCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-user-profile-card.md"
+  },
+  "common-user-profile-form": {
+    "name": "UserProfileForm",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-user-profile-form.md"
+  },
+  "common-user-preferences-form": {
+    "name": "UserPreferencesForm",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-user-preferences-form.md"
+  },
+  "common-coupon-input": {
+    "name": "CouponInput",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-coupon-input.md"
+  },
+  "common-discount-badge": {
+    "name": "DiscountBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-discount-badge.md"
+  },
+  "common-payment-method-selector": {
+    "name": "PaymentMethodSelector",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-payment-method-selector.md"
+  },
+  "common-payment-summary-card": {
+    "name": "PaymentSummaryCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-payment-summary-card.md"
+  },
+  "common-forgot-password-form": {
+    "name": "ForgotPasswordForm",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-forgot-password-form.md"
+  },
+  "common-session-expired-banner": {
+    "name": "SessionExpiredBanner",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-session-expired-banner.md"
+  },
+  "common-seo-form": {
+    "name": "SeoForm",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-seo-form.md"
+  },
+  "common-seo-preview": {
+    "name": "SeoPreview",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-seo-preview.md"
+  },
+  "common-address-selector": {
+    "name": "AddressSelector",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-address-selector.md"
+  },
+  "common-location-picker": {
+    "name": "LocationPicker",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-location-picker.md"
+  },
+  "common-geo-point-display": {
+    "name": "GeoPointDisplay",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-geo-point-display.md"
+  },
+  "common-processing-status-indicator": {
+    "name": "ProcessingStatusIndicator",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-processing-status-indicator.md"
+  },
+  "common-currency-selector": {
+    "name": "CurrencySelector",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-currency-selector.md"
+  },
+  "common-country-selector": {
+    "name": "CountrySelector",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-country-selector.md"
+  },
+  "common-direction-provider": {
+    "name": "DirectionProvider",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-direction-provider.md"
+  },
+  "common-credit-card-visual": {
+    "name": "CreditCardVisual",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-credit-card-visual.md"
+  },
+  "common-credit-card-form": {
+    "name": "CreditCardForm",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-credit-card-form.md"
+  },
+  "common-saved-card-selector": {
+    "name": "SavedCardSelector",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-saved-card-selector.md"
+  },
+  "common-not-found-page": {
+    "name": "NotFoundPage",
+    "layer": "app",
+    "category": "Domain",
+    "file": "common-not-found-page.md"
+  },
+  "common-chat-box": {
+    "name": "ChatBox",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-chat-box.md"
+  },
+  "common-notification-menu": {
+    "name": "NotificationMenu",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-notification-menu.md"
+  },
+  "common-subscription-plan-card": {
+    "name": "SubscriptionPlanCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-subscription-plan-card.md"
+  },
+  "common-charts": {
+    "name": "Charts",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-charts.md"
+  },
+  "common-checkout-success-state": {
+    "name": "CheckoutSuccessState",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "common-checkout-success-state.md"
+  },
+  "blog-post-status-badge": {
+    "name": "PostStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "blog-post-status-badge.md"
+  },
+  "blog-category-badge": {
+    "name": "CategoryBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "blog-category-badge.md"
+  },
+  "blog-post-meta": {
+    "name": "PostMeta",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "blog-post-meta.md"
+  },
+  "blog-post-content": {
+    "name": "PostContent",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "blog-post-content.md"
+  },
+  "blog-post-card": {
+    "name": "PostCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "blog-post-card.md"
+  },
+  "blog-comment-form": {
+    "name": "CommentForm",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "blog-comment-form.md"
+  },
+  "blog-comment-item": {
+    "name": "CommentItem",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "blog-comment-item.md"
+  },
+  "blog-comment-list": {
+    "name": "CommentList",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "blog-comment-list.md"
+  },
+  "blog-author-bio-card": {
+    "name": "AuthorBioCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "blog-author-bio-card.md"
+  },
+  "blog-topic-cloud": {
+    "name": "TopicCloud",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "blog-topic-cloud.md"
+  },
+  "blog-author-stats-row": {
+    "name": "AuthorStatsRow",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "blog-author-stats-row.md"
+  },
+  "event-status-badge": {
+    "name": "EventStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "event-status-badge.md"
+  },
+  "event-format-badge": {
+    "name": "EventFormatBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "event-format-badge.md"
+  },
+  "event-category-badge": {
+    "name": "EventCategoryBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "event-category-badge.md"
+  },
+  "event-card": {
+    "name": "EventCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "event-card.md"
+  },
+  "organizer-card": {
+    "name": "OrganizerCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "organizer-card.md"
+  },
+  "section-pricing-card": {
+    "name": "SectionPricingCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "section-pricing-card.md"
+  },
+  "ticket-card": {
+    "name": "TicketCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "ticket-card.md"
+  },
+  "event-info-grid": {
+    "name": "EventInfoGrid",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "event-info-grid.md"
+  },
+  "ticket-sidebar-box": {
+    "name": "TicketSidebarBox",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "ticket-sidebar-box.md"
+  },
+  "step-indicator": {
+    "name": "StepIndicator",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "step-indicator.md"
+  },
+  "checkout-success": {
+    "name": "CheckoutSuccess",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "checkout-success.md"
+  },
+  "seat-map-picker": {
+    "name": "SeatMapPicker",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "seat-map-picker.md"
+  },
+  "hero-slide": {
+    "name": "HeroSlide",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "hero-slide.md"
+  },
+  "event-nav-dropdown": {
+    "name": "NavDropdown",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "event-nav-dropdown.md"
+  },
+  "event-city-picker": {
+    "name": "CityPicker",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "event-city-picker.md"
+  },
+  "event-nav-language-switcher": {
+    "name": "NavLanguageSwitcher",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "event-nav-language-switcher.md"
+  },
+  "event-nav-theme-switcher": {
+    "name": "NavThemeSwitcher",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "event-nav-theme-switcher.md"
+  },
+  "event-order-status-badge": {
+    "name": "EventOrderStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "event-order-status-badge.md"
+  },
+  "event-ticket-row-meta": {
+    "name": "TicketRowMeta + TicketRowActions",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "event-ticket-row-meta.md"
+  },
+  "map-view": {
+    "name": "MapView",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "map-view.md"
+  },
+  "api-doc-status-code-badge": {
+    "name": "StatusCodeBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-status-code-badge.md"
+  },
+  "api-doc-http-method-badge": {
+    "name": "HttpMethodBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-http-method-badge.md"
+  },
+  "api-doc-security-badge": {
+    "name": "SecurityBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-security-badge.md"
+  },
+  "api-doc-security-scheme-badge": {
+    "name": "SecuritySchemeBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-security-scheme-badge.md"
+  },
+  "api-doc-schema-viewer": {
+    "name": "SchemaViewer",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-schema-viewer.md"
+  },
+  "api-doc-parameter-table": {
+    "name": "ParameterTable",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-parameter-table.md"
+  },
+  "api-doc-response-card": {
+    "name": "ResponseCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-response-card.md"
+  },
+  "api-doc-code-sample-panel": {
+    "name": "CodeSamplePanel",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-code-sample-panel.md"
+  },
+  "api-doc-endpoint-row": {
+    "name": "EndpointRow",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-endpoint-row.md"
+  },
+  "api-doc-server-selector": {
+    "name": "ServerSelector",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-server-selector.md"
+  },
+  "api-doc-api-tag-section": {
+    "name": "ApiTagSection",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-api-tag-section.md"
+  },
+  "api-doc-operation-panel": {
+    "name": "OperationPanel",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-operation-panel.md"
+  },
+  "api-doc-auth-scheme-card": {
+    "name": "AuthSchemeCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-auth-scheme-card.md"
+  },
+  "api-doc-oauth-flow-diagram": {
+    "name": "OAuthFlowDiagram",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-oauth-flow-diagram.md"
+  },
+  "api-doc-api-key-token-card": {
+    "name": "ApiKeyTokenCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "api-doc-api-key-token-card.md"
+  },
+  "landing-hero-section": {
+    "name": "HeroSection",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-hero-section.md"
+  },
+  "landing-feature-card": {
+    "name": "FeatureCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-feature-card.md"
+  },
+  "landing-feature-grid": {
+    "name": "FeatureGrid",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-feature-grid.md"
+  },
+  "landing-pricing-plan-card": {
+    "name": "PricingPlanCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-pricing-plan-card.md"
+  },
+  "landing-pricing-grid": {
+    "name": "PricingGrid",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-pricing-grid.md"
+  },
+  "landing-testimonial-card": {
+    "name": "TestimonialCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-testimonial-card.md"
+  },
+  "landing-testimonial-grid": {
+    "name": "TestimonialGrid",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-testimonial-grid.md"
+  },
+  "landing-faq-accordion": {
+    "name": "FaqAccordion",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-faq-accordion.md"
+  },
+  "landing-stats-bar": {
+    "name": "StatsBar",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-stats-bar.md"
+  },
+  "landing-team-member-card": {
+    "name": "TeamMemberCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-team-member-card.md"
+  },
+  "landing-partner-logos-strip": {
+    "name": "PartnerLogosStrip",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-partner-logos-strip.md"
+  },
+  "landing-how-it-works": {
+    "name": "HowItWorksSection",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-how-it-works.md"
+  },
+  "landing-announcement-bar": {
+    "name": "AnnouncementBar",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-announcement-bar.md"
+  },
+  "landing-mega-menu": {
+    "name": "MegaMenu",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "landing-mega-menu.md"
+  },
+  "jobs-status-badge": {
+    "name": "JobStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "jobs-status-badge.md"
+  },
+  "jobs-type-badge": {
+    "name": "JobTypeBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "jobs-type-badge.md"
+  },
+  "jobs-work-mode-badge": {
+    "name": "JobWorkModeBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "jobs-work-mode-badge.md"
+  },
+  "jobs-experience-badge": {
+    "name": "JobExperienceBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "jobs-experience-badge.md"
+  },
+  "jobs-application-status-badge": {
+    "name": "ApplicationStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "jobs-application-status-badge.md"
+  },
+  "jobs-job-meta": {
+    "name": "JobMeta",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "jobs-job-meta.md"
+  },
+  "jobs-job-card": {
+    "name": "JobCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "jobs-job-card.md"
+  },
+  "jobs-company-card": {
+    "name": "CompanyCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "jobs-company-card.md"
+  },
+  "fintech-wallet-status-badge": {
+    "name": "WalletStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "fintech-wallet-status-badge.md"
+  },
+  "fintech-currency-badge": {
+    "name": "CurrencyBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "fintech-currency-badge.md"
+  },
+  "fintech-transaction-type-badge": {
+    "name": "TransactionTypeBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "fintech-transaction-type-badge.md"
+  },
+  "fintech-transaction-status-badge": {
+    "name": "TransactionStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "fintech-transaction-status-badge.md"
+  },
+  "fintech-wallet-card": {
+    "name": "WalletCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "fintech-wallet-card.md"
+  },
+  "fintech-transaction-row": {
+    "name": "TransactionRow",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "fintech-transaction-row.md"
+  },
+  "fintech-portfolio-holding-row": {
+    "name": "PortfolioHoldingRow",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "fintech-portfolio-holding-row.md"
+  },
+  "fintech-asset-allocation-card": {
+    "name": "AssetAllocationCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "fintech-asset-allocation-card.md"
+  },
+  "fintech-performance-sparkline": {
+    "name": "PerformanceSparkline",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "fintech-performance-sparkline.md"
+  },
+  "fintech-payment-card-tile": {
+    "name": "PaymentCardTile",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "fintech-payment-card-tile.md"
+  },
+  "fintech-card-limit-meter": {
+    "name": "CardLimitMeter",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "fintech-card-limit-meter.md"
+  },
+  "fintech-card-action-menu": {
+    "name": "CardActionMenu",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "fintech-card-action-menu.md"
+  },
+  "commerce-product-status-badge": {
+    "name": "ProductStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "commerce-product-status-badge.md"
+  },
+  "commerce-product-type-badge": {
+    "name": "ProductTypeBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "commerce-product-type-badge.md"
+  },
+  "commerce-stock-status-badge": {
+    "name": "StockStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "commerce-stock-status-badge.md"
+  },
+  "commerce-order-status-badge": {
+    "name": "OrderStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "commerce-order-status-badge.md"
+  },
+  "commerce-product-card": {
+    "name": "ProductCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "commerce-product-card.md"
+  },
+  "commerce-order-card": {
+    "name": "OrderCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "commerce-order-card.md"
+  },
+  "commerce-cart-item": {
+    "name": "CartItem",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "commerce-cart-item.md"
+  },
+  "commerce-wishlist-item-card": {
+    "name": "WishlistItemCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "commerce-wishlist-item-card.md"
+  },
+  "commerce-empty-wishlist-state": {
+    "name": "EmptyWishlistState",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "commerce-empty-wishlist-state.md"
+  },
+  "media-video-status-badge": {
+    "name": "VideoStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "media-video-status-badge.md"
+  },
+  "media-video-card": {
+    "name": "VideoCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "media-video-card.md"
+  },
+  "media-channel-card": {
+    "name": "ChannelCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "media-channel-card.md"
+  },
+  "media-video-meta": {
+    "name": "VideoMeta",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "media-video-meta.md"
+  },
+  "media-channel-stats-card": {
+    "name": "ChannelStatsCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "media-channel-stats-card.md"
+  },
+  "media-video-performance-row": {
+    "name": "VideoPerformanceRow",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "media-video-performance-row.md"
+  },
+  "media-watch-time-chart": {
+    "name": "WatchTimeChart",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "media-watch-time-chart.md"
+  },
+  "media-playlist-header-card": {
+    "name": "PlaylistHeaderCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "media-playlist-header-card.md"
+  },
+  "media-playlist-video-row": {
+    "name": "PlaylistVideoRow",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "media-playlist-video-row.md"
+  },
+  "forum-topic-status-badge": {
+    "name": "TopicStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "forum-topic-status-badge.md"
+  },
+  "forum-post-status-badge": {
+    "name": "PostStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "forum-post-status-badge.md"
+  },
+  "forum-reaction-type-badge": {
+    "name": "ReactionTypeBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "forum-reaction-type-badge.md"
+  },
+  "forum-category-card": {
+    "name": "ForumCategoryCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "forum-category-card.md"
+  },
+  "forum-topic-row": {
+    "name": "TopicRow",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "forum-topic-row.md"
+  },
+  "forum-user-card": {
+    "name": "ForumUserCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "forum-user-card.md"
+  },
+  "forum-reputation-bar": {
+    "name": "ReputationBar",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "forum-reputation-bar.md"
+  },
+  "forum-badge-shelf": {
+    "name": "BadgeShelf",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "forum-badge-shelf.md"
+  },
+  "forum-user-activity-row": {
+    "name": "UserActivityRow",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "forum-user-activity-row.md"
+  },
+  "forum-post-composer": {
+    "name": "PostComposer",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "forum-post-composer.md"
+  },
+  "real-estate-property-status-badge": {
+    "name": "PropertyStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "real-estate-property-status-badge.md"
+  },
+  "real-estate-property-type-badge": {
+    "name": "PropertyTypeBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "real-estate-property-type-badge.md"
+  },
+  "real-estate-listing-type-badge": {
+    "name": "ListingTypeBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "real-estate-listing-type-badge.md"
+  },
+  "real-estate-property-card": {
+    "name": "PropertyCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "real-estate-property-card.md"
+  },
+  "real-estate-agent-card": {
+    "name": "AgentCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "real-estate-agent-card.md"
+  },
+  "food-restaurant-status-badge": {
+    "name": "RestaurantStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "food-restaurant-status-badge.md"
+  },
+  "food-order-status-badge": {
+    "name": "OrderStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "food-order-status-badge.md"
+  },
+  "food-delivery-status-badge": {
+    "name": "DeliveryStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "food-delivery-status-badge.md"
+  },
+  "food-restaurant-card": {
+    "name": "RestaurantCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "food-restaurant-card.md"
+  },
+  "food-menu-item-card": {
+    "name": "MenuItemCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "food-menu-item-card.md"
+  },
+  "food-order-tracking-timeline": {
+    "name": "OrderTrackingTimeline",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "food-order-tracking-timeline.md"
+  },
+  "food-courier-card": {
+    "name": "CourierCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "food-courier-card.md"
+  },
+  "food-eta-countdown-card": {
+    "name": "EtaCountdownCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "food-eta-countdown-card.md"
+  },
+  "food-cuisine-hero-banner": {
+    "name": "CuisineHeroBanner",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "food-cuisine-hero-banner.md"
+  },
+  "food-cuisine-tag-chip": {
+    "name": "CuisineTagChip",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "food-cuisine-tag-chip.md"
+  },
+  "food-featured-dish-card": {
+    "name": "FeaturedDishCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "food-featured-dish-card.md"
+  },
+  "travel-booking-status-badge": {
+    "name": "BookingStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "travel-booking-status-badge.md"
+  },
+  "travel-flight-cabin-badge": {
+    "name": "FlightCabinBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "travel-flight-cabin-badge.md"
+  },
+  "travel-flight-segment-status-badge": {
+    "name": "FlightSegmentStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "travel-flight-segment-status-badge.md"
+  },
+  "travel-flight-card": {
+    "name": "FlightCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "travel-flight-card.md"
+  },
+  "travel-hotel-card": {
+    "name": "HotelCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "travel-hotel-card.md"
+  },
+  "ai-model-provider-badge": {
+    "name": "ModelProviderBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "ai-model-provider-badge.md"
+  },
+  "ai-model-type-badge": {
+    "name": "ModelTypeBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "ai-model-type-badge.md"
+  },
+  "ai-model-card": {
+    "name": "ModelCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "ai-model-card.md"
+  },
+  "ai-job-status-badge": {
+    "name": "AIJobStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "ai-job-status-badge.md"
+  },
+  "ai-chat-message": {
+    "name": "ChatMessage",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "ai-chat-message.md"
+  },
+  "ai-feature-check-cell": {
+    "name": "FeatureCheckCell",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "ai-feature-check-cell.md"
+  },
+  "ai-model-score-sparkline": {
+    "name": "ModelScoreSparkline",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "ai-model-score-sparkline.md"
+  },
+  "ai-model-comparison-table": {
+    "name": "ModelComparisonTable",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "ai-model-comparison-table.md"
+  },
+  "ai-usage-stats-card": {
+    "name": "UsageStatsCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "ai-usage-stats-card.md"
+  },
+  "social-post-status-badge": {
+    "name": "PostStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "social-post-status-badge.md"
+  },
+  "social-post-privacy-badge": {
+    "name": "PostPrivacyBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "social-post-privacy-badge.md"
+  },
+  "social-post-card": {
+    "name": "PostCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "social-post-card.md"
+  },
+  "social-profile-card": {
+    "name": "SocialProfileCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "social-profile-card.md"
+  },
+  "social-notification-item": {
+    "name": "SocialNotificationItem",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "social-notification-item.md"
+  },
+  "social-marketplace-listing-card": {
+    "name": "MarketplaceListingCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "social-marketplace-listing-card.md"
+  },
+  "iot-device-status-badge": {
+    "name": "DeviceStatusBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "iot-device-status-badge.md"
+  },
+  "iot-device-type-badge": {
+    "name": "DeviceTypeBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "iot-device-type-badge.md"
+  },
+  "iot-alert-severity-badge": {
+    "name": "AlertSeverityBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "iot-alert-severity-badge.md"
+  },
+  "iot-device-card": {
+    "name": "DeviceCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "iot-device-card.md"
+  },
+  "iot-cloud-workspace-card": {
+    "name": "CloudWorkspaceCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "iot-cloud-workspace-card.md"
+  },
+  "iot-ruleset-editor": {
+    "name": "RulesetEditor",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "iot-ruleset-editor.md"
+  },
+  "iot-metric-sparkline-card": {
+    "name": "MetricSparklineCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "iot-metric-sparkline-card.md"
+  },
+  "iot-telemetry-time-series-chart": {
+    "name": "TelemetryTimeSeriesChart",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "iot-telemetry-time-series-chart.md"
+  },
+  "iot-log-stream-row": {
+    "name": "LogStreamRow",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "iot-log-stream-row.md"
+  },
+  "iot-alert-detail-header": {
+    "name": "AlertDetailHeader",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "iot-alert-detail-header.md"
+  },
+  "iot-alert-event-timeline": {
+    "name": "AlertEventTimeline",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "iot-alert-event-timeline.md"
+  },
+  "nft-rarity-badge": {
+    "name": "RarityBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-rarity-badge.md"
+  },
+  "nft-blockchain-badge": {
+    "name": "BlockchainBadge",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-blockchain-badge.md"
+  },
+  "nft-price-tag": {
+    "name": "PriceTag",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-price-tag.md"
+  },
+  "nft-trait-tag": {
+    "name": "TraitTag",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-trait-tag.md"
+  },
+  "nft-card": {
+    "name": "NftCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-card.md"
+  },
+  "nft-detail-header": {
+    "name": "NftDetailHeader",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-detail-header.md"
+  },
+  "nft-collection-card": {
+    "name": "CollectionCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-collection-card.md"
+  },
+  "nft-collection-stats-bar": {
+    "name": "CollectionStatsBar",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-collection-stats-bar.md"
+  },
+  "nft-floor-price-chart": {
+    "name": "FloorPriceChart",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-floor-price-chart.md"
+  },
+  "nft-creator-profile-card": {
+    "name": "CreatorProfileCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-creator-profile-card.md"
+  },
+  "nft-creator-leaderboard-row": {
+    "name": "CreatorLeaderboardRow",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-creator-leaderboard-row.md"
+  },
+  "nft-activity-feed-row": {
+    "name": "ActivityFeedRow",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-activity-feed-row.md"
+  },
+  "nft-auction-countdown": {
+    "name": "AuctionCountdown",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-auction-countdown.md"
+  },
+  "nft-bid-history-row": {
+    "name": "BidHistoryRow",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-bid-history-row.md"
+  },
+  "nft-wallet-connect-button": {
+    "name": "WalletConnectButton",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-wallet-connect-button.md"
+  },
+  "nft-mint-progress-bar": {
+    "name": "MintProgressBar",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "nft-mint-progress-bar.md"
+  },
+  "reviews-rating-distribution": {
+    "name": "RatingDistribution",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "reviews-rating-distribution.md"
+  },
+  "reviews-review-card": {
+    "name": "ReviewCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "reviews-review-card.md"
+  },
+  "reviews-review-summary-card": {
+    "name": "ReviewSummaryCard",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "reviews-review-summary-card.md"
+  },
+  "reviews-review-submit-form": {
+    "name": "ReviewSubmitForm",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "reviews-review-submit-form.md"
+  }
+}

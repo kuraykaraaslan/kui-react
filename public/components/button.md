@@ -1,0 +1,151 @@
+# Button
+
+- **id:** `button`
+- **layer:** ui
+- **category:** Atom
+- **filePath:** `modules/ui/Button.tsx`
+- **status:** stable
+- **since:** 2025-01
+
+Temel interaktif element. 5 görsel stil (variant) ve 5 boyut (size) destekler. disabled ve loading durumları yerleşiktir.
+
+## Used by
+
+- `reviews-review-submit-form`
+
+## Design tokens consumed
+
+- `--border`
+- `--border-focus`
+- `--error`
+- `--primary`
+- `--primary-fg`
+- `--primary-hover`
+- `--secondary`
+- `--surface-overlay`
+- `--text-inverse`
+- `--text-primary`
+
+## Variants
+
+### Primary
+
+```tsx
+<Button variant="primary">Primary</Button>
+```
+
+### Secondary
+
+```tsx
+<Button variant="secondary">Secondary</Button>
+```
+
+### Ghost
+
+```tsx
+<Button variant="ghost">Ghost</Button>
+```
+
+### Danger
+
+```tsx
+<Button variant="danger">Danger</Button>
+```
+
+### Outline
+
+```tsx
+<Button variant="outline">Outline</Button>
+```
+
+### Disabled
+
+```tsx
+<Button variant="primary" disabled>Disabled</Button>
+```
+
+### Sizes
+
+```tsx
+<Button size="xs">XS</Button>
+<Button size="sm">SM</Button>
+<Button size="md">MD</Button>
+<Button size="lg">LG</Button>
+<Button size="xl">XL</Button>
+```
+
+### Icon left / right
+
+```tsx
+<Button iconLeft="⬇">Download</Button>
+<Button variant="outline" iconRight="→">Next</Button>
+```
+
+### Icon only
+
+```tsx
+<Button iconOnly aria-label="Delete item">✕</Button>
+```
+
+### Full width
+
+```tsx
+<Button fullWidth>Full-width</Button>
+```
+
+### Selected / active state
+
+```tsx
+<Button variant="outline" selected>Selected</Button>
+```
+
+### Loading state
+
+```tsx
+<Button variant="primary" loading>Saving…</Button>
+```
+
+## Full source
+
+```tsx
+'use client';
+import { cn } from '@/libs/utils/cn';
+
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
+type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+const variantClasses: Record<ButtonVariant, string> = {
+  primary:   'bg-primary text-primary-fg hover:bg-primary-hover',
+  secondary: 'bg-secondary text-secondary-fg hover:bg-secondary-hover',
+  ghost:     'bg-transparent text-text-primary hover:bg-surface-overlay',
+  danger:    'bg-error text-text-inverse hover:opacity-90',
+  outline:   'border border-border text-text-primary hover:bg-surface-overlay',
+};
+
+const sizeClasses: Record<ButtonSize, string> = {
+  xs: 'px-2 py-1 text-xs',
+  sm: 'px-3 py-1.5 text-sm',
+  md: 'px-4 py-2 text-sm',
+  lg: 'px-5 py-2.5 text-base',
+  xl: 'px-6 py-3 text-lg',
+};
+
+export function Button({ children, variant = 'primary', size = 'md', disabled, loading, ...props }) {
+  return (
+    <button
+      type="button"
+      disabled={disabled || loading}
+      aria-busy={loading}
+      className={cn(
+        'inline-flex items-center gap-2 rounded-md font-medium transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        variantClasses[variant], sizeClasses[size]
+      )}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+```

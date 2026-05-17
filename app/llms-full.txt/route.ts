@@ -1,13 +1,26 @@
 // Long-form markdown dump of the entire component catalog. Designed to be
 // fetched and pasted into an AI context window in one go.
 //
-// Generated at request time from the registry — kept in sync automatically.
+// Reads the static snapshot at public/registry/components.json (built by
+// `npm run registry:snapshot`).
 
-import { buildRegistry } from '@/modules/registry/registry';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import type { Registry, RegistryComponent } from '@/modules/registry/registry.types';
 
 export const dynamic = 'force-dynamic';
 
-function renderComponent(c: ReturnType<typeof buildRegistry>['components'][number]): string {
+const SNAPSHOT_PATH = path.join(process.cwd(), 'public/registry/components.json');
+
+let cached: Registry | null = null;
+async function loadSnapshot(): Promise<Registry> {
+  if (cached) return cached;
+  const raw = await readFile(SNAPSHOT_PATH, 'utf8');
+  cached = JSON.parse(raw) as Registry;
+  return cached;
+}
+
+function renderComponent(c: RegistryComponent): string {
   const lines: string[] = [];
   lines.push(`### ${c.name}  (\`${c.id}\`)`);
   lines.push('');
@@ -49,10 +62,19 @@ function renderComponent(c: ReturnType<typeof buildRegistry>['components'][numbe
   return lines.join('\n');
 }
 
-export function GET() {
-  const reg = buildRegistry();
-  const out: string[] = [];
+export async function GET() {
+  let reg: Registry;
+  try {
+    reg = await loadSnapshot();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return new Response(
+      `# Registry snapshot not available\n\nRun \`npm run registry:snapshot\` to build it.\n\nDetail: ${message}\n`,
+      { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' } },
+    );
+  }
 
+  const out: string[] = [];
   out.push(`# ${reg.name} v${reg.version} — Full component catalog`);
   out.push('');
   out.push(`Generated ${reg.generatedAt}.`);
@@ -81,7 +103,7 @@ export function GET() {
   out.push('');
 
   // Group components by layer + category for AI-skimmability.
-  const groups = new Map<string, typeof reg.components>();
+  const groups = new Map<string, RegistryComponent[]>();
   for (const c of reg.components) {
     const key = `${c.layer} / ${c.category}`;
     if (!groups.has(key)) groups.set(key, []);
