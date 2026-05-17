@@ -1,0 +1,73 @@
+# kui-react — Windsurf rules
+# Canonical source: AGENTS.md
+
+## Discovery first
+
+Before generating code, fetch the AI-facing catalog:
+
+- `GET /api/registry?index=1` — every component, theme, design token, convention (no source, ~5x smaller)
+- `GET /api/registry` — same plus full inline source per component + variants
+- `GET /llms-full.txt` — markdown dump for paste-into-context
+- Offline fallback: `public/registry/components.json`
+
+Filter `components[]` by `layer` (ui | app | domain | theme), `category`, `name`, or `filePath`. Follow `composes[]` recursively to know what else to copy when porting a component; `usedBy[]` is the inverse.
+
+## Hard rules
+
+1. `'use client';` at top of every `modules/ui/`, `modules/app/`, `modules/domains/` file. Theme `layout.tsx` is client; theme `page.tsx` is server unless it owns state.
+2. Named exports only. No default exports (excluding `next/dynamic` wrappers).
+3. `cn()` from `@/libs/utils/cn` for classNames. Never template-literal or string-concat classes.
+4. Token-only styling: `bg-primary`, `text-text-secondary`, `border-border-focus`. Never raw hex / rgb / hsl.
+5. Icons: Font Awesome only. Named imports from `@fortawesome/free-solid-svg-icons` / `free-brands-svg-icons`. No `lucide-react`, `heroicons`, `react-icons`, inline SVG, or emoji as icons.
+6. Accessibility on every interactive element:
+   - `focus-visible:ring-2 focus-visible:ring-border-focus`
+   - `aria-busy` / `aria-invalid` / `aria-describedby` / `aria-pressed` / `aria-expanded` per pattern
+   - `disabled:opacity-50 disabled:cursor-not-allowed`
+   - `aria-hidden="true"` on decorative `<FontAwesomeIcon>`
+7. Spread `...rest` to the root element.
+8. No business logic in `modules/ui/` — data fetching, routing, external calls belong in `modules/app/` or `modules/domains/`.
+
+## Where new code goes
+
+| Building | Location |
+| --- | --- |
+| Atom / molecule | `modules/ui/` |
+| Organism / shell / form | `modules/app/` |
+| Industry component | `modules/domains/<vertical>/` |
+| New vertical | `modules/domains/<vertical>/` + `modules/showcase/data/sections/domain-<vertical>.showcase.tsx` + entry in `modules/showcase/data/showcase.menu.ts` |
+| Full multi-page demo | `app/theme/<vertical>/` |
+
+## Path aliases
+
+`@/` → project root  ·  `@/modules/ui/...`  ·  `@/modules/app/...`  ·  `@/modules/domains/<vertical>`  ·  `@/libs/utils/cn`
+
+## Template
+
+```tsx
+'use client';
+import { cn } from '@/libs/utils/cn';
+
+type Variant = 'primary' | 'secondary';
+const variantClasses: Record<Variant, string> = {
+  primary:   'bg-primary text-primary-fg hover:bg-primary-hover',
+  secondary: 'bg-secondary text-secondary-fg hover:bg-secondary-hover',
+};
+
+type Props = { variant?: Variant; className?: string } & React.HTMLAttributes<HTMLDivElement>;
+
+export function MyComponent({ variant = 'primary', className, children, ...rest }: Props) {
+  return (
+    <div
+      className={cn(
+        'rounded-md px-4 py-2 transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+        variantClasses[variant],
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+```

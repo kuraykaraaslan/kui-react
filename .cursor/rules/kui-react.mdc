@@ -1,0 +1,105 @@
+---
+description: Project-wide rules for the kui-react boilerplate. Always-on.
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# kui-react — Cursor rules
+
+Canonical source: [AGENTS.md](mdc:AGENTS.md). When Cursor and AGENTS.md disagree, AGENTS.md wins.
+
+## Before writing code, fetch the catalog
+
+1. `GET /api/registry?index=1` — every component, theme, design token, and convention. ~5x smaller than the full registry.
+2. `GET /api/registry` — same shape with full source code per component + variants.
+3. `GET /llms-full.txt` — markdown dump of the full registry.
+4. Offline fallback: `public/registry/components.json` (built by `npm run registry:snapshot`).
+
+Search recipe:
+
+```ts
+const reg = await fetch('/api/registry?index=1').then(r => r.json());
+const matches = reg.components.filter(c =>
+  c.layer === 'domain' && c.filePath.includes('/commerce/') && /card/i.test(c.name)
+);
+```
+
+Follow `composes[]` recursively to know what other files to copy when porting a component. `usedBy[]` is the inverse index.
+
+## Hard rules
+
+1. **`'use client';`** at the top of every file in `modules/ui/`, `modules/app/`, `modules/domains/`. Theme `layout.tsx` is client; theme `page.tsx` is server unless it owns local state.
+2. **Named exports only.** No default exports (excluding `next/dynamic` wrappers).
+3. **`cn()` for classNames.** Import from `@/libs/utils/cn`. Never template-literal or string-concat classes.
+4. **Token-only styling.** Reference CSS-variable tokens (`bg-primary`, `text-text-secondary`, `border-border-focus`). Never raw hex / rgb / hsl.
+5. **Icons: Font Awesome only.** Named imports from `@fortawesome/free-solid-svg-icons` / `free-brands-svg-icons`. No `lucide-react`, `heroicons`, `react-icons`, inline SVG, or emoji as icons.
+6. **Accessibility every time:**
+   - `focus-visible:ring-2 focus-visible:ring-border-focus` on interactive elements
+   - `aria-busy` / `aria-invalid` / `aria-describedby` / `aria-pressed` / `aria-expanded` where applicable
+   - `disabled:opacity-50 disabled:cursor-not-allowed`
+   - `aria-hidden="true"` on decorative `<FontAwesomeIcon>`
+7. **Spread `...rest`** to the root element so consumers can pass through HTML attributes.
+8. **No business logic in `modules/ui/`** — data fetching, routing, external calls go in `modules/app/` or `modules/domains/`.
+
+## Where new code goes
+
+| What you're building | Where |
+| --- | --- |
+| Single-purpose atom (button, input) | `modules/ui/` |
+| Composed molecule (card, modal) | `modules/ui/` |
+| Full page section / shell / form | `modules/app/` |
+| Industry-specific component | `modules/domains/<vertical>/` |
+| New industry vertical | `modules/domains/<vertical>/` + `modules/showcase/data/sections/domain-<vertical>.showcase.tsx` + add to `modules/showcase/data/showcase.menu.ts` |
+| Full multi-page demo | `app/theme/<vertical>/` |
+
+## Path aliases
+
+- `@/` — project root
+- `@/modules/ui/<Component>` — atoms + molecules
+- `@/modules/app/<Component>` — organisms + page shells
+- `@/modules/domains/<vertical>` — industry vertical barrel
+- `@/libs/utils/cn` — className utility
+
+## Component template
+
+```tsx
+'use client';
+import { cn } from '@/libs/utils/cn';
+
+type MyComponentVariant = 'primary' | 'secondary';
+
+const variantClasses: Record<MyComponentVariant, string> = {
+  primary:   'bg-primary text-primary-fg hover:bg-primary-hover',
+  secondary: 'bg-secondary text-secondary-fg hover:bg-secondary-hover',
+};
+
+type MyComponentProps = {
+  variant?: MyComponentVariant;
+  children?: React.ReactNode;
+  className?: string;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+export function MyComponent({ variant = 'primary', children, className, ...rest }: MyComponentProps) {
+  return (
+    <div
+      className={cn(
+        'rounded-md px-4 py-2 font-medium transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+        variantClasses[variant],
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+```
+
+## Don't
+
+- Don't install new icon libraries.
+- Don't introduce a CSS-in-JS runtime (styled-components, emotion). Tailwind + CSS variables only.
+- Don't fetch real data inside a `modules/ui/` component.
+- Don't write a new component if one already exists in the registry — extend or compose instead.

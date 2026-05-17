@@ -1,0 +1,32 @@
+# kui-react — Cline / Continue.dev rules
+# Canonical source: AGENTS.md
+
+## Discover before generating
+
+Fetch the AI-facing catalog so you know what already exists:
+- `GET /api/registry?index=1` — full catalog (no source) — ~5x smaller
+- `GET /api/registry` — full catalog with inline source per component + variants
+- `GET /llms-full.txt` — markdown dump
+- Offline fallback: `public/registry/components.json`
+- Per-component markdown chunks: `public/components/<id>.md`
+
+Filter `components[]` by `layer` (`ui` | `app` | `domain` | `theme`), `category`, `name`, or `filePath`. Follow `composes[]` recursively when porting a component; `usedBy[]` is the inverse index.
+
+## Hard rules (full detail in AGENTS.md)
+
+1. `'use client';` at the top of every `modules/ui/`, `modules/app/`, `modules/domains/` file.
+2. Named exports only.
+3. `cn()` from `@/libs/utils/cn` for classNames.
+4. Token-only styling: `bg-primary`, `text-text-secondary`, `border-border-focus`. No raw hex / rgb / hsl.
+5. Font Awesome icons only, named imports. No `lucide-react`, `heroicons`, `react-icons`, inline SVG, emoji as icons.
+6. Accessibility: `focus-visible:ring-2 focus-visible:ring-border-focus`, aria-* per pattern, `disabled:opacity-50 disabled:cursor-not-allowed`.
+7. Spread `...rest` to the root element.
+8. No business logic in `modules/ui/`.
+
+## Where new code goes
+
+- `modules/ui/` — atoms + molecules
+- `modules/app/` — organisms, shells, forms, providers
+- `modules/domains/<vertical>/` — industry-specific components
+- `app/theme/<vertical>/` — full multi-page demos
+- New vertical → also `modules/showcase/data/sections/domain-<vertical>.showcase.tsx` and entries in `modules/showcase/data/showcase.menu.ts`.
