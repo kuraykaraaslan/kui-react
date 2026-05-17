@@ -224,18 +224,41 @@ function reply(id, result, error) {
 
 // Line-delimited JSON framing (one JSON message per line).
 let buffer = '';
+let inflight = 0;
+let stdinEnded = false;
+
+function maybeExit() {
+  if (stdinEnded && inflight === 0) process.exit(0);
+}
+
+async function processLine(line) {
+  inflight++;
+  try {
+    let msg;
+    try { msg = JSON.parse(line); } catch { return; }
+    const out = await handle(msg);
+    if (out) process.stdout.write(JSON.stringify(out) + '\n');
+  } finally {
+    inflight--;
+    maybeExit();
+  }
+}
+
 process.stdin.setEncoding('utf8');
-process.stdin.on('data', async (chunk) => {
+process.stdin.on('data', (chunk) => {
   buffer += chunk;
   let nl;
   while ((nl = buffer.indexOf('\n')) !== -1) {
     const line = buffer.slice(0, nl).trim();
     buffer = buffer.slice(nl + 1);
-    if (!line) continue;
-    let msg;
-    try { msg = JSON.parse(line); } catch { continue; }
-    const out = await handle(msg);
-    if (out) process.stdout.write(JSON.stringify(out) + '\n');
+    if (line) void processLine(line);
   }
 });
-process.stdin.on('end', () => process.exit(0));
+process.stdin.on('end', () => {
+  stdinEnded = true;
+  if (buffer.trim()) {
+    void processLine(buffer.trim());
+    buffer = '';
+  }
+  maybeExit();
+});
