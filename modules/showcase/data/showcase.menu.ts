@@ -475,16 +475,6 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'social',       title: 'Social Theme',       category: 'Theme', abbr: 'SO', href: '/theme/social',         since: '2026-05' },
       { id: 'iot',          title: 'IoT Theme',          category: 'Theme', abbr: 'IT', href: '/theme/iot',            since: '2026-05' },
       { id: 'nft',          title: 'NFT Theme',          category: 'Theme', abbr: 'NT', href: '/theme/nft',            since: '2026-05' },
-      { id: 'media-studio',         title: 'Media · Studio',        category: 'Theme', abbr: 'MS', href: '/theme/media/studio',                                          since: '2026-05' },
-      { id: 'media-playlist',       title: 'Media · Playlist',      category: 'Theme', abbr: 'MP', href: '/theme/media/playlists/cozy-italian-cooking-essentials',       since: '2026-05' },
-      { id: 'forum-user-profile',   title: 'Forum · User Profile',  category: 'Theme', abbr: 'FP', href: '/theme/forum/users/mod_jane',                                  since: '2026-05' },
-      { id: 'forum-new-topic',      title: 'Forum · New Topic',     category: 'Theme', abbr: 'FN', href: '/theme/forum/topics/new',                                      since: '2026-05' },
-      { id: 'food-order-tracking',  title: 'Food · Order Tracking', category: 'Theme', abbr: 'OT', href: '/theme/food/orders/ord-02',                                    since: '2026-05' },
-      { id: 'food-cuisine',         title: 'Food · Cuisine',        category: 'Theme', abbr: 'FC', href: '/theme/food/cuisines/italian',                                 since: '2026-05' },
-      { id: 'iot-device-metrics',   title: 'IoT · Device Metrics',  category: 'Theme', abbr: 'IM', href: '/theme/iot/devices/press-line-sensor-a1/metrics',              since: '2026-05' },
-      { id: 'iot-alert-detail',     title: 'IoT · Alert Detail',    category: 'Theme', abbr: 'IA', href: '/theme/iot/alerts/alert-001',                                  since: '2026-05' },
-      { id: 'fintech-portfolio',    title: 'Fintech · Portfolio',   category: 'Theme', abbr: 'FX', href: '/theme/fintech/portfolio',                                     since: '2026-05' },
-      { id: 'fintech-cards',        title: 'Fintech · Cards',       category: 'Theme', abbr: 'FY', href: '/theme/fintech/cards',                                         since: '2026-05' },
     ],
   }
 ];
