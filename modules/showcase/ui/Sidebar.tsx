@@ -69,7 +69,6 @@ function NavContent({ groups, selectedId, onSelect, collapsed }: NavContentProps
         initial.add(g.label);
       }
     }
-    if (initial.size === 0 && groups[0]) initial.add(groups[0].label);
     return initial;
   });
 
