@@ -63,7 +63,7 @@ export function RadioGroup({
                 disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
 
                 variant === 'card' && [
-                  'rounded-lg border border-border bg-surface p-3 transition-colors',
+                  'rounded-lg border border-border bg-surface-base p-3 transition-colors',
                   'hover:border-border-focus',
                   isSelected && 'border-primary bg-primary/5',
                   error && 'border-error',
