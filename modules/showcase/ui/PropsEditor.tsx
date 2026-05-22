@@ -112,7 +112,7 @@ export function PropsEditor({ controls, render, generateCode }: PlaygroundDef) {
   );
 
   return (
-    <div className="bg-surface-raised border border-border rounded-xl overflow-hidden">
+    <div className="bg-surface-raised border border-border rounded-xl overflow-hidden mb-4">
       {/* header */}
       <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border bg-surface-overlay">
         <div className="flex items-center gap-2">
