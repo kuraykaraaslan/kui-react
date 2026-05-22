@@ -26,6 +26,14 @@ If you are an AI assistant working in this repo, **read these first**:
 | Registry source of truth | [modules/registry/registry.ts](modules/registry/registry.ts) | Derives the catalog from showcase data + menu. |
 | Type definitions | [modules/registry/registry.types.ts](modules/registry/registry.types.ts) | TypeScript types for the registry JSON. |
 
+> ⚠️ **Keep the catalog in sync (REQUIRED).** Any time you **add, rename, or remove** a component (`modules/ui/`, `modules/app/`, `modules/domains/<vertical>/`), a theme (`app/theme/<vertical>/`), a showcase section file, or a `showcase.menu.ts` entry, you **must** rebuild the catalog before committing:
+>
+> ```bash
+> npm run registry:snapshot
+> ```
+>
+> This regenerates `public/registry/components.json` + `public/registry/components.index.json` + `public/components/*.md` from the showcase data. The script also runs automatically via the `prebuild` npm hook before `npm run build`, but commit the regenerated files so the catalog stays in lockstep with the code. A stale catalog is worse than no catalog — it misleads every AI agent that reads it.
+
 **Search recipe:**
 ```ts
 // "Find me every Card-like organism in commerce"

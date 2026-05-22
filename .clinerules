@@ -12,6 +12,16 @@ Fetch the AI-facing catalog so you know what already exists:
 
 Filter `components[]` by `layer` (`ui` | `app` | `domain` | `theme`), `category`, `name`, or `filePath`. Follow `composes[]` recursively when porting a component; `usedBy[]` is the inverse index.
 
+## ⚠️ Catalog sync — REQUIRED
+
+**Any time you add, rename, or remove a component (`modules/ui/`, `modules/app/`, `modules/domains/<vertical>/`), a theme (`app/theme/<vertical>/`), a showcase section file, or a `showcase.menu.ts` entry, run:**
+
+```bash
+npm run registry:snapshot
+```
+
+**before committing.** This regenerates `public/registry/components.json` + `public/registry/components.index.json` + `public/components/*.md` from the showcase data. The same script runs automatically via the `prebuild` npm hook before `npm run build`, but you must still commit the regenerated files so the catalog stays in lockstep with the code. A stale catalog misleads every AI agent that reads it — treat it as broken-build severity.
+
 ## Hard rules (full detail in AGENTS.md)
 
 1. `'use client';` at the top of every `modules/ui/`, `modules/app/`, `modules/domains/` file.

@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-17T11:49:32.527Z",
+  "generatedAt": "2026-05-17T16:24:41.940Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -7470,86 +7470,6 @@
       "title": "NFT Theme",
       "route": "/theme/nft",
       "consumesDomain": "nft",
-      "since": "2026-05",
-      "status": "stable"
-    },
-    {
-      "id": "media-studio",
-      "title": "Media · Studio",
-      "route": "/theme/media/studio",
-      "consumesDomain": "media-studio",
-      "since": "2026-05",
-      "status": "stable"
-    },
-    {
-      "id": "media-playlist",
-      "title": "Media · Playlist",
-      "route": "/theme/media/playlists/cozy-italian-cooking-essentials",
-      "consumesDomain": "media-playlist",
-      "since": "2026-05",
-      "status": "stable"
-    },
-    {
-      "id": "forum-user-profile",
-      "title": "Forum · User Profile",
-      "route": "/theme/forum/users/mod_jane",
-      "consumesDomain": "forum-user-profile",
-      "since": "2026-05",
-      "status": "stable"
-    },
-    {
-      "id": "forum-new-topic",
-      "title": "Forum · New Topic",
-      "route": "/theme/forum/topics/new",
-      "consumesDomain": "forum-new-topic",
-      "since": "2026-05",
-      "status": "stable"
-    },
-    {
-      "id": "food-order-tracking",
-      "title": "Food · Order Tracking",
-      "route": "/theme/food/orders/ord-02",
-      "consumesDomain": "food-order-tracking",
-      "since": "2026-05",
-      "status": "stable"
-    },
-    {
-      "id": "food-cuisine",
-      "title": "Food · Cuisine",
-      "route": "/theme/food/cuisines/italian",
-      "consumesDomain": "food-cuisine",
-      "since": "2026-05",
-      "status": "stable"
-    },
-    {
-      "id": "iot-device-metrics",
-      "title": "IoT · Device Metrics",
-      "route": "/theme/iot/devices/press-line-sensor-a1/metrics",
-      "consumesDomain": "iot-device-metrics",
-      "since": "2026-05",
-      "status": "stable"
-    },
-    {
-      "id": "iot-alert-detail",
-      "title": "IoT · Alert Detail",
-      "route": "/theme/iot/alerts/alert-001",
-      "consumesDomain": "iot-alert-detail",
-      "since": "2026-05",
-      "status": "stable"
-    },
-    {
-      "id": "fintech-portfolio",
-      "title": "Fintech · Portfolio",
-      "route": "/theme/fintech/portfolio",
-      "consumesDomain": "fintech-portfolio",
-      "since": "2026-05",
-      "status": "stable"
-    },
-    {
-      "id": "fintech-cards",
-      "title": "Fintech · Cards",
-      "route": "/theme/fintech/cards",
-      "consumesDomain": "fintech-cards",
       "since": "2026-05",
       "status": "stable"
     }

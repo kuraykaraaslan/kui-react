@@ -8,6 +8,14 @@ Before writing code, fetch the catalog so you know what already exists:
   GET /llms-full.txt          (markdown dump)
 Offline fallback: public/registry/components.json
 
+⚠️ CATALOG SYNC — REQUIRED
+After adding, renaming, or removing a component (modules/ui/, modules/app/, modules/domains/<vertical>/),
+a theme (app/theme/<vertical>/), a showcase section file, or a showcase.menu.ts entry, run:
+  npm run registry:snapshot
+before committing. This regenerates public/registry/* and public/components/*.md from the showcase data.
+The same script also runs via the `prebuild` npm hook before `npm run build`, but commit the regenerated
+files so the catalog stays in lockstep with the code. A stale catalog misleads every AI agent.
+
 Hard rules (see AGENTS.md for full detail):
 1. 'use client'; at the top of every modules/ui/, modules/app/, modules/domains/ file.
 2. Named exports only — no default exports.
