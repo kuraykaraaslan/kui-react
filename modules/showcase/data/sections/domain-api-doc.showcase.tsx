@@ -963,7 +963,7 @@ curl -H "Authorization: Bearer $TOKEN" https://api.example.com/v1/users`,
             <div className="max-w-md">
               <ApiKeyTokenCard
                 name="Staging key"
-                token="sk_test_9aaB2vKn7Lm9XpQrS5tUwYzC"
+                token="demo_staging_token_REDACTED"
                 environment="staging"
                 createdAt={new Date('2026-04-01')}
                 lastUsedAt={null}
