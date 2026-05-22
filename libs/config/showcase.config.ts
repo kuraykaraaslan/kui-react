@@ -129,3 +129,43 @@ export function buildShowcaseColorCss(): string {
   if (dark) parts.push(`.dark {\n${dark}\n}`);
   return parts.join('\n');
 }
+
+/**
+ * Build a consistent browser `<title>` body that pairs with the root
+ * `metadata.title.template` (`%s | ${SHOWCASE_BRAND.name}`).
+ *
+ * Mirrors the EJS sibling repo's `buildPageTitle()` helper:
+ *
+ * - `buildPageTitle()`                       → undefined (root default applies)
+ * - `buildPageTitle('Button')`               → `"Button"`               → "Button | Brand"
+ * - `buildPageTitle('Cart', 'Commerce Theme')` → `"Cart — Commerce Theme"` → "Cart — Commerce Theme | Brand"
+ */
+export function buildPageTitle(page?: string | null, suffix?: string | null): string | undefined {
+  if (!page) return undefined;
+  if (suffix) return `${page} — ${suffix}`;
+  return page;
+}
+
+/**
+ * Map of theme route slug → display name used as the page-title suffix.
+ * Sourced from `modules/showcase/data/showcase.menu.ts` (`Themes` group).
+ */
+export const THEME_TITLES: Record<string, string> = {
+  common:        'Common Theme',
+  blog:          'Blog Theme',
+  event:         'Event Theme',
+  'api-doc':     'API Doc Theme',
+  landing:       'Landing Theme',
+  jobs:          'Jobs Theme',
+  fintech:       'Fintech Theme',
+  media:         'Media Theme',
+  forum:         'Forum Theme',
+  commerce:      'Commerce Theme',
+  'real-estate': 'Real Estate Theme',
+  food:          'Food Theme',
+  travel:        'Travel Theme',
+  ai:            'AI Theme',
+  social:        'Social Theme',
+  iot:           'IoT Theme',
+  nft:           'NFT Theme',
+};
