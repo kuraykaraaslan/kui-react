@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Raised / flat / outline varyantlı içerik konteyneri. title + subtitle + headerRight + footer slotları desteklenir.
+Content container with raised / flat / outline variants. Supports title, subtitle, headerRight, footer slots and loading skeleton state.
 
 ## Design tokens consumed
 

@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Hata durumu: uyarı banner'ı + merkezi boş durum kombinasyonu. onRetry ile yeniden deneme aksiyonu.
+Error state pairing an inline alert banner with a centered empty state. Optional retry action.
 
 ## Variants
 
@@ -42,7 +42,7 @@ import { ErrorState } from '@/modules/app/EmptyErrorState';
   message="Failed to load user data."
 />
 
-// Retry aksiyonu ile:
+// With retry action:
 <ErrorState
   title="Database connection failed"
   message="Could not connect. Please try again."

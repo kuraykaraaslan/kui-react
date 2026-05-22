@@ -230,7 +230,7 @@ export function buildAppShellData(): ShowcaseComponent[] {
       title: 'AppShell',
       category: 'App',
       abbr: 'AS',
-      description: 'Tam ekran layout wrapper. logo, sidebar ve topbar slotlarına component geçilir. Masaüstünde sidebar aside olarak gösterilir, mobilde Drawer ile açılır.',
+      description: 'Full-screen layout wrapper with logo, sidebar and topbar slots. Sidebar renders as an aside on desktop and opens via a drawer on mobile.',
       filePath: 'modules/app/AppShell.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -325,7 +325,7 @@ export function AppShell({ logo, compactLogo, sidebarCollapsed = false, sidebar,
       title: 'AppSidebar',
       category: 'App',
       abbr: 'Ab',
-      description: 'Daraltılabilir kenar çubuğu. navGroups veya navItems alır; collapsed toggle dahili. searchable prop ile yerleşik arama filtresi; footer slotu ile kullanıcı bilgisi veya herhangi bir içerik gösterilebilir.',
+      description: 'Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter and a footer slot can host a user block or any content.',
       filePath: 'modules/app/AppSidebar.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -432,7 +432,7 @@ export function AppSidebar({ navGroups, navItems, activeId, onSelect, collapsed,
       title: 'AppTopBar',
       category: 'App',
       abbr: 'AT',
-      description: 'AppShell\'in header slotuna geçilen üst çubuk wrapper\'ı. logo slotu sol tarafa; children (GlobalSearch, UserMenu, Button vb.) flex satırda sıralanır.',
+      description: 'Top bar wrapper passed into AppShell\'s header slot. The logo slot anchors the left side while children (GlobalSearch, UserMenu, Button, etc.) are arranged in a flex row.',
       filePath: 'modules/app/AppTopBar.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';

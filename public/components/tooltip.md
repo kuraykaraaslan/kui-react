@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Hover ve focus ile görünür yardım metni. role="tooltip" + aria-describedby bağlantısı ile erişilebilir. 4 yön desteklenir.
+Short hint shown on hover and focus. Accessible via role="tooltip" + aria-describedby. Supports 4 placements, 3 themes, optional arrow, and configurable delay.
 
 ## Design tokens consumed
 

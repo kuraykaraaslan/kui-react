@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-17T16:24:41.940Z",
+  "generatedAt": "2026-05-22T16:12:16.939Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -159,7 +159,7 @@
       "category": "Atom",
       "filePath": "modules/ui/Button.tsx",
       "abbr": "Bt",
-      "description": "Temel interaktif element. 5 görsel stil (variant) ve 5 boyut (size) destekler. disabled ve loading durumları yerleşiktir.",
+      "description": "Core interactive element. Supports 5 visual styles (variants) and 5 sizes. disabled, loading and selected states are built-in.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\ntype ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';\ntype ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';\n\nconst variantClasses: Record<ButtonVariant, string> = {\n  primary:   'bg-primary text-primary-fg hover:bg-primary-hover',\n  secondary: 'bg-secondary text-secondary-fg hover:bg-secondary-hover',\n  ghost:     'bg-transparent text-text-primary hover:bg-surface-overlay',\n  danger:    'bg-error text-text-inverse hover:opacity-90',\n  outline:   'border border-border text-text-primary hover:bg-surface-overlay',\n};\n\nconst sizeClasses: Record<ButtonSize, string> = {\n  xs: 'px-2 py-1 text-xs',\n  sm: 'px-3 py-1.5 text-sm',\n  md: 'px-4 py-2 text-sm',\n  lg: 'px-5 py-2.5 text-base',\n  xl: 'px-6 py-3 text-lg',\n};\n\nexport function Button({ children, variant = 'primary', size = 'md', disabled, loading, ...props }) {\n  return (\n    <button\n      type=\"button\"\n      disabled={disabled || loading}\n      aria-busy={loading}\n      className={cn(\n        'inline-flex items-center gap-2 rounded-md font-medium transition-colors',\n        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',\n        'disabled:opacity-50 disabled:cursor-not-allowed',\n        variantClasses[variant], sizeClasses[size]\n      )}\n      {...props}\n    >\n      {children}\n    </button>\n  );\n}",
       "variants": [
         {
@@ -236,7 +236,7 @@
       "category": "Atom",
       "filePath": "modules/ui/Badge.tsx",
       "abbr": "Bg",
-      "description": "Durum, kategori veya etiket göstergesi. Feedback varyantları yalnızca semantik anlamlarına uygun bağlamlarda kullanılır.",
+      "description": "Status, category or label indicator. 6 semantic variants, 3 sizes, dot and dismissible support.",
       "source": "import { cn } from '@/libs/utils/cn';\n\nconst variantMap = {\n  success: 'bg-success-subtle text-success-fg',\n  error:   'bg-error-subtle text-error-fg',\n  warning: 'bg-warning-subtle text-warning-fg',\n  info:    'bg-info-subtle text-info-fg',\n  neutral: 'bg-surface-sunken text-text-secondary',\n  primary: 'bg-primary-subtle text-primary',\n};\n\nexport function Badge({ children, variant = 'neutral', className }) {\n  return (\n    <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium', variantMap[variant], className)}>\n      {children}\n    </span>\n  );\n}",
       "variants": [
         {
@@ -305,7 +305,7 @@
       "category": "Atom",
       "filePath": "modules/ui/Avatar.tsx",
       "abbr": "Av",
-      "description": "Kullanıcı profil fotoğrafı veya baş harfleri gösterici. 5 boyut destekler. Fotoğraf yoksa bg-primary-subtle / text-primary ile initials render edilir.",
+      "description": "User profile photo or initials indicator. 5 sizes with optional status dot. When no image is provided, initials render on a bg-primary-subtle / text-primary tile.",
       "source": "import { cn } from '@/libs/utils/cn';\n\nconst sizeMap = {\n  xs: 'h-6 w-6 text-xs',  sm: 'h-8 w-8 text-xs',\n  md: 'h-10 w-10 text-sm', lg: 'h-12 w-12 text-base', xl: 'h-16 w-16 text-lg',\n};\n\nfunction getInitials(name) {\n  return name.trim().split(/\\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase() || '?';\n}\n\nexport function Avatar({ src, name, size = 'md', className }) {\n  const sizeClass = sizeMap[size];\n  if (src) return <img src={src} alt={name} className={cn(sizeClass, 'rounded-full object-cover border border-border shrink-0', className)} />;\n  return (\n    <span aria-label={name} className={cn(sizeClass, 'rounded-full bg-primary-subtle text-primary font-semibold flex items-center justify-center shrink-0 border border-primary-subtle select-none', className)}>\n      {getInitials(name)}\n    </span>\n  );\n}",
       "variants": [
         {
@@ -347,7 +347,7 @@
       "category": "Atom",
       "filePath": "modules/ui/Spinner.tsx",
       "abbr": "Sp",
-      "description": "CSS border tabanlı yükleme göstergesi. FontAwesome gerektirmez. 5 boyut, border-border / border-t-primary renk sistemi.",
+      "description": "CSS border-based loading indicator. Does not require FontAwesome. 5 sizes, border-border / border-t-primary colour system.",
       "source": "import { cn } from '@/libs/utils/cn';\n\nconst sizeMap = {\n  xs: 'h-3 w-3 border', sm: 'h-4 w-4 border-2',\n  md: 'h-6 w-6 border-2', lg: 'h-8 w-8 border-[3px]', xl: 'h-12 w-12 border-4',\n};\n\nexport function Spinner({ size = 'md', className }) {\n  return (\n    <>\n      <span aria-hidden=\"true\" className={cn('inline-block rounded-full border-border border-t-primary animate-spin', sizeMap[size], className)} />\n      <span className=\"sr-only\">Loading…</span>\n    </>\n  );\n}",
       "variants": [
         {
@@ -372,7 +372,7 @@
       "category": "Atom",
       "filePath": "modules/ui/Skeleton.tsx",
       "abbr": "Sk",
-      "description": "İçerik yüklenmeden önce yer tutan animasyonlu placeholder. animate-pulse bg-surface-sunken kullanır. aria-busy=\"true\" ile erişilebilirlik sağlanır.",
+      "description": "Animated placeholder shown before content loads. Uses animate-pulse bg-surface-sunken. aria-busy=\"true\" ensures accessibility.",
       "source": "import { cn } from '@/libs/utils/cn';\n\nconst base = 'animate-pulse bg-surface-sunken';\n\nexport function SkeletonLine({ width = 'w-full', className }) {\n  return <div className={cn(base, 'h-3 rounded', width, className)} />;\n}\n\nexport function SkeletonAvatar({ size = 'md', className }) {\n  const s = { sm: 'h-8 w-8', md: 'h-10 w-10', lg: 'h-12 w-12' }[size];\n  return <div className={cn(base, 'rounded-full shrink-0', s, className)} />;\n}\n\nexport function SkeletonText({ lines = 3, className }) {\n  return (\n    <div className={cn('space-y-2', className)} aria-busy=\"true\" aria-label=\"Loading content\">\n      {Array.from({ length: lines }).map((_, i) => (\n        <SkeletonLine key={i} width={i === lines - 1 ? 'w-4/5' : 'w-full'} />\n      ))}\n    </div>\n  );\n}\n\nexport function SkeletonCard({ className }) {\n  return (\n    <div className={cn('bg-surface-raised border border-border rounded-xl p-6 space-y-4', className)} aria-busy=\"true\">\n      <div className=\"flex items-center gap-3\">\n        <SkeletonAvatar />\n        <div className=\"flex-1 space-y-2\">\n          <SkeletonLine width=\"w-2/3\" />\n          <SkeletonLine width=\"w-1/2\" />\n        </div>\n      </div>\n      <SkeletonText lines={3} />\n    </div>\n  );\n}",
       "variants": [
         {
@@ -415,7 +415,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/ButtonGroup.tsx",
       "abbr": "BG",
-      "description": "Segmented button group for mutually-exclusive options. Supports multiple variants and sizes.",
+      "description": "Segmented button group for mutually-exclusive options. Supports 4 variants, 4 sizes and disabled items.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function ButtonGroup({ items, value, onChange, variant = 'outline', size = 'md' }) {\n  return (\n    <div role=\"group\" className=\"inline-flex rounded-md overflow-hidden border border-border divide-x divide-border\">\n      {items.map((item) => (\n        <button key={item.value} type=\"button\" aria-pressed={item.value === value}\n          onClick={() => onChange(item.value)}\n          className={cn('px-4 py-2 text-sm font-medium transition-colors', item.value === value ? 'bg-surface-overlay font-semibold' : 'bg-surface-base hover:bg-surface-overlay')}>\n          {item.label}\n        </button>\n      ))}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -545,7 +545,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/Input.tsx",
       "abbr": "In",
-      "description": "Label + input + hint + error mesajından oluşan form alanı. Dört parça aria-describedby ile birbirine bağlanır.",
+      "description": "Text input field with label, hint, error, prefix icon, password toggle, and 3 size variants.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function Input({ id, label, hint, error, required, className, ...props }) {\n  const describedBy = [hint && !error ? `${id}-hint` : null, error ? `${id}-error` : null].filter(Boolean).join(' ');\n  return (\n    <div className=\"space-y-1\">\n      <label htmlFor={id} className=\"block text-sm font-medium text-text-primary\">\n        {label}\n        {required && <span className=\"text-error ml-1\" aria-hidden=\"true\">*</span>}\n      </label>\n      <input id={id} required={required} aria-invalid={!!error} aria-describedby={describedBy || undefined}\n        className={cn('block w-full rounded-md border px-3 py-2 text-sm transition-colors text-text-primary placeholder:text-text-disabled focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-surface-sunken', error ? 'border-error ring-1 ring-error bg-error-subtle' : 'border-border bg-surface-base', className)}\n        {...props} />\n      {hint && !error && <p id={`${id}-hint`} className=\"text-xs text-text-secondary\">{hint}</p>}\n      {error && <p id={`${id}-error`} className=\"text-xs text-error\" role=\"alert\">{error}</p>}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -623,7 +623,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/Textarea.tsx",
       "abbr": "Ta",
-      "description": "Label + textarea + hint + error anatomy. resize-y ile dikey boyutlandırma aktif, aria-describedby bağlantısı kurulmuş.",
+      "description": "Label + textarea + hint + error anatomy. Vertical resizing is enabled via resize-y and the parts are linked through aria-describedby.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function Textarea({ id, label, hint, error, disabled, required, rows = 4, className, ...props }) {\n  const hintId = hint ? `${id}-hint` : undefined;\n  const errorId = error ? `${id}-error` : undefined;\n  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;\n  return (\n    <div className={cn('space-y-1', className)}>\n      <label htmlFor={id} className=\"block text-sm font-medium text-text-primary\">\n        {label}{required && <span className=\"text-error ml-1\" aria-hidden=\"true\">*</span>}\n      </label>\n      <textarea id={id} rows={rows} disabled={disabled} required={required} aria-describedby={describedBy} aria-invalid={!!error}\n        className={cn('block w-full rounded-md border px-3 py-2 text-sm transition-colors resize-y text-text-primary placeholder:text-text-disabled focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-surface-sunken', error ? 'border-error ring-1 ring-error bg-error-subtle' : 'border-border bg-surface-base', className)} {...props} />\n      {hint && !error && <p id={hintId} className=\"text-xs text-text-secondary\">{hint}</p>}\n      {error && <p id={errorId} className=\"text-xs text-error\" role=\"alert\">{error}</p>}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -669,7 +669,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/SearchBar.tsx",
       "abbr": "Sb",
-      "description": "role=\"searchbox\" + arama ikonu + temizle butonu. Controlled / uncontrolled modda çalışır.",
+      "description": "role=\"searchbox\" with search icon and clear button. Works in controlled and uncontrolled modes.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\n\nexport function SearchBar({ id = 'search', placeholder = 'Search…', value, onChange, onClear, className }) {\n  const [internal, setInternal] = useState('');\n  const controlled = value !== undefined;\n  const currentValue = controlled ? value : internal;\n  function handleChange(e) { if (!controlled) setInternal(e.target.value); onChange?.(e.target.value); }\n  function handleClear() { if (!controlled) setInternal(''); onChange?.(''); onClear?.(); }\n  return (\n    <div className={cn('relative flex items-center', className)}>\n      <span aria-hidden=\"true\" className=\"absolute left-3 text-text-disabled pointer-events-none select-none\">⌕</span>\n      <input id={id} type=\"search\" role=\"searchbox\" value={currentValue} onChange={handleChange} placeholder={placeholder} autoComplete=\"off\"\n        className={cn('block w-full rounded-md border border-border bg-surface-base px-3 py-2 pl-8 text-sm text-text-primary placeholder:text-text-disabled focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus transition-colors', currentValue && 'pr-8')} />\n      {currentValue && (\n        <button type=\"button\" onClick={handleClear} aria-label=\"Clear search\" className=\"absolute right-2 text-text-disabled hover:text-text-primary transition-colors focus-visible:outline-none rounded\">✕</button>\n      )}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -707,7 +707,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/Checkbox.tsx",
       "abbr": "Cb",
-      "description": "Label + checkbox + opsiyonel hint / hata mesajı. aria-describedby bağlantısı kurulmuş, error durumunda border-error uygulanır.",
+      "description": "Label + checkbox + optional hint / error message. aria-describedby is wired up and border-error is applied on the error state.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function Checkbox({ id, label, hint, error, disabled, className, ...props }) {\n  const hintId = hint ? `${id}-hint` : undefined;\n  const errorId = error ? `${id}-error` : undefined;\n  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;\n  return (\n    <div className={cn('flex items-start gap-3', className)}>\n      <input id={id} type=\"checkbox\" disabled={disabled} aria-describedby={describedBy} aria-invalid={!!error}\n        className={cn('mt-0.5 h-4 w-4 rounded border-border text-primary focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50 disabled:cursor-not-allowed', error && 'border-error')} {...props} />\n      <div>\n        <label htmlFor={id} className={cn('text-sm font-medium', disabled ? 'text-text-disabled' : 'text-text-primary')}>{label}</label>\n        {hint && !error && <p id={hintId} className=\"text-xs text-text-secondary mt-0.5\">{hint}</p>}\n        {error && <p id={errorId} className=\"text-xs text-error mt-0.5\" role=\"alert\">{error}</p>}\n      </div>\n    </div>\n  );\n}",
       "variants": [
         {
@@ -751,7 +751,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/RadioGroup.tsx",
       "abbr": "Rg",
-      "description": "fieldset + legend tabanlı radio grubu. WCAG uyumlu klavye navigasyonu için fieldset/legend zorunludur.",
+      "description": "fieldset + legend based radio group. WCAG-compliant keyboard navigation with an optional card-style variant.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function RadioGroup({ name, legend, options, value, onChange, error, disabled, className }) {\n  return (\n    <fieldset className={cn('space-y-1', className)}>\n      <legend className=\"text-sm font-medium text-text-primary mb-2\">{legend}</legend>\n      <div className=\"space-y-2\">\n        {options.map((opt) => (\n          <label key={opt.value} className={cn('flex items-start gap-2', disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer')}>\n            <input type=\"radio\" name={name} value={opt.value} checked={value === opt.value} disabled={disabled}\n              onChange={() => onChange?.(opt.value)} className=\"mt-0.5 h-4 w-4 border-border text-primary focus-visible:ring-2 focus-visible:ring-border-focus\" />\n            <div>\n              <span className=\"text-sm text-text-primary\">{opt.label}</span>\n              {opt.hint && <p className=\"text-xs text-text-secondary\">{opt.hint}</p>}\n            </div>\n          </label>\n        ))}\n      </div>\n      {error && <p className=\"text-xs text-error mt-1\" role=\"alert\">{error}</p>}\n    </fieldset>\n  );\n}",
       "variants": [
         {
@@ -786,7 +786,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/Toggle.tsx",
       "abbr": "Tg",
-      "description": "role=\"switch\" tabanlı toggle/switch. 3 boyut, description slot, disabled desteği. CSS transform ile native input olmadan tam erişilebilir.",
+      "description": "role=\"switch\" toggle/switch with three sizes, description slot, and disabled support. Fully accessible via CSS transform without a native input.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nconst sizeMap = {\n  sm: { track: 'h-4 w-7',  thumb: 'h-3 w-3',     on: 'translate-x-3.5' },\n  md: { track: 'h-5 w-9',  thumb: 'h-3.5 w-3.5', on: 'translate-x-4'   },\n  lg: { track: 'h-6 w-11', thumb: 'h-4 w-4',     on: 'translate-x-5'   },\n};\n\nexport function Toggle({ id, label, description, checked, onChange, disabled, size = 'md', className }) {\n  const { track, thumb, on } = sizeMap[size];\n  return (\n    <label htmlFor={id} className={cn('flex items-start gap-3', disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer', className)}>\n      <div className=\"relative shrink-0 mt-0.5\">\n        <input id={id} type=\"checkbox\" role=\"switch\" checked={checked} onChange={(e) => onChange(e.target.checked)} disabled={disabled} aria-checked={checked} className=\"sr-only\" />\n        <div className={cn('rounded-full transition-colors duration-200', track, checked ? 'bg-primary' : 'bg-surface-sunken border border-border')} />\n        <div className={cn('absolute top-0.5 left-0.5 rounded-full bg-white shadow-sm transition-transform duration-200', thumb, checked ? on : 'translate-x-0')} />\n      </div>\n      <div>\n        <span className=\"text-sm font-medium text-text-primary\">{label}</span>\n        {description && <p className=\"text-xs text-text-secondary mt-0.5\">{description}</p>}\n      </div>\n    </label>\n  );\n}",
       "variants": [
         {
@@ -824,7 +824,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/CheckboxGroup.tsx",
       "abbr": "Cg",
-      "description": "Chip görünümlü çoklu seçim grubu. Seçili chip bg-primary-subtle / border-primary renk tokenları ile işaretlenir. Klavye erişilebilir.",
+      "description": "Chip-style multi-select group. Selected chips use bg-primary-subtle / border-primary tokens. Keyboard accessible.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function CheckboxGroup({ legend, options, selected, onChange, disabled, error, className }) {\n  function toggle(opt, checked) {\n    onChange(checked ? [...selected, opt] : selected.filter((s) => s !== opt));\n  }\n  return (\n    <fieldset className={cn('space-y-2', className)}>\n      <legend className=\"text-sm font-medium text-text-primary mb-2\">{legend}</legend>\n      <div className=\"flex flex-wrap gap-2\">\n        {options.map((opt) => {\n          const isSelected = selected.includes(opt);\n          return (\n            <label key={opt} className={cn('flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm transition-colors focus-within:ring-2 focus-within:ring-border-focus', disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer', isSelected ? 'bg-primary-subtle border-primary text-primary' : 'bg-surface-base border-border text-text-primary hover:bg-surface-overlay')}>\n              <input type=\"checkbox\" checked={isSelected} disabled={disabled} onChange={(e) => toggle(opt, e.target.checked)} className=\"sr-only\" />\n              {isSelected && <span aria-hidden=\"true\" className=\"text-xs font-bold\">✓</span>}\n              <span>{opt}</span>\n            </label>\n          );\n        })}\n      </div>\n      {error && <p className=\"text-xs text-error mt-1\" role=\"alert\">{error}</p>}\n    </fieldset>\n  );\n}",
       "variants": [
         {
@@ -856,7 +856,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/Select.tsx",
       "abbr": "Sl",
-      "description": "Label + select + hint + error anatomy. appearance-none ile native dropdown stilini override eder.",
+      "description": "Label + select + hint + error anatomy. appearance-none overrides the native dropdown style and renders a chevron icon.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function Select({ id, label, options, placeholder, hint, error, disabled, required, className, ...props }) {\n  const hintId = hint ? `${id}-hint` : undefined;\n  const errorId = error ? `${id}-error` : undefined;\n  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined;\n  return (\n    <div className={cn('space-y-1', className)}>\n      <label htmlFor={id} className=\"block text-sm font-medium text-text-primary\">\n        {label}{required && <span className=\"text-error ml-1\" aria-hidden=\"true\">*</span>}\n      </label>\n      <select id={id} disabled={disabled} required={required} aria-describedby={describedBy} aria-invalid={!!error}\n        className={cn('block w-full rounded-md border px-3 py-2 text-sm transition-colors appearance-none bg-surface-base text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-surface-sunken', error ? 'border-error ring-1 ring-error bg-error-subtle' : 'border-border')} {...props}>\n        {placeholder && <option value=\"\">{placeholder}</option>}\n        {options.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}\n      </select>\n      {hint && !error && <p id={hintId} className=\"text-xs text-text-secondary\">{hint}</p>}\n      {error && <p id={errorId} className=\"text-xs text-error\" role=\"alert\">{error}</p>}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -902,7 +902,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/TagInput.tsx",
       "abbr": "Ti",
-      "description": "Enter veya virgülle tag ekleme, çift tıkla düzenleme, Backspace ile silme. Duplicate eklenmez. Controlled string[] modeli.",
+      "description": "Free-text input that creates chips. Add tags with Enter or comma, double-click to edit, Backspace to delete. Duplicates are ignored.",
       "source": "'use client';\nimport { useRef, useState } from 'react';\nimport { cn } from '@/libs/utils/cn';\n\nexport function TagInput({ id, label, hint, error, value, onChange, placeholder = 'Type and press Enter or comma…', disabled, className }) {\n  const [input, setInput] = useState('');\n  const [editingIdx, setEditingIdx] = useState(null);\n  const [editValue, setEditValue] = useState('');\n\n  function addTags(raw) {\n    const tags = raw.split(',').map((t) => t.trim()).filter(Boolean);\n    onChange([...new Set([...value, ...tags])]);\n    setInput('');\n  }\n  function removeTag(idx) { onChange(value.filter((_, i) => i !== idx)); }\n  // ... keyboard handlers + inline edit\n  return (\n    <div className={cn('space-y-1', className)}>\n      <label htmlFor={id} className=\"block text-sm font-medium text-text-primary\">{label}</label>\n      <div className={cn('flex flex-wrap gap-1.5 min-h-10 w-full rounded-md border px-3 py-2 transition-colors cursor-text focus-within:ring-2 focus-within:ring-border-focus', disabled ? 'opacity-50 cursor-not-allowed bg-surface-sunken' : 'bg-surface-base border-border', error && 'border-error ring-1 ring-error')}>\n        {value.map((tag, i) => (\n          <span key={i} className=\"inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-primary-subtle text-primary\">\n            {tag}\n            {!disabled && <button type=\"button\" onClick={() => removeTag(i)} className=\"hover:opacity-70\">✕</button>}\n          </span>\n        ))}\n        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder={value.length === 0 ? placeholder : undefined} disabled={disabled} className=\"flex-1 min-w-24 bg-transparent text-sm text-text-primary placeholder:text-text-disabled outline-none\" />\n      </div>\n    </div>\n  );\n}",
       "variants": [
         {
@@ -935,7 +935,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/MultiSelect.tsx",
       "abbr": "Ms",
-      "description": "Multi-value select with tag chips, keyboard navigation, and remove-item support.",
+      "description": "Chip-based multi-select popover with searchable filter, keyboard navigation, and disabled-option support.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useEffect, useRef, useState } from 'react';\n\nexport function MultiSelect({ id, label, options, value, onChange, placeholder = 'Select…' }) {\n  // ... (controlled/uncontrolled multi-select with chip tags)\n}",
       "variants": [
         {
@@ -966,7 +966,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/ComboBox.tsx",
       "abbr": "Cb",
-      "description": "Single-select combobox with type-to-filter behavior, keyboard navigation, and optional async search.",
+      "description": "Searchable autocomplete single-select with keyboard navigation, described options, and a clearable button.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\n\nexport function ComboBox({ id, label, options, value, onChange, onSearch }) {\n  // searchable single-select combobox with async search support\n}",
       "variants": [
         {
@@ -989,7 +989,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/DatePicker.tsx",
       "abbr": "Dp",
-      "description": "Native date input ile label + hint + error anatomy. Date | null değer modeli, min/max kısıtlaması, disabled tooltip desteği.",
+      "description": "Native date input with label + hint + error anatomy. Supports min/max constraints and a disabled state.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function DatePicker({ id, label, hint, error, value, onChange, disabled, required, min, max, className }) {\n  const formatted = value && !isNaN(value.getTime()) ? value.toISOString().split('T')[0] : '';\n  function handleChange(e) {\n    if (!e.target.value) { onChange(null); return; }\n    const d = new Date(e.target.value);\n    onChange(isNaN(d.getTime()) ? null : d);\n  }\n  return (\n    <div className={cn('space-y-1', className)}>\n      <label htmlFor={id} className=\"block text-sm font-medium text-text-primary\">\n        {label}{required && <span className=\"text-error ml-1\" aria-hidden=\"true\">*</span>}\n      </label>\n      <input id={id} type=\"date\" value={formatted} onChange={handleChange} disabled={disabled} required={required} min={min} max={max} aria-invalid={!!error}\n        className={cn('block w-full rounded-md border px-3 py-2 text-sm transition-colors text-text-primary bg-surface-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-surface-sunken', error ? 'border-error ring-1 ring-error bg-error-subtle' : 'border-border')} />\n      {hint && !error && <p className=\"text-xs text-text-secondary\">{hint}</p>}\n      {error && <p className=\"text-xs text-error\" role=\"alert\">{error}</p>}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1027,7 +1027,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/DateRangePicker.tsx",
       "abbr": "Dr",
-      "description": "Date range picker with start/end fields and end ≥ start validation. Also ships a TimePicker.",
+      "description": "fieldset-based dual native date inputs. Start/end auto-constrain each other (min/max) with accessible sr-only labels.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function DateRangePicker({ id, label, value, onChange }) {\n  // start/end date inputs, auto-clears end if start > end\n}\n\nexport function TimePicker({ id, label, value, onChange, step = 60 }) {}",
       "variants": [
         {
@@ -1081,7 +1081,7 @@
       "category": "Organism",
       "filePath": "modules/ui/Card.tsx",
       "abbr": "Ca",
-      "description": "Raised / flat / outline varyantlı içerik konteyneri. title + subtitle + headerRight + footer slotları desteklenir.",
+      "description": "Content container with raised / flat / outline variants. Supports title, subtitle, headerRight, footer slots and loading skeleton state.",
       "source": "import { cn } from '@/libs/utils/cn';\n\nexport function Card({ title, subtitle, headerRight, footer, children, variant = 'raised', className }) {\n  return (\n    <div className={cn('rounded-xl border border-border overflow-hidden', variant === 'raised' && 'bg-surface-raised shadow-sm', variant === 'flat' && 'bg-surface-base', variant === 'outline' && 'bg-transparent', className)}>\n      {(title || headerRight) && (\n        <div className=\"flex items-start justify-between gap-3 px-6 py-4 border-b border-border\">\n          <div>\n            {title && <h3 className=\"text-sm font-semibold text-text-primary\">{title}</h3>}\n            {subtitle && <p className=\"text-xs text-text-secondary mt-0.5\">{subtitle}</p>}\n          </div>\n          {headerRight && <div className=\"shrink-0\">{headerRight}</div>}\n        </div>\n      )}\n      {children && <div className=\"px-6 py-4\">{children}</div>}\n      {footer && <div className=\"px-6 py-3 border-t border-border bg-surface-base\">{footer}</div>}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1128,7 +1128,7 @@
       "category": "Organism",
       "filePath": "modules/ui/PageHeader.tsx",
       "abbr": "Ph",
-      "description": "Sayfa başlığı + subtitle + badge + action butonları. Tüm varyantlar (primary/outline/danger/ghost) desteklenir. href veya onClick tabanlı aksiyonlar.",
+      "description": "Page title + subtitle + optional badge + action buttons. Supports 5 button variants (primary/secondary/outline/danger/ghost); rendered as a link with href or as a button.",
       "source": "import { cn } from '@/libs/utils/cn';\n\nconst variantMap = {\n  primary:   'bg-primary text-primary-fg hover:bg-primary-hover',\n  secondary: 'bg-secondary text-secondary-fg hover:bg-secondary-hover',\n  outline:   'border border-border text-text-primary hover:bg-surface-overlay',\n  danger:    'bg-error text-text-inverse hover:opacity-90',\n  ghost:     'bg-transparent text-text-primary hover:bg-surface-overlay',\n};\n\nexport function PageHeader({ title, subtitle, badge, actions, className }) {\n  return (\n    <div className={cn('flex items-start justify-between gap-4 pb-5 border-b border-border', className)}>\n      <div className=\"min-w-0\">\n        <div className=\"flex items-center gap-2 flex-wrap\">\n          <h1 className=\"text-2xl font-bold text-text-primary leading-tight\">{title}</h1>\n          {badge}\n        </div>\n        {subtitle && <p className=\"text-sm text-text-secondary mt-0.5\">{subtitle}</p>}\n      </div>\n      {actions?.length > 0 && (\n        <div className=\"flex items-center gap-2 shrink-0\">\n          {actions.map((action, i) => (\n            <button key={i} type=\"button\" onClick={action.onClick} disabled={action.disabled} className={cn('inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50', variantMap[action.variant ?? 'primary'])}>\n              {action.label}\n            </button>\n          ))}\n        </div>\n      )}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1167,7 +1167,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/Slider.tsx",
       "abbr": "Sl",
-      "description": "Erişilebilir carousel. role=\"region\" + aria-roledescription=\"carousel\" + slide aria etiketleri dahildir. Otomatik oynatma, ok tuşları ve dot navigasyon desteklenir.",
+      "description": "Accessible carousel. Includes role=\"region\" + aria-roledescription=\"carousel\" and per-slide aria labels. Supports autoplay, arrow keys, and dot navigation.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState, useEffect, useCallback, useRef } from 'react';\n\nexport function Slider({ slides, autoPlay = false, autoPlayInterval = 4000, showDots = true, showArrows = true, loop = true, className, slideClassName }) {\n  const [current, setCurrent] = useState(0);\n  const total = slides.length;\n  const goTo = useCallback((index) => setCurrent(loop ? ((index + total) % total) : Math.max(0, Math.min(index, total - 1))), [loop, total]);\n  const prev = () => goTo(current - 1);\n  const next = () => goTo(current + 1);\n  useEffect(() => {\n    if (!autoPlay || total <= 1) return;\n    const t = setInterval(() => setCurrent((c) => (c + 1) % total), autoPlayInterval);\n    return () => clearInterval(t);\n  }, [autoPlay, autoPlayInterval, total]);\n  return (\n    <div className={cn('relative overflow-hidden rounded-xl', className)} role=\"region\" aria-label=\"Content slider\" aria-roledescription=\"carousel\">\n      <div className=\"flex transition-transform duration-350 ease-in-out\" style={{ transform: `translateX(-${current * 100}%)` }}>\n        {slides.map((slide, i) => (\n          <div key={i} role=\"group\" aria-roledescription=\"slide\" aria-label={`Slide ${i + 1} of ${total}`} aria-hidden={i !== current} className={cn('w-full shrink-0', slideClassName)}>{slide}</div>\n        ))}\n      </div>\n      {showArrows && (loop || current > 0) && <button onClick={prev} aria-label=\"Previous slide\" className=\"absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center\">‹</button>}\n      {showArrows && (loop || current < total - 1) && <button onClick={next} aria-label=\"Next slide\" className=\"absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center\">›</button>}\n      {showDots && total > 1 && (\n        <div className=\"absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10\" role=\"tablist\" aria-label=\"Slide indicators\">\n          {slides.map((_, i) => <button key={i} role=\"tab\" aria-selected={i === current} aria-label={`Go to slide ${i + 1}`} onClick={() => goTo(i)} className={cn('h-2 rounded-full transition-all', i === current ? 'w-5 bg-white' : 'w-2 bg-white/40')} />)}\n        </div>\n      )}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1194,7 +1194,7 @@
       "category": "Organism",
       "filePath": "modules/ui/StatCard.tsx",
       "abbr": "Sc",
-      "description": "Küçük metrik gösterim kartı; değer, etiket ve opsiyonel vurgu rengi.",
+      "description": "Compact metric display card with value, label, and optional accent color.",
       "source": "import { StatCard } from '@/modules/ui/StatCard';\n\n<StatCard label=\"Total Users\" value={1284} />\n<StatCard label=\"Active\"      value={947}  accent=\"text-success\" />\n<StatCard label=\"Cancelled\"   value={12}   accent=\"text-error\" />",
       "variants": [
         {
@@ -1216,7 +1216,7 @@
       "category": "Organism",
       "filePath": "modules/ui/AlertBanner.tsx",
       "abbr": "Ab",
-      "description": "Sayfa düzeyinde bilgi, uyarı veya hata mesajı. role=\"alert\" ile ekran okuyucular için duyurulur. dismissible özelliği eklenebilir.",
+      "description": "Page-level info, success, warning or error message. Announced via role=\"alert\" for screen readers with optional dismissible and action support.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\n\nconst variantMap = {\n  success: { container: 'bg-success-subtle border-success text-success-fg', icon: '✓' },\n  warning: { container: 'bg-warning-subtle border-warning text-warning-fg', icon: '⚠' },\n  error:   { container: 'bg-error-subtle border-error text-error-fg',       icon: '✕' },\n  info:    { container: 'bg-info-subtle border-info text-info-fg',          icon: 'ℹ' },\n};\n\nexport function AlertBanner({ variant = 'info', title, message, dismissible = false, className }) {\n  const [dismissed, setDismissed] = useState(false);\n  if (dismissed) return null;\n  const { container, icon } = variantMap[variant];\n  return (\n    <div role=\"alert\" className={cn('flex items-start gap-3 rounded-lg border p-4', container, className)}>\n      <span aria-hidden=\"true\" className=\"mt-0.5 shrink-0 font-bold\">{icon}</span>\n      <div className=\"flex-1 text-sm\">\n        {title && <p className=\"font-semibold\">{title}</p>}\n        <p className={cn(title && 'mt-0.5')}>{message}</p>\n      </div>\n      {dismissible && (\n        <button type=\"button\" aria-label=\"Dismiss\" onClick={() => setDismissed(true)} className=\"shrink-0 hover:opacity-70 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded\">✕</button>\n      )}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1271,7 +1271,7 @@
       "category": "Organism",
       "filePath": "modules/ui/Toast.tsx",
       "abbr": "To",
-      "description": "Zustand store üzerinden yönetilen bildirim sistemi. Hover'da dondurma, progress bar, title, actions, loading ve promise desteği.",
+      "description": "Notification system with success/warning/error/info/loading variants. Hover-to-freeze, progress bar, title, actions, and promise support.",
       "source": "// Mount once at app root\n<ToastProvider position=\"top-right\" />\n\n// Fire from anywhere\nimport { toast } from '@/modules/ui/Toast';\n\ntoast.success('Kaydedildi.');\ntoast.error('Hata oluştu.', { title: 'Bağlantı hatası' });\ntoast.loading('İşleniyor...');\ntoast.promise(fetchData(), {\n  loading: 'Yükleniyor...',\n  success: (d) => `${d.name} yüklendi.`,\n  error:   'Yüklenemedi.',\n});\n\n// With actions\ntoast.info('Öğe silindi.', {\n  actions: [\n    { label: 'Geri Al', onClick: (dismiss) => { undo(); dismiss(); } },\n    { label: 'Kalıcı sil', onClick: (d) => { purge(); d(); }, variant: 'danger' },\n  ],\n});\n\n// Programmatic control\ntoast.update(id, { message: 'Güncellendi.' });\ntoast.dismiss(id);\nconst { clear } = useToastStore();",
       "variants": [
         {
@@ -1302,7 +1302,7 @@
       "category": "Organism",
       "filePath": "modules/ui/EmptyState.tsx",
       "abbr": "Es",
-      "description": "Veri yokken gösterilen boş durum mesajı. icon + title + description + action slotları desteklenir.",
+      "description": "Empty-state message shown when there is no data. Supports icon, title, description, and action slots.",
       "source": "import { cn } from '@/libs/utils/cn';\n\nexport function EmptyState({ icon, title, description, action, className }) {\n  return (\n    <div className={cn('flex flex-col items-center justify-center text-center py-16 px-6', className)}>\n      {icon && <div className=\"h-12 w-12 rounded-full bg-surface-sunken flex items-center justify-center text-text-disabled text-2xl mb-4\" aria-hidden=\"true\">{icon}</div>}\n      <h3 className=\"text-sm font-semibold text-text-primary\">{title}</h3>\n      {description && <p className=\"mt-1 text-sm text-text-secondary max-w-xs\">{description}</p>}\n      {action && <div className=\"mt-4\">{action}</div>}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1332,7 +1332,7 @@
       "category": "Organism",
       "filePath": "modules/ui/Pagination.tsx",
       "abbr": "Pg",
-      "description": "Sayfa navigasyonu. Ellipsis ile büyük sayfa sayılarını kısaltır. aria-label ve aria-current=\"page\" ile erişilebilir.",
+      "description": "Page navigation control. Collapses large page counts with ellipsis; accessible via aria-label and aria-current=\"page\".",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function Pagination({ page, totalPages, onPageChange, className }) {\n  // builds visible pages with ellipsis ...\n  return (\n    <nav aria-label=\"Pagination\" className={cn('flex items-center gap-1', className)}>\n      <button type=\"button\" onClick={() => onPageChange(page - 1)} disabled={page <= 1} aria-label=\"Go to previous page\" className=\"...\">‹</button>\n      {/* page buttons */}\n      <button type=\"button\" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} aria-label=\"Go to next page\" className=\"...\">›</button>\n    </nav>\n  );\n}",
       "variants": [
         {
@@ -1359,7 +1359,7 @@
       "category": "Organism",
       "filePath": "modules/ui/TabGroup.tsx",
       "abbr": "Tg",
-      "description": "role=\"tablist\" / role=\"tab\" / role=\"tabpanel\" ARIA pattern. Ok tuşları ile navigasyon, tabIndex=-1 aktif olmayan tablar için.",
+      "description": "Accessible tab navigation following the role=\"tablist\" / role=\"tab\" / role=\"tabpanel\" ARIA pattern. Arrow-key navigation; tabIndex=-1 on inactive tabs.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\n\nexport function TabGroup({ tabs, defaultTab, label = 'Tabs', className }) {\n  const [active, setActive] = useState(defaultTab ?? tabs[0]?.id ?? '');\n  function handleKeyDown(e, index) {\n    if (e.key === 'ArrowRight') setActive(tabs[(index + 1) % tabs.length].id);\n    else if (e.key === 'ArrowLeft') setActive(tabs[(index - 1 + tabs.length) % tabs.length].id);\n  }\n  return (\n    <div className={cn('w-full', className)}>\n      <div role=\"tablist\" aria-label={label} className=\"flex border-b border-border pb-3\">\n        {tabs.map((tab, i) => (\n          <button key={tab.id} role=\"tab\" id={`tab-btn-${tab.id}`} aria-selected={tab.id === active} aria-controls={`tabpanel-${tab.id}`} tabIndex={tab.id === active ? 0 : -1}\n            onClick={() => setActive(tab.id)} onKeyDown={(e) => handleKeyDown(e, i)}\n            className={cn('px-4 py-2.5 text-sm font-medium border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus', tab.id === active ? 'border-primary text-primary' : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border')}>\n            {tab.label}\n          </button>\n        ))}\n      </div>\n      {tabs.map((tab) => (\n        <div key={tab.id} id={`tabpanel-${tab.id}`} role=\"tabpanel\" aria-labelledby={`tab-btn-${tab.id}`} tabIndex={0} hidden={tab.id !== active} className=\"py-4 focus-visible:outline-none\">\n          {tab.content}\n        </div>\n      ))}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1393,7 +1393,7 @@
       "category": "Organism",
       "filePath": "modules/ui/Breadcrumb.tsx",
       "abbr": "Bc",
-      "description": "nav aria-label=\"Breadcrumb\" sarıcı ile erişilebilir. Son öge aria-current=\"page\" ile işaretlenir, ayrılıcı aria-hidden.",
+      "description": "Hierarchical navigation trail wrapped in nav aria-label=\"Breadcrumb\". Last item marked with aria-current=\"page\" and aria-hidden separators.",
       "source": "import { cn } from '@/libs/utils/cn';\n\nexport function Breadcrumb({ items, className }) {\n  return (\n    <nav aria-label=\"Breadcrumb\" className={className}>\n      <ol className=\"flex flex-wrap items-center gap-1 text-sm\">\n        {items.map((item, i) => {\n          const isLast = i === items.length - 1;\n          return (\n            <li key={i} className=\"flex items-center gap-1\">\n              {!isLast && item.href ? (\n                <><a href={item.href} className=\"text-text-secondary hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded\">{item.label}</a><span aria-hidden=\"true\" className=\"text-text-disabled\">›</span></>\n              ) : (\n                <span className={isLast ? 'text-text-primary font-medium' : 'text-text-secondary'} aria-current={isLast ? 'page' : undefined}>{item.label}</span>\n              )}\n            </li>\n          );\n        })}\n      </ol>\n    </nav>\n  );\n}",
       "variants": [
         {
@@ -1482,7 +1482,7 @@
       "category": "Organism",
       "filePath": "modules/ui/TabButton.tsx",
       "abbr": "TB",
-      "description": "Pill tarzı sekme butonu; aktif/pasif renklendirme ve opsiyonel sayaç rozeti.",
+      "description": "Pill-style tab button with active/inactive coloring and an optional count badge.",
       "source": "import { TabButton } from '@/modules/ui/TabButton';\n\n<TabButton active={tab === 'all'}    onClick={() => setTab('all')}    count={42}>All</TabButton>\n<TabButton active={tab === 'active'} onClick={() => setTab('active')} count={18}>Active</TabButton>",
       "variants": [
         {
@@ -1505,7 +1505,7 @@
       "category": "Organism",
       "filePath": "modules/ui/ViewToggle.tsx",
       "abbr": "VT",
-      "description": "Yatay / dikey görünüm geçiş kontrolü; ikonlu iki durumlu seçici.",
+      "description": "Horizontal / vertical view toggle control; two-state icon selector. Emits a viewtoggle:change CustomEvent.",
       "source": "import { ViewToggle, type ViewOrientation } from '@/modules/ui/ViewToggle';\n\nconst [view, setView] = useState<ViewOrientation>('horizontal');\n\n<ViewToggle value={view} onChange={setView} />\n\n// With custom labels\n<ViewToggle\n  value={view}\n  onChange={setView}\n  labels={{ horizontal: 'Yatay', vertical: 'Dikey' }}\n  ariaLabel=\"Görünüm seçenekleri\"\n/>",
       "variants": [
         {
@@ -1528,7 +1528,7 @@
       "category": "Organism",
       "filePath": "modules/ui/Modal.tsx",
       "abbr": "Md",
-      "description": "Odak yönetimi, Escape kapatma, backdrop tıklama ile kapatma. role=\"dialog\" + aria-modal + aria-labelledby zorunludur.",
+      "description": "Focus-trapped dialog. Closes on Escape and backdrop click. Requires role=\"dialog\" + aria-modal + aria-labelledby; supports sm/md/lg sizes.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useEffect, useRef } from 'react';\n\nexport function Modal({ open, onClose, title, description, children, footer, size = 'md', className }) {\n  const panelRef = useRef(null);\n  useEffect(() => { if (!open) return; const prev = document.activeElement; panelRef.current?.focus(); return () => prev?.focus(); }, [open]);\n  useEffect(() => { if (!open) return; const onKey = (e) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', onKey); return () => document.removeEventListener('keydown', onKey); }, [open, onClose]);\n  if (!open) return null;\n  const sizeClass = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg' }[size];\n  return (\n    <div className=\"fixed inset-0 z-50 flex items-center justify-center p-4\" aria-modal=\"true\" role=\"dialog\" aria-labelledby=\"modal-title\">\n      <div className=\"absolute inset-0 bg-black/50\" onClick={onClose} aria-hidden=\"true\" />\n      <div ref={panelRef} tabIndex={-1} className={cn('relative z-10 w-full rounded-xl border border-border bg-surface-raised shadow-xl flex flex-col focus-visible:outline-none', sizeClass, className)}>\n        <div className=\"flex items-start justify-between gap-3 px-6 py-4 border-b border-border\">\n          <h2 id=\"modal-title\" className=\"text-base font-semibold text-text-primary\">{title}</h2>\n          <button type=\"button\" onClick={onClose} aria-label=\"Close dialog\" className=\"text-text-disabled hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded\">✕</button>\n        </div>\n        {children && <div className=\"px-6 py-4 flex-1\">{children}</div>}\n        {footer && <div className=\"px-6 py-4 border-t border-border flex justify-end gap-2\">{footer}</div>}\n      </div>\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1566,7 +1566,7 @@
       "category": "Organism",
       "filePath": "modules/ui/Drawer.tsx",
       "abbr": "Dr",
-      "description": "Ekranın kenarından süzülen panel. Sol / sağ taraf seçeneği, odak yönetimi ve Escape kapatma dahildir.",
+      "description": "Side panel sliding in from the screen edge. Left / right placement with focus management and Escape close.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useEffect, useRef } from 'react';\n\nexport function Drawer({ open, onClose, title, side = 'right', children, footer, className }) {\n  // focus trap + Escape key handler\n  return (\n    <div className={cn('fixed inset-0 z-50 flex', !open && 'pointer-events-none')} aria-modal=\"true\" role=\"dialog\" aria-label={title}>\n      <div className={cn('absolute inset-0 bg-black/50 transition-opacity duration-200', open ? 'opacity-100' : 'opacity-0')} onClick={onClose} aria-hidden=\"true\" />\n      <div className={cn('relative flex flex-col w-80 max-w-full h-full bg-surface-raised shadow-xl transition-transform duration-200 focus-visible:outline-none', side === 'right' ? 'ml-auto border-l border-border' : 'mr-auto border-r border-border', open ? 'translate-x-0' : side === 'right' ? 'translate-x-full' : '-translate-x-full', className)}>\n        <div className=\"flex items-center justify-between gap-3 px-4 py-4 border-b border-border shrink-0\">\n          <h2 className=\"text-base font-semibold text-text-primary\">{title}</h2>\n          <button type=\"button\" onClick={onClose} aria-label=\"Close drawer\" className=\"text-text-disabled hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded\">✕</button>\n        </div>\n        <div className=\"flex-1 overflow-y-auto px-4 py-4\">{children}</div>\n        {footer && <div className=\"px-4 py-4 border-t border-border shrink-0 flex justify-end gap-2\">{footer}</div>}\n      </div>\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1596,7 +1596,7 @@
       "category": "Organism",
       "filePath": "modules/ui/Tooltip.tsx",
       "abbr": "Tt",
-      "description": "Hover ve focus ile görünür yardım metni. role=\"tooltip\" + aria-describedby bağlantısı ile erişilebilir. 4 yön desteklenir.",
+      "description": "Short hint shown on hover and focus. Accessible via role=\"tooltip\" + aria-describedby. Supports 4 placements, 3 themes, optional arrow, and configurable delay.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useRef, useState } from 'react';\n\nexport function Tooltip({ content, placement = 'top', children, className }) {\n  const [visible, setVisible] = useState(false);\n  const id = useRef(`tooltip-${Math.random().toString(36).slice(2)}`).current;\n  const placementClass = { top: 'bottom-full left-1/2 -translate-x-1/2 mb-1.5', bottom: 'top-full left-1/2 -translate-x-1/2 mt-1.5', left: 'right-full top-1/2 -translate-y-1/2 mr-1.5', right: 'left-full top-1/2 -translate-y-1/2 ml-1.5' }[placement];\n  return (\n    <span className={cn('relative inline-flex items-center', className)} onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} onFocus={() => setVisible(true)} onBlur={() => setVisible(false)}>\n      <span aria-describedby={id}>{children}</span>\n      <span id={id} role=\"tooltip\" className={cn('absolute z-50 whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium shadow-md bg-surface-overlay text-text-primary border border-border transition-opacity duration-150 pointer-events-none', placementClass, visible ? 'opacity-100' : 'opacity-0')}>{content}</span>\n    </span>\n  );\n}",
       "variants": [
         {
@@ -1628,7 +1628,7 @@
       "category": "Organism",
       "filePath": "modules/ui/DropdownMenu.tsx",
       "abbr": "Dm",
-      "description": "role=\"menu\" + role=\"menuitem\" ile erişilebilir dropdown. Escape ile kapanır, dışarı tıklamada kapanır. Danger ve disabled item desteği var.",
+      "description": "Accessible dropdown using role=\"menu\" + role=\"menuitem\". Closes on Escape and outside click. Supports left/right alignment, icons, separators, danger and disabled items, and arrow-key navigation.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useEffect, useRef, useState } from 'react';\n\nexport function DropdownMenu({ trigger, items, align = 'left', className }) {\n  const [open, setOpen] = useState(false);\n  // outside click + Escape handlers\n  return (\n    <div ref={containerRef} className={cn('relative inline-block', className)}>\n      <div onClick={() => setOpen((p) => !p)} aria-haspopup=\"menu\" aria-expanded={open}>{trigger}</div>\n      {open && (\n        <div role=\"menu\" className={cn('absolute z-50 mt-1 min-w-[10rem] rounded-lg border border-border bg-surface-raised shadow-lg py-1', align === 'right' ? 'right-0' : 'left-0')}>\n          {items.map((item, i) => item.type === 'separator' ? <div key={i} role=\"separator\" className=\"my-1 border-t border-border\" /> : (\n            <button key={i} role=\"menuitem\" type=\"button\" disabled={item.disabled} onClick={() => { item.onClick?.(); setOpen(false); }}\n              className={cn('flex w-full items-center gap-2 px-3 py-2 text-sm text-left transition-colors focus-visible:outline-none focus-visible:bg-surface-overlay', item.danger ? 'text-error hover:bg-error-subtle' : 'text-text-primary hover:bg-surface-overlay', item.disabled && 'opacity-50 cursor-not-allowed')}>\n              {item.icon && <span aria-hidden=\"true\">{item.icon}</span>}{item.label}\n            </button>\n          ))}\n        </div>\n      )}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1682,7 +1682,7 @@
       "category": "Organism",
       "filePath": "modules/ui/Table.tsx",
       "abbr": "Tb",
-      "description": "Responsive tablo. scope=\"col\" başlıklar, hover satır vurgusu, boş durum mesajı ve özel cell render desteği.",
+      "description": "Responsive table. scope=\"col\" headers, hover row highlight, empty-state message, and custom cell render support.",
       "source": "import { cn } from '@/libs/utils/cn';\n\nexport function Table({ columns, rows, caption, emptyMessage = 'No results found.', className }) {\n  return (\n    <div className={cn('w-full overflow-x-auto rounded-lg border border-border', className)}>\n      <table className=\"w-full text-sm\">\n        {caption && <caption className=\"sr-only\">{caption}</caption>}\n        <thead className=\"bg-surface-sunken border-b border-border\">\n          <tr>{columns.map((col) => <th key={col.key} scope=\"col\" className=\"px-4 py-3 text-xs font-semibold text-text-secondary uppercase tracking-wider text-left\">{col.header}</th>)}</tr>\n        </thead>\n        <tbody className=\"divide-y divide-border bg-surface-base\">\n          {rows.length === 0 ? (\n            <tr><td colSpan={columns.length} className=\"px-4 py-8 text-center text-text-secondary\">{emptyMessage}</td></tr>\n          ) : rows.map((row, i) => (\n            <tr key={i} className=\"hover:bg-surface-overlay transition-colors\">\n              {columns.map((col) => <td key={col.key} className=\"px-4 py-3 text-text-primary\">{col.render ? col.render(row) : String(row[col.key] ?? '')}</td>)}\n            </tr>\n          ))}\n        </tbody>\n      </table>\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1718,7 +1718,7 @@
       "category": "Organism",
       "filePath": "modules/ui/DataTable.tsx",
       "abbr": "Dt",
-      "description": "Table + SearchBar + Pagination tek bileşende. Client-side arama ve sayfalama. Filtrelenmiş sonuç sayacı, satır/sayfa seçici.",
+      "description": "Table + SearchBar + Pagination in a single component. Client-side search and pagination with filtered result counter and rows-per-page selector.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useMemo, useState } from 'react';\nimport { SearchBar } from './SearchBar';\nimport { Pagination } from './Pagination';\n\nexport function DataTable({ columns, rows, caption, searchable = true, searchPlaceholder = 'Search…', pageSize: defaultPageSize = 10, pageSizeOptions = [5,10,25,50], emptyMessage = 'No results found.', className }) {\n  const [search, setSearch] = useState('');\n  const [page, setPage] = useState(1);\n  const [pageSize, setPageSize] = useState(defaultPageSize);\n\n  const filtered = useMemo(() => {\n    if (!search.trim()) return rows;\n    const q = search.toLowerCase();\n    return rows.filter((row) => columns.some((col) => !col.render && String(row[col.key] ?? '').toLowerCase().includes(q)));\n  }, [rows, search, columns]);\n\n  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));\n  const paginated  = filtered.slice((page - 1) * pageSize, page * pageSize);\n\n  return (\n    <div className={cn('space-y-3', className)}>\n      {searchable && (\n        <div className=\"flex items-center gap-2 flex-wrap\">\n          <SearchBar value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder={searchPlaceholder} className=\"flex-1 min-w-40\" />\n          <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }} className=\"rounded-md border border-border bg-surface-base px-2 py-1.5 text-sm\">\n            {pageSizeOptions.map((s) => <option key={s} value={s}>{s}</option>)}\n          </select>\n        </div>\n      )}\n      {/* table body ... */}\n      <div className=\"flex items-center justify-between gap-4 flex-wrap\">\n        <p className=\"text-xs text-text-secondary\">Showing {(page-1)*pageSize+1}–{Math.min(page*pageSize, filtered.length)} of {filtered.length}</p>\n        {totalPages > 1 && <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />}\n      </div>\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1769,7 +1769,7 @@
       "category": "Organism",
       "filePath": "modules/ui/ContentScoreBar.tsx",
       "abbr": "Cs",
-      "description": "Kural tabanlı içerik kalite skoru. Good ≥70 / Fair ≥40 / Poor <40 tier sistemi. Her kural chip olarak gösterilir, geçen/kalan sayım altında.",
+      "description": "Rule-based content quality score with Good ≥70 / Fair ≥40 / Poor <40 tier system. Each rule shown as a chip with passed/total count. role=\"progressbar\" + aria-valuenow.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useMemo } from 'react';\n\nconst tierMap = {\n  great: { bar: 'bg-success', text: 'text-success-fg', bg: 'bg-success-subtle', border: 'border-success', label: 'Good' },\n  ok:    { bar: 'bg-warning', text: 'text-warning-fg', bg: 'bg-warning-subtle', border: 'border-warning', label: 'Fair' },\n  poor:  { bar: 'bg-error',   text: 'text-error-fg',   bg: 'bg-error-subtle',   border: 'border-error',   label: 'Poor' },\n};\n\nexport function ContentScoreBar({ value, rules, label, className }) {\n  const { score, results } = useMemo(() => {\n    let earned = 0, total = 0;\n    const results = rules.map((rule) => { const pass = rule.check(value); if (pass) earned += rule.points; total += rule.points; return { label: rule.label, pass, hint: rule.hint }; });\n    return { score: total > 0 ? Math.round((earned / total) * 100) : 0, results };\n  }, [value, rules]);\n  const tier = score >= 70 ? 'great' : score >= 40 ? 'ok' : 'poor';\n  const t = tierMap[tier];\n  return (\n    <div className={cn('rounded-lg border p-3 space-y-2', t.bg, t.border, className)}>\n      <div className=\"flex items-center gap-2\">\n        {label && <span className=\"text-xs font-semibold text-text-secondary uppercase tracking-wider\">{label}</span>}\n        <div className=\"ml-auto flex items-center gap-1.5\">\n          <span className={cn('text-xs font-medium', t.text)}>{t.label}</span>\n          <span className={cn('text-sm font-bold tabular-nums', t.text)}>{score}%</span>\n        </div>\n      </div>\n      <div className=\"h-1.5 w-full rounded-full bg-surface-sunken overflow-hidden\">\n        <div className={cn('h-full rounded-full transition-all duration-500', t.bar)} style={{ width: `${score}%` }} />\n      </div>\n      <div className=\"flex flex-wrap gap-1\">\n        {results.map((r, i) => <span key={i} title={r.hint} className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium', r.pass ? cn(t.bg, t.text, 'border', t.border) : 'bg-surface-sunken text-text-disabled border border-border')}>{r.pass && <span aria-hidden=\"true\">✓</span>}{r.label}</span>)}\n      </div>\n      <p className=\"text-xs text-text-secondary\">{results.filter(r => r.pass).length} / {results.length} rules passed</p>\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1809,7 +1809,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/VideoPlayer.tsx",
       "abbr": "Vp",
-      "description": "Özelleştirilmiş HTML5 video oynatıcı. Kalite seçimi, altyazı (WebVTT overlay + font boyutu), ses dili, oynatma hızı, seek, ses kontrolü ve tam ekran desteği. Klavye kısayolları: Space/K=oynat, ←→=±10s, ↑↓=ses, M=sessiz, F=tam ekran.",
+      "description": "Custom HTML5 video player. Quality, subtitle, audio track, and playback rate selection; custom WebVTT subtitle overlay; auto-hiding controls; programmatic API. Keyboard shortcuts: Space/K=play, ←→=±10s, ↑↓=volume, M=mute, F=fullscreen.",
       "source": "'use client';\nimport { VideoPlayer } from '@/modules/ui/VideoPlayer';\n\n<VideoPlayer\n  src=\"video.mp4\"\n  poster=\"poster.jpg\"\n  title=\"My Video\"\n  qualities={[\n    { label: '1080p HD', value: '1080' },\n    { label: '720p',     value: '720'  },\n    { label: 'Auto',     value: 'auto' },\n  ]}\n  defaultQuality=\"auto\"\n  subtitles={[\n    { label: 'English', srclang: 'en', src: 'en.vtt' },\n    { label: 'Türkçe',  srclang: 'tr', src: 'tr.vtt' },\n  ]}\n  audioTracks={[\n    { label: 'English', language: 'en' },\n    { label: 'Türkçe',  language: 'tr' },\n  ]}\n  onQualityChange={(v) => console.log('quality:', v)}\n  onAudioTrackChange={(i) => console.log('audio track:', i)}\n/>",
       "variants": [
         {
@@ -1836,7 +1836,7 @@
       "category": "App",
       "filePath": "modules/app/AppShell.tsx",
       "abbr": "AS",
-      "description": "Tam ekran layout wrapper. logo, sidebar ve topbar slotlarına component geçilir. Masaüstünde sidebar aside olarak gösterilir, mobilde Drawer ile açılır.",
+      "description": "Full-screen layout wrapper with logo, sidebar and topbar slots. Sidebar renders as an aside on desktop and opens via a drawer on mobile.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function AppShell({ logo, compactLogo, sidebarCollapsed = false, sidebar, topbar, children, className, ...rest }) {\n  const logoContent = sidebarCollapsed && compactLogo ? compactLogo : (logo ?? compactLogo);\n\n  return (\n    <div className={cn('flex h-screen overflow-hidden bg-surface-base', className)} {...rest}>\n      {sidebar && (\n        <aside className=\"relative hidden lg:flex flex-col h-full min-h-0 shrink-0 border-r border-border bg-surface-raised\">\n          {logoContent && (\n            <div className={cn(\n              'absolute inset-x-0 top-0 z-10 flex items-center h-14 border-b border-border bg-surface-raised overflow-hidden',\n              sidebarCollapsed && compactLogo ? 'justify-center px-2' : 'px-4'\n            )}>{logoContent}</div>\n          )}\n          <div className={cn('flex min-h-0 flex-1', logoContent && 'pt-14')}>\n            {sidebar}\n          </div>\n        </aside>\n      )}\n      <div className=\"flex flex-1 flex-col min-w-0 min-h-0\">\n        {topbar && (\n          <header className=\"sticky top-0 z-30 flex items-center h-14 px-4 border-b border-border bg-surface-raised/90 backdrop-blur shrink-0\">\n            {topbar}\n          </header>\n        )}\n        <main id=\"main-content\" className=\"flex-1 overflow-y-auto p-4 sm:p-6\">\n          {children}\n        </main>\n      </div>\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1863,7 +1863,7 @@
       "category": "App",
       "filePath": "modules/app/AppSidebar.tsx",
       "abbr": "Ab",
-      "description": "Daraltılabilir kenar çubuğu. navGroups veya navItems alır; collapsed toggle dahili. searchable prop ile yerleşik arama filtresi; footer slotu ile kullanıcı bilgisi veya herhangi bir içerik gösterilebilir.",
+      "description": "Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter and a footer slot can host a user block or any content.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\nimport { Badge } from '@/modules/ui/Badge';\n\nexport function AppSidebar({ navGroups, navItems, activeId, onSelect, collapsed, defaultCollapsed = false, onCollapsedChange, footer, className, ...rest }) {\n  const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed);\n  const isCollapsed = collapsed ?? internalCollapsed;\n  const groups = navGroups ?? (navItems ? [{ items: navItems }] : []);\n  const footerContent = typeof footer === 'function' ? footer({ collapsed: isCollapsed }) : footer;\n\n  const setCollapsed = (next) => {\n    if (collapsed === undefined) setInternalCollapsed(next);\n    onCollapsedChange?.(next);\n  };\n\n  return (\n    <div data-collapsed={isCollapsed ? 'true' : 'false'} className={cn('flex flex-col flex-1 min-h-0 transition-all duration-200', isCollapsed ? 'w-14' : 'w-56', className)} {...rest}>\n      <div className={cn('flex items-center px-2 py-2 border-b border-border', isCollapsed ? 'justify-center' : 'justify-end')}>\n        <button type=\"button\" onClick={() => setCollapsed(!isCollapsed)}\n          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}\n          className=\"p-1.5 rounded text-text-secondary hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus\">\n          <span aria-hidden=\"true\" className={cn('block text-lg transition-transform', isCollapsed ? 'rotate-180' : '')}>‹</span>\n        </button>\n      </div>\n      <nav className=\"flex-1 overflow-y-auto px-2 py-3 space-y-4 sidebar-scrollbar-hover\" aria-label=\"Sidebar navigation\">\n        {groups.map((group, gi) => (\n          <div key={group.label ?? gi}>\n            {group.label && !isCollapsed && (\n              <p className=\"text-[10px] font-semibold uppercase tracking-widest text-text-disabled px-3 mb-1\">{group.label}</p>\n            )}\n            <div className=\"space-y-0.5\">\n              {group.items.map((item) => (\n                <button key={item.id} type=\"button\"\n                  aria-current={item.id === activeId ? 'page' : undefined}\n                  title={isCollapsed ? item.label : undefined}\n                  onClick={() => onSelect?.(item.id)}\n                  className={cn('w-full flex items-center gap-2.5 rounded-lg text-sm transition-colors',\n                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',\n                    isCollapsed ? 'justify-center px-2 py-2' : 'px-3 py-2 text-left',\n                    item.id === activeId ? 'bg-primary-subtle text-primary font-medium' : 'text-text-secondary hover:text-text-primary hover:bg-surface-overlay')}>\n                  {item.icon && <span aria-hidden=\"true\" className=\"shrink-0 w-5 text-center text-[15px] leading-none\">{item.icon}</span>}\n                  {!isCollapsed && <span className=\"flex-1 truncate\">{item.label}</span>}\n                  {!isCollapsed && item.badge > 0 && <Badge variant=\"primary\" size=\"sm\">{item.badge}</Badge>}\n                </button>\n              ))}\n            </div>\n          </div>\n        ))}\n      </nav>\n      {footerContent != null && (\n        <div className={cn('border-t border-border shrink-0', isCollapsed ? 'flex justify-center px-2 py-3' : '')}>{footerContent}</div>\n      )}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1900,7 +1900,7 @@
       "category": "App",
       "filePath": "modules/app/AppTopBar.tsx",
       "abbr": "AT",
-      "description": "AppShell'in header slotuna geçilen üst çubuk wrapper'ı. logo slotu sol tarafa; children (GlobalSearch, UserMenu, Button vb.) flex satırda sıralanır.",
+      "description": "Top bar wrapper passed into AppShell's header slot. The logo slot anchors the left side while children (GlobalSearch, UserMenu, Button, etc.) are arranged in a flex row.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function AppTopBar({ logo, children, className, ...rest }) {\n  return (\n    <div className={cn('flex items-center gap-3 flex-1', className)} {...rest}>\n      {logo && <div className=\"shrink-0\">{logo}</div>}\n      {children}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1923,7 +1923,7 @@
       "category": "App",
       "filePath": "modules/app/AppNav.tsx",
       "abbr": "AN",
-      "description": "Yatay navigasyon çubuğu. Masaüstünde inline linkler, mobilde NavDrawer açan hamburger gösterir. logo, navItems, actions slotları var.",
+      "description": "Horizontal navigation bar. Renders inline links on desktop and a hamburger that opens a NavDrawer on mobile. Provides logo, navItems and actions slots.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { NavDrawer } from '@/modules/app/NavDrawer';\nimport { Button } from '@/modules/ui/Button';\n\nexport function AppNav({ logo, navItems = [], children, sticky = false, bordered = true, className, ...rest }) {\n  return (\n    <header className={cn('w-full flex items-center gap-3 px-4 py-3 bg-surface-raised',\n      bordered && 'border-b border-border', sticky && 'sticky top-0 z-40', className)} {...rest}>\n      <div className=\"md:hidden\">\n        <NavDrawer title=\"Navigation\" side=\"left\"\n          trigger={<Button variant=\"ghost\" size=\"sm\" iconOnly aria-label=\"Open navigation menu\">☰</Button>}>\n          <nav className=\"flex flex-col gap-0.5 pt-1\" aria-label=\"Mobile navigation\">\n            {navItems.map((item) => (\n              <a key={item.label} href={item.href ?? '#'} aria-current={item.active ? 'page' : undefined}\n                className={cn('flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',\n                  item.active ? 'bg-primary-subtle text-primary' : 'text-text-primary hover:bg-surface-overlay')}>\n                {item.label}\n              </a>\n            ))}\n          </nav>\n        </NavDrawer>\n      </div>\n      {logo && <div className=\"shrink-0\">{logo}</div>}\n      <nav className=\"hidden md:flex items-center gap-0.5 flex-1\" aria-label=\"Main navigation\">\n        {navItems.map((item) => (\n          <a key={item.label} href={item.href ?? '#'} aria-current={item.active ? 'page' : undefined}\n            className={cn('px-3 py-1.5 rounded-md text-sm font-medium transition-colors',\n              item.active ? 'bg-primary-subtle text-primary' : 'text-text-secondary hover:text-text-primary hover:bg-surface-overlay')}>\n            {item.label}\n          </a>\n        ))}\n      </nav>\n      {children && <div className=\"flex items-center gap-2 ml-auto shrink-0\">{children}</div>}\n    </header>\n  );\n}",
       "variants": [
         {
@@ -1955,7 +1955,7 @@
       "category": "App",
       "filePath": "modules/app/NavDrawer.tsx",
       "abbr": "ND",
-      "description": "Herhangi bir trigger + children'ı drawer içinde saran wrapper. Açık/kapalı state'i kendi içinde tutar. AppNav'ın mobil menüsü olarak kullanılır, bağımsız da çalışır.",
+      "description": "Wrapper that wraps any trigger and children inside a drawer. Manages its own open/closed state. Used as AppNav's mobile menu and also works standalone.",
       "source": "'use client';\nimport { useState } from 'react';\nimport { Drawer } from '@/modules/ui/Drawer';\n\nexport function NavDrawer({ trigger, title = 'Menu', side = 'left', footer, children, className }) {\n  const [open, setOpen] = useState(false);\n  return (\n    <>\n      <div role=\"none\" onClick={() => setOpen(true)} className={cn('inline-flex', className)}>\n        {trigger}\n      </div>\n      <Drawer open={open} onClose={() => setOpen(false)} title={title} side={side} footer={footer}>\n        {children}\n      </Drawer>\n    </>\n  );\n}",
       "variants": [
         {
@@ -1978,7 +1978,7 @@
       "category": "App",
       "filePath": "modules/app/UserMenu.tsx",
       "abbr": "UM",
-      "description": "Avatar + isim + rol gösteren trigger'a tıklayınca açılan kullanıcı dropdown'ı. SafeUser prop'u alır; dropdown başlığında isim ve e-posta görünür.",
+      "description": "User dropdown opened by a trigger showing avatar, name and role. Accepts a SafeUser prop; the dropdown header shows the name and email.",
       "source": "'use client';\nimport { Avatar } from '@/modules/ui/Avatar';\nimport { DropdownMenu } from '@/modules/ui/DropdownMenu';\n\nexport function UserMenu({ user, items, align = 'right' }) {\n  const displayName = user.userProfile?.name ?? user.name ?? user.email;\n  const avatar      = user.userProfile?.profilePicture ?? null;\n\n  const defaultItems = items ?? [\n    { type: 'item', label: 'Profile',  icon: '👤' },\n    { type: 'item', label: 'Settings', icon: '⚙️' },\n    { type: 'separator' },\n    { type: 'item', label: 'Sign out', icon: '↩️', danger: true },\n  ];\n\n  const header = (\n    <div className=\"px-3 py-2.5\">\n      <p className=\"text-sm font-semibold text-text-primary truncate\">{displayName}</p>\n      <p className=\"text-xs text-text-secondary truncate\">{user.email}</p>\n    </div>\n  );\n\n  const trigger = (\n    <button type=\"button\"\n      className=\"flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus\">\n      <Avatar src={avatar} name={displayName} size=\"sm\" />\n      <div className=\"hidden sm:block text-left min-w-0\">\n        <p className=\"text-sm font-medium text-text-primary truncate max-w-[8rem]\">{displayName}</p>\n        <p className=\"text-xs text-text-secondary truncate\">{user.userRole}</p>\n      </div>\n      <span aria-hidden=\"true\" className=\"text-text-disabled text-xs hidden sm:block\">▾</span>\n    </button>\n  );\n\n  return <DropdownMenu trigger={trigger} items={defaultItems} header={header} align={align} />;\n}",
       "variants": [
         {
@@ -2010,7 +2010,7 @@
       "category": "App",
       "filePath": "modules/app/GlobalSearch.tsx",
       "abbr": "GS",
-      "description": "Komut paleti benzeri global arama alanı. Kategori bazlı sonuç listesi, klavye navigasyonu ve sonuç seçimi destekler.",
+      "description": "Command-palette-style global search field. Supports a categorised result list, keyboard navigation and result selection.",
       "source": "'use client';\nimport { GlobalSearch } from '@/modules/app/GlobalSearch';\n\nexport function Demo() {\n  return (\n    <GlobalSearch\n      placeholder=\"Search…\"\n      results={results}\n      onSearch={handleSearch}\n      onSelect={handleSelect}\n    />\n  );\n}",
       "variants": [
         {
@@ -2033,8 +2033,8 @@
       "category": "App",
       "filePath": "modules/app/AppCommandBar.tsx",
       "abbr": "CB",
-      "description": "Keyboard-first komut paleti. ⌘K trigger'ı ile açılır; items prop'u ile özel komutlar geçilebilir, varsayılan navigation/actions/recent seti dahilidir.",
-      "source": "'use client';\nimport { AppCommandBar } from '@/modules/app/AppCommandBar';\n\n// Varsayılan komutlarla:\n<AppCommandBar onSelect={(item) => router.push(item.href)} />\n\n// Özel komutlarla:\n<AppCommandBar\n  items={[\n    { icon: '🏠', label: 'Dashboard', shortcut: 'G D', category: 'Navigation' },\n    { icon: '➕', label: 'New Project', shortcut: '⌘N', category: 'Actions', onClick: handleNew },\n    { icon: '🕐', label: 'Recent Item', category: 'Recent' },\n  ]}\n  trigger={<Button variant=\"outline\" size=\"sm\">⌘K</Button>}\n  onSelect={handleSelect}\n/>",
+      "description": "Keyboard-first command palette. Opens with ⌘K; an items prop accepts custom commands while a default navigation/actions/recent set is included.",
+      "source": "'use client';\nimport { AppCommandBar } from '@/modules/app/AppCommandBar';\n\n// With default commands:\n<AppCommandBar onSelect={(item) => router.push(item.href)} />\n\n// With custom commands:\n<AppCommandBar\n  items={[\n    { icon: '🏠', label: 'Dashboard', shortcut: 'G D', category: 'Navigation' },\n    { icon: '➕', label: 'New Project', shortcut: '⌘N', category: 'Actions', onClick: handleNew },\n    { icon: '🕐', label: 'Recent Item', category: 'Recent' },\n  ]}\n  trigger={<Button variant=\"outline\" size=\"sm\">⌘K</Button>}\n  onSelect={handleSelect}\n/>",
       "variants": [
         {
           "title": "Varsayılan komutlar",
@@ -2056,7 +2056,7 @@
       "category": "App",
       "filePath": "modules/app/SectionCard.tsx",
       "abbr": "SC",
-      "description": "Başlıklı form bölüm kartı; alt çizgili başlık ve içerik alanı. Hesap sayfalarındaki ayarlar / şifre değiştirme gibi bölümler için.",
+      "description": "Titled content card with rounded-xl + border + bg-surface-raised + p-6. Header is separated by an underline; children slot accepts arbitrary content.",
       "source": "import { SectionCard } from '@/modules/app/SectionCard';\n\n<SectionCard title=\"Preferences\">\n  <UserPreferencesForm ... />\n</SectionCard>\n\n<SectionCard title=\"Change Password\">\n  <ChangePasswordForm ... />\n</SectionCard>",
       "variants": [
         {
@@ -2079,7 +2079,7 @@
       "category": "App",
       "filePath": "modules/app/InlineAlert.tsx",
       "abbr": "IA",
-      "description": "Form işlem sonuçları için satır içi küçük uyarı; success / error / warning / info variantları.",
+      "description": "Compact inline alert strip used next to form fields or inside cards. success / error / warning / info variants; icon + single-line message.",
       "source": "import { InlineAlert } from '@/modules/app/InlineAlert';\n\n// Default: success\n<InlineAlert message=\"Changes saved.\" />\n\n// Error\n<InlineAlert variant=\"error\" message=\"Something went wrong.\" />\n\n// Conditional display (e.g. after save)\n{saved && <InlineAlert message=\"Profile saved successfully.\" />}",
       "variants": [
         {
@@ -2098,7 +2098,7 @@
       "category": "App",
       "filePath": "modules/app/StepShell.tsx",
       "abbr": "Ss",
-      "description": "Checkout ve sihirbaz akışları için adım kapsayıcısı; active / done / pending durumları, daraltılmış özet ve Edit butonu.",
+      "description": "Wrapper card for a single step in a multi-step flow. Border and number circle change based on active / done / inactive state; the done + onEdit combination shows an Edit button alongside the summary.",
       "source": "import { StepShell } from '@/modules/app/StepShell';\n\n// Done step — shows summary, allows editing\n<StepShell\n  number={1}\n  title=\"Delivery address\"\n  active={false}\n  done\n  summary={<AddressCard address={selected} />}\n  onEdit={() => setStep('address')}\n/>\n\n// Active step — shows children\n<StepShell number={2} title=\"Payment method\" active done={false}>\n  <PaymentMethodSelector ... />\n  <Button onClick={() => setStep('details')}>Continue</Button>\n</StepShell>\n\n// Pending step — title dimmed, no content\n<StepShell number={3} title=\"Review &amp; pay\" active={false} done={false} />",
       "variants": [
         {
@@ -2117,7 +2117,7 @@
       "category": "App",
       "filePath": "modules/app/Form.tsx",
       "abbr": "Fm",
-      "description": "Form layout wrapper'ı. title, description, error ve actions named slot'ları alır; children ui/ field bileşenleri için grid'de sıralanır.",
+      "description": "Form layout wrapper with title, description, error and actions slots. `columns` prop renders fields in a 1 or 2 column grid.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { AlertBanner } from '@/modules/ui/AlertBanner';\n\nexport function Form({ title, description, error, columns = 1, actions, children, onSubmit, className }) {\n  return (\n    <form onSubmit={onSubmit} noValidate className={cn('space-y-6', className)}>\n      {(title || description) && (\n        <div>\n          {title && <h2 className=\"text-lg font-semibold text-text-primary\">{title}</h2>}\n          {description && <p className=\"text-sm text-text-secondary mt-0.5\">{description}</p>}\n        </div>\n      )}\n      {error && <AlertBanner variant=\"error\" message={error} />}\n      <div className={cn('grid gap-4', columns === 2 ? 'sm:grid-cols-2' : 'grid-cols-1')}>\n        {children}\n      </div>\n      {actions && (\n        <div className=\"flex items-center justify-end gap-3 pt-2 border-t border-border\">\n          {actions}\n        </div>\n      )}\n    </form>\n  );\n}",
       "variants": [
         {
@@ -2146,7 +2146,7 @@
       "category": "App",
       "filePath": "modules/app/FilterBar.tsx",
       "abbr": "FB",
-      "description": "Liste ve dashboard ekranları için select, multiselect, daterange ve tag tabanlı filtre paneli.",
+      "description": "Select, multiselect, daterange and text-based filter panel. Supports URL-based filtering via GET form submit.",
       "source": "'use client';\nimport { FilterBar } from '@/modules/app/FilterBar';\n\nexport function Demo() {\n  return (\n    <FilterBar\n      fields={fields}\n      values={values}\n      onChange={handleChange}\n      onApply={handleApply}\n      onReset={handleReset}\n    />\n  );\n}",
       "variants": [
         {
@@ -2192,8 +2192,8 @@
       "category": "App",
       "filePath": "modules/app/EmptyErrorState.tsx",
       "abbr": "Er",
-      "description": "Hata durumu: uyarı banner'ı + merkezi boş durum kombinasyonu. onRetry ile yeniden deneme aksiyonu.",
-      "source": "'use client';\nimport { ErrorState } from '@/modules/app/EmptyErrorState';\n\n<ErrorState\n  title=\"Something went wrong\"\n  message=\"Failed to load user data.\"\n/>\n\n// Retry aksiyonu ile:\n<ErrorState\n  title=\"Database connection failed\"\n  message=\"Could not connect. Please try again.\"\n  onRetry={handleRetry}\n  retryLabel=\"Try again\"\n/>",
+      "description": "Error state pairing an inline alert banner with a centered empty state. Optional retry action.",
+      "source": "'use client';\nimport { ErrorState } from '@/modules/app/EmptyErrorState';\n\n<ErrorState\n  title=\"Something went wrong\"\n  message=\"Failed to load user data.\"\n/>\n\n// With retry action:\n<ErrorState\n  title=\"Database connection failed\"\n  message=\"Could not connect. Please try again.\"\n  onRetry={handleRetry}\n  retryLabel=\"Try again\"\n/>",
       "variants": [
         {
           "title": "Default",
@@ -2215,8 +2215,8 @@
       "category": "App",
       "filePath": "modules/app/EmptyErrorState.tsx",
       "abbr": "Ns",
-      "description": "Kayıt bulunamadı / içerik yok durumu. onGoBack ile geri dön aksiyonu.",
-      "source": "'use client';\nimport { NotFoundState } from '@/modules/app/EmptyErrorState';\n\n<NotFoundState />\n\n// Özel başlık + geri dön butonu ile:\n<NotFoundState\n  title=\"User not found\"\n  description=\"This user account doesn't exist or may have been deleted.\"\n  onGoBack={() => router.back()}\n  goBackLabel=\"Back to users\"\n/>",
+      "description": "Not-found / empty record state with optional go-back action.",
+      "source": "'use client';\nimport { NotFoundState } from '@/modules/app/EmptyErrorState';\n\n<NotFoundState />\n\n// With custom title + back button:\n<NotFoundState\n  title=\"User not found\"\n  description=\"This user account doesn't exist or may have been deleted.\"\n  onGoBack={() => router.back()}\n  goBackLabel=\"Back to users\"\n/>",
       "variants": [
         {
           "title": "Default",
@@ -2238,7 +2238,7 @@
       "category": "App",
       "filePath": "modules/app/LoadingState.tsx",
       "abbr": "Lo",
-      "description": "İskelet yükleme animasyonları. spinner / table / cards / list / detail / form variant'ları.",
+      "description": "Skeleton loading animations. Variants: spinner / table / cards / list / detail / form.",
       "source": "'use client';\nimport { LoadingState } from '@/modules/app/LoadingState';\n\n<LoadingState variant=\"spinner\" />\n<LoadingState variant=\"table\"  rows={5} cols={4} />\n<LoadingState variant=\"cards\"  cards={3} />\n<LoadingState variant=\"list\"   rows={4} />\n<LoadingState variant=\"form\"   rows={3} />",
       "variants": [
         {
@@ -2501,7 +2501,7 @@
       "category": "Domain",
       "filePath": "modules/domains/common/user/UserMenu.tsx",
       "abbr": "UM",
-      "description": "User dropdown that consumes SafeUser. Understands the UserRole enum, shows English role labels, and accepts custom dropdown items.",
+      "description": "Avatar + name + role trigger. Dropdown with Profile, Settings, and Sign out items. Closes on outside click.",
       "source": "'use client';\nimport { UserMenu } from '@/modules/domains/common/user/UserMenu';\n\n<UserMenu user={currentUser} align=\"right\" />",
       "variants": [
         {
@@ -3341,7 +3341,7 @@
       "category": "Domain",
       "filePath": "modules/domains/common/payment/CheckoutSuccessState.tsx",
       "abbr": "CK",
-      "description": "Ödeme tamamlama sonrası başarı ekranı; onay ikonu, ödeme özeti ve opsiyonel teslimat adresi.",
+      "description": "Success screen shown after checkout completion; includes a confirmation icon, payment summary, and optional delivery address.",
       "source": "import { CheckoutSuccessState } from '@/modules/domains/common/payment/CheckoutSuccessState';\n\n<CheckoutSuccessState\n  payment={payment}\n  address={deliveryAddress}\n  onReset={() => window.location.reload()}\n/>",
       "variants": [
         {
@@ -4026,7 +4026,7 @@
       "category": "Molecule",
       "filePath": "modules/ui/MapView.tsx",
       "abbr": "Mp",
-      "description": "Leaflet tabanlı etkileşimli harita. Tooltip destekli işaretçiler, önceden tanımlı zone'lar (polygon), rota çizgisi (polyline) ve tıkla-ekle işaretçi modu içerir.",
+      "description": "Leaflet-based interactive map. Tooltip-enabled markers, predefined zones (polygon), route lines (polyline), and click-to-add marker mode.",
       "source": "'use client';\nimport { MapView } from '@/modules/ui/MapView';\n\n<MapView\n  center={[39.9, 32.8]}\n  zoom={6}\n  markers={[\n    {\n      id: 'ankara',\n      position: [39.925, 32.836],\n      variant: 'primary',\n      tooltip: {\n        title: 'Ankara',\n        description: 'Türkiye başkenti',\n        fields: [{ label: 'Nüfus', value: '5.6 M' }],\n      },\n    },\n  ]}\n  zones={[\n    {\n      id: 'zone-1',\n      label: 'İç Anadolu',\n      variant: 'success',\n      positions: [[40,30],[40,34],[38,34],[38,30]],\n    },\n  ]}\n  routes={[\n    {\n      id: 'r1',\n      label: 'Ankara → İstanbul',\n      positions: [[39.9,32.8],[41.0,28.9]],\n      color: '#3b82f6',\n      weight: 3,\n    },\n  ]}\n  onMarkerAdd={(pos) => console.log(pos)}\n  onMarkerClick={(id) => console.log(id)}\n  height={480}\n/>",
       "variants": [
         {

@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Table + SearchBar + Pagination tek bileşende. Client-side arama ve sayfalama. Filtrelenmiş sonuç sayacı, satır/sayfa seçici.
+Table + SearchBar + Pagination in a single component. Client-side search and pagination with filtered result counter and rows-per-page selector.
 
 ## Design tokens consumed
 

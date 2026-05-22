@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Veri yokken gösterilen boş durum mesajı. icon + title + description + action slotları desteklenir.
+Empty-state message shown when there is no data. Supports icon, title, description, and action slots.
 
 ## Design tokens consumed
 

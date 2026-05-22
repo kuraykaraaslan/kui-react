@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Tam ekran layout wrapper. logo, sidebar ve topbar slotlarına component geçilir. Masaüstünde sidebar aside olarak gösterilir, mobilde Drawer ile açılır.
+Full-screen layout wrapper with logo, sidebar and topbar slots. Sidebar renders as an aside on desktop and opens via a drawer on mobile.
 
 ## Design tokens consumed
 

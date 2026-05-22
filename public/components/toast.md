@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Zustand store üzerinden yönetilen bildirim sistemi. Hover'da dondurma, progress bar, title, actions, loading ve promise desteği.
+Notification system with success/warning/error/info/loading variants. Hover-to-freeze, progress bar, title, actions, and promise support.
 
 ## Variants
 

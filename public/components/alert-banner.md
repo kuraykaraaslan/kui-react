@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Sayfa düzeyinde bilgi, uyarı veya hata mesajı. role="alert" ile ekran okuyucular için duyurulur. dismissible özelliği eklenebilir.
+Page-level info, success, warning or error message. Announced via role="alert" for screen readers with optional dismissible and action support.
 
 ## Design tokens consumed
 

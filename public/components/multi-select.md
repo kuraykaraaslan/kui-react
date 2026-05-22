@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Multi-value select with tag chips, keyboard navigation, and remove-item support.
+Chip-based multi-select popover with searchable filter, keyboard navigation, and disabled-option support.
 
 ## Variants
 

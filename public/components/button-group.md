@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-01
 
-Segmented button group for mutually-exclusive options. Supports multiple variants and sizes.
+Segmented button group for mutually-exclusive options. Supports 4 variants, 4 sizes and disabled items.
 
 ## Design tokens consumed
 

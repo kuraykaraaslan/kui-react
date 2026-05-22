@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-01
 
-CSS border tabanlı yükleme göstergesi. FontAwesome gerektirmez. 5 boyut, border-border / border-t-primary renk sistemi.
+CSS border-based loading indicator. Does not require FontAwesome. 5 sizes, border-border / border-t-primary colour system.
 
 ## Design tokens consumed
 

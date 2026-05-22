@@ -23,7 +23,7 @@ export function buildMoleculePickersData(): ShowcaseComponent[] {
       title: 'DatePicker',
       category: 'Molecule',
       abbr: 'Dp',
-      description: 'Native date input ile label + hint + error anatomy. Date | null değer modeli, min/max kısıtlaması, disabled tooltip desteği.',
+      description: 'Native date input with label + hint + error anatomy. Supports min/max constraints and a disabled state.',
       filePath: 'modules/ui/DatePicker.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -75,7 +75,7 @@ export function DatePicker({ id, label, hint, error, value, onChange, disabled, 
       title: 'DateRangePicker',
       category: 'Molecule',
       abbr: 'Dr',
-      description: 'Date range picker with start/end fields and end ≥ start validation. Also ships a TimePicker.',
+      description: 'fieldset-based dual native date inputs. Start/end auto-constrain each other (min/max) with accessible sr-only labels.',
       filePath: 'modules/ui/DateRangePicker.tsx',
       sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function DateRangePicker({ id, label, value, onChange }) {\n  // start/end date inputs, auto-clears end if start > end\n}\n\nexport function TimePicker({ id, label, value, onChange, step = 60 }) {}`,
       variants: [

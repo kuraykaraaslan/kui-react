@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2026-05
 
-Ödeme tamamlama sonrası başarı ekranı; onay ikonu, ödeme özeti ve opsiyonel teslimat adresi.
+Success screen shown after checkout completion; includes a confirmation icon, payment summary, and optional delivery address.
 
 ## Variants
 

@@ -33,7 +33,7 @@ export function buildContainerData(): ShowcaseComponent[] {
       title: 'Card',
       category: 'Organism',
       abbr: 'Ca',
-      description: 'Raised / flat / outline varyantlı içerik konteyneri. title + subtitle + headerRight + footer slotları desteklenir.',
+      description: 'Content container with raised / flat / outline variants. Supports title, subtitle, headerRight, footer slots and loading skeleton state.',
       filePath: 'modules/ui/Card.tsx',
       sourceCode: `import { cn } from '@/libs/utils/cn';
 
@@ -162,7 +162,7 @@ export function Card({ title, subtitle, headerRight, footer, children, variant =
       title: 'PageHeader',
       category: 'Organism',
       abbr: 'Ph',
-      description: 'Sayfa başlığı + subtitle + badge + action butonları. Tüm varyantlar (primary/outline/danger/ghost) desteklenir. href veya onClick tabanlı aksiyonlar.',
+      description: 'Page title + subtitle + optional badge + action buttons. Supports 5 button variants (primary/secondary/outline/danger/ghost); rendered as a link with href or as a button.',
       filePath: 'modules/ui/PageHeader.tsx',
       sourceCode: `import { cn } from '@/libs/utils/cn';
 
@@ -273,7 +273,7 @@ export function PageHeader({ title, subtitle, badge, actions, className }) {
       title: 'Slider',
       category: 'Molecule',
       abbr: 'Sl',
-      description: 'Erişilebilir carousel. role="region" + aria-roledescription="carousel" + slide aria etiketleri dahildir. Otomatik oynatma, ok tuşları ve dot navigasyon desteklenir.',
+      description: 'Accessible carousel. Includes role="region" + aria-roledescription="carousel" and per-slide aria labels. Supports autoplay, arrow keys, and dot navigation.',
       filePath: 'modules/ui/Slider.tsx',
       sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState, useEffect, useCallback, useRef } from 'react';\n\nexport function Slider({ slides, autoPlay = false, autoPlayInterval = 4000, showDots = true, showArrows = true, loop = true, className, slideClassName }) {\n  const [current, setCurrent] = useState(0);\n  const total = slides.length;\n  const goTo = useCallback((index) => setCurrent(loop ? ((index + total) % total) : Math.max(0, Math.min(index, total - 1))), [loop, total]);\n  const prev = () => goTo(current - 1);\n  const next = () => goTo(current + 1);\n  useEffect(() => {\n    if (!autoPlay || total <= 1) return;\n    const t = setInterval(() => setCurrent((c) => (c + 1) % total), autoPlayInterval);\n    return () => clearInterval(t);\n  }, [autoPlay, autoPlayInterval, total]);\n  return (\n    <div className={cn('relative overflow-hidden rounded-xl', className)} role="region" aria-label="Content slider" aria-roledescription="carousel">\n      <div className="flex transition-transform duration-350 ease-in-out" style={{ transform: \`translateX(-\${current * 100}%)\` }}>\n        {slides.map((slide, i) => (\n          <div key={i} role="group" aria-roledescription="slide" aria-label={\`Slide \${i + 1} of \${total}\`} aria-hidden={i !== current} className={cn('w-full shrink-0', slideClassName)}>{slide}</div>\n        ))}\n      </div>\n      {showArrows && (loop || current > 0) && <button onClick={prev} aria-label="Previous slide" className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center">‹</button>}\n      {showArrows && (loop || current < total - 1) && <button onClick={next} aria-label="Next slide" className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center">›</button>}\n      {showDots && total > 1 && (\n        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10" role="tablist" aria-label="Slide indicators">\n          {slides.map((_, i) => <button key={i} role="tab" aria-selected={i === current} aria-label={\`Go to slide \${i + 1}\`} onClick={() => goTo(i)} className={cn('h-2 rounded-full transition-all', i === current ? 'w-5 bg-white' : 'w-2 bg-white/40')} />)}\n        </div>\n      )}\n    </div>\n  );\n}`,
       variants: [
@@ -323,7 +323,7 @@ export function PageHeader({ title, subtitle, badge, actions, className }) {
       title: 'StatCard',
       category: 'Organism',
       abbr: 'Sc',
-      description: 'Küçük metrik gösterim kartı; değer, etiket ve opsiyonel vurgu rengi.',
+      description: 'Compact metric display card with value, label, and optional accent color.',
       filePath: 'modules/ui/StatCard.tsx',
       sourceCode: `import { StatCard } from '@/modules/ui/StatCard';
 

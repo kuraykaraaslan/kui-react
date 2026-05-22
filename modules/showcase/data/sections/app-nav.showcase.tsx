@@ -114,7 +114,7 @@ export function buildAppNavData(): ShowcaseComponent[] {
       title: 'AppNav',
       category: 'App',
       abbr: 'AN',
-      description: 'Yatay navigasyon çubuğu. Masaüstünde inline linkler, mobilde NavDrawer açan hamburger gösterir. logo, navItems, actions slotları var.',
+      description: 'Horizontal navigation bar. Renders inline links on desktop and a hamburger that opens a NavDrawer on mobile. Provides logo, navItems and actions slots.',
       filePath: 'modules/app/AppNav.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -192,7 +192,7 @@ export function AppNav({ logo, navItems = [], children, sticky = false, bordered
       title: 'NavDrawer',
       category: 'App',
       abbr: 'ND',
-      description: 'Herhangi bir trigger + children\'ı drawer içinde saran wrapper. Açık/kapalı state\'i kendi içinde tutar. AppNav\'ın mobil menüsü olarak kullanılır, bağımsız da çalışır.',
+      description: 'Wrapper that wraps any trigger and children inside a drawer. Manages its own open/closed state. Used as AppNav\'s mobile menu and also works standalone.',
       filePath: 'modules/app/NavDrawer.tsx',
       sourceCode: `'use client';
 import { useState } from 'react';

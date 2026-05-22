@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-nav aria-label="Breadcrumb" sarıcı ile erişilebilir. Son öge aria-current="page" ile işaretlenir, ayrılıcı aria-hidden.
+Hierarchical navigation trail wrapped in nav aria-label="Breadcrumb". Last item marked with aria-current="page" and aria-hidden separators.
 
 ## Design tokens consumed
 

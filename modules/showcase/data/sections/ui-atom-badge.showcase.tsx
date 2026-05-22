@@ -24,7 +24,7 @@ export function buildBadgeData(): ShowcaseComponent[] {
       title: 'Badge',
       category: 'Atom',
       abbr: 'Bg',
-      description: 'Durum, kategori veya etiket göstergesi. Feedback varyantları yalnızca semantik anlamlarına uygun bağlamlarda kullanılır.',
+      description: 'Status, category or label indicator. 6 semantic variants, 3 sizes, dot and dismissible support.',
       filePath: 'modules/ui/Badge.tsx',
       sourceCode: `import { cn } from '@/libs/utils/cn';
 

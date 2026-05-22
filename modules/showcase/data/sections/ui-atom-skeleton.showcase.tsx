@@ -9,7 +9,7 @@ export function buildSkeletonData(): ShowcaseComponent[] {
       title: 'Skeleton',
       category: 'Atom',
       abbr: 'Sk',
-      description: 'İçerik yüklenmeden önce yer tutan animasyonlu placeholder. animate-pulse bg-surface-sunken kullanır. aria-busy="true" ile erişilebilirlik sağlanır.',
+      description: 'Animated placeholder shown before content loads. Uses animate-pulse bg-surface-sunken. aria-busy="true" ensures accessibility.',
       filePath: 'modules/ui/Skeleton.tsx',
       sourceCode: `import { cn } from '@/libs/utils/cn';
 

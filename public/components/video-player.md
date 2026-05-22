@@ -7,7 +7,7 @@
 - **status:** beta
 - **since:** 2025-04
 
-Özelleştirilmiş HTML5 video oynatıcı. Kalite seçimi, altyazı (WebVTT overlay + font boyutu), ses dili, oynatma hızı, seek, ses kontrolü ve tam ekran desteği. Klavye kısayolları: Space/K=oynat, ←→=±10s, ↑↓=ses, M=sessiz, F=tam ekran.
+Custom HTML5 video player. Quality, subtitle, audio track, and playback rate selection; custom WebVTT subtitle overlay; auto-hiding controls; programmatic API. Keyboard shortcuts: Space/K=play, ←→=±10s, ↑↓=volume, M=mute, F=fullscreen.
 
 ## Variants
 

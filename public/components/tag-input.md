@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Enter veya virgülle tag ekleme, çift tıkla düzenleme, Backspace ile silme. Duplicate eklenmez. Controlled string[] modeli.
+Free-text input that creates chips. Add tags with Enter or comma, double-click to edit, Backspace to delete. Duplicates are ignored.
 
 ## Design tokens consumed
 

@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2026-05
 
-Form işlem sonuçları için satır içi küçük uyarı; success / error / warning / info variantları.
+Compact inline alert strip used next to form fields or inside cards. success / error / warning / info variants; icon + single-line message.
 
 ## Variants
 

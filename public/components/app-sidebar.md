@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Daraltılabilir kenar çubuğu. navGroups veya navItems alır; collapsed toggle dahili. searchable prop ile yerleşik arama filtresi; footer slotu ile kullanıcı bilgisi veya herhangi bir içerik gösterilebilir.
+Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter and a footer slot can host a user block or any content.
 
 ## Design tokens consumed
 

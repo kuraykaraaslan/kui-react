@@ -724,7 +724,7 @@ import { UserStatusBadge } from '@/modules/domains/common/user/UserStatusBadge';
       title: 'UserMenu',
       category: 'Domain',
       abbr: 'UM',
-      description: 'User dropdown that consumes SafeUser. Understands the UserRole enum, shows English role labels, and accepts custom dropdown items.',
+      description: 'Avatar + name + role trigger. Dropdown with Profile, Settings, and Sign out items. Closes on outside click.',
       filePath: 'modules/domains/common/user/UserMenu.tsx',
       sourceCode: `'use client';
 import { UserMenu } from '@/modules/domains/common/user/UserMenu';
@@ -1465,7 +1465,7 @@ import { SubscriptionPlanCard } from '@/modules/domains/common/subscription/Subs
       title: 'CheckoutSuccessState',
       category: 'Domain',
       abbr: 'CK',
-      description: 'Ödeme tamamlama sonrası başarı ekranı; onay ikonu, ödeme özeti ve opsiyonel teslimat adresi.',
+      description: 'Success screen shown after checkout completion; includes a confirmation icon, payment summary, and optional delivery address.',
       filePath: 'modules/domains/common/payment/CheckoutSuccessState.tsx',
       sourceCode: `import { CheckoutSuccessState } from '@/modules/domains/common/payment/CheckoutSuccessState';
 

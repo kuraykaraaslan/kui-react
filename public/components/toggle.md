@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-role="switch" tabanlı toggle/switch. 3 boyut, description slot, disabled desteği. CSS transform ile native input olmadan tam erişilebilir.
+role="switch" toggle/switch with three sizes, description slot, and disabled support. Fully accessible via CSS transform without a native input.
 
 ## Design tokens consumed
 

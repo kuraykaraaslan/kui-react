@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Label + textarea + hint + error anatomy. resize-y ile dikey boyutlandırma aktif, aria-describedby bağlantısı kurulmuş.
+Label + textarea + hint + error anatomy. Vertical resizing is enabled via resize-y and the parts are linked through aria-describedby.
 
 ## Used by
 

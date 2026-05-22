@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-01
 
-Temel interaktif element. 5 görsel stil (variant) ve 5 boyut (size) destekler. disabled ve loading durumları yerleşiktir.
+Core interactive element. Supports 5 visual styles (variants) and 5 sizes. disabled, loading and selected states are built-in.
 
 ## Used by
 

@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Label + input + hint + error mesajından oluşan form alanı. Dört parça aria-describedby ile birbirine bağlanır.
+Text input field with label, hint, error, prefix icon, password toggle, and 3 size variants.
 
 ## Used by
 

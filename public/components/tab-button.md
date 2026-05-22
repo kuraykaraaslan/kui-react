@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2026-05
 
-Pill tarzı sekme butonu; aktif/pasif renklendirme ve opsiyonel sayaç rozeti.
+Pill-style tab button with active/inactive coloring and an optional count badge.
 
 ## Variants
 

@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Kural tabanlı içerik kalite skoru. Good ≥70 / Fair ≥40 / Poor <40 tier sistemi. Her kural chip olarak gösterilir, geçen/kalan sayım altında.
+Rule-based content quality score with Good ≥70 / Fair ≥40 / Poor <40 tier system. Each rule shown as a chip with passed/total count. role="progressbar" + aria-valuenow.
 
 ## Design tokens consumed
 

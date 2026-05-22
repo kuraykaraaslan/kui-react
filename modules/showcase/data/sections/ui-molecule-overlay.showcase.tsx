@@ -128,7 +128,7 @@ export function buildOverlayData(): ShowcaseComponent[] {
       title: 'Modal',
       category: 'Organism',
       abbr: 'Md',
-      description: 'Odak yönetimi, Escape kapatma, backdrop tıklama ile kapatma. role="dialog" + aria-modal + aria-labelledby zorunludur.',
+      description: 'Focus-trapped dialog. Closes on Escape and backdrop click. Requires role="dialog" + aria-modal + aria-labelledby; supports sm/md/lg sizes.',
       filePath: 'modules/ui/Modal.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -182,7 +182,7 @@ export function Modal({ open, onClose, title, description, children, footer, siz
       title: 'Drawer',
       category: 'Organism',
       abbr: 'Dr',
-      description: 'Ekranın kenarından süzülen panel. Sol / sağ taraf seçeneği, odak yönetimi ve Escape kapatma dahildir.',
+      description: 'Side panel sliding in from the screen edge. Left / right placement with focus management and Escape close.',
       filePath: 'modules/ui/Drawer.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -222,7 +222,7 @@ export function Drawer({ open, onClose, title, side = 'right', children, footer,
       title: 'Tooltip',
       category: 'Organism',
       abbr: 'Tt',
-      description: 'Hover ve focus ile görünür yardım metni. role="tooltip" + aria-describedby bağlantısı ile erişilebilir. 4 yön desteklenir.',
+      description: 'Short hint shown on hover and focus. Accessible via role="tooltip" + aria-describedby. Supports 4 placements, 3 themes, optional arrow, and configurable delay.',
       filePath: 'modules/ui/Tooltip.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -319,7 +319,7 @@ export function Tooltip({ content, placement = 'top', children, className }) {
       title: 'DropdownMenu',
       category: 'Organism',
       abbr: 'Dm',
-      description: 'role="menu" + role="menuitem" ile erişilebilir dropdown. Escape ile kapanır, dışarı tıklamada kapanır. Danger ve disabled item desteği var.',
+      description: 'Accessible dropdown using role="menu" + role="menuitem". Closes on Escape and outside click. Supports left/right alignment, icons, separators, danger and disabled items, and arrow-key navigation.',
       filePath: 'modules/ui/DropdownMenu.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';

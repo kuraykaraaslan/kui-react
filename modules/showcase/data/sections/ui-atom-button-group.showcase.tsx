@@ -36,7 +36,7 @@ export function buildButtonGroupData(): ShowcaseComponent[] {
       title: 'ButtonGroup',
       category: 'Molecule',
       abbr: 'BG',
-      description: 'Segmented button group for mutually-exclusive options. Supports multiple variants and sizes.',
+      description: 'Segmented button group for mutually-exclusive options. Supports 4 variants, 4 sizes and disabled items.',
       filePath: 'modules/ui/ButtonGroup.tsx',
       sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function ButtonGroup({ items, value, onChange, variant = 'outline', size = 'md' }) {\n  return (\n    <div role="group" className="inline-flex rounded-md overflow-hidden border border-border divide-x divide-border">\n      {items.map((item) => (\n        <button key={item.value} type="button" aria-pressed={item.value === value}\n          onClick={() => onChange(item.value)}\n          className={cn('px-4 py-2 text-sm font-medium transition-colors', item.value === value ? 'bg-surface-overlay font-semibold' : 'bg-surface-base hover:bg-surface-overlay')}>\n          {item.label}\n        </button>\n      ))}\n    </div>\n  );\n}`,
       variants: [

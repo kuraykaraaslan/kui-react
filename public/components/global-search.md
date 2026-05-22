@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-04
 
-Komut paleti benzeri global arama alanı. Kategori bazlı sonuç listesi, klavye navigasyonu ve sonuç seçimi destekler.
+Command-palette-style global search field. Supports a categorised result list, keyboard navigation and result selection.
 
 ## Variants
 

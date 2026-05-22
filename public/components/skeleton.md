@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-01
 
-İçerik yüklenmeden önce yer tutan animasyonlu placeholder. animate-pulse bg-surface-sunken kullanır. aria-busy="true" ile erişilebilirlik sağlanır.
+Animated placeholder shown before content loads. Uses animate-pulse bg-surface-sunken. aria-busy="true" ensures accessibility.
 
 ## Design tokens consumed
 

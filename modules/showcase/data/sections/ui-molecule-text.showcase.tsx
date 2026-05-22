@@ -30,7 +30,7 @@ export function buildMoleculeTextData(): ShowcaseComponent[] {
       title: 'Input',
       category: 'Molecule',
       abbr: 'In',
-      description: 'Label + input + hint + error mesajından oluşan form alanı. Dört parça aria-describedby ile birbirine bağlanır.',
+      description: 'Text input field with label, hint, error, prefix icon, password toggle, and 3 size variants.',
       filePath: 'modules/ui/Input.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -226,7 +226,7 @@ export function Input({ id, label, hint, error, required, className, ...props })
       title: 'Textarea',
       category: 'Molecule',
       abbr: 'Ta',
-      description: 'Label + textarea + hint + error anatomy. resize-y ile dikey boyutlandırma aktif, aria-describedby bağlantısı kurulmuş.',
+      description: 'Label + textarea + hint + error anatomy. Vertical resizing is enabled via resize-y and the parts are linked through aria-describedby.',
       filePath: 'modules/ui/Textarea.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -325,7 +325,7 @@ export function Textarea({ id, label, hint, error, disabled, required, rows = 4,
       title: 'SearchBar',
       category: 'Molecule',
       abbr: 'Sb',
-      description: 'role="searchbox" + arama ikonu + temizle butonu. Controlled / uncontrolled modda çalışır.',
+      description: 'role="searchbox" with search icon and clear button. Works in controlled and uncontrolled modes.',
       filePath: 'modules/ui/SearchBar.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';

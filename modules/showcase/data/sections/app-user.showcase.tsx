@@ -122,7 +122,7 @@ export function buildAppUserData(): ShowcaseComponent[] {
       title: 'UserMenu',
       category: 'App',
       abbr: 'UM',
-      description: 'Avatar + isim + rol gösteren trigger\'a tıklayınca açılan kullanıcı dropdown\'ı. SafeUser prop\'u alır; dropdown başlığında isim ve e-posta görünür.',
+      description: 'User dropdown opened by a trigger showing avatar, name and role. Accepts a SafeUser prop; the dropdown header shows the name and email.',
       filePath: 'modules/app/UserMenu.tsx',
       sourceCode: `'use client';
 import { Avatar } from '@/modules/ui/Avatar';
@@ -195,7 +195,7 @@ export function UserMenu({ user, items, align = 'right' }) {
       title: 'GlobalSearch',
       category: 'App',
       abbr: 'GS',
-      description: 'Komut paleti benzeri global arama alanı. Kategori bazlı sonuç listesi, klavye navigasyonu ve sonuç seçimi destekler.',
+      description: 'Command-palette-style global search field. Supports a categorised result list, keyboard navigation and result selection.',
       filePath: 'modules/app/GlobalSearch.tsx',
       sourceCode: `'use client';
 import { GlobalSearch } from '@/modules/app/GlobalSearch';
@@ -235,15 +235,15 @@ export function Demo() {
       title: 'AppCommandBar',
       category: 'App',
       abbr: 'CB',
-      description: 'Keyboard-first komut paleti. ⌘K trigger\'ı ile açılır; items prop\'u ile özel komutlar geçilebilir, varsayılan navigation/actions/recent seti dahilidir.',
+      description: 'Keyboard-first command palette. Opens with ⌘K; an items prop accepts custom commands while a default navigation/actions/recent set is included.',
       filePath: 'modules/app/AppCommandBar.tsx',
       sourceCode: `'use client';
 import { AppCommandBar } from '@/modules/app/AppCommandBar';
 
-// Varsayılan komutlarla:
+// With default commands:
 <AppCommandBar onSelect={(item) => router.push(item.href)} />
 
-// Özel komutlarla:
+// With custom commands:
 <AppCommandBar
   items={[
     { icon: '🏠', label: 'Dashboard', shortcut: 'G D', category: 'Navigation' },

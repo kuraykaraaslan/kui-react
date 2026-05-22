@@ -130,7 +130,7 @@ export function buildAppFormData(): ShowcaseComponent[] {
       title: 'SectionCard',
       category: 'App',
       abbr: 'SC',
-      description: 'Başlıklı form bölüm kartı; alt çizgili başlık ve içerik alanı. Hesap sayfalarındaki ayarlar / şifre değiştirme gibi bölümler için.',
+      description: 'Titled content card with rounded-xl + border + bg-surface-raised + p-6. Header is separated by an underline; children slot accepts arbitrary content.',
       filePath: 'modules/app/SectionCard.tsx',
       sourceCode: `import { SectionCard } from '@/modules/app/SectionCard';
 
@@ -183,7 +183,7 @@ export function buildAppFormData(): ShowcaseComponent[] {
       title: 'InlineAlert',
       category: 'App',
       abbr: 'IA',
-      description: 'Form işlem sonuçları için satır içi küçük uyarı; success / error / warning / info variantları.',
+      description: 'Compact inline alert strip used next to form fields or inside cards. success / error / warning / info variants; icon + single-line message.',
       filePath: 'modules/app/InlineAlert.tsx',
       sourceCode: `import { InlineAlert } from '@/modules/app/InlineAlert';
 
@@ -220,7 +220,7 @@ export function buildAppFormData(): ShowcaseComponent[] {
       title: 'StepShell',
       category: 'App',
       abbr: 'Ss',
-      description: 'Checkout ve sihirbaz akışları için adım kapsayıcısı; active / done / pending durumları, daraltılmış özet ve Edit butonu.',
+      description: 'Wrapper card for a single step in a multi-step flow. Border and number circle change based on active / done / inactive state; the done + onEdit combination shows an Edit button alongside the summary.',
       filePath: 'modules/app/StepShell.tsx',
       sourceCode: `import { StepShell } from '@/modules/app/StepShell';
 
@@ -281,7 +281,7 @@ export function buildAppFormData(): ShowcaseComponent[] {
       title: 'Form',
       category: 'App',
       abbr: 'Fm',
-      description: 'Form layout wrapper\'ı. title, description, error ve actions named slot\'ları alır; children ui/ field bileşenleri için grid\'de sıralanır.',
+      description: 'Form layout wrapper with title, description, error and actions slots. `columns` prop renders fields in a 1 or 2 column grid.',
       filePath: 'modules/app/Form.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -351,7 +351,7 @@ export function Form({ title, description, error, columns = 1, actions, children
       title: 'FilterBar',
       category: 'App',
       abbr: 'FB',
-      description: 'Liste ve dashboard ekranları için select, multiselect, daterange ve tag tabanlı filtre paneli.',
+      description: 'Select, multiselect, daterange and text-based filter panel. Supports URL-based filtering via GET form submit.',
       filePath: 'modules/app/FilterBar.tsx',
       sourceCode: `'use client';
 import { FilterBar } from '@/modules/app/FilterBar';

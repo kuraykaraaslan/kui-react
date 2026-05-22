@@ -56,7 +56,7 @@ export function buildMoleculeSelectionData(): ShowcaseComponent[] {
       title: 'Checkbox',
       category: 'Molecule',
       abbr: 'Cb',
-      description: 'Label + checkbox + opsiyonel hint / hata mesajı. aria-describedby bağlantısı kurulmuş, error durumunda border-error uygulanır.',
+      description: 'Label + checkbox + optional hint / error message. aria-describedby is wired up and border-error is applied on the error state.',
       filePath: 'modules/ui/Checkbox.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -123,7 +123,7 @@ export function Checkbox({ id, label, hint, error, disabled, className, ...props
       title: 'RadioGroup',
       category: 'Molecule',
       abbr: 'Rg',
-      description: 'fieldset + legend tabanlı radio grubu. WCAG uyumlu klavye navigasyonu için fieldset/legend zorunludur.',
+      description: 'fieldset + legend based radio group. WCAG-compliant keyboard navigation with an optional card-style variant.',
       filePath: 'modules/ui/RadioGroup.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -216,7 +216,7 @@ export function RadioGroup({ name, legend, options, value, onChange, error, disa
       title: 'Toggle',
       category: 'Molecule',
       abbr: 'Tg',
-      description: 'role="switch" tabanlı toggle/switch. 3 boyut, description slot, disabled desteği. CSS transform ile native input olmadan tam erişilebilir.',
+      description: 'role="switch" toggle/switch with three sizes, description slot, and disabled support. Fully accessible via CSS transform without a native input.',
       filePath: 'modules/ui/Toggle.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -340,7 +340,7 @@ export function Toggle({ id, label, description, checked, onChange, disabled, si
       title: 'CheckboxGroup',
       category: 'Molecule',
       abbr: 'Cg',
-      description: 'Chip görünümlü çoklu seçim grubu. Seçili chip bg-primary-subtle / border-primary renk tokenları ile işaretlenir. Klavye erişilebilir.',
+      description: 'Chip-style multi-select group. Selected chips use bg-primary-subtle / border-primary tokens. Keyboard accessible.',
       filePath: 'modules/ui/CheckboxGroup.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -392,7 +392,7 @@ export function CheckboxGroup({ legend, options, selected, onChange, disabled, e
       title: 'Select',
       category: 'Molecule',
       abbr: 'Sl',
-      description: 'Label + select + hint + error anatomy. appearance-none ile native dropdown stilini override eder.',
+      description: 'Label + select + hint + error anatomy. appearance-none overrides the native dropdown style and renders a chevron icon.',
       filePath: 'modules/ui/Select.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';

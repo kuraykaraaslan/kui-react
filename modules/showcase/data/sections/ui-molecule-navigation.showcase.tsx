@@ -112,7 +112,7 @@ export function buildNavigationData(): ShowcaseComponent[] {
       title: 'Pagination',
       category: 'Organism',
       abbr: 'Pg',
-      description: 'Sayfa navigasyonu. Ellipsis ile büyük sayfa sayılarını kısaltır. aria-label ve aria-current="page" ile erişilebilir.',
+      description: 'Page navigation control. Collapses large page counts with ellipsis; accessible via aria-label and aria-current="page".',
       filePath: 'modules/ui/Pagination.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -170,7 +170,7 @@ export function Pagination({ page, totalPages, onPageChange, className }) {
       title: 'TabGroup',
       category: 'Organism',
       abbr: 'Tg',
-      description: 'role="tablist" / role="tab" / role="tabpanel" ARIA pattern. Ok tuşları ile navigasyon, tabIndex=-1 aktif olmayan tablar için.',
+      description: 'Accessible tab navigation following the role="tablist" / role="tab" / role="tabpanel" ARIA pattern. Arrow-key navigation; tabIndex=-1 on inactive tabs.',
       filePath: 'modules/ui/TabGroup.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -274,7 +274,7 @@ export function TabGroup({ tabs, defaultTab, label = 'Tabs', className }) {
       title: 'Breadcrumb',
       category: 'Organism',
       abbr: 'Bc',
-      description: 'nav aria-label="Breadcrumb" sarıcı ile erişilebilir. Son öge aria-current="page" ile işaretlenir, ayrılıcı aria-hidden.',
+      description: 'Hierarchical navigation trail wrapped in nav aria-label="Breadcrumb". Last item marked with aria-current="page" and aria-hidden separators.',
       filePath: 'modules/ui/Breadcrumb.tsx',
       sourceCode: `import { cn } from '@/libs/utils/cn';
 
@@ -412,7 +412,7 @@ export function Breadcrumb({ items, className }) {
       title: 'TabButton',
       category: 'Organism',
       abbr: 'TB',
-      description: 'Pill tarzı sekme butonu; aktif/pasif renklendirme ve opsiyonel sayaç rozeti.',
+      description: 'Pill-style tab button with active/inactive coloring and an optional count badge.',
       filePath: 'modules/ui/TabButton.tsx',
       sourceCode: `import { TabButton } from '@/modules/ui/TabButton';
 
@@ -449,7 +449,7 @@ export function Breadcrumb({ items, className }) {
       title: 'ViewToggle',
       category: 'Organism',
       abbr: 'VT',
-      description: 'Yatay / dikey görünüm geçiş kontrolü; ikonlu iki durumlu seçici.',
+      description: 'Horizontal / vertical view toggle control; two-state icon selector. Emits a viewtoggle:change CustomEvent.',
       filePath: 'modules/ui/ViewToggle.tsx',
       sourceCode: `import { ViewToggle, type ViewOrientation } from '@/modules/ui/ViewToggle';
 

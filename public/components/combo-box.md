@@ -7,7 +7,7 @@
 - **status:** beta
 - **since:** 2025-03
 
-Single-select combobox with type-to-filter behavior, keyboard navigation, and optional async search.
+Searchable autocomplete single-select with keyboard navigation, described options, and a clearable button.
 
 ## Variants
 

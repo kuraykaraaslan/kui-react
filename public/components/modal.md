@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Odak yönetimi, Escape kapatma, backdrop tıklama ile kapatma. role="dialog" + aria-modal + aria-labelledby zorunludur.
+Focus-trapped dialog. Closes on Escape and backdrop click. Requires role="dialog" + aria-modal + aria-labelledby; supports sm/md/lg sizes.
 
 ## Design tokens consumed
 

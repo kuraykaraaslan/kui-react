@@ -114,7 +114,7 @@ import { DetailHeader } from '@/modules/app/DetailHeader';
       title: 'ErrorState',
       category: 'App',
       abbr: 'Er',
-      description: 'Hata durumu: uyarı banner\'ı + merkezi boş durum kombinasyonu. onRetry ile yeniden deneme aksiyonu.',
+      description: 'Error state pairing an inline alert banner with a centered empty state. Optional retry action.',
       filePath: 'modules/app/EmptyErrorState.tsx',
       sourceCode: `'use client';
 import { ErrorState } from '@/modules/app/EmptyErrorState';
@@ -124,7 +124,7 @@ import { ErrorState } from '@/modules/app/EmptyErrorState';
   message="Failed to load user data."
 />
 
-// Retry aksiyonu ile:
+// With retry action:
 <ErrorState
   title="Database connection failed"
   message="Could not connect. Please try again."
@@ -159,14 +159,14 @@ import { ErrorState } from '@/modules/app/EmptyErrorState';
       title: 'NotFoundState',
       category: 'App',
       abbr: 'Ns',
-      description: 'Kayıt bulunamadı / içerik yok durumu. onGoBack ile geri dön aksiyonu.',
+      description: 'Not-found / empty record state with optional go-back action.',
       filePath: 'modules/app/EmptyErrorState.tsx',
       sourceCode: `'use client';
 import { NotFoundState } from '@/modules/app/EmptyErrorState';
 
 <NotFoundState />
 
-// Özel başlık + geri dön butonu ile:
+// With custom title + back button:
 <NotFoundState
   title="User not found"
   description="This user account doesn't exist or may have been deleted."
@@ -198,7 +198,7 @@ import { NotFoundState } from '@/modules/app/EmptyErrorState';
       title: 'LoadingState',
       category: 'App',
       abbr: 'Lo',
-      description: 'İskelet yükleme animasyonları. spinner / table / cards / list / detail / form variant\'ları.',
+      description: 'Skeleton loading animations. Variants: spinner / table / cards / list / detail / form.',
       filePath: 'modules/app/LoadingState.tsx',
       sourceCode: `'use client';
 import { LoadingState } from '@/modules/app/LoadingState';

@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Label + checkbox + opsiyonel hint / hata mesajı. aria-describedby bağlantısı kurulmuş, error durumunda border-error uygulanır.
+Label + checkbox + optional hint / error message. aria-describedby is wired up and border-error is applied on the error state.
 
 ## Design tokens consumed
 

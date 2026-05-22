@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-01
 
-Kullanıcı profil fotoğrafı veya baş harfleri gösterici. 5 boyut destekler. Fotoğraf yoksa bg-primary-subtle / text-primary ile initials render edilir.
+User profile photo or initials indicator. 5 sizes with optional status dot. When no image is provided, initials render on a bg-primary-subtle / text-primary tile.
 
 ## Used by
 

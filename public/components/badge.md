@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-01
 
-Durum, kategori veya etiket göstergesi. Feedback varyantları yalnızca semantik anlamlarına uygun bağlamlarda kullanılır.
+Status, category or label indicator. 6 semantic variants, 3 sizes, dot and dismissible support.
 
 ## Used by
 

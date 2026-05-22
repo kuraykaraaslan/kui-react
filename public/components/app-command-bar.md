@@ -7,7 +7,7 @@
 - **status:** beta
 - **since:** 2025-04
 
-Keyboard-first komut paleti. ⌘K trigger'ı ile açılır; items prop'u ile özel komutlar geçilebilir, varsayılan navigation/actions/recent seti dahilidir.
+Keyboard-first command palette. Opens with ⌘K; an items prop accepts custom commands while a default navigation/actions/recent set is included.
 
 ## Variants
 
@@ -33,10 +33,10 @@ Keyboard-first komut paleti. ⌘K trigger'ı ile açılır; items prop'u ile öz
 'use client';
 import { AppCommandBar } from '@/modules/app/AppCommandBar';
 
-// Varsayılan komutlarla:
+// With default commands:
 <AppCommandBar onSelect={(item) => router.push(item.href)} />
 
-// Özel komutlarla:
+// With custom commands:
 <AppCommandBar
   items={[
     { icon: '🏠', label: 'Dashboard', shortcut: 'G D', category: 'Navigation' },

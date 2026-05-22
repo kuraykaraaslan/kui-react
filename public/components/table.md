@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Responsive tablo. scope="col" başlıklar, hover satır vurgusu, boş durum mesajı ve özel cell render desteği.
+Responsive table. scope="col" headers, hover row highlight, empty-state message, and custom cell render support.
 
 ## Design tokens consumed
 

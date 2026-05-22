@@ -40,7 +40,7 @@ export function buildDataData(): ShowcaseComponent[] {
       title: 'Table',
       category: 'Organism',
       abbr: 'Tb',
-      description: 'Responsive tablo. scope="col" başlıklar, hover satır vurgusu, boş durum mesajı ve özel cell render desteği.',
+      description: 'Responsive table. scope="col" headers, hover row highlight, empty-state message, and custom cell render support.',
       filePath: 'modules/ui/Table.tsx',
       sourceCode: `import { cn } from '@/libs/utils/cn';
 
@@ -125,7 +125,7 @@ export function Table({ columns, rows, caption, emptyMessage = 'No results found
       title: 'DataTable',
       category: 'Organism',
       abbr: 'Dt',
-      description: 'Table + SearchBar + Pagination tek bileşende. Client-side arama ve sayfalama. Filtrelenmiş sonuç sayacı, satır/sayfa seçici.',
+      description: 'Table + SearchBar + Pagination in a single component. Client-side search and pagination with filtered result counter and rows-per-page selector.',
       filePath: 'modules/ui/DataTable.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -270,7 +270,7 @@ export function DataTable({ columns, rows, caption, searchable = true, searchPla
       title: 'ContentScoreBar',
       category: 'Organism',
       abbr: 'Cs',
-      description: 'Kural tabanlı içerik kalite skoru. Good ≥70 / Fair ≥40 / Poor <40 tier sistemi. Her kural chip olarak gösterilir, geçen/kalan sayım altında.',
+      description: 'Rule-based content quality score with Good ≥70 / Fair ≥40 / Poor <40 tier system. Each rule shown as a chip with passed/total count. role="progressbar" + aria-valuenow.',
       filePath: 'modules/ui/ContentScoreBar.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';

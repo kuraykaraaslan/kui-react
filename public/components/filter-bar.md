@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Liste ve dashboard ekranları için select, multiselect, daterange ve tag tabanlı filtre paneli.
+Select, multiselect, daterange and text-based filter panel. Supports URL-based filtering via GET form submit.
 
 ## Variants
 

@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-User dropdown that consumes SafeUser. Understands the UserRole enum, shows English role labels, and accepts custom dropdown items.
+Avatar + name + role trigger. Dropdown with Profile, Settings, and Sign out items. Closes on outside click.
 
 ## Variants
 

@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2026-05
 
-Küçük metrik gösterim kartı; değer, etiket ve opsiyonel vurgu rengi.
+Compact metric display card with value, label, and optional accent color.
 
 ## Design tokens consumed
 

@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-fieldset + legend tabanlı radio grubu. WCAG uyumlu klavye navigasyonu için fieldset/legend zorunludur.
+fieldset + legend based radio group. WCAG-compliant keyboard navigation with an optional card-style variant.
 
 ## Design tokens consumed
 

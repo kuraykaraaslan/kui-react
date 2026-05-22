@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2026-05
 
-Başlıklı form bölüm kartı; alt çizgili başlık ve içerik alanı. Hesap sayfalarındaki ayarlar / şifre değiştirme gibi bölümler için.
+Titled content card with rounded-xl + border + bg-surface-raised + p-6. Header is separated by an underline; children slot accepts arbitrary content.
 
 ## Variants
 

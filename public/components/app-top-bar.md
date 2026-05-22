@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-AppShell'in header slotuna geçilen üst çubuk wrapper'ı. logo slotu sol tarafa; children (GlobalSearch, UserMenu, Button vb.) flex satırda sıralanır.
+Top bar wrapper passed into AppShell's header slot. The logo slot anchors the left side while children (GlobalSearch, UserMenu, Button, etc.) are arranged in a flex row.
 
 ## Variants
 

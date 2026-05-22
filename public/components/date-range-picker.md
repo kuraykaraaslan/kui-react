@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Date range picker with start/end fields and end ≥ start validation. Also ships a TimePicker.
+fieldset-based dual native date inputs. Start/end auto-constrain each other (min/max) with accessible sr-only labels.
 
 ## Variants
 

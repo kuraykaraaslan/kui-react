@@ -113,7 +113,7 @@ export function buildMoleculeAdvancedData(): ShowcaseComponent[] {
       title: 'TagInput',
       category: 'Molecule',
       abbr: 'Ti',
-      description: 'Enter veya virgülle tag ekleme, çift tıkla düzenleme, Backspace ile silme. Duplicate eklenmez. Controlled string[] modeli.',
+      description: 'Free-text input that creates chips. Add tags with Enter or comma, double-click to edit, Backspace to delete. Duplicates are ignored.',
       filePath: 'modules/ui/TagInput.tsx',
       sourceCode: `'use client';
 import { useRef, useState } from 'react';
@@ -176,7 +176,7 @@ export function TagInput({ id, label, hint, error, value, onChange, placeholder 
       title: 'MultiSelect',
       category: 'Molecule',
       abbr: 'Ms',
-      description: 'Multi-value select with tag chips, keyboard navigation, and remove-item support.',
+      description: 'Chip-based multi-select popover with searchable filter, keyboard navigation, and disabled-option support.',
       filePath: 'modules/ui/MultiSelect.tsx',
       sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useEffect, useRef, useState } from 'react';\n\nexport function MultiSelect({ id, label, options, value, onChange, placeholder = 'Select…' }) {\n  // ... (controlled/uncontrolled multi-select with chip tags)\n}`,
       variants: [
@@ -224,7 +224,7 @@ export function TagInput({ id, label, hint, error, value, onChange, placeholder 
       title: 'ComboBox',
       category: 'Molecule',
       abbr: 'Cb',
-      description: 'Single-select combobox with type-to-filter behavior, keyboard navigation, and optional async search.',
+      description: 'Searchable autocomplete single-select with keyboard navigation, described options, and a clearable button.',
       filePath: 'modules/ui/ComboBox.tsx',
       sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\n\nexport function ComboBox({ id, label, options, value, onChange, onSearch }) {\n  // searchable single-select combobox with async search support\n}`,
       variants: [

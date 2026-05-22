@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Avatar + isim + rol gösteren trigger'a tıklayınca açılan kullanıcı dropdown'ı. SafeUser prop'u alır; dropdown başlığında isim ve e-posta görünür.
+User dropdown opened by a trigger showing avatar, name and role. Accepts a SafeUser prop; the dropdown header shows the name and email.
 
 ## Design tokens consumed
 

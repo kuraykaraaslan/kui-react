@@ -95,7 +95,7 @@ export function buildFeedbackData(): ShowcaseComponent[] {
       title: 'AlertBanner',
       category: 'Organism',
       abbr: 'Ab',
-      description: 'Sayfa düzeyinde bilgi, uyarı veya hata mesajı. role="alert" ile ekran okuyucular için duyurulur. dismissible özelliği eklenebilir.',
+      description: 'Page-level info, success, warning or error message. Announced via role="alert" for screen readers with optional dismissible and action support.',
       filePath: 'modules/ui/AlertBanner.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -189,7 +189,7 @@ export function AlertBanner({ variant = 'info', title, message, dismissible = fa
       title: 'Toast',
       category: 'Organism',
       abbr: 'To',
-      description: 'Zustand store üzerinden yönetilen bildirim sistemi. Hover\'da dondurma, progress bar, title, actions, loading ve promise desteği.',
+      description: 'Notification system with success/warning/error/info/loading variants. Hover-to-freeze, progress bar, title, actions, and promise support.',
       filePath: 'modules/ui/Toast.tsx',
       sourceCode: `// Mount once at app root
 <ToastProvider position="top-right" />
@@ -250,7 +250,7 @@ const { clear } = useToastStore();`,
       title: 'EmptyState',
       category: 'Organism',
       abbr: 'Es',
-      description: 'Veri yokken gösterilen boş durum mesajı. icon + title + description + action slotları desteklenir.',
+      description: 'Empty-state message shown when there is no data. Supports icon, title, description, and action slots.',
       filePath: 'modules/ui/EmptyState.tsx',
       sourceCode: `import { cn } from '@/libs/utils/cn';
 

@@ -26,7 +26,7 @@ export function buildAvatarData(): ShowcaseComponent[] {
       title: 'Avatar',
       category: 'Atom',
       abbr: 'Av',
-      description: 'Kullanıcı profil fotoğrafı veya baş harfleri gösterici. 5 boyut destekler. Fotoğraf yoksa bg-primary-subtle / text-primary ile initials render edilir.',
+      description: 'User profile photo or initials indicator. 5 sizes with optional status dot. When no image is provided, initials render on a bg-primary-subtle / text-primary tile.',
       filePath: 'modules/ui/Avatar.tsx',
       sourceCode: `import { cn } from '@/libs/utils/cn';
 

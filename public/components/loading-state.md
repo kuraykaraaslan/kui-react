@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-İskelet yükleme animasyonları. spinner / table / cards / list / detail / form variant'ları.
+Skeleton loading animations. Variants: spinner / table / cards / list / detail / form.
 
 ## Variants
 

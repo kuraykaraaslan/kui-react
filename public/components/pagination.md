@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Sayfa navigasyonu. Ellipsis ile büyük sayfa sayılarını kısaltır. aria-label ve aria-current="page" ile erişilebilir.
+Page navigation control. Collapses large page counts with ellipsis; accessible via aria-label and aria-current="page".
 
 ## Variants
 

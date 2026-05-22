@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Label + select + hint + error anatomy. appearance-none ile native dropdown stilini override eder.
+Label + select + hint + error anatomy. appearance-none overrides the native dropdown style and renders a chevron icon.
 
 ## Design tokens consumed
 

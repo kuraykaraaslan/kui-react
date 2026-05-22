@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Chip görünümlü çoklu seçim grubu. Seçili chip bg-primary-subtle / border-primary renk tokenları ile işaretlenir. Klavye erişilebilir.
+Chip-style multi-select group. Selected chips use bg-primary-subtle / border-primary tokens. Keyboard accessible.
 
 ## Design tokens consumed
 

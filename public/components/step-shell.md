@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2026-05
 
-Checkout ve sihirbaz akışları için adım kapsayıcısı; active / done / pending durumları, daraltılmış özet ve Edit butonu.
+Wrapper card for a single step in a multi-step flow. Border and number circle change based on active / done / inactive state; the done + onEdit combination shows an Edit button alongside the summary.
 
 ## Variants
 

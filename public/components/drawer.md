@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Ekranın kenarından süzülen panel. Sol / sağ taraf seçeneği, odak yönetimi ve Escape kapatma dahildir.
+Side panel sliding in from the screen edge. Left / right placement with focus management and Escape close.
 
 ## Design tokens consumed
 

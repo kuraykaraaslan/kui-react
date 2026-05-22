@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Kayıt bulunamadı / içerik yok durumu. onGoBack ile geri dön aksiyonu.
+Not-found / empty record state with optional go-back action.
 
 ## Variants
 
@@ -36,7 +36,7 @@ import { NotFoundState } from '@/modules/app/EmptyErrorState';
 
 <NotFoundState />
 
-// Özel başlık + geri dön butonu ile:
+// With custom title + back button:
 <NotFoundState
   title="User not found"
   description="This user account doesn't exist or may have been deleted."
