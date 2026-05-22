@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { WORKSPACES } from '../iot.data';
 import type { CloudWorkspace, CloudStatus, CloudPlan } from '@/modules/domains/iot/types';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 type WorkspaceRow = {
   cloudId: string;
@@ -160,7 +161,9 @@ export default function WorkspacesPage() {
   const totalDevices = WORKSPACES.reduce((s, w) => s + w.deviceCount, 0);
 
   return (
-    <div className="h-full overflow-y-auto">
+    <>
+      <DocumentTitle text="Workspaces — IoT Theme" />
+      <div className="h-full overflow-y-auto">
       <div className="p-6 space-y-6">
         <div>
           <h1 className="text-xl font-bold text-text-primary">Workspaces</h1>
@@ -178,6 +181,7 @@ export default function WorkspacesPage() {
           caption="Cloud workspaces"
         />
       </div>
-    </div>
+      </div>
+    </>
   );
 }

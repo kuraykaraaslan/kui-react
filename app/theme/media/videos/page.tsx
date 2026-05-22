@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { VideoCard } from '@/modules/domains/media/video/VideoCard';
@@ -20,6 +22,7 @@ export default function VideosPage() {
 
   return (
     <div className="bg-surface-base text-text-primary">
+      <DocumentTitle text={`Videos — ${THEME_TITLES.media}`} />
       <div className="mx-auto max-w-7xl px-6 py-10">
         {/* Page header */}
         <div className="mb-8">

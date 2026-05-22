@@ -1,8 +1,14 @@
+import type { Metadata } from 'next';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { PricingGrid } from '@/modules/domains/landing/pricing/PricingGrid';
 import { FaqAccordion } from '@/modules/domains/landing/faq/FaqAccordion';
 import { StatsBar } from '@/modules/domains/landing/stat/StatsBar';
 import { ALL_PLANS, FAQ_ITEMS, STATS } from '../landing.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Pricing', THEME_TITLES.landing),
+};
 
 const BASE = '/theme/landing';
 

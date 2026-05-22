@@ -1,5 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { cn } from '@/libs/utils/cn';
 import { Avatar } from '@/modules/ui/Avatar';
 import { Button } from '@/modules/ui/Button';
@@ -52,6 +54,7 @@ export default function MessagesPage() {
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] lg:h-screen overflow-hidden">
+      <DocumentTitle text={`Messages — ${THEME_TITLES.social}`} />
 
       {/* Conversation list */}
       <div className={cn(

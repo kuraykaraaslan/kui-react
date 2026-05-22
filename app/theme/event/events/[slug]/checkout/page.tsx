@@ -1,5 +1,7 @@
 'use client';
 import { useState, use, useMemo } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { Input } from '@/modules/ui/Input';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
@@ -62,6 +64,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
   if (!event) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <DocumentTitle text={`Checkout — ${THEME_TITLES.event}`} />
         <p className="text-text-secondary">Etkinlik bulunamadı.</p>
         <a
           href="/theme/event/events"
@@ -132,16 +135,19 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
 
   if (step === 'confirm') {
     return (
-      <CheckoutSuccess
-        orderId={orderId}
-        ticketId={ticketId}
-        buyerName={buyer.name}
-        buyerEmail={buyer.email}
-        event={{ eventId: event.eventId, title: event.title, startAt: event.startAt, slug }}
-        venue={venue}
-        cartItems={cartItems}
-        total={total}
-      />
+      <>
+        <DocumentTitle text={`Checkout — ${event.title} — ${THEME_TITLES.event}`} />
+        <CheckoutSuccess
+          orderId={orderId}
+          ticketId={ticketId}
+          buyerName={buyer.name}
+          buyerEmail={buyer.email}
+          event={{ eventId: event.eventId, title: event.title, startAt: event.startAt, slug }}
+          venue={venue}
+          cartItems={cartItems}
+          total={total}
+        />
+      </>
     );
   }
 
@@ -149,6 +155,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-8">
+      <DocumentTitle text={`Checkout — ${event.title} — ${THEME_TITLES.event}`} />
       <Breadcrumb
         items={[
           { label: 'Ana Sayfa', href: '/theme/event' },

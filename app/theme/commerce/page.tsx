@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { Badge } from '@/modules/ui/Badge';
 import { Slider } from '@/modules/ui/Slider';
@@ -14,6 +16,10 @@ import {
   faTag,
 } from '@fortawesome/free-solid-svg-icons';
 import { PRODUCTS, CATEGORIES } from './commerce.data';
+
+export const metadata: Metadata = {
+  title: { absolute: THEME_TITLES['commerce'] },
+};
 
 /* ── Hero slides ────────────────────────────────────────── */
 const HERO_SLIDES = [

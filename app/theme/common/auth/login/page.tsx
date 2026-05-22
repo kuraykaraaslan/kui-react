@@ -4,6 +4,7 @@ import { BrandLogo } from '@/modules/ui/BrandLogo';
 import { LoginForm } from '@/modules/domains/common/auth/LoginForm';
 import { OAuthButtons } from '@/modules/domains/common/auth/OAuthButtons';
 import { SessionExpiredBanner } from '@/modules/domains/common/auth/SessionExpiredBanner';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 export default function LoginPage() {
   const [showExpiredBanner, setShowExpiredBanner] = useState(true);
@@ -15,6 +16,8 @@ export default function LoginPage() {
   }
 
   return (
+    <>
+      <DocumentTitle text="Login — Common Theme" />
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         {showExpiredBanner && (
@@ -72,5 +75,6 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+    </>
   );
 }

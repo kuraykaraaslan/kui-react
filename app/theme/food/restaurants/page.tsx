@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -8,6 +10,10 @@ import {
   faTag,
   faStore,
 } from '@fortawesome/free-solid-svg-icons';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Restaurants', THEME_TITLES['food']),
+};
 import { RestaurantCard } from '@/modules/domains/food/restaurant/RestaurantCard';
 import { RESTAURANTS, CUISINE_TYPES } from '../food.data';
 

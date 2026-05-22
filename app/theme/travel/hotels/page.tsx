@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { cn } from '@/libs/utils/cn';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -229,6 +231,7 @@ export default function HotelsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
+      <DocumentTitle text={`Hotels — ${THEME_TITLES['travel']}`} />
       {/* Page header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-text-primary">

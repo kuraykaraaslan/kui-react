@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { EventCard } from '@/modules/domains/event/EventCard';
 import { ArtistCard } from '@/modules/domains/event/ArtistCard';
@@ -15,6 +17,12 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
   return VENUES.map((v) => ({ slug: v.slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const venue = getVenueBySlug(slug);
+  return { title: buildPageTitle(venue?.name ?? slug, THEME_TITLES.event) };
 }
 
 export default async function VenueDetailPage({ params }: Props) {

@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { ALERTS } from '../iot.data';
 import type { Alert, AlertSeverity, AlertStatus } from '@/modules/domains/iot/types';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 type AlertRow = {
   alertId: string;
@@ -134,7 +135,9 @@ export default function AlertsPage() {
   const resolved = ALERTS.filter((a) => a.status === 'RESOLVED').length;
 
   return (
-    <div className="h-full overflow-y-auto">
+    <>
+      <DocumentTitle text="Alerts — IoT Theme" />
+      <div className="h-full overflow-y-auto">
       <div className="p-6 space-y-6">
         <div>
           <h1 className="text-xl font-bold text-text-primary">Alerts</h1>
@@ -152,6 +155,7 @@ export default function AlertsPage() {
           caption="Alerts"
         />
       </div>
-    </div>
+      </div>
+    </>
   );
 }

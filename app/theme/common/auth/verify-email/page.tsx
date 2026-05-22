@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/modules/ui/Button';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 const CODE_LENGTH = 6;
 
@@ -68,6 +69,8 @@ export default function VerifyEmailPage() {
 
   if (verified) {
     return (
+      <>
+        <DocumentTitle text="Verify Email — Common Theme" />
       <div className="min-h-screen flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md text-center space-y-5">
           <span className="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-success-subtle">
@@ -83,10 +86,13 @@ export default function VerifyEmailPage() {
           </a>
         </div>
       </div>
+      </>
     );
   }
 
   return (
+    <>
+      <DocumentTitle text="Verify Email — Common Theme" />
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         <div className="rounded-2xl border border-border bg-surface-raised shadow-sm p-8 space-y-6">
@@ -152,5 +158,6 @@ export default function VerifyEmailPage() {
         </p>
       </div>
     </div>
+    </>
   );
 }

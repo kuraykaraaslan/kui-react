@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { Button } from '@/modules/ui/Button';
 import { Card } from '@/modules/ui/Card';
@@ -19,6 +20,11 @@ import {
   BLOG_POSTS,
   FEATURED_POST,
 } from '@/app/theme/blog/blog.data';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: { absolute: THEME_TITLES.blog },
+};
 
 const LATEST_POSTS = BLOG_POSTS.slice(1, 5);
 const FEATURED_CATEGORY = FEATURED_POST.category;

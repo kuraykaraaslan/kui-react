@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { Badge } from '@/modules/ui/Badge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,6 +11,10 @@ import {
   faChevronRight,
   faCircleInfo,
 } from '@fortawesome/free-solid-svg-icons';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Salaries', THEME_TITLES['jobs']),
+};
 
 type SalaryRow = {
   title: string;

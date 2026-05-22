@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { Card } from '@/modules/ui/Card';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -5,6 +7,10 @@ import { faClipboardList, faStore, faUtensils } from '@fortawesome/free-solid-sv
 import { OrderStatusBadge } from '@/modules/domains/food/order/OrderStatusBadge';
 import { DeliveryStatusBadge } from '@/modules/domains/food/order/DeliveryStatusBadge';
 import { SAMPLE_ORDERS } from '../food.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Orders', THEME_TITLES['food']),
+};
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', {

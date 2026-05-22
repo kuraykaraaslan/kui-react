@@ -9,6 +9,7 @@ import { DeviceStatusBadge } from '@/modules/domains/iot/device/DeviceStatusBadg
 import { DeviceTypeBadge } from '@/modules/domains/iot/device/DeviceTypeBadge';
 import { DEVICES } from '../iot.data';
 import type { Device } from '@/modules/domains/iot/types';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 type DeviceRow = {
   deviceId: string;
@@ -157,7 +158,9 @@ export default function DevicesPage() {
   const rows = DEVICES.map(toRow);
 
   return (
-    <div className="h-full overflow-y-auto">
+    <>
+      <DocumentTitle text="Devices — IoT Theme" />
+      <div className="h-full overflow-y-auto">
       <div className="p-6 space-y-6">
         <div>
           <h1 className="text-xl font-bold text-text-primary">Devices</h1>
@@ -175,6 +178,7 @@ export default function DevicesPage() {
           caption="Devices"
         />
       </div>
-    </div>
+      </div>
+    </>
   );
 }

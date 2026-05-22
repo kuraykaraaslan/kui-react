@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { VENUES, EVENT_VENUE, EVENTS } from '@/app/theme/event/event.data';
 import { VenueCard } from '@/modules/domains/event/VenueCard';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Venues', THEME_TITLES.event),
+};
 
 export default function VenuesPage() {
   return (

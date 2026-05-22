@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { BookingStatusBadge } from '@/modules/domains/travel/booking/BookingStatusBadge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTicket, faPlane, faHotel } from '@fortawesome/free-solid-svg-icons';
 import { SAMPLE_BOOKINGS } from '../travel.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Bookings', THEME_TITLES['travel']),
+};
 
 export default function BookingsPage() {
   return (

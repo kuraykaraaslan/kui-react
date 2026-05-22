@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { Badge } from '@/modules/ui/Badge';
 import { TransactionRow } from '@/modules/domains/fintech/transaction/TransactionRow';
@@ -21,6 +23,10 @@ import {
   faCheckCircle,
 } from '@fortawesome/free-solid-svg-icons';
 import { WALLETS, TRANSACTIONS } from './fintech.data';
+
+export const metadata: Metadata = {
+  title: { absolute: THEME_TITLES['fintech'] },
+};
 
 const QUICK_ACTIONS = [
   { label: 'Send',     icon: faPaperPlane, href: '/theme/fintech/transfer',     bg: 'bg-primary text-primary-fg',      desc: 'To friends' },

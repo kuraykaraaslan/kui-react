@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Input } from '@/modules/ui/Input';
 import { Textarea } from '@/modules/ui/Textarea';
 import { Button } from '@/modules/ui/Button';
@@ -59,6 +61,7 @@ export default function SettingsPage() {
 
   return (
     <div className="px-4 py-6 bg-surface-base border-r border-border min-h-full">
+      <DocumentTitle text={`Settings — ${THEME_TITLES.social}`} />
       <div className="flex items-center gap-2 mb-6">
         <FontAwesomeIcon icon={faGear} className="w-5 h-5 text-primary" aria-hidden="true" />
         <h1 className="text-xl font-bold text-text-primary">Settings</h1>

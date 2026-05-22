@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { ProductCard } from '@/modules/domains/commerce/product/ProductCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -7,6 +9,10 @@ import {
   faFilter,
 } from '@fortawesome/free-solid-svg-icons';
 import { PRODUCTS, CATEGORIES } from '../commerce.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Products', THEME_TITLES['commerce']),
+};
 
 const SORT_OPTIONS = [
   'Featured',

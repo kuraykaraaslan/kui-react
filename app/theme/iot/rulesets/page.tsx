@@ -19,6 +19,7 @@ import { Textarea } from '@/modules/ui/Textarea';
 import { Button } from '@/modules/ui/Button';
 import { RULE_CHAINS } from '../iot.data';
 import type { RuleChain } from '@/modules/domains/iot/types';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 /* ─── Row type for DataTable ─────────────────────────────────────────────── */
 
@@ -220,7 +221,9 @@ export default function RulesetsPage() {
   const deleteChain = chains.find((c) => c.chainId === deleteTarget);
 
   return (
-    <div className="h-full overflow-y-auto">
+    <>
+      <DocumentTitle text="Rulesets — IoT Theme" />
+      <div className="h-full overflow-y-auto">
       <div className="p-6 space-y-6">
 
         {/* Page header */}
@@ -327,6 +330,7 @@ export default function RulesetsPage() {
           This action cannot be undone.
         </p>
       </Modal>
-    </div>
+      </div>
+    </>
   );
 }

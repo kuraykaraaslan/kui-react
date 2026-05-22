@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBuilding,
@@ -13,6 +15,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/modules/ui/Button';
 import { AGENTS } from '../real-estate.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('About', THEME_TITLES['real-estate']),
+};
 
 const MILESTONES = [
   { year: '2012', title: 'EstateView Founded', desc: 'Started with a small team of 5 agents in Istanbul with a simple goal: honest, transparent property search.' },

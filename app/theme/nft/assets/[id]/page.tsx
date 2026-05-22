@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faGavel, faTag } from '@fortawesome/free-solid-svg-icons';
@@ -8,9 +9,20 @@ import { BidHistoryRow } from '@/modules/domains/nft/auction/BidHistoryRow';
 import { AuctionCountdown } from '@/modules/domains/nft/auction/AuctionCountdown';
 import { ActivityFeedRow } from '@/modules/domains/nft/activity/ActivityFeedRow';
 import { ASSETS, COLLECTIONS, BIDS, AUCTIONS, ACTIVITY } from '../../nft.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 
 export async function generateStaticParams() {
   return ASSETS.map((a) => ({ id: a.assetId }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const asset = ASSETS.find((a) => a.assetId === id);
+  return { title: buildPageTitle(asset?.name ?? 'Asset Detail', THEME_TITLES.nft) };
 }
 
 export default async function NftDetailPage({

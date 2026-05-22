@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Badge } from '@/modules/ui/Badge';
 import { ModelCard } from '@/modules/domains/ai/model/ModelCard';
 import { ModelProviderBadge } from '@/modules/domains/ai/model/ModelProviderBadge';
@@ -10,9 +11,20 @@ import {
   faCircleCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import { MODELS } from '../../ai.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 
 export function generateStaticParams() {
   return MODELS.map((m) => ({ slug: m.modelId }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const model = MODELS.find((m) => m.modelId === slug);
+  return { title: buildPageTitle(model?.name ?? slug, THEME_TITLES.ai) };
 }
 
 export default async function ModelDetailPage({

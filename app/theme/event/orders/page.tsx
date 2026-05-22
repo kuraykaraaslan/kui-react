@@ -1,6 +1,12 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { MY_ORDERS } from '@/app/theme/event/event.data';
 import { cn } from '@/libs/utils/cn';
 import { EventOrderStatusBadge } from '@/modules/domains/event/EventOrderStatusBadge';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Orders', THEME_TITLES.event),
+};
 
 const FMT_CURRENCY = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 });
 const FMT_DATE = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });

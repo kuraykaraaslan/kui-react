@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { EventStatusBadge } from '@/modules/domains/event/EventStatusBadge';
 import { EventFormatBadge } from '@/modules/domains/event/EventFormatBadge';
@@ -22,6 +24,12 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
   return EVENTS.map((e) => ({ slug: e.slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const event = getEventBySlug(slug);
+  return { title: buildPageTitle(event?.title ?? slug, THEME_TITLES.event) };
 }
 
 export default async function EventDetailPage({ params }: Props) {

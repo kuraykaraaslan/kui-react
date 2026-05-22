@@ -11,6 +11,7 @@ import {
 import { faEthereum } from '@fortawesome/free-brands-svg-icons';
 import { cn } from '@/libs/utils/cn';
 import { MintProgressBar } from '@/modules/domains/nft/mint/MintProgressBar';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 const STEPS = ['Upload', 'Details', 'Pricing', 'Review'] as const;
 type Step = (typeof STEPS)[number];
@@ -28,7 +29,9 @@ export default function NftCreatePage() {
   const back = () => stepIndex > 0 && setStep(STEPS[stepIndex - 1]);
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
+    <>
+      <DocumentTitle text="Create — NFT Theme" />
+      <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Create new item</h1>
         <p className="mt-1 text-sm text-text-secondary">
@@ -224,6 +227,7 @@ export default function NftCreatePage() {
           </button>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

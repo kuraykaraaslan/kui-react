@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
 import { CollectionCard } from '@/modules/domains/nft/collection/CollectionCard';
 import { COLLECTIONS } from '../nft.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Collections', THEME_TITLES.nft),
+};
 
 const TABS = ['Trending', 'Top', 'New'] as const;
 

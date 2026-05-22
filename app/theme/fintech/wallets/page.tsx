@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { Badge } from '@/modules/ui/Badge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,6 +15,10 @@ import {
   faArrowRightArrowLeft,
 } from '@fortawesome/free-solid-svg-icons';
 import { WALLETS } from '../fintech.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Wallets', THEME_TITLES['fintech']),
+};
 
 const CURRENCY_SYMBOLS: Record<string, string> = {
   TRY: '₺',

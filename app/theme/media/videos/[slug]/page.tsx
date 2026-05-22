@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faThumbsUp,
@@ -12,6 +14,12 @@ import { VIDEOS, CHANNELS } from '../../media.data';
 
 export function generateStaticParams() {
   return VIDEOS.map((v) => ({ slug: v.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const video = VIDEOS.find((v) => v.slug === slug);
+  return { title: buildPageTitle(video?.title ?? slug, THEME_TITLES.media) };
 }
 
 export default async function VideoDetailPage({

@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { ChannelCard } from '@/modules/domains/media/channel/ChannelCard';
 import { CHANNELS } from '../media.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Channels', THEME_TITLES.media),
+};
 
 export default function ChannelsPage() {
   return (

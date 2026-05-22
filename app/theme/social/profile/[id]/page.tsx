@@ -1,10 +1,18 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { SocialProfileCard } from '@/modules/domains/social/profile/SocialProfileCard';
 import { PostCard } from '@/modules/domains/social/post/PostCard';
 import { USERS, FEED_POSTS, ME } from '../../social.data';
 
 export async function generateStaticParams() {
   return [...USERS.map((u) => ({ id: u.userId })), { id: ME.userId }];
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const user = id === ME.userId ? ME : USERS.find((u) => u.userId === id);
+  return { title: buildPageTitle(user?.name ?? id, THEME_TITLES.social) };
 }
 
 export default async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {

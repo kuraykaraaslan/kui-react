@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/modules/ui/Badge';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
@@ -18,9 +19,20 @@ import {
     getPostBySlug,
     getRelatedPosts,
 } from '../blog.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 
 export async function generateStaticParams() {
     return BLOG_POSTS.map((post) => ({ slug: post.slug }));
+}
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+    const { slug } = await params;
+    const post = getPostBySlug(slug);
+    return { title: buildPageTitle(post?.title ?? slug, THEME_TITLES.blog) };
 }
 
 export default async function BlogPostPage({

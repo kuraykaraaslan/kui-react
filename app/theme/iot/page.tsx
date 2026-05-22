@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faMicrochip,
@@ -10,6 +11,11 @@ import {
 import { AlertSeverityBadge } from '@/modules/domains/iot/alert/AlertSeverityBadge';
 import { DeviceStatusBadge } from '@/modules/domains/iot/device/DeviceStatusBadge';
 import { DEVICES, ALERTS, WORKSPACES } from './iot.data';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: { absolute: THEME_TITLES.iot },
+};
 
 const activeCloud = WORKSPACES[0];
 

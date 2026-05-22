@@ -5,6 +5,7 @@ import { RegisterForm } from '@/modules/domains/common/auth/RegisterForm';
 import { OAuthButtons } from '@/modules/domains/common/auth/OAuthButtons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 export default function RegisterPage() {
   const [successEmail, setSuccessEmail] = useState('');
@@ -15,6 +16,8 @@ export default function RegisterPage() {
   }
 
   return (
+    <>
+      <DocumentTitle text="Register — Common Theme" />
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         <div className="rounded-2xl border border-border bg-surface-raised shadow-sm p-8 space-y-6">
@@ -77,5 +80,6 @@ export default function RegisterPage() {
         </p>
       </div>
     </div>
+    </>
   );
 }

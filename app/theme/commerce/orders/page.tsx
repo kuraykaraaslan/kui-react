@@ -1,9 +1,15 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { OrderCard } from '@/modules/domains/commerce/order/OrderCard';
 import { OrderStatusBadge } from '@/modules/domains/commerce/order/OrderStatusBadge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClipboardList } from '@fortawesome/free-solid-svg-icons';
 import { ORDERS } from '../commerce.data';
 import type { OrderStatus } from '@/modules/domains/commerce/types';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Orders', THEME_TITLES['commerce']),
+};
 
 const ALL_STATUSES: OrderStatus[] = [
   'PENDING', 'CONFIRMED', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED',

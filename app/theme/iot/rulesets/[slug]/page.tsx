@@ -14,6 +14,7 @@ import { Badge } from '@/modules/ui/Badge';
 import { RulesetEditor } from '@/modules/domains/iot/ruleset/RulesetEditor';
 import type { RulesetEditorRef } from '@/modules/domains/iot/ruleset/RulesetEditor';
 import { RULE_CHAINS } from '../../iot.data';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 export default function RulesetEditorPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -23,7 +24,9 @@ export default function RulesetEditorPage({ params }: { params: Promise<{ slug: 
   const editorRef = useRef<RulesetEditorRef>(null);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <>
+      <DocumentTitle text={`${chain.name} — IoT Theme`} />
+      <div className="flex flex-col h-full overflow-hidden">
 
       {/* ── Toolbar ── */}
       <div className="shrink-0 flex items-center gap-3 border-b border-border bg-surface-base px-4 py-2.5">
@@ -89,6 +92,7 @@ export default function RulesetEditorPage({ params }: { params: Promise<{ slug: 
           className="h-full"
         />
       </div>
-    </div>
+      </div>
+    </>
   );
 }

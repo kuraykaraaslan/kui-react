@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { Badge } from '@/modules/ui/Badge';
 import { Card } from '@/modules/ui/Card';
@@ -18,6 +20,12 @@ export function generateStaticParams() {
 }
 
 type Props = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const restaurant = RESTAURANTS.find((r) => r.slug === slug);
+  return { title: buildPageTitle(restaurant?.name ?? slug, THEME_TITLES['food']) };
+}
 
 export default async function RestaurantDetailPage({ params }: Props) {
   const { slug } = await params;

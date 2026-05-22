@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faArrowRight,
@@ -7,6 +9,10 @@ import {
 import { VideoCard } from '@/modules/domains/media/video/VideoCard';
 import { ChannelCard } from '@/modules/domains/media/channel/ChannelCard';
 import { VIDEOS, CHANNELS, CATEGORIES, FEATURED_VIDEO } from './media.data';
+
+export const metadata: Metadata = {
+  title: { absolute: THEME_TITLES.media },
+};
 
 export default function MediaThemePage() {
   const trendingVideos = VIDEOS.slice(0, 6);

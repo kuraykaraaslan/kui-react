@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { cn } from '@/libs/utils/cn';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { FlightCard } from '@/modules/domains/travel/flight/FlightCard';
 import { HotelCard } from '@/modules/domains/travel/hotel/HotelCard';
@@ -30,6 +32,7 @@ export default function TravelHomePage() {
 
   return (
     <div className="bg-surface-base text-text-primary">
+      <DocumentTitle text={THEME_TITLES['travel']} absolute />
 
       {/* ── Hero ── */}
       <section className="relative flex items-end justify-center overflow-hidden" style={{ minHeight: '520px' }}>

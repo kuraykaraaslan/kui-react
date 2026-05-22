@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { SocialNotificationItem } from '@/modules/domains/social/notification/SocialNotificationItem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -24,6 +26,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="bg-surface-base border-r border-border min-h-full">
+      <DocumentTitle text={`Notifications — ${THEME_TITLES.social}`} />
       {/* Header */}
       <div className="sticky top-0 z-10 bg-surface-base/90 backdrop-blur-sm border-b border-border px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">

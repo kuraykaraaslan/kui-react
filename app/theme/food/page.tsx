@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
+export const metadata: Metadata = {
+  title: { absolute: THEME_TITLES['food'] },
+};
 import {
   faLocationDot,
   faMagnifyingGlass,

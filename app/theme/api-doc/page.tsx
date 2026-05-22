@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faFileContract, faUpRightFromSquare, faShield } from '@fortawesome/free-solid-svg-icons';
 import { ApiTagSection } from '@/modules/domains/api-doc/ApiTagSection';
@@ -6,6 +7,10 @@ import { StatusCodeBadge } from '@/modules/domains/api-doc/StatusCodeBadge';
 import { Badge } from '@/modules/ui/Badge';
 import { SAMPLE_SPEC } from './api-doc.data';
 import type { PathItem } from '@/modules/domains/api-doc/types';
+
+export const metadata: Metadata = {
+  title: { absolute: `${SAMPLE_SPEC.info.title} ${SAMPLE_SPEC.info.version}` },
+};
 
 const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'error' | 'neutral'> = {
   ACTIVE:     'success',

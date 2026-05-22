@@ -6,6 +6,7 @@ import { SectionCard } from '@/modules/app/SectionCard';
 import { InlineAlert } from '@/modules/app/InlineAlert';
 import { DEMO_USER } from '../../common.data';
 import type { UserPreferences, ChangePassword } from '@/modules/domains/common/types';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 type SaveState = 'idle' | 'saved' | 'error';
 
@@ -27,6 +28,8 @@ export default function SettingsPage() {
   }
 
   return (
+    <>
+      <DocumentTitle text="Settings — Common Theme" />
     <div className="space-y-6">
       <h2 className="text-lg font-semibold text-text-primary">Settings</h2>
 
@@ -53,5 +56,6 @@ export default function SettingsPage() {
         <ChangePasswordForm onSubmit={handlePassword} />
       </SectionCard>
     </div>
+    </>
   );
 }

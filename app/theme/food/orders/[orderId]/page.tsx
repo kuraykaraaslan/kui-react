@@ -1,6 +1,8 @@
 'use client';
 import { use } from 'react';
 import { notFound } from 'next/navigation';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { OrderTrackingTimeline } from '@/modules/domains/food/order/OrderTrackingTimeline';
@@ -29,6 +31,7 @@ export default function OrderTrackingPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
+      <DocumentTitle text={`Order #${order.orderNumber} — ${THEME_TITLES['food']}`} />
       <a
         href="/theme/food/orders"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"

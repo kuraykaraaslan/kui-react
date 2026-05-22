@@ -1,8 +1,14 @@
+import type { Metadata } from 'next';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { TeamMemberCard } from '@/modules/domains/landing/team/TeamMemberCard';
 import { StatsBar } from '@/modules/domains/landing/stat/StatsBar';
 import { PartnerLogosStrip } from '@/modules/domains/landing/partner/PartnerLogosStrip';
 import { TEAM, STATS, PARTNERS } from '../landing.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('About', THEME_TITLES.landing),
+};
 
 const BASE = '/theme/landing';
 

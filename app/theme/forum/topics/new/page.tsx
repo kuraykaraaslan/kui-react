@@ -1,4 +1,6 @@
 'use client';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { PostComposer } from '@/modules/domains/forum/post/PostComposer';
@@ -12,6 +14,7 @@ export default function NewTopicPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
+      <DocumentTitle text={`New Topic — ${THEME_TITLES.forum}`} />
       <a
         href="/theme/forum/topics"
         className="inline-flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary mb-4 transition-colors"

@@ -1,6 +1,12 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faVideo, faChartLine, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/modules/ui/Button';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Studio', THEME_TITLES.media),
+};
 import { ChannelStatsCard } from '@/modules/domains/media/channel/ChannelStatsCard';
 import { VideoPerformanceRow } from '@/modules/domains/media/video/VideoPerformanceRow';
 import { WatchTimeChart } from '@/modules/domains/media/chart/WatchTimeChart';

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Badge } from '@/modules/ui/Badge';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { Button } from '@/modules/ui/Button';
@@ -8,6 +9,11 @@ import { CategoryBadge } from '@/modules/domains/blog/category/CategoryBadge';
 import { PostCard } from '@/modules/domains/blog/post/PostCard';
 import { PostStatusBadge } from '@/modules/domains/blog/post/PostStatusBadge';
 import { BLOG_CATEGORIES, BLOG_POSTS, FEATURED_POST } from '../blog.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Archive', THEME_TITLES.blog),
+};
 
 const ARCHIVE_POSTS = BLOG_POSTS.slice(1);
 

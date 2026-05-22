@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { PROPERTIES, AGENTS } from '../../real-estate.data';
 import { PropertyDetailClient } from './PropertyDetailClient';
 
@@ -7,6 +9,12 @@ export function generateStaticParams() {
 }
 
 type Props = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const property = PROPERTIES.find((p) => p.slug === slug);
+  return { title: buildPageTitle(property?.title ?? slug, THEME_TITLES['real-estate']) };
+}
 
 export default async function PropertyDetailPage({ params }: Props) {
   const { slug } = await params;

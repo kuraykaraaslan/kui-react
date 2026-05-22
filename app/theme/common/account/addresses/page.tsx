@@ -6,6 +6,7 @@ import { Button } from '@/modules/ui/Button';
 import { InlineAlert } from '@/modules/app/InlineAlert';
 import { SAVED_ADDRESSES } from '../../common.data';
 import type { Address } from '@/modules/domains/common/AddressTypes';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 type Mode = { kind: 'list' } | { kind: 'add' } | { kind: 'edit'; index: number };
 
@@ -37,6 +38,8 @@ export default function AddressesPage() {
   }
 
   return (
+    <>
+      <DocumentTitle text="Addresses — Common Theme" />
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-text-primary">Address Book</h2>
@@ -72,5 +75,6 @@ export default function AddressesPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

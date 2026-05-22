@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { NftCard } from '@/modules/domains/nft/asset/NftCard';
 import { ASSETS, COLLECTIONS } from '../nft.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Explore', THEME_TITLES.nft),
+};
 
 export default function NftExplorePage() {
   return (

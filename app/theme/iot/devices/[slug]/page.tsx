@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -14,9 +15,20 @@ import { DeviceStatusBadge } from '@/modules/domains/iot/device/DeviceStatusBadg
 import { DeviceTypeBadge } from '@/modules/domains/iot/device/DeviceTypeBadge';
 import { AlertSeverityBadge } from '@/modules/domains/iot/alert/AlertSeverityBadge';
 import { DEVICES, TELEMETRY_READINGS, ALERTS } from '../../iot.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 
 export async function generateStaticParams() {
   return DEVICES.map((d) => ({ slug: d.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const device = DEVICES.find((d) => d.slug === slug);
+  return { title: buildPageTitle(device?.name ?? slug, THEME_TITLES.iot) };
 }
 
 function formatDateTime(date: Date | null | undefined) {

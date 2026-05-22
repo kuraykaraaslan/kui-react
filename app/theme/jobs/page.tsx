@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { Badge } from '@/modules/ui/Badge';
 import { SearchBar } from '@/modules/ui/SearchBar';
@@ -13,6 +15,10 @@ import {
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 import { JOBS, COMPANIES, JOB_CATEGORIES, FEATURED_JOB } from './jobs.data';
+
+export const metadata: Metadata = {
+  title: { absolute: THEME_TITLES['jobs'] },
+};
 
 const STATS = [
   { label: 'Open Roles',  value: '12,400+', icon: faBriefcase },

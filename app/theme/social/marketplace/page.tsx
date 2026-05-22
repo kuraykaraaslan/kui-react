@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { SearchBar } from '@/modules/ui/SearchBar';
 import { MarketplaceListingCard } from '@/modules/domains/social/marketplace/MarketplaceListingCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -23,6 +25,7 @@ export default function MarketplacePage() {
 
   return (
     <div className="px-4 py-4 bg-surface-base border-r border-border min-h-full">
+      <DocumentTitle text={`Marketplace — ${THEME_TITLES.social}`} />
       {/* Header */}
       <div className="sticky top-0 z-10 bg-surface-base/90 backdrop-blur-sm -mx-4 px-4 py-3 mb-4 border-b border-border flex items-center gap-2">
         <FontAwesomeIcon icon={faStore} className="w-4 h-4 text-primary" aria-hidden="true" />

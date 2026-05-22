@@ -6,6 +6,7 @@ import { faArrowLeft, faBookOpen } from '@fortawesome/free-solid-svg-icons';
 import { AlertDetailHeader } from '@/modules/domains/iot/alert/AlertDetailHeader';
 import { AlertEventTimeline } from '@/modules/domains/iot/alert/AlertEventTimeline';
 import { ALERTS, ALERT_EVENTS, DEVICES } from '../../iot.data';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 export default function AlertDetailPage({
   params,
@@ -21,7 +22,9 @@ export default function AlertDetailPage({
   const device = DEVICES.find((d) => d.deviceId === alert.deviceId);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6">
+    <>
+      <DocumentTitle text="Alert Detail — IoT Theme" />
+      <div className="mx-auto max-w-5xl px-4 py-6">
       <a
         href="/theme/iot/alerts"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"
@@ -90,6 +93,7 @@ export default function AlertDetailPage({
           </aside>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

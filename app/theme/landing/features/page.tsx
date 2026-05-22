@@ -1,8 +1,14 @@
+import type { Metadata } from 'next';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { FeatureGrid } from '@/modules/domains/landing/feature/FeatureGrid';
 import { HowItWorksSection } from '@/modules/domains/landing/how-it-works/HowItWorksSection';
 import { TestimonialGrid } from '@/modules/domains/landing/testimonial/TestimonialGrid';
 import { FEATURES, TESTIMONIALS, HOW_IT_WORKS_STEPS } from '../landing.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Features', THEME_TITLES.landing),
+};
 
 const BASE = '/theme/landing';
 

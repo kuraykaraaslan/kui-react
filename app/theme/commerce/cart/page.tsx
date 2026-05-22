@@ -1,8 +1,14 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { CartItem } from '@/modules/domains/commerce/cart/CartItem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart, faArrowRight, faLock } from '@fortawesome/free-solid-svg-icons';
 import { CART_ITEMS } from '../commerce.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Cart', THEME_TITLES['commerce']),
+};
 
 function formatPrice(amount: number, currency: string): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 2 }).format(amount);

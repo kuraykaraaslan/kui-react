@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUsers,
@@ -12,6 +14,10 @@ import {
 import { Avatar } from '@/modules/ui/Avatar';
 import { Badge } from '@/modules/ui/Badge';
 import { AGENTS, PROPERTIES } from '../real-estate.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Agents', THEME_TITLES['real-estate']),
+};
 
 const STATS = [
   { label: 'Expert Agents',   value: String(AGENTS.length),       icon: faUsers    },

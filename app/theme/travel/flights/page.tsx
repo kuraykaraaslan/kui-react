@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { cn } from '@/libs/utils/cn';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { FlightCabinBadge } from '@/modules/domains/travel/flight/FlightCabinBadge';
 import { FlightSegmentStatusBadge } from '@/modules/domains/travel/flight/FlightSegmentStatusBadge';
@@ -55,6 +57,7 @@ export default function FlightsPage() {
 
   return (
     <div className="bg-surface-base min-h-screen">
+      <DocumentTitle text={`Flights — ${THEME_TITLES['travel']}`} />
       {/* ── Search bar hero ── */}
       <div className="bg-primary py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">

@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { PlaylistHeaderCard } from '@/modules/domains/media/playlist/PlaylistHeaderCard';
@@ -6,6 +8,12 @@ import { PLAYLISTS, VIDEOS, CHANNELS } from '../../media.data';
 
 export function generateStaticParams() {
   return PLAYLISTS.map((p) => ({ slug: p.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const playlist = PLAYLISTS.find((p) => p.slug === slug);
+  return { title: buildPageTitle(playlist?.title ?? slug, THEME_TITLES.media) };
 }
 
 export default async function PlaylistDetailPage({

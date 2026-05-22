@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Slider } from '@/modules/ui/Slider';
 import { EventCard } from '@/modules/domains/event/EventCard';
 import { HeroSlide } from '@/modules/domains/event/HeroSlide';
@@ -7,6 +9,10 @@ import {
 } from '@/app/theme/event/event.data';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMusic, faTrophy, faMasksTheater, faLaptop, faFaceSmile, faStar, faTicket } from '@fortawesome/free-solid-svg-icons';
+
+export const metadata: Metadata = {
+  title: { absolute: THEME_TITLES.event },
+};
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'cat-music':      <FontAwesomeIcon icon={faMusic} className="w-6 h-6" aria-hidden="true" />,

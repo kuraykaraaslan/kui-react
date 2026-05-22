@@ -7,9 +7,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine, faTrophy, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { MODELS } from '../../ai.data';
 import type { AIModel } from '@/modules/domains/ai/types';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 
 export const metadata: Metadata = {
-  title: 'Compare Models · Umay',
+  title: buildPageTitle('Model Comparison', THEME_TITLES.ai),
   description: 'Side-by-side comparison of frontier AI models on price, context window, and benchmarks.',
 };
 

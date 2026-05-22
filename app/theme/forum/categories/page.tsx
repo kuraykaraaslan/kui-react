@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,6 +10,10 @@ import {
   faPenToSquare,
 } from '@fortawesome/free-solid-svg-icons';
 import { FORUM_CATEGORIES, CATEGORY_GROUPS, TOPICS } from '../forum.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Categories', THEME_TITLES.forum),
+};
 
 function formatLastPost(dateStr: string) {
   const date = new Date(dateStr);

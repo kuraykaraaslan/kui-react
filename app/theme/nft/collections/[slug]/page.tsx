@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -7,9 +8,20 @@ import { NftCard } from '@/modules/domains/nft/asset/NftCard';
 import { ActivityFeedRow } from '@/modules/domains/nft/activity/ActivityFeedRow';
 import { BlockchainBadge } from '@/modules/domains/nft/wallet/BlockchainBadge';
 import { COLLECTIONS, ASSETS, ACTIVITY, FLOOR_PRICE_HISTORY } from '../../nft.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 
 export async function generateStaticParams() {
   return COLLECTIONS.map((c) => ({ slug: c.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const collection = COLLECTIONS.find((c) => c.slug === slug);
+  return { title: buildPageTitle(collection?.name ?? slug, THEME_TITLES.nft) };
 }
 
 export default async function CollectionDetailPage({

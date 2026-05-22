@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Pagination } from '@/modules/ui/Pagination';
 import { Badge } from '@/modules/ui/Badge';
 import { TransactionRow } from '@/modules/domains/fintech/transaction/TransactionRow';
@@ -78,6 +80,7 @@ export default function TransactionsPage() {
 
   return (
     <div className="bg-[#f5f7fa] min-h-screen">
+      <DocumentTitle text={`Transactions — ${THEME_TITLES['fintech']}`} />
       <div className="mx-auto max-w-5xl px-4 py-10 space-y-8">
 
         {/* Page header */}

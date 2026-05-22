@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { ARTISTS, EVENT_ARTISTS, EVENTS } from '@/app/theme/event/event.data';
 import { ArtistCard } from '@/modules/domains/event/ArtistCard';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Artists', THEME_TITLES.event),
+};
 
 export default function ArtistsPage() {
   return (

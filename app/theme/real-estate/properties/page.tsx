@@ -1,5 +1,7 @@
 'use client';
 import { useState, useMemo } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { PropertyCard } from '@/modules/domains/real-estate/property/PropertyCard';
 import { Button } from '@/modules/ui/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -104,6 +106,7 @@ export default function PropertiesPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
+      <DocumentTitle text={`Properties — ${THEME_TITLES['real-estate']}`} />
 
       {/* ── Page header ── */}
       <div className="flex items-center justify-between mb-6 gap-4">

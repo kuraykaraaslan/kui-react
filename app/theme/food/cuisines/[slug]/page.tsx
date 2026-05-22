@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { CuisineHeroBanner } from '@/modules/domains/food/cuisine/CuisineHeroBanner';
@@ -14,6 +16,16 @@ import {
 
 export function generateStaticParams() {
   return CUISINES.map((c) => ({ slug: c.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const cuisine = CUISINES.find((c) => c.slug === slug);
+  return { title: buildPageTitle(cuisine?.name ?? slug, THEME_TITLES['food']) };
 }
 
 export default async function CuisinePage({

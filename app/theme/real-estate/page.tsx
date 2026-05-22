@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { Badge } from '@/modules/ui/Badge';
 import { PropertyCard } from '@/modules/domains/real-estate/property/PropertyCard';
@@ -24,6 +26,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { PROPERTIES, CITIES, PROPERTY_TYPES, TESTIMONIALS, NEIGHBORHOODS } from './real-estate.data';
 import type { PropertyType } from '@/modules/domains/real-estate/types';
+
+export const metadata: Metadata = {
+  title: { absolute: THEME_TITLES['real-estate'] },
+};
 
 const STATS = [
   { label: 'Properties Listed',  value: '2,400+', icon: faBuilding   },

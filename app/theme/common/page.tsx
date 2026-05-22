@@ -1,9 +1,15 @@
+import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faKey, faUser, faEnvelope, faLock, faEnvelopeCircleCheck, faShield,
   faCartShopping, faLightbulb, faCreditCard, faMagnifyingGlass,
   faIdCard, faGear, faLocationDot, faBox, faArrowRight,
 } from '@fortawesome/free-solid-svg-icons';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: { absolute: THEME_TITLES.common },
+};
 
 const SECTIONS = [
   {

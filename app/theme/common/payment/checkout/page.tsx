@@ -17,6 +17,7 @@ import { StepShell } from '@/modules/app/StepShell';
 import { SAVED_ADDRESSES, SAVED_CARDS, ORDER_TOTALS, DEMO_CART } from '../../common.data';
 import type { Address } from '@/modules/domains/common/AddressTypes';
 import type { PaymentMethod, SavedCard, CreditCardInput, PaymentBase } from '@/modules/domains/common/PaymentTypes';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 /* ─── types ─── */
 
@@ -134,6 +135,8 @@ export default function CheckoutPage() {
 
   if (step === 'success') {
     return (
+      <>
+        <DocumentTitle text="Checkout — Common Theme" />
       <div className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
         <CheckoutSuccessState
           payment={MOCK_PAYMENT}
@@ -141,12 +144,15 @@ export default function CheckoutPage() {
           onReset={() => window.location.reload()}
         />
       </div>
+      </>
     );
   }
 
   const currentIndex = stepIndex(step);
 
   return (
+    <>
+      <DocumentTitle text="Checkout — Common Theme" />
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-text-primary">Checkout</h1>
@@ -359,6 +365,7 @@ export default function CheckoutPage() {
         </aside>
       </div>
     </div>
+    </>
   );
 }
 

@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { FLIGHTS } from '../../travel.data';
@@ -6,6 +8,17 @@ import { FlightBookingFlow } from '../../FlightBookingFlow';
 
 export function generateStaticParams() {
   return FLIGHTS.map((f) => ({ flightId: f.flightId }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ flightId: string }>;
+}): Promise<Metadata> {
+  const { flightId } = await params;
+  const flight = FLIGHTS.find((f) => f.flightId === flightId);
+  const label = flight ? `Flight ${flight.flightId}` : flightId;
+  return { title: buildPageTitle(label, THEME_TITLES['travel']) };
 }
 
 export default async function FlightDetailPage({ params }: { params: Promise<{ flightId: string }> }) {

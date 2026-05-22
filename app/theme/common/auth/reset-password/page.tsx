@@ -5,6 +5,7 @@ import { Button } from '@/modules/ui/Button';
 import { Form } from '@/modules/app/Form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faArrowRight, faLock } from '@fortawesome/free-solid-svg-icons';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 type FormState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -34,6 +35,8 @@ export default function ResetPasswordPage() {
 
   if (formState === 'success') {
     return (
+      <>
+        <DocumentTitle text="Reset Password — Common Theme" />
       <div className="min-h-screen flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md text-center space-y-5">
           <span className="flex h-16 w-16 mx-auto items-center justify-center rounded-full bg-success-subtle">
@@ -49,10 +52,13 @@ export default function ResetPasswordPage() {
           </a>
         </div>
       </div>
+      </>
     );
   }
 
   return (
+    <>
+      <DocumentTitle text="Reset Password — Common Theme" />
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         <div className="rounded-2xl border border-border bg-surface-raised shadow-sm p-8 space-y-6">
@@ -103,5 +109,6 @@ export default function ResetPasswordPage() {
         </p>
       </div>
     </div>
+    </>
   );
 }

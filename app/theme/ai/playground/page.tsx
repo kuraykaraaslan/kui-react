@@ -7,6 +7,7 @@ import { Button } from '@/modules/ui/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { MODELS, CHAT_MESSAGES } from '../ai.data';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 const TEXT_MODELS = MODELS.filter((m) => m.type === 'TEXT');
 const DEMO_SESSION_ID = 'sess-01';
@@ -30,7 +31,9 @@ export default function PlaygroundPage() {
   }));
 
   return (
-    <div className="h-full flex flex-col bg-surface-base">
+    <>
+      <DocumentTitle text="Playground — AI Theme" />
+      <div className="h-full flex flex-col bg-surface-base">
       {/* Model selector topbar */}
       <div className="shrink-0 flex items-center justify-center h-12 border-b border-border">
         <DropdownMenu
@@ -62,6 +65,7 @@ export default function PlaygroundPage() {
           modelName={`${selectedModel?.name ?? 'Umay'} hata yapabilir. Önemli bilgileri doğrulayın.`}
         />
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { ActivityFeedRow } from '@/modules/domains/nft/activity/ActivityFeedRow';
 import { ACTIVITY, COLLECTIONS } from '../nft.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Activity', THEME_TITLES.nft),
+};
 
 export default function NftActivityPage() {
   const sorted = [...ACTIVITY].sort(

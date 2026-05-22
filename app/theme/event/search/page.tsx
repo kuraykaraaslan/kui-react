@@ -1,6 +1,8 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
 import { useMemo, Suspense } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { EventCard } from '@/modules/domains/event/EventCard';
@@ -136,8 +138,11 @@ function SearchResults() {
 
 export default function SearchPage() {
   return (
-    <Suspense>
-      <SearchResults />
-    </Suspense>
+    <>
+      <DocumentTitle text={`Search — ${THEME_TITLES.event}`} />
+      <Suspense>
+        <SearchResults />
+      </Suspense>
+    </>
   );
 }

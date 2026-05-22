@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Badge } from '@/modules/ui/Badge';
 import { Button } from '@/modules/ui/Button';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
@@ -7,6 +9,10 @@ import { JobWorkModeBadge } from '@/modules/domains/jobs/job/JobWorkModeBadge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faLocationDot, faSliders } from '@fortawesome/free-solid-svg-icons';
 import { JOBS, JOB_CATEGORIES } from '../jobs.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Jobs', THEME_TITLES['jobs']),
+};
 
 const JOB_TYPES = ['FULL_TIME', 'PART_TIME', 'CONTRACT', 'FREELANCE', 'INTERNSHIP'] as const;
 const WORK_MODES = ['REMOTE', 'HYBRID', 'ONSITE'] as const;

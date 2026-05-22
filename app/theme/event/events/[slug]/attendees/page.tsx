@@ -1,6 +1,8 @@
 'use client';
 import { use, useMemo, useState } from 'react';
 import { notFound } from 'next/navigation';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faMagnifyingGlass, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { AttendeeAvatarStack } from '@/modules/domains/event/attendees/AttendeeAvatarStack';
@@ -64,6 +66,7 @@ export default function EventAttendeesPage({
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
+      <DocumentTitle text={`Attendees — ${event.title} — ${THEME_TITLES.event}`} />
       <a
         href={`/theme/event/events/${slug}`}
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"

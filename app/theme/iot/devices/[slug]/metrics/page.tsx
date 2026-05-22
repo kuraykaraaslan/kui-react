@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -5,9 +6,21 @@ import { MetricSparklineCard } from '@/modules/domains/iot/telemetry/MetricSpark
 import { TelemetryTimeSeriesChart } from '@/modules/domains/iot/telemetry/TelemetryTimeSeriesChart';
 import { LogStreamRow } from '@/modules/domains/iot/telemetry/LogStreamRow';
 import { DEVICES, DEVICE_METRICS } from '../../../iot.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 
 export function generateStaticParams() {
   return Object.keys(DEVICE_METRICS).map((slug) => ({ slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const device = DEVICES.find((d) => d.slug === slug);
+  const base = device?.name ?? slug;
+  return { title: buildPageTitle(`${base} — Metrics`, THEME_TITLES.iot) };
 }
 
 export default async function DeviceMetricsPage({

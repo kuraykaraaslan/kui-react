@@ -5,6 +5,7 @@ import { PaymentStatusBadge } from '@/modules/domains/common/payment/PaymentStat
 import { PriceDisplay } from '@/modules/domains/common/money/PriceDisplay';
 import { DEMO_ORDERS } from '../../common.data';
 import type { PaymentBase, PaymentStatus } from '@/modules/domains/common/PaymentTypes';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 const STATUS_FILTERS: { label: string; value: PaymentStatus | 'ALL' }[] = [
   { label: 'All',        value: 'ALL' },
@@ -25,6 +26,8 @@ export default function OrdersPage() {
   const fmt = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' });
 
   return (
+    <>
+      <DocumentTitle text="Orders — Common Theme" />
     <div className="space-y-6">
       <h2 className="text-lg font-semibold text-text-primary">Order History</h2>
 
@@ -98,5 +101,6 @@ export default function OrdersPage() {
         </span>
       </div>
     </div>
+    </>
   );
 }

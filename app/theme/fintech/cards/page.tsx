@@ -1,6 +1,8 @@
 'use client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { PaymentCardTile } from '@/modules/domains/fintech/card/PaymentCardTile';
 import { CardLimitMeter } from '@/modules/domains/fintech/card/CardLimitMeter';
@@ -10,6 +12,7 @@ import { PAYMENT_CARDS } from '../fintech.data';
 export default function CardsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
+      <DocumentTitle text={`Cards — ${THEME_TITLES['fintech']}`} />
       <a
         href="/theme/fintech"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"

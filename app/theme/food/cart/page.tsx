@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { Card } from '@/modules/ui/Card';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping, faTrash, faArrowRight } from '@fortawesome/free-solid-svg-icons';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Cart', THEME_TITLES['food']),
+};
 
 const CART_ITEMS = [
   { id: 'ci-01', name: 'Margherita Pizza',    quantity: 1, unitPrice: 14.5,  restaurantName: 'Bella Napoli' },

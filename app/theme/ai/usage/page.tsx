@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
 import { StatCard } from '@/modules/ui/StatCard';
 import { Table } from '@/modules/ui/Table';
 import { UsageStatsCard } from '@/modules/domains/ai/usage/UsageStatsCard';
 import { USAGES } from '../ai.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Usage', THEME_TITLES.ai),
+};
 
 const TABLE_COLUMNS = [
   { key: 'modelId',          header: 'Model'            },

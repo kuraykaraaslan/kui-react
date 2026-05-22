@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faHeart, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { SavedPropertyCard } from '@/modules/domains/real-estate/saved/SavedPropertyCard';
@@ -68,6 +70,7 @@ export default function SavedPropertiesPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
+      <DocumentTitle text={`Saved Properties — ${THEME_TITLES['real-estate']}`} />
       <a
         href="/theme/real-estate"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"

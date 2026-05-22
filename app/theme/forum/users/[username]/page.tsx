@@ -1,5 +1,7 @@
 'use client';
 import { use } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { ForumUserCard } from '@/modules/domains/forum/user/ForumUserCard';
@@ -18,6 +20,7 @@ export default function ForumUserProfilePage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
+      <DocumentTitle text={`${user.displayName ?? user.username} — ${THEME_TITLES.forum}`} />
       <a
         href="/theme/forum"
         className="inline-flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary mb-4 transition-colors"

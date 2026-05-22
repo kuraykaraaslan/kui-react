@@ -1,6 +1,8 @@
 'use client';
 import { use, useState, useMemo } from 'react';
 import { notFound } from 'next/navigation';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPaperPlane, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/modules/ui/Button';
@@ -81,6 +83,7 @@ export default function ConversationThreadPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
+      <DocumentTitle text={`${active.name} — Messages — ${THEME_TITLES.social}`} />
       <a
         href="/theme/social/messages"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"

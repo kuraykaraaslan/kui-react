@@ -1,9 +1,15 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faBriefcase, faCalendarDays } from '@fortawesome/free-solid-svg-icons';
 import { ApplicationCard } from '@/modules/domains/jobs/application/ApplicationCard';
 import { InterviewScheduleRow, type InterviewMode } from '@/modules/domains/jobs/application/InterviewScheduleRow';
 import type { ApplicationStatus } from '@/modules/domains/jobs/types';
 import { JOBS } from '../jobs.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Applications', THEME_TITLES['jobs']),
+};
 
 type Application = {
   applicationId: string;

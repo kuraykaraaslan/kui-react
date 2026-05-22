@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { CaseStudyCard } from '@/modules/domains/landing/case-study/CaseStudyCard';
 import { MetricsCallout } from '@/modules/domains/landing/case-study/MetricsCallout';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Case Studies', THEME_TITLES.landing),
+};
 
 const CASE_STUDIES = [
   {

@@ -8,6 +8,7 @@ import {
   NotificationFilterTabs,
 } from '@/modules/domains/common/notification/NotificationFilterTabs';
 import type { NotificationKind } from '@/modules/domains/common/notification/NotificationListItem';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 type Notification = {
   id: string;
@@ -108,6 +109,8 @@ export default function NotificationsPage() {
   const unreadCount = NOTIFICATIONS.filter((n) => !readState[n.id]).length;
 
   return (
+    <>
+      <DocumentTitle text="Notifications — Common Theme" />
     <div className="mx-auto max-w-3xl px-4 py-8">
       <a
         href="/theme/common"
@@ -164,5 +167,6 @@ export default function NotificationsPage() {
         </section>
       )}
     </div>
+    </>
   );
 }

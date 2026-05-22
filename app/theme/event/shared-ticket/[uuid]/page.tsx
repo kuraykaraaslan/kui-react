@@ -1,5 +1,7 @@
 'use client';
 import { use, useState } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { TicketCard } from '@/modules/domains/event/TicketCard';
 import { getTicketById } from '@/app/theme/event/event.data';
 import { cn } from '@/libs/utils/cn';
@@ -55,6 +57,7 @@ export default function SharedTicketPage({ params }: { params: Promise<{ uuid: s
   if (!entry) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-surface-base px-4">
+        <DocumentTitle text={`Shared Ticket — ${THEME_TITLES.event}`} />
         <FontAwesomeIcon icon={faTicket} className="w-12 h-12 text-text-disabled" aria-hidden="true" />
         <h1 className="text-xl font-bold text-text-primary">Bilet bulunamadı</h1>
         <p className="text-sm text-text-secondary text-center max-w-xs">
@@ -74,6 +77,7 @@ export default function SharedTicketPage({ params }: { params: Promise<{ uuid: s
 
   return (
     <div className="min-h-screen bg-surface-base flex flex-col">
+      <DocumentTitle text={`Shared Ticket — ${event.title} — ${THEME_TITLES.event}`} />
 
       {/* ── minimal header ── */}
       <header className="border-b border-border bg-surface-raised print:hidden">

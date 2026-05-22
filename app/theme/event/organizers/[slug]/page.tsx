@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { BrandLogo } from '@/modules/ui/BrandLogo';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { EventCard } from '@/modules/domains/event/EventCard';
@@ -14,6 +16,12 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
   return ORGANIZERS.map((o) => ({ slug: o.slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const organizer = getOrganizerBySlug(slug);
+  return { title: buildPageTitle(organizer?.name ?? slug, THEME_TITLES.event) };
 }
 
 export default async function OrganizerDetailPage({ params }: Props) {

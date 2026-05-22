@@ -1,5 +1,7 @@
 'use client';
 import { useState, useMemo } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { SearchBar } from '@/modules/ui/SearchBar';
 import { Button } from '@/modules/ui/Button';
 import { Select } from '@/modules/ui/Select';
@@ -82,6 +84,7 @@ export default function EventsListingPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
+      <DocumentTitle text={`Events — ${THEME_TITLES.event}`} />
       {/* header */}
       <div className="mb-6">
         <h1 className="text-2xl font-black text-text-primary">Tüm Etkinlikler</h1>

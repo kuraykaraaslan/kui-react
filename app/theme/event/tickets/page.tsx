@@ -1,5 +1,7 @@
 'use client';
 import { useState, useMemo } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { TicketCard } from '@/modules/domains/event/TicketCard';
 import { EmptyState } from '@/modules/ui/EmptyState';
 import { StatCard } from '@/modules/ui/StatCard';
@@ -54,6 +56,7 @@ export default function MyTicketsPage() {
 
   return (
     <div className="min-h-screen bg-surface-base">
+      <DocumentTitle text={`Tickets — ${THEME_TITLES.event}`} />
 
       {/* ── hero banner ── */}
       <div className="bg-gradient-to-br from-primary to-secondary px-6 py-10">

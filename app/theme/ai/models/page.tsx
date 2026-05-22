@@ -5,6 +5,7 @@ import { Badge } from '@/modules/ui/Badge';
 import { ModelCard } from '@/modules/domains/ai/model/ModelCard';
 import type { AIModelType } from '@/modules/domains/ai/types';
 import { MODELS } from '../ai.data';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 const MODEL_TYPES: { label: string; value: AIModelType | 'ALL' }[] = [
   { label: 'All',       value: 'ALL'       },
@@ -29,7 +30,9 @@ export default function ModelsPage() {
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
+    <>
+      <DocumentTitle text="Models — AI Theme" />
+      <div className="mx-auto max-w-7xl px-6 py-12">
       {/* Page header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-text-primary">AI Models</h1>
@@ -88,6 +91,7 @@ export default function ModelsPage() {
           <p className="mt-1 text-sm">Try adjusting your search or filter.</p>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

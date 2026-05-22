@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPlane } from '@fortawesome/free-solid-svg-icons';
 import { ItineraryDayCard } from '@/modules/domains/travel/itinerary/ItineraryDayCard';
 import { TripTimelineItem, type TimelineItemKind } from '@/modules/domains/travel/itinerary/TripTimelineItem';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Itinerary', THEME_TITLES['travel']),
+};
 
 type Stop = {
   kind: TimelineItemKind;

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faChartLine,
@@ -12,6 +13,11 @@ import { NftCard } from '@/modules/domains/nft/asset/NftCard';
 import { ActivityFeedRow } from '@/modules/domains/nft/activity/ActivityFeedRow';
 import { CreatorLeaderboardRow } from '@/modules/domains/nft/creator/CreatorLeaderboardRow';
 import { COLLECTIONS, ASSETS, ACTIVITY, CREATORS } from './nft.data';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: { absolute: THEME_TITLES.nft },
+};
 
 const HERO = COLLECTIONS[0];
 const TRENDING = [...COLLECTIONS].sort((a, b) => b.totalVolumeEth - a.totalVolumeEth).slice(0, 4);

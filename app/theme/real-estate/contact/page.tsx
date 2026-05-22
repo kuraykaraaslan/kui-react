@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faPhone,
@@ -88,6 +90,7 @@ export default function ContactPage() {
 
   return (
     <div className="bg-surface-base text-text-primary">
+      <DocumentTitle text={`Contact — ${THEME_TITLES['real-estate']}`} />
 
       {/* ── Hero ── */}
       <section className="border-b border-border bg-surface-raised">

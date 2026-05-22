@@ -10,6 +10,7 @@ import { PriceDisplay } from '@/modules/domains/common/money/PriceDisplay';
 import { Button } from '@/modules/ui/Button';
 import { SAVED_CARDS, ORDER_TOTALS } from '../common.data';
 import type { PaymentBase } from '@/modules/domains/common/PaymentTypes';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 const DEMO_PAYMENT: PaymentBase = {
   paymentId: 'pay_demo_001',
@@ -23,6 +24,8 @@ const DEMO_PAYMENT: PaymentBase = {
 
 export default function PaymentOverviewPage() {
   return (
+    <>
+      <DocumentTitle text="Payment — Common Theme" />
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-12 space-y-16">
 
       {/* Hero */}
@@ -107,6 +110,7 @@ export default function PaymentOverviewPage() {
         </div>
       </ComponentSection>
     </div>
+    </>
   );
 }
 

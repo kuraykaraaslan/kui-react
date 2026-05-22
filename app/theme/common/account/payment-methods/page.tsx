@@ -6,6 +6,7 @@ import { Button } from '@/modules/ui/Button';
 import { InlineAlert } from '@/modules/app/InlineAlert';
 import { SAVED_CARDS } from '../../common.data';
 import type { SavedCard, CreditCardInput } from '@/modules/domains/common/PaymentTypes';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 export default function PaymentMethodsPage() {
   const [cards, setCards]       = useState<SavedCard[]>(SAVED_CARDS);
@@ -38,6 +39,8 @@ export default function PaymentMethodsPage() {
   }
 
   return (
+    <>
+      <DocumentTitle text="Payment Methods — Common Theme" />
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-text-primary">Payment Methods</h2>
@@ -68,5 +71,6 @@ export default function PaymentMethodsPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

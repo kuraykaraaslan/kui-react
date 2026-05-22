@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -6,9 +7,20 @@ import { NftCard } from '@/modules/domains/nft/asset/NftCard';
 import { CollectionCard } from '@/modules/domains/nft/collection/CollectionCard';
 import { ActivityFeedRow } from '@/modules/domains/nft/activity/ActivityFeedRow';
 import { CREATORS, COLLECTIONS, ASSETS, ACTIVITY } from '../../nft.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 
 export async function generateStaticParams() {
   return CREATORS.map((c) => ({ handle: c.handle }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ handle: string }>;
+}): Promise<Metadata> {
+  const { handle } = await params;
+  const creator = CREATORS.find((c) => c.handle === handle);
+  return { title: buildPageTitle(creator?.displayName ?? handle, THEME_TITLES.nft) };
 }
 
 export default async function CreatorProfilePage({

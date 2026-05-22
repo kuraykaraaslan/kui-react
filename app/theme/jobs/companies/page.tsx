@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { Badge } from '@/modules/ui/Badge';
 import { CompanyCard } from '@/modules/domains/jobs/company/CompanyCard';
@@ -12,6 +14,10 @@ import {
   faStar,
 } from '@fortawesome/free-solid-svg-icons';
 import { COMPANIES, JOBS } from '../jobs.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Companies', THEME_TITLES['jobs']),
+};
 
 const INDUSTRIES = ['All', 'Developer Tools', 'Fintech', 'SaaS', 'Database / Cloud', 'Design Tools'];
 const SIZES = ['All', '1–50', '51–200', '201–500', '501–1000', '1000+'];

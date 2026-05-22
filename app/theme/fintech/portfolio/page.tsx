@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faChartLine } from '@fortawesome/free-solid-svg-icons';
 import { AssetAllocationCard } from '@/modules/domains/fintech/portfolio/AssetAllocationCard';
@@ -8,6 +10,10 @@ import {
   PORTFOLIO_HOLDINGS,
   PORTFOLIO_PERFORMANCE_SERIES,
 } from '../fintech.data';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Portfolio', THEME_TITLES['fintech']),
+};
 
 export default function PortfolioPage() {
   const totalUsd = PORTFOLIO_HOLDINGS.reduce((s, h) => s + h.usdValue, 0);

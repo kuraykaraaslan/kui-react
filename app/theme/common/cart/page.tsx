@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { CartSummary } from '@/modules/domains/common/cart/CartSummary';
 import { DEMO_CART } from '../common.data';
 import type { Cart } from '@/modules/domains/common/CartTypes';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 export default function CartPage() {
   const [cart, setCart] = useState<Cart>(DEMO_CART);
@@ -60,6 +61,8 @@ export default function CartPage() {
   }
 
   return (
+    <>
+      <DocumentTitle text="Cart — Common Theme" />
     <div className="mx-auto max-w-3xl px-4 sm:px-6 py-10 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-text-primary">Shopping Cart</h1>
@@ -83,5 +86,6 @@ export default function CartPage() {
         showCoupon
       />
     </div>
+    </>
   );
 }

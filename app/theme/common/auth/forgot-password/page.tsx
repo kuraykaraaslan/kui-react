@@ -1,8 +1,11 @@
 'use client';
 import { ForgotPasswordForm } from '@/modules/domains/common/auth/ForgotPasswordForm';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 export default function ForgotPasswordPage() {
   return (
+    <>
+      <DocumentTitle text="Forgot Password — Common Theme" />
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         <div className="rounded-2xl border border-border bg-surface-raised shadow-sm p-8 space-y-6">
@@ -42,5 +45,6 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

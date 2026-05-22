@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { Button } from '@/modules/ui/Button';
 import { Badge } from '@/modules/ui/Badge';
@@ -22,6 +24,16 @@ import { JOBS } from '../../jobs.data';
 
 export async function generateStaticParams() {
   return JOBS.map((j) => ({ slug: j.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const job = JOBS.find((j) => j.slug === slug);
+  return { title: buildPageTitle(job?.title ?? slug, THEME_TITLES['jobs']) };
 }
 
 export default async function JobDetailPage({ params }: { params: Promise<{ slug: string }> }) {

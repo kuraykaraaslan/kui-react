@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
 import { Button } from '@/modules/ui/Button';
 import { ChatInputBar } from '@/modules/domains/ai/chat/ChatInputBar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCode, faPenNib, faMagnifyingGlass, faLightbulb } from '@fortawesome/free-solid-svg-icons';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
+
+export const metadata: Metadata = {
+  title: { absolute: THEME_TITLES.ai },
+};
 
 const SUGGESTIONS = [
   { icon: faCode,             label: 'Kod Yaz',     description: 'Hata ayıkla, açıkla ya da kod üret' },

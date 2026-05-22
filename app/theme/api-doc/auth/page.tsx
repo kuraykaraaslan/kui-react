@@ -5,9 +5,10 @@ import { ApiKeyTokenCard } from '@/modules/domains/api-doc/ApiKeyTokenCard';
 import { CodeSamplePanel } from '@/modules/domains/api-doc/CodeSamplePanel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShield, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 
 export const metadata: Metadata = {
-  title: 'Authentication · API Docs',
+  title: buildPageTitle('Authentication', THEME_TITLES['api-doc']),
   description: 'Authentication and authorization schemes supported by the API.',
 };
 

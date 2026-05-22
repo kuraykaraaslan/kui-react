@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -21,6 +23,16 @@ import { HOTELS } from '../../travel.data';
 
 export function generateStaticParams() {
   return HOTELS.map((h) => ({ slug: h.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const hotel = HOTELS.find((h) => h.slug === slug);
+  return { title: buildPageTitle(hotel?.name ?? slug, THEME_TITLES['travel']) };
 }
 
 const AMENITY_ICONS: Record<string, typeof faWifi> = {

@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { TicketCard } from '@/modules/domains/event/TicketCard';
 import { EventOrderStatusBadge } from '@/modules/domains/event/EventOrderStatusBadge';
@@ -12,6 +14,12 @@ type Props = { params: Promise<{ id: string }> };
 
 export async function generateStaticParams() {
   return MY_ORDERS.map((o) => ({ id: o.orderId }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const order = getOrderById(id);
+  return { title: buildPageTitle(order ? `Order ${order.orderId}` : id, THEME_TITLES.event) };
 }
 
 const FMT_CURRENCY = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 });

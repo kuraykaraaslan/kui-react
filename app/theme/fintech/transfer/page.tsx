@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { Input } from '@/modules/ui/Input';
 import { Select } from '@/modules/ui/Select';
@@ -61,6 +63,7 @@ export default function TransferPage() {
   if (submitted) {
     return (
       <div className="mx-auto max-w-md px-6 py-20 text-center space-y-5">
+        <DocumentTitle text={`Transfer — ${THEME_TITLES['fintech']}`} />
         <div className="flex h-20 w-20 mx-auto items-center justify-center rounded-full bg-[#e6f4ea]">
           <FontAwesomeIcon icon={faCheckCircle} className="w-10 h-10 text-[#188038]" aria-hidden="true" />
         </div>
@@ -105,6 +108,7 @@ export default function TransferPage() {
 
   return (
     <div className="bg-[#f5f7fa] min-h-screen">
+      <DocumentTitle text={`Transfer — ${THEME_TITLES['fintech']}`} />
       <div className="mx-auto max-w-lg px-4 py-10 space-y-6">
 
         {/* Page header */}

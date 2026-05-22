@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { AuthorBioCard } from '@/modules/domains/blog/author/AuthorBioCard';
@@ -5,9 +6,22 @@ import { TopicCloud, type TopicCloudItem } from '@/modules/domains/blog/author/T
 import { AuthorStatsRow } from '@/modules/domains/blog/author/AuthorStatsRow';
 import { PostCard } from '@/modules/domains/blog/post/PostCard';
 import { BLOG_AUTHORS, BLOG_POSTS } from '../../blog.data';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 
 export async function generateStaticParams() {
   return BLOG_AUTHORS.map((a) => ({ slug: a.userProfile?.username ?? a.userId }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const author = BLOG_AUTHORS.find(
+    (a) => a.userProfile?.username === slug || a.userId === slug,
+  );
+  return { title: buildPageTitle(author?.userProfile?.name ?? slug, THEME_TITLES.blog) };
 }
 
 function aggregateTopics(posts: typeof BLOG_POSTS): TopicCloudItem[] {

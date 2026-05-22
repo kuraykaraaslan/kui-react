@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Avatar } from '@/modules/ui/Avatar';
 import { Button } from '@/modules/ui/Button';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
@@ -18,6 +20,12 @@ import { TOPICS, POSTS, FORUM_CATEGORIES } from '../../forum.data';
 
 export async function generateStaticParams() {
   return TOPICS.map((t) => ({ slug: t.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const topic = TOPICS.find((t) => t.slug === slug);
+  return { title: buildPageTitle(topic?.title ?? slug, THEME_TITLES.forum) };
 }
 
 function formatPostDate(dateStr: string) {

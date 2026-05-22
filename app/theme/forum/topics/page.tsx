@@ -1,7 +1,13 @@
+import type { Metadata } from 'next';
+import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { Badge } from '@/modules/ui/Badge';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { TopicStatusBadge } from '@/modules/domains/forum/topic/TopicStatusBadge';
+
+export const metadata: Metadata = {
+  title: buildPageTitle('Topics', THEME_TITLES.forum),
+};
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faThumbtack,
