@@ -407,6 +407,12 @@
     "category": "App",
     "file": "theme-switcher.md"
   },
+  "rich-text-editor": {
+    "name": "RichTextEditor",
+    "layer": "app",
+    "category": "App",
+    "file": "rich-text-editor.md"
+  },
   "common-login-form": {
     "name": "LoginForm",
     "layer": "domain",

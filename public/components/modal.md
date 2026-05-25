@@ -9,6 +9,10 @@
 
 Focus-trapped dialog. Closes on Escape and backdrop click. Requires role="dialog" + aria-modal + aria-labelledby; supports sm/md/lg sizes.
 
+## Used by
+
+- `rich-text-editor`
+
 ## Design tokens consumed
 
 - `--border`

@@ -12,6 +12,7 @@ Text input field with label, hint, error, prefix icon, password toggle, and 3 si
 ## Used by
 
 - `reviews-review-submit-form`
+- `rich-text-editor`
 
 ## Design tokens consumed
 

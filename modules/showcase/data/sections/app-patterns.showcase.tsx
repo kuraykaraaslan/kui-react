@@ -5,6 +5,7 @@ import { buildAppUserData } from './app-user.showcase';
 import { buildAppFormData } from './app-form.showcase';
 import { buildAppContentData } from './app-content.showcase';
 import { buildAppExtrasData } from './app-extras.showcase';
+import { buildAppEditorData } from './app-editor.showcase';
 import type { ShowcaseComponent } from '../showcase.types';
 
 export function buildAppPatternsData(): ShowcaseComponent[] {
@@ -15,5 +16,6 @@ export function buildAppPatternsData(): ShowcaseComponent[] {
     ...buildAppFormData(),
     ...buildAppContentData(),
     ...buildAppExtrasData(),
+    ...buildAppEditorData(),
   ];
 }

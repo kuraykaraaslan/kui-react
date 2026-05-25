@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-22T17:27:43.565Z",
+  "generatedAt": "2026-05-24T20:47:57.272Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -175,7 +175,8 @@
         "--text-primary"
       ],
       "usedBy": [
-        "reviews-review-submit-form"
+        "reviews-review-submit-form",
+        "rich-text-editor"
       ],
       "variantCount": 12
     },
@@ -364,7 +365,8 @@
         "--text-secondary"
       ],
       "usedBy": [
-        "reviews-review-submit-form"
+        "reviews-review-submit-form",
+        "rich-text-editor"
       ],
       "variantCount": 12
     },
@@ -881,6 +883,9 @@
         "--text-disabled",
         "--text-primary"
       ],
+      "usedBy": [
+        "rich-text-editor"
+      ],
       "variantCount": 4
     },
     {
@@ -1359,6 +1364,67 @@
       "since": "2026-05",
       "designTokens": [],
       "variantCount": 1
+    },
+    {
+      "id": "rich-text-editor",
+      "name": "RichTextEditor",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/RichTextEditor.tsx",
+      "abbr": "RT",
+      "description": "WYSIWYG editor for long-form prose. Built on Quill 2.x — single shared library on both the React and EJS sibling repos so output HTML is identical. Toolbar covers bold/italic/underline/strike/inline code, headings, blockquote, code block, lists, link, image (via Modal + FileInput), text align, clear formatting, undo/redo.",
+      "status": "stable",
+      "since": "2026-05",
+      "composes": [
+        "modal",
+        "input",
+        "button"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "textbox",
+          "toolbar"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Ctrl/Cmd + B",
+            "action": "Bold selection"
+          },
+          {
+            "keys": "Ctrl/Cmd + I",
+            "action": "Italic selection"
+          },
+          {
+            "keys": "Ctrl/Cmd + U",
+            "action": "Underline selection"
+          },
+          {
+            "keys": "Ctrl/Cmd + Z",
+            "action": "Undo"
+          },
+          {
+            "keys": "Ctrl/Cmd + Shift + Z",
+            "action": "Redo"
+          }
+        ]
+      },
+      "designTokens": [
+        "--surface-base",
+        "--surface-sunken",
+        "--surface-raised",
+        "--text-primary",
+        "--text-secondary",
+        "--text-disabled",
+        "--border",
+        "--border-focus",
+        "--primary",
+        "--error"
+      ],
+      "dependencies": [
+        "quill"
+      ],
+      "variantCount": 3
     },
     {
       "id": "common-login-form",

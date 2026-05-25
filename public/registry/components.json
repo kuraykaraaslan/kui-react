@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-22T17:27:43.565Z",
+  "generatedAt": "2026-05-24T20:47:57.272Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -226,7 +226,8 @@
         "--text-primary"
       ],
       "usedBy": [
-        "reviews-review-submit-form"
+        "reviews-review-submit-form",
+        "rich-text-editor"
       ]
     },
     {
@@ -613,7 +614,8 @@
         "--text-secondary"
       ],
       "usedBy": [
-        "reviews-review-submit-form"
+        "reviews-review-submit-form",
+        "rich-text-editor"
       ]
     },
     {
@@ -1557,6 +1559,9 @@
         "--surface-raised",
         "--text-disabled",
         "--text-primary"
+      ],
+      "usedBy": [
+        "rich-text-editor"
       ]
     },
     {
@@ -2355,6 +2360,81 @@
       "status": "stable",
       "since": "2026-05",
       "designTokens": []
+    },
+    {
+      "id": "rich-text-editor",
+      "name": "RichTextEditor",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/RichTextEditor.tsx",
+      "abbr": "RT",
+      "description": "WYSIWYG editor for long-form prose. Built on Quill 2.x — single shared library on both the React and EJS sibling repos so output HTML is identical. Toolbar covers bold/italic/underline/strike/inline code, headings, blockquote, code block, lists, link, image (via Modal + FileInput), text align, clear formatting, undo/redo.",
+      "source": "import { RichTextEditor } from '@/modules/app/RichTextEditor';\n\nconst [body, setBody] = useState('');\n\n<RichTextEditor\n  id=\"article-body\"\n  label=\"Article body\"\n  hint=\"Use the toolbar to format your text.\"\n  value={body}\n  onChange={setBody}\n  placeholder=\"Start writing your article…\"\n/>\n\n// Pre-populated, uncontrolled:\n<RichTextEditor\n  id=\"release-notes\"\n  label=\"Release notes\"\n  defaultValue={initialHtml}\n  onChange={setBody}\n/>\n\n// Read-only (toolbar hidden):\n<RichTextEditor id=\"archived\" defaultValue={savedHtml} readOnly />",
+      "variants": [
+        {
+          "title": "Empty",
+          "code": "const [body, setBody] = useState('');\n\n<RichTextEditor\n  id=\"article-body\"\n  label=\"Article body\"\n  hint=\"Use the toolbar to format your text.\"\n  value={body}\n  onChange={setBody}\n  placeholder=\"Start writing your article…\"\n/>"
+        },
+        {
+          "title": "Pre-populated",
+          "code": "const initial = '<h1>Release notes</h1><p>...</p>';\n\n<RichTextEditor\n  id=\"release-notes\"\n  label=\"Release notes\"\n  defaultValue={initial}\n  onChange={setBody}\n/>"
+        },
+        {
+          "title": "Read-only",
+          "code": "<RichTextEditor\n  id=\"archived\"\n  label=\"Archived document\"\n  hint=\"This document is read-only.\"\n  defaultValue={savedHtml}\n  readOnly\n/>"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-05",
+      "composes": [
+        "modal",
+        "input",
+        "button"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "textbox",
+          "toolbar"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Ctrl/Cmd + B",
+            "action": "Bold selection"
+          },
+          {
+            "keys": "Ctrl/Cmd + I",
+            "action": "Italic selection"
+          },
+          {
+            "keys": "Ctrl/Cmd + U",
+            "action": "Underline selection"
+          },
+          {
+            "keys": "Ctrl/Cmd + Z",
+            "action": "Undo"
+          },
+          {
+            "keys": "Ctrl/Cmd + Shift + Z",
+            "action": "Redo"
+          }
+        ]
+      },
+      "designTokens": [
+        "--surface-base",
+        "--surface-sunken",
+        "--surface-raised",
+        "--text-primary",
+        "--text-secondary",
+        "--text-disabled",
+        "--border",
+        "--border-focus",
+        "--primary",
+        "--error"
+      ],
+      "dependencies": [
+        "quill"
+      ]
     },
     {
       "id": "common-login-form",

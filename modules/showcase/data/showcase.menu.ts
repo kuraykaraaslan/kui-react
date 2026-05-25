@@ -258,6 +258,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'app-breadcrumbs', title: 'AppBreadcrumbs',category: 'App', abbr: 'ABc',since: '2026-05' },
       { id: 'app-footer',      title: 'AppFooter',     category: 'App', abbr: 'AFt',since: '2026-05' },
       { id: 'theme-switcher',  title: 'ThemeSwitcher', category: 'App', abbr: 'TS', since: '2026-05' },
+      { id: 'rich-text-editor',title: 'RichTextEditor',category: 'App', abbr: 'RT', since: '2026-05' },
     ],
   },
   {
