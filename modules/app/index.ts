@@ -28,6 +28,14 @@ export type { CommandItem } from './AppCommandBar';
 // Theming
 export { ThemeSwitcher } from './ThemeSwitcher';
 
+// Overlays
+export { ContextMenu } from './ContextMenu';
+export type { ContextMenuItem, ContextMenuProps } from './ContextMenu';
+
+// Gallery
+export { ImageGallery } from './ImageGallery';
+export type { ImageGalleryImage, ImageGalleryProps } from './ImageGallery';
+
 // Forms
 export { Form } from './Form';
 export { FormField } from './FormField';

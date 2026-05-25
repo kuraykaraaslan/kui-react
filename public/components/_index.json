@@ -281,6 +281,12 @@
     "category": "Molecule",
     "file": "video-player.md"
   },
+  "image-gallery": {
+    "name": "ImageGallery",
+    "layer": "app",
+    "category": "Organism",
+    "file": "image-gallery.md"
+  },
   "app-shell": {
     "name": "AppShell",
     "layer": "app",
@@ -406,6 +412,12 @@
     "layer": "app",
     "category": "App",
     "file": "theme-switcher.md"
+  },
+  "context-menu": {
+    "name": "ContextMenu",
+    "layer": "app",
+    "category": "App",
+    "file": "context-menu.md"
   },
   "rich-text-editor": {
     "name": "RichTextEditor",
@@ -1204,6 +1216,12 @@
     "layer": "domain",
     "category": "Domain",
     "file": "commerce-empty-wishlist-state.md"
+  },
+  "commerce-product-image-gallery": {
+    "name": "ProductImageGallery",
+    "layer": "domain",
+    "category": "Domain",
+    "file": "commerce-product-image-gallery.md"
   },
   "media-video-status-badge": {
     "name": "VideoStatusBadge",

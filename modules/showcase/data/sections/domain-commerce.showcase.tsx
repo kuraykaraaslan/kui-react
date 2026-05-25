@@ -9,6 +9,7 @@ import { OrderCard } from '@/modules/domains/commerce/order/OrderCard';
 import { CartItem } from '@/modules/domains/commerce/cart/CartItem';
 import { WishlistItemCard } from '@/modules/domains/commerce/wishlist/WishlistItemCard';
 import { EmptyWishlistState } from '@/modules/domains/commerce/wishlist/EmptyWishlistState';
+import { ProductImageGallery } from '@/modules/domains/commerce/product/ProductImageGallery';
 import type { ProductStatus, ProductType, StockStatus, OrderStatus } from '@/modules/domains/commerce/types';
 
 /* ─── demo data ─── */
@@ -430,6 +431,102 @@ export function buildCommerceDomainData(): ShowcaseComponent[] {
             </div>
           ),
           code: `<EmptyWishlistState browseHref="/products" />`,
+        },
+      ],
+    },
+    {
+      id: 'commerce-product-image-gallery',
+      title: 'ProductImageGallery',
+      category: 'Domain',
+      abbr: 'PG',
+      description:
+        'Product image viewer: large main image with a thumbnail strip below. Hovering a thumbnail instantly swaps the main image via crossfade. When the image count exceeds thumbsVisible (default 5), the strip grows left/right arrows and becomes a slider.',
+      filePath: 'modules/domains/commerce/product/ProductImageGallery.tsx',
+      sourceCode: `import { ProductImageGallery } from '@/modules/domains/commerce/product/ProductImageGallery';
+
+<ProductImageGallery
+  images={[
+    { src: '/product-front.jpg',  alt: 'Product front view' },
+    { src: '/product-back.jpg',   alt: 'Product back view' },
+    { src: '/product-detail.jpg', alt: 'Product detail' },
+  ]}
+  thumbsVisible={5}
+/>`,
+      variants: [
+        {
+          title: '4 görsel — thumbnail strip',
+          layout: 'stack' as const,
+          preview: (
+            <div className="w-full max-w-sm">
+              <ProductImageGallery
+                images={[
+                  { src: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80', alt: 'Sony WH-1000XM5 — front' },
+                  { src: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&q=80', alt: 'Sony WH-1000XM5 — side' },
+                  { src: 'https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=600&q=80', alt: 'Sony WH-1000XM5 — on desk' },
+                  { src: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600&q=80', alt: 'Sony WH-1000XM5 — profile' },
+                ]}
+                thumbsVisible={5}
+              />
+            </div>
+          ),
+          code: `<ProductImageGallery
+  images={[
+    { src: '/front.jpg',   alt: 'Front view' },
+    { src: '/side.jpg',    alt: 'Side view' },
+    { src: '/on-desk.jpg', alt: 'On desk' },
+    { src: '/profile.jpg', alt: 'Profile' },
+  ]}
+  thumbsVisible={5}
+/>`,
+        },
+        {
+          title: '8 görsel — slider aktif',
+          layout: 'stack' as const,
+          preview: (
+            <div className="w-full max-w-sm">
+              <ProductImageGallery
+                images={[
+                  { src: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80', alt: 'T-Shirt — white front' },
+                  { src: 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80', alt: 'T-Shirt — flat lay' },
+                  { src: 'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600&q=80', alt: 'T-Shirt — worn' },
+                  { src: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80', alt: 'T-Shirt — folded' },
+                  { src: 'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=600&q=80', alt: 'T-Shirt — detail' },
+                  { src: 'https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&q=80', alt: 'T-Shirt — color range' },
+                  { src: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80', alt: 'T-Shirt — close up' },
+                  { src: 'https://images.unsplash.com/photo-1589310243389-96a5483213a8?w=600&q=80', alt: 'T-Shirt — collection' },
+                ]}
+                thumbsVisible={5}
+              />
+            </div>
+          ),
+          code: `// 8 images, thumbsVisible=5 → arrows appear automatically
+<ProductImageGallery
+  images={productImages}
+  thumbsVisible={5}
+/>`,
+        },
+        {
+          title: 'Video aspect ratio',
+          layout: 'stack' as const,
+          preview: (
+            <div className="w-full max-w-md">
+              <ProductImageGallery
+                images={[
+                  { src: 'https://images.unsplash.com/photo-1617331721458-bd3bd3f9c7f8?w=800&q=80', alt: 'Keyboard — overhead' },
+                  { src: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600&q=80', alt: 'Keyboard — front' },
+                  { src: 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=600&q=80', alt: 'Keyboard — RGB' },
+                  { src: 'https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&q=80', alt: 'Keyboard — backlight' },
+                ]}
+                aspect="video"
+                thumbsVisible={5}
+              />
+            </div>
+          ),
+          code: `<ProductImageGallery
+  images={productImages}
+  aspect="video"
+  thumbsVisible={5}
+/>`,
         },
       ],
     },

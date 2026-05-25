@@ -2,8 +2,26 @@
 import { AppBreadcrumbs } from '@/modules/app/AppBreadcrumbs';
 import { AppFooter } from '@/modules/app/AppFooter';
 import { ThemeSwitcher } from '@/modules/app/ThemeSwitcher';
+import { ContextMenu } from '@/modules/app/ContextMenu';
 import { Badge } from '@/modules/ui/Badge';
 import { BrandLogo } from '@/modules/ui/BrandLogo';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCopy,
+  faCut,
+  faPaste,
+  faTrash,
+  faPen,
+  faLink,
+  faDownload,
+  faShareNodes,
+  faFolder,
+  faFile,
+  faEye,
+  faCodeBranch,
+  faTag,
+  faArrowRight,
+} from '@fortawesome/free-solid-svg-icons';
 import type { ShowcaseComponent } from '../showcase.types';
 
 function AppBreadcrumbsBasicDemo() {
@@ -181,6 +199,147 @@ import { ThemeSwitcher } from '@/modules/app/ThemeSwitcher';
           title: 'Default',
           preview: <ThemeSwitcherDemo />,
           code: `<ThemeSwitcher />`,
+        },
+      ],
+    },
+    {
+      id: 'context-menu',
+      title: 'ContextMenu',
+      category: 'App',
+      abbr: 'CM',
+      description:
+        'Right-click context menu. Wraps any element as a trigger. Supports item groups, keyboard shortcuts, separators, danger items, and disabled items. Positions itself via viewport-aware boundary detection, auto-flips when near screen edges. Full keyboard navigation: ↑↓ arrows, Enter, Escape.',
+      filePath: 'modules/app/ContextMenu.tsx',
+      sourceCode: `'use client';
+import { ContextMenu } from '@/modules/app/ContextMenu';
+import type { ContextMenuItem } from '@/modules/app/ContextMenu';
+
+const items: ContextMenuItem[] = [
+  { label: 'Copy',   icon: <Icon />, shortcut: '⌘C', onClick: () => {} },
+  { label: 'Paste',  icon: <Icon />, shortcut: '⌘V', onClick: () => {} },
+  { type: 'separator' },
+  { label: 'Delete', icon: <Icon />, danger: true,   onClick: () => {} },
+];
+
+<ContextMenu items={items}>
+  <div>Right-click anywhere here</div>
+</ContextMenu>`,
+      variants: [
+        {
+          title: 'Text editor — clipboard + format actions',
+          layout: 'stack' as const,
+          preview: (
+            <ContextMenu
+              items={[
+                { label: 'Cut',    icon: <FontAwesomeIcon icon={faCut}   className="w-3.5 h-3.5" aria-hidden="true" />, shortcut: '⌘X', onClick: () => {} },
+                { label: 'Copy',   icon: <FontAwesomeIcon icon={faCopy}  className="w-3.5 h-3.5" aria-hidden="true" />, shortcut: '⌘C', onClick: () => {} },
+                { label: 'Paste',  icon: <FontAwesomeIcon icon={faPaste} className="w-3.5 h-3.5" aria-hidden="true" />, shortcut: '⌘V', onClick: () => {} },
+                { type: 'separator' },
+                { label: 'Copy link', icon: <FontAwesomeIcon icon={faLink} className="w-3.5 h-3.5" aria-hidden="true" />, shortcut: '⌘⇧C', onClick: () => {} },
+                { type: 'separator' },
+                { label: 'Rename', icon: <FontAwesomeIcon icon={faPen}   className="w-3.5 h-3.5" aria-hidden="true" />, onClick: () => {} },
+                { label: 'Delete', icon: <FontAwesomeIcon icon={faTrash} className="w-3.5 h-3.5" aria-hidden="true" />, shortcut: '⌫',   danger: true, onClick: () => {} },
+              ]}
+            >
+              <div className="rounded-xl border-2 border-dashed border-border bg-surface-raised p-8 text-center text-sm text-text-secondary select-none cursor-default hover:border-border-strong hover:bg-surface-overlay transition-colors">
+                Right-click anywhere in this area
+              </div>
+            </ContextMenu>
+          ),
+          code: `<ContextMenu items={[
+  { label: 'Cut',      icon: <Icon />, shortcut: '⌘X' },
+  { label: 'Copy',     icon: <Icon />, shortcut: '⌘C' },
+  { label: 'Paste',    icon: <Icon />, shortcut: '⌘V' },
+  { type: 'separator' },
+  { label: 'Copy link',icon: <Icon />, shortcut: '⌘⇧C' },
+  { type: 'separator' },
+  { label: 'Rename',   icon: <Icon /> },
+  { label: 'Delete',   icon: <Icon />, danger: true, shortcut: '⌫' },
+]}>
+  <div>Right-click anywhere in this area</div>
+</ContextMenu>`,
+        },
+        {
+          title: 'File manager — groups + shortcut hint',
+          layout: 'stack' as const,
+          preview: (
+            <div className="grid grid-cols-3 gap-3 p-4 bg-surface-raised rounded-xl border border-border">
+              {['Report Q1.pdf', 'Design System.fig', 'README.md'].map((name) => (
+                <ContextMenu
+                  key={name}
+                  items={[
+                    { type: 'group', label: 'Actions' },
+                    { label: 'Open',     icon: <FontAwesomeIcon icon={faEye}        className="w-3.5 h-3.5" aria-hidden="true" />, onClick: () => {} },
+                    { label: 'Download', icon: <FontAwesomeIcon icon={faDownload}   className="w-3.5 h-3.5" aria-hidden="true" />, shortcut: '⌘D', onClick: () => {} },
+                    { label: 'Share',    icon: <FontAwesomeIcon icon={faShareNodes} className="w-3.5 h-3.5" aria-hidden="true" />, shortcut: '⌘⇧S', onClick: () => {} },
+                    { type: 'separator' },
+                    { type: 'group', label: 'Organise' },
+                    { label: 'Move to…', icon: <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />, onClick: () => {} },
+                    { label: 'Add tag',  icon: <FontAwesomeIcon icon={faTag}        className="w-3.5 h-3.5" aria-hidden="true" />, onClick: () => {} },
+                    { type: 'separator' },
+                    { label: 'Delete',   icon: <FontAwesomeIcon icon={faTrash}      className="w-3.5 h-3.5" aria-hidden="true" />, danger: true, onClick: () => {} },
+                  ]}
+                >
+                  <div className="flex flex-col items-center gap-2 p-3 rounded-lg border border-border bg-surface-base hover:bg-surface-overlay cursor-default select-none transition-colors text-center">
+                    <FontAwesomeIcon
+                      icon={name.endsWith('.fig') ? faFolder : faFile}
+                      className="w-8 h-8 text-[var(--primary)]"
+                      aria-hidden="true"
+                    />
+                    <span className="text-xs text-text-secondary truncate w-full">{name}</span>
+                  </div>
+                </ContextMenu>
+              ))}
+            </div>
+          ),
+          code: `<ContextMenu items={[
+  { type: 'group', label: 'Actions' },
+  { label: 'Open',     icon: <Icon /> },
+  { label: 'Download', icon: <Icon />, shortcut: '⌘D' },
+  { label: 'Share',    icon: <Icon />, shortcut: '⌘⇧S' },
+  { type: 'separator' },
+  { type: 'group', label: 'Organise' },
+  { label: 'Move to…', icon: <Icon /> },
+  { label: 'Add tag',  icon: <Icon /> },
+  { type: 'separator' },
+  { label: 'Delete', icon: <Icon />, danger: true },
+]}>
+  <FileCard name="Report Q1.pdf" />
+</ContextMenu>`,
+        },
+        {
+          title: 'Code branch — some items disabled',
+          layout: 'stack' as const,
+          preview: (
+            <ContextMenu
+              items={[
+                { label: 'View diff',    icon: <FontAwesomeIcon icon={faCodeBranch} className="w-3.5 h-3.5" aria-hidden="true" />, onClick: () => {} },
+                { label: 'Copy branch name', icon: <FontAwesomeIcon icon={faCopy} className="w-3.5 h-3.5" aria-hidden="true" />, shortcut: '⌘C', onClick: () => {} },
+                { type: 'separator' },
+                { label: 'Merge into main', icon: <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />, disabled: true, onClick: () => {} },
+                { label: 'Cherry-pick', disabled: true, onClick: () => {} },
+                { type: 'separator' },
+                { label: 'Delete branch', icon: <FontAwesomeIcon icon={faTrash} className="w-3.5 h-3.5" aria-hidden="true" />, danger: true, onClick: () => {} },
+              ]}
+            >
+              <div className="flex items-center gap-2.5 px-4 py-3 rounded-lg border border-border bg-surface-raised cursor-default select-none hover:bg-surface-overlay transition-colors w-fit">
+                <FontAwesomeIcon icon={faCodeBranch} className="w-4 h-4 text-[var(--primary)]" aria-hidden="true" />
+                <span className="text-sm font-medium text-text-primary">feature/context-menu</span>
+                <span className="text-xs text-text-disabled">(right-click)</span>
+              </div>
+            </ContextMenu>
+          ),
+          code: `<ContextMenu items={[
+  { label: 'View diff',        icon: <Icon /> },
+  { label: 'Copy branch name', icon: <Icon />, shortcut: '⌘C' },
+  { type: 'separator' },
+  { label: 'Merge into main',  icon: <Icon />, disabled: true },
+  { label: 'Cherry-pick',                      disabled: true },
+  { type: 'separator' },
+  { label: 'Delete branch',    icon: <Icon />, danger: true },
+]}>
+  <BranchRow name="feature/context-menu" />
+</ContextMenu>`,
         },
       ],
     },

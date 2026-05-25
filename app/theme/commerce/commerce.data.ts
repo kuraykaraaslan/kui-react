@@ -64,6 +64,7 @@ export type CommerceProduct = {
   status: ProductStatus;
   categoryId: string;
   image: string;
+  gallery?: string[];
   basePrice: number;
   salePrice?: number;
   currency: string;
@@ -84,6 +85,14 @@ export const PRODUCTS: CommerceProduct[] = [
     status: 'PUBLISHED',
     categoryId: 'cat-01',
     image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80',
+      'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=600&q=80',
+      'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&q=80',
+      'https://images.unsplash.com/photo-1484788984921-03950022c9ef?w=600&q=80',
+      'https://images.unsplash.com/photo-1629752187687-3d3c7ea3a21b?w=600&q=80',
+      'https://images.unsplash.com/photo-1550439062-609e1531270e?w=600&q=80',
+    ],
     basePrice: 1999,
     currency: 'USD',
     stockStatus: 'IN_STOCK',
@@ -101,6 +110,12 @@ export const PRODUCTS: CommerceProduct[] = [
     status: 'PUBLISHED',
     categoryId: 'cat-01',
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&q=80',
+      'https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=600&q=80',
+      'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600&q=80',
+      'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&q=80',
+    ],
     basePrice: 399,
     salePrice: 279,
     currency: 'USD',
@@ -119,6 +134,15 @@ export const PRODUCTS: CommerceProduct[] = [
     status: 'PUBLISHED',
     categoryId: 'cat-02',
     image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80',
+      'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600&q=80',
+      'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&q=80',
+      'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=600&q=80',
+      'https://images.unsplash.com/photo-1622445275463-afa2ab738c34?w=600&q=80',
+      'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=600&q=80',
+      'https://images.unsplash.com/photo-1589310243389-96a5483213a8?w=600&q=80',
+    ],
     basePrice: 35,
     currency: 'USD',
     stockStatus: 'IN_STOCK',
@@ -171,6 +195,13 @@ export const PRODUCTS: CommerceProduct[] = [
     status: 'PUBLISHED',
     categoryId: 'cat-01',
     image: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=600&q=80',
+    gallery: [
+      'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=600&q=80',
+      'https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&q=80',
+      'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&q=80',
+      'https://images.unsplash.com/photo-1601445638532-3c6f6c3aa1d6?w=600&q=80',
+      'https://images.unsplash.com/photo-1561121978-7c989ee67a63?w=600&q=80',
+    ],
     basePrice: 149,
     currency: 'USD',
     stockStatus: 'OUT_OF_STOCK',

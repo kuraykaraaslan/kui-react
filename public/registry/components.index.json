@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-24T20:47:57.272Z",
+  "generatedAt": "2026-05-25T21:03:23.827Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -1053,6 +1053,19 @@
       "variantCount": 3
     },
     {
+      "id": "image-gallery",
+      "name": "ImageGallery",
+      "layer": "app",
+      "category": "Organism",
+      "filePath": "modules/app/ImageGallery.tsx",
+      "abbr": "IG",
+      "description": "Responsive image grid with a full-screen lightbox, right-click context menu (open, copy URL, move to first/last, remove), and drag-to-reorder. Supports 2–4 columns, square / video / portrait / auto aspect ratios, optional captions, zoom toggle, thumbnail strip, and full keyboard navigation (← → Escape).",
+      "status": "stable",
+      "since": "2026-05",
+      "designTokens": [],
+      "variantCount": 4
+    },
+    {
       "id": "app-shell",
       "name": "AppShell",
       "layer": "app",
@@ -1364,6 +1377,19 @@
       "since": "2026-05",
       "designTokens": [],
       "variantCount": 1
+    },
+    {
+      "id": "context-menu",
+      "name": "ContextMenu",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/ContextMenu.tsx",
+      "abbr": "CM",
+      "description": "Right-click context menu. Wraps any element as a trigger. Supports item groups, keyboard shortcuts, separators, danger items, and disabled items. Positions itself via viewport-aware boundary detection, auto-flips when near screen edges. Full keyboard navigation: ↑↓ arrows, Enter, Escape.",
+      "status": "stable",
+      "since": "2026-05",
+      "designTokens": [],
+      "variantCount": 3
     },
     {
       "id": "rich-text-editor",
@@ -3139,6 +3165,19 @@
       "status": "stable",
       "designTokens": [],
       "variantCount": 2
+    },
+    {
+      "id": "commerce-product-image-gallery",
+      "name": "ProductImageGallery",
+      "layer": "domain",
+      "category": "Domain",
+      "filePath": "modules/domains/commerce/product/ProductImageGallery.tsx",
+      "abbr": "PG",
+      "description": "Product image viewer: large main image with a thumbnail strip below. Hovering a thumbnail instantly swaps the main image via crossfade. When the image count exceeds thumbsVisible (default 5), the strip grows left/right arrows and becomes a slider.",
+      "status": "stable",
+      "since": "2026-05",
+      "designTokens": [],
+      "variantCount": 3
     },
     {
       "id": "media-video-status-badge",

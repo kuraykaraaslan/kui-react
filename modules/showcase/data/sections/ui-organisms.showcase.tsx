@@ -5,6 +5,7 @@ import { buildNavigationData } from './ui-molecule-navigation.showcase';
 import { buildOverlayData } from './ui-molecule-overlay.showcase';
 import { buildDataData } from './ui-molecule-data.showcase';
 import { buildMediaData } from './ui-molecule-media.showcase';
+import { buildImageGalleryData } from './ui-molecule-image-gallery.showcase';
 import type { ShowcaseComponent } from '../showcase.types';
 
 export function buildOrganismsData(): ShowcaseComponent[] {
@@ -15,5 +16,6 @@ export function buildOrganismsData(): ShowcaseComponent[] {
     ...buildOverlayData(),
     ...buildDataData(),
     ...buildMediaData(),
+    ...buildImageGalleryData(),
   ];
 }

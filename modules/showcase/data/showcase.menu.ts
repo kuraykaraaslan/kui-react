@@ -82,6 +82,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'stat-card',           title: 'StatCard',          category: 'Organism', abbr: 'Sc', since: '2026-05' },
       { id: 'tab-button',          title: 'TabButton',         category: 'Organism', abbr: 'TB', since: '2026-05' },
       { id: 'view-toggle',         title: 'ViewToggle',        category: 'Organism', abbr: 'VT', since: '2026-05' },
+      { id: 'image-gallery',       title: 'ImageGallery',      category: 'Organism', abbr: 'IG', since: '2026-05' },
     ],
   },
   {
@@ -259,6 +260,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'app-footer',      title: 'AppFooter',     category: 'App', abbr: 'AFt',since: '2026-05' },
       { id: 'theme-switcher',  title: 'ThemeSwitcher', category: 'App', abbr: 'TS', since: '2026-05' },
       { id: 'rich-text-editor',title: 'RichTextEditor',category: 'App', abbr: 'RT', since: '2026-05' },
+      { id: 'context-menu',   title: 'ContextMenu',   category: 'App', abbr: 'CM', since: '2026-05' },
     ],
   },
   {
@@ -307,6 +309,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'commerce-product-card',         title: 'ProductCard',        category: 'Domain', abbr: 'PC', since: '2026-05' },
       { id: 'commerce-order-card',           title: 'OrderCard',          category: 'Domain', abbr: 'OC', since: '2026-05' },
       { id: 'commerce-cart-item',            title: 'CartItem',           category: 'Domain', abbr: 'CI', since: '2026-05' },
+      { id: 'commerce-product-image-gallery', title: 'ProductImageGallery', category: 'Domain', abbr: 'PG', since: '2026-05' },
     ],
   },
   {

@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-24T20:47:57.272Z",
+  "generatedAt": "2026-05-25T21:03:23.827Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -1835,6 +1835,37 @@
       "designTokens": []
     },
     {
+      "id": "image-gallery",
+      "name": "ImageGallery",
+      "layer": "app",
+      "category": "Organism",
+      "filePath": "modules/app/ImageGallery.tsx",
+      "abbr": "IG",
+      "description": "Responsive image grid with a full-screen lightbox, right-click context menu (open, copy URL, move to first/last, remove), and drag-to-reorder. Supports 2–4 columns, square / video / portrait / auto aspect ratios, optional captions, zoom toggle, thumbnail strip, and full keyboard navigation (← → Escape).",
+      "source": "'use client';\nimport { ImageGallery } from '@/modules/app/ImageGallery';\n\nconst images = [\n  { src: '/photo-1.jpg', alt: 'Mountain', caption: 'Sunrise over the Alps' },\n  { src: '/photo-2.jpg', alt: 'Ocean',    caption: 'Golden hour' },\n  { src: '/photo-3.jpg', alt: 'Forest',   caption: 'Morning mist' },\n];\n\n// Basic — lightbox only\n<ImageGallery images={images} columns={3} aspect=\"square\" />\n\n// Editable — right-click menu + drag reorder\n<ImageGallery\n  images={images}\n  columns={3}\n  reorderable\n  onReorder={(next) => setImages(next)}\n  onRemove={(idx, img) => console.log('removed', img.alt)}\n/>",
+      "variants": [
+        {
+          "title": "Reorderable — drag + right-click menu",
+          "code": "<ImageGallery\n  images={images}\n  columns={3}\n  aspect=\"square\"\n  gap=\"md\"\n  reorderable\n  onReorder={(next) => setImages(next)}\n  onRemove={(idx, img) => console.log('removed', img.alt)}\n/>"
+        },
+        {
+          "title": "3-column grid — lightbox only",
+          "code": "<ImageGallery\n  images={images}\n  columns={3}\n  aspect=\"square\"\n  gap=\"md\"\n  lightbox\n/>"
+        },
+        {
+          "title": "2-column with captions",
+          "code": "<ImageGallery\n  images={images}\n  columns={2}\n  aspect=\"video\"\n  gap=\"lg\"\n  showCaptions\n  lightbox\n/>"
+        },
+        {
+          "title": "4-column compact",
+          "code": "<ImageGallery\n  images={images}\n  columns={4}\n  aspect=\"square\"\n  gap=\"sm\"\n  lightbox\n/>"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-05",
+      "designTokens": []
+    },
+    {
       "id": "app-shell",
       "name": "AppShell",
       "layer": "app",
@@ -2355,6 +2386,33 @@
         {
           "title": "Default",
           "code": "<ThemeSwitcher />"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-05",
+      "designTokens": []
+    },
+    {
+      "id": "context-menu",
+      "name": "ContextMenu",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/ContextMenu.tsx",
+      "abbr": "CM",
+      "description": "Right-click context menu. Wraps any element as a trigger. Supports item groups, keyboard shortcuts, separators, danger items, and disabled items. Positions itself via viewport-aware boundary detection, auto-flips when near screen edges. Full keyboard navigation: ↑↓ arrows, Enter, Escape.",
+      "source": "'use client';\nimport { ContextMenu } from '@/modules/app/ContextMenu';\nimport type { ContextMenuItem } from '@/modules/app/ContextMenu';\n\nconst items: ContextMenuItem[] = [\n  { label: 'Copy',   icon: <Icon />, shortcut: '⌘C', onClick: () => {} },\n  { label: 'Paste',  icon: <Icon />, shortcut: '⌘V', onClick: () => {} },\n  { type: 'separator' },\n  { label: 'Delete', icon: <Icon />, danger: true,   onClick: () => {} },\n];\n\n<ContextMenu items={items}>\n  <div>Right-click anywhere here</div>\n</ContextMenu>",
+      "variants": [
+        {
+          "title": "Text editor — clipboard + format actions",
+          "code": "<ContextMenu items={[\n  { label: 'Cut',      icon: <Icon />, shortcut: '⌘X' },\n  { label: 'Copy',     icon: <Icon />, shortcut: '⌘C' },\n  { label: 'Paste',    icon: <Icon />, shortcut: '⌘V' },\n  { type: 'separator' },\n  { label: 'Copy link',icon: <Icon />, shortcut: '⌘⇧C' },\n  { type: 'separator' },\n  { label: 'Rename',   icon: <Icon /> },\n  { label: 'Delete',   icon: <Icon />, danger: true, shortcut: '⌫' },\n]}>\n  <div>Right-click anywhere in this area</div>\n</ContextMenu>"
+        },
+        {
+          "title": "File manager — groups + shortcut hint",
+          "code": "<ContextMenu items={[\n  { type: 'group', label: 'Actions' },\n  { label: 'Open',     icon: <Icon /> },\n  { label: 'Download', icon: <Icon />, shortcut: '⌘D' },\n  { label: 'Share',    icon: <Icon />, shortcut: '⌘⇧S' },\n  { type: 'separator' },\n  { type: 'group', label: 'Organise' },\n  { label: 'Move to…', icon: <Icon /> },\n  { label: 'Add tag',  icon: <Icon /> },\n  { type: 'separator' },\n  { label: 'Delete', icon: <Icon />, danger: true },\n]}>\n  <FileCard name=\"Report Q1.pdf\" />\n</ContextMenu>"
+        },
+        {
+          "title": "Code branch — some items disabled",
+          "code": "<ContextMenu items={[\n  { label: 'View diff',        icon: <Icon /> },\n  { label: 'Copy branch name', icon: <Icon />, shortcut: '⌘C' },\n  { type: 'separator' },\n  { label: 'Merge into main',  icon: <Icon />, disabled: true },\n  { label: 'Cherry-pick',                      disabled: true },\n  { type: 'separator' },\n  { label: 'Delete branch',    icon: <Icon />, danger: true },\n]}>\n  <BranchRow name=\"feature/context-menu\" />\n</ContextMenu>"
         }
       ],
       "status": "stable",
@@ -5436,6 +5494,33 @@
         }
       ],
       "status": "stable",
+      "designTokens": []
+    },
+    {
+      "id": "commerce-product-image-gallery",
+      "name": "ProductImageGallery",
+      "layer": "domain",
+      "category": "Domain",
+      "filePath": "modules/domains/commerce/product/ProductImageGallery.tsx",
+      "abbr": "PG",
+      "description": "Product image viewer: large main image with a thumbnail strip below. Hovering a thumbnail instantly swaps the main image via crossfade. When the image count exceeds thumbsVisible (default 5), the strip grows left/right arrows and becomes a slider.",
+      "source": "import { ProductImageGallery } from '@/modules/domains/commerce/product/ProductImageGallery';\n\n<ProductImageGallery\n  images={[\n    { src: '/product-front.jpg',  alt: 'Product front view' },\n    { src: '/product-back.jpg',   alt: 'Product back view' },\n    { src: '/product-detail.jpg', alt: 'Product detail' },\n  ]}\n  thumbsVisible={5}\n/>",
+      "variants": [
+        {
+          "title": "4 görsel — thumbnail strip",
+          "code": "<ProductImageGallery\n  images={[\n    { src: '/front.jpg',   alt: 'Front view' },\n    { src: '/side.jpg',    alt: 'Side view' },\n    { src: '/on-desk.jpg', alt: 'On desk' },\n    { src: '/profile.jpg', alt: 'Profile' },\n  ]}\n  thumbsVisible={5}\n/>"
+        },
+        {
+          "title": "8 görsel — slider aktif",
+          "code": "// 8 images, thumbsVisible=5 → arrows appear automatically\n<ProductImageGallery\n  images={productImages}\n  thumbsVisible={5}\n/>"
+        },
+        {
+          "title": "Video aspect ratio",
+          "code": "<ProductImageGallery\n  images={productImages}\n  aspect=\"video\"\n  thumbsVisible={5}\n/>"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-05",
       "designTokens": []
     },
     {
