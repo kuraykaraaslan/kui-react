@@ -3,7 +3,7 @@
 - **id:** `iot-ruleset-editor`
 - **layer:** domain
 - **category:** Domain
-- **filePath:** `modules/domains/iot/ruleset/RulesetEditor.tsx`
+- **filePath:** `modules/domains/iot/ruleset/RulesetEditor/index.tsx`
 - **status:** stable
 - **since:** 2026-05
 

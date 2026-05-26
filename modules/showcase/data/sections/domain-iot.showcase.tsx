@@ -319,7 +319,7 @@ export function CloudWorkspaceCard({ workspace, className, onClick }) {
       category: 'Domain',
       abbr: 'RE',
       description: 'Drag-and-drop visual rule chain editor — build telemetry pipelines with Trigger, Filter, Switch, Transform, and Action nodes.',
-      filePath: 'modules/domains/iot/ruleset/RulesetEditor.tsx',
+      filePath: 'modules/domains/iot/ruleset/RulesetEditor/index.tsx',
       sourceCode: `'use client';
 // Drag nodes from palette onto the canvas.
 // Click output ports (filled) → input ports (hollow) to wire them.
