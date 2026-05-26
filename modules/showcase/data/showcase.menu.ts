@@ -53,6 +53,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'file-input',        title: 'FileInput',       category: 'Molecule', abbr: 'Fi', since: '2025-02' },
       { id: 'color-picker',      title: 'ColorPicker',     category: 'Molecule', abbr: 'Cp', since: '2026-05' },
       { id: 'chart',             title: 'Chart',           category: 'Molecule', abbr: 'Ch', since: '2026-05', status: 'beta' },
+      { id: 'diff-viewer',       title: 'DiffViewer',      category: 'Molecule', abbr: 'Dv', since: '2026-05' },
     ],
   },
   {
@@ -265,6 +266,8 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'code-editor',     title: 'CodeEditor',    category: 'App', abbr: 'CE', since: '2026-05' },
       { id: 'context-menu',   title: 'ContextMenu',   category: 'App', abbr: 'CM', since: '2026-05' },
       { id: 'file-upload-section', title: 'FileUploadSection', category: 'App', abbr: 'FU', since: '2026-05' },
+      { id: 'kanban-board',    title: 'KanbanBoard',   category: 'App', abbr: 'KB', since: '2026-05', status: 'beta' },
+      { id: 'calendar',        title: 'Calendar',      category: 'App', abbr: 'Cl', since: '2026-05', status: 'beta' },
     ],
   },
   {

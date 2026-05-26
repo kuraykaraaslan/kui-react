@@ -24,14 +24,20 @@ import { buildIoTDomainData } from './sections/domain-iot.showcase';
 import { buildNftDomainData } from './sections/domain-nft.showcase';
 import { buildReviewsDomainData } from './sections/domain-reviews.showcase';
 import { buildPrimitiveChartsData } from './sections/ui-primitive-charts.showcase';
+import { buildAppKanbanBoardData } from './sections/app-kanban-board.showcase';
+import { buildAppCalendarData } from './sections/app-calendar.showcase';
+import { buildMoleculeDiffViewerData } from './sections/ui-molecule-diff-viewer.showcase';
 
 export function buildShowcaseData() {
   return [
     ...buildAtomsData(),
     ...buildMoleculesData(),
+    ...buildMoleculeDiffViewerData(),
     ...buildPrimitiveChartsData(),
     ...buildOrganismsData(),
     ...buildAppPatternsData(),
+    ...buildAppKanbanBoardData(),
+    ...buildAppCalendarData(),
     ...buildCommonDomainData(),
     ...buildBlogDomainData(),
     ...buildEventDomainData(),
