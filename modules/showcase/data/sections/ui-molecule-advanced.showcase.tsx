@@ -106,6 +106,58 @@ function AsyncComboBoxDemo() {
   );
 }
 
+// M1 — debounced async with AbortController-aware suggestions.
+function DebouncedAsyncComboBoxDemo() {
+  const [value, setValue] = useState('');
+
+  // Pretend dataset — would be a /api/suggest call IRL. The debounce in
+  // useAsync ensures we don't fire on every keystroke, and AbortController
+  // cancels any in-flight request when the user types again.
+  const POOL: ComboBoxOption[] = [
+    { value: 'react',      label: 'React',         description: 'UI library' },
+    { value: 'react-dom',  label: 'React DOM',     description: 'DOM renderer' },
+    { value: 'react-native', label: 'React Native', description: 'Mobile bindings' },
+    { value: 'react-router', label: 'React Router', description: 'Client routing' },
+    { value: 'next',       label: 'Next.js',       description: 'React framework' },
+    { value: 'remix',      label: 'Remix',         description: 'Full-stack React' },
+    { value: 'redwood',    label: 'RedwoodJS',     description: 'Full-stack JS' },
+    { value: 'astro',      label: 'Astro',         description: 'Content sites' },
+    { value: 'svelte',     label: 'Svelte',        description: 'Compiler-driven UI' },
+    { value: 'solid',      label: 'SolidJS',       description: 'Fine-grained reactivity' },
+  ];
+
+  async function suggest(query: string, signal?: AbortSignal): Promise<ComboBoxOption[]> {
+    const q = query.trim().toLowerCase();
+    // Simulate latency; honour cancellation.
+    await new Promise((resolve, reject) => {
+      const t = setTimeout(resolve, 350);
+      signal?.addEventListener('abort', () => {
+        clearTimeout(t);
+        reject(new DOMException('aborted', 'AbortError'));
+      });
+    });
+    if (!q) return POOL.slice(0, 5);
+    return POOL.filter((p) => p.label.toLowerCase().includes(q));
+  }
+
+  return (
+    <div className="w-full max-w-sm space-y-1">
+      <ComboBox
+        id="cb-async-debounced"
+        label="Debounced suggestions"
+        options={[]}
+        value={value}
+        onChange={setValue}
+        onSearch={suggest}
+        debounceMs={300}
+        placeholder="Try typing 'react'…"
+        hint="Debounced 300ms, AbortController cancels in-flight, 5-min cache."
+      />
+      <p className="text-xs text-text-secondary">Selected: {value || 'none'}</p>
+    </div>
+  );
+}
+
 export function buildMoleculeAdvancedData(): ShowcaseComponent[] {
   return [
     {
@@ -178,7 +230,7 @@ export function TagInput({ id, label, hint, error, value, onChange, placeholder 
       abbr: 'Ms',
       description: 'Chip-based multi-select popover with searchable filter, keyboard navigation, and disabled-option support.',
       filePath: 'modules/ui/MultiSelect.tsx',
-      sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useEffect, useRef, useState } from 'react';\n\nexport function MultiSelect({ id, label, options, value, onChange, placeholder = 'Select…' }) {\n  // ... (controlled/uncontrolled multi-select with chip tags)\n}`,
+      sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useFilter, useAsync, useLoadMore } from './ComboBox/hooks';\n\nexport function MultiSelect({ id, label, options, value, onChange, onSearch, onLoadMore, debounceMs = 300 }) {\n  // shares filter/async/load-more hooks with ComboBox; chip strip stays local.\n}`,
       variants: [
         {
           title: 'Controlled',
@@ -225,8 +277,8 @@ export function TagInput({ id, label, hint, error, value, onChange, placeholder 
       category: 'Molecule',
       abbr: 'Cb',
       description: 'Searchable autocomplete single-select with keyboard navigation, described options, and a clearable button.',
-      filePath: 'modules/ui/ComboBox.tsx',
-      sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\n\nexport function ComboBox({ id, label, options, value, onChange, onSearch }) {\n  // searchable single-select combobox with async search support\n}`,
+      filePath: 'modules/ui/ComboBox/index.tsx',
+      sourceCode: `'use client';\nimport { Trigger } from './parts/Trigger';\nimport { Listbox } from './parts/Listbox';\nimport { useFilter } from './hooks/useFilter';\nimport { useAsync } from './hooks/useAsync';\nimport { useLoadMore } from './hooks/useLoadMore';\n\nexport function ComboBox({ id, label, options, value, onChange, onSearch, onLoadMore, debounceMs = 300, virtualize }) {\n  // M1: debounced async + AbortController + 5min cache + IO-backed pagination + manual windowing.\n}`,
       variants: [
         {
           title: 'Controlled selection',
@@ -239,6 +291,12 @@ export function TagInput({ id, label, hint, error, value, onChange, placeholder 
           layout: 'stack' as const,
           preview: <AsyncComboBoxDemo />,
           code: `<ComboBox id="search" label="Async search" options={COMBO_OPTIONS} onSearch={search} value={value} onChange={setValue} />`,
+        },
+        {
+          title: 'Debounced async suggestions',
+          layout: 'stack' as const,
+          preview: <DebouncedAsyncComboBoxDemo />,
+          code: `async function suggest(query, signal) {\n  const res = await fetch('/api/suggest?q=' + encodeURIComponent(query), { signal });\n  return res.json();\n}\n\n<ComboBox\n  id="cb-async-debounced"\n  label="Debounced suggestions"\n  options={[]}\n  value={value}\n  onChange={setValue}\n  onSearch={suggest}      // signature: (q, signal) => Promise<Option[]>\n  debounceMs={300}        // useAsync debounces & cancels in-flight\n  placeholder="Type to search…"\n/>`,
         },
       ],
     },
