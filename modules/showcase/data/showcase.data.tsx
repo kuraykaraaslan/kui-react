@@ -23,11 +23,13 @@ import { buildSocialDomainData } from './sections/domain-social.showcase';
 import { buildIoTDomainData } from './sections/domain-iot.showcase';
 import { buildNftDomainData } from './sections/domain-nft.showcase';
 import { buildReviewsDomainData } from './sections/domain-reviews.showcase';
+import { buildPrimitiveChartsData } from './sections/ui-primitive-charts.showcase';
 
 export function buildShowcaseData() {
   return [
     ...buildAtomsData(),
     ...buildMoleculesData(),
+    ...buildPrimitiveChartsData(),
     ...buildOrganismsData(),
     ...buildAppPatternsData(),
     ...buildCommonDomainData(),
