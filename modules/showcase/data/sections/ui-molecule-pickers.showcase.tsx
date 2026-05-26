@@ -2,6 +2,7 @@
 import React from 'react';
 import { DatePicker } from '@/modules/ui/DatePicker';
 import { DateRangePicker, TimePicker } from '@/modules/ui/DateRangePicker';
+import type { DateRange } from '@/modules/ui/DatePicker';
 import { FileInput } from '@/modules/ui/FileInput';
 import { ColorPicker } from '@/modules/ui/ColorPicker';
 import { useState } from 'react';
@@ -20,9 +21,48 @@ function ColorPickerNativeDemo() {
   return <ColorPicker label="Background" value={c} onChange={setC} showNoColor showHexInput showNativePicker swatches={[]} />;
 }
 
+function DatePickerDefaultDemo() {
+  const [d, setD] = useState<Date | null>(null);
+  return <div className="w-full max-w-xs"><DatePicker id="sc-dp-default" label="Appointment date" hint="Select a future date." value={d} onChange={setD} /></div>;
+}
+function DatePickerValueDemo() {
+  const [d, setD] = useState<Date | null>(new Date('2026-06-15'));
+  return <div className="w-full max-w-xs"><DatePicker id="sc-dp-val" label="Start date" value={d} onChange={setD} /></div>;
+}
+function DatePickerErrorDemo() {
+  const [a, setA] = useState<Date | null>(null);
+  const [b, setB] = useState<Date | null>(new Date('2026-01-01'));
+  return (
+    <div className="w-full max-w-xs space-y-3">
+      <DatePicker id="sc-dp-err" label="Due date" error="Please select a date." required value={a} onChange={setA} />
+      <DatePicker id="sc-dp-dis" label="Locked date" value={b} onChange={setB} disabled />
+    </div>
+  );
+}
+function DatePickerTrDemo() {
+  const [d, setD] = useState<Date | null>(new Date('2026-05-26'));
+  return (
+    <div className="w-full max-w-xs">
+      <DatePicker
+        id="sc-dp-tr"
+        label="Randevu tarihi"
+        hint="Lütfen ileri bir tarih seçin."
+        locale="tr"
+        value={d}
+        onChange={setD}
+        messages={{ today: 'Bugün seç', clear: 'Temizle' }}
+      />
+    </div>
+  );
+}
+
 function DateRangeDemo() {
-  const [range, setRange] = useState<{ start: Date | null; end: Date | null }>({ start: null, end: null });
+  const [range, setRange] = useState<DateRange>({ start: null, end: null });
   return <DateRangePicker id="dr-demo" label="Select date range" value={range} onChange={setRange} />;
+}
+function DateRangeValueDemo() {
+  const [range, setRange] = useState<DateRange>({ start: new Date('2026-06-01'), end: new Date('2026-06-15') });
+  return <DateRangePicker id="dr-val" label="Booking window" value={range} onChange={setRange} locale="en" />;
 }
 
 function TimePickerDemo() {
@@ -37,50 +77,65 @@ export function buildMoleculePickersData(): ShowcaseComponent[] {
       title: 'DatePicker',
       category: 'Molecule',
       abbr: 'Dp',
-      description: 'Native date input with label + hint + error anatomy. Supports min/max constraints and a disabled state.',
-      filePath: 'modules/ui/DatePicker.tsx',
+      description:
+        'Popover-based date picker with a locale-aware calendar grid (TR / EN), quick month / year jump from the header, min / max / disabledDates support, and full keyboard navigation (Arrow / PageUp/Down / Shift+Page / Home / End / Enter / Esc). Pixel-identical EJS sibling at modules/ui/DatePicker/DatePicker.ejs.',
+      filePath: 'modules/ui/DatePicker/index.tsx',
       sourceCode: `'use client';
-import { cn } from '@/libs/utils/cn';
+import { DatePicker } from '@/modules/ui/DatePicker';
 
-export function DatePicker({ id, label, hint, error, value, onChange, disabled, required, min, max, className }) {
-  const formatted = value && !isNaN(value.getTime()) ? value.toISOString().split('T')[0] : '';
-  function handleChange(e) {
-    if (!e.target.value) { onChange(null); return; }
-    const d = new Date(e.target.value);
-    onChange(isNaN(d.getTime()) ? null : d);
-  }
-  return (
-    <div className={cn('space-y-1', className)}>
-      <label htmlFor={id} className="block text-sm font-medium text-text-primary">
-        {label}{required && <span className="text-error ml-1" aria-hidden="true">*</span>}
-      </label>
-      <input id={id} type="date" value={formatted} onChange={handleChange} disabled={disabled} required={required} min={min} max={max} aria-invalid={!!error}
-        className={cn('block w-full rounded-md border px-3 py-2 text-sm transition-colors text-text-primary bg-surface-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-surface-sunken', error ? 'border-error ring-1 ring-error bg-error-subtle' : 'border-border')} />
-      {hint && !error && <p className="text-xs text-text-secondary">{hint}</p>}
-      {error && <p className="text-xs text-error" role="alert">{error}</p>}
-    </div>
-  );
-}`,
+// Single-date popover — defaults to Turkish locale (Monday-first, GG.AA.YYYY).
+const [date, setDate] = useState<Date | null>(null);
+<DatePicker
+  id="appointment"
+  label="Appointment date"
+  value={date}
+  onChange={setDate}
+  hint="Select a future date."
+/>
+
+// English locale, min/max constraints + disabledDates predicate.
+<DatePicker
+  locale="en"
+  value={date}
+  onChange={setDate}
+  min={new Date('2026-06-01')}
+  max={new Date('2026-06-30')}
+  disabledDates={(d) => d.getDay() === 0 /* no Sundays */}
+/>
+
+// Override individual messages.
+<DatePicker
+  locale="tr"
+  value={date}
+  onChange={setDate}
+  messages={{ today: 'Bugün seç', clear: 'Temizle' }}
+/>`,
       variants: [
         {
           title: 'Default',
-          preview: <div className="w-full max-w-xs"><DatePicker id="sc-dp-default" label="Appointment date" hint="Select a future date." onChange={() => {}} value={null} /></div>,
-          code: `<DatePicker id="date" label="Appointment date" hint="Select a future date." value={date} onChange={setDate} />`,
+          preview: <DatePickerDefaultDemo />,
+          code: `const [date, setDate] = useState<Date | null>(null);
+<DatePicker id="date" label="Appointment date" hint="Select a future date." value={date} onChange={setDate} />`,
         },
         {
           title: 'With value',
-          preview: <div className="w-full max-w-xs"><DatePicker id="sc-dp-val" label="Start date" value={new Date('2026-06-15')} onChange={() => {}} /></div>,
+          preview: <DatePickerValueDemo />,
           code: `<DatePicker id="start" label="Start date" value={new Date('2026-06-15')} onChange={setDate} />`,
         },
         {
           title: 'Error / Disabled',
-          preview: (
-            <div className="w-full max-w-xs space-y-3">
-              <DatePicker id="sc-dp-err" label="Due date" error="Please select a date." onChange={() => {}} value={null} required />
-              <DatePicker id="sc-dp-dis" label="Locked date" value={new Date('2026-01-01')} onChange={() => {}} disabled />
-            </div>
-          ),
+          preview: <DatePickerErrorDemo />,
           code: `<DatePicker id="due" label="Due date" error="Please select a date." required />\n<DatePicker id="locked" label="Locked date" value={date} disabled />`,
+        },
+        {
+          title: 'Locale: Türkçe + custom messages',
+          preview: <DatePickerTrDemo />,
+          code: `<DatePicker
+  locale="tr"
+  value={date}
+  onChange={setDate}
+  messages={{ today: 'Bugün seç', clear: 'Temizle' }}
+/>`,
         },
       ],
     },
@@ -89,15 +144,33 @@ export function DatePicker({ id, label, hint, error, value, onChange, disabled, 
       title: 'DateRangePicker',
       category: 'Molecule',
       abbr: 'Dr',
-      description: 'fieldset-based dual native date inputs. Start/end auto-constrain each other (min/max) with accessible sr-only labels.',
-      filePath: 'modules/ui/DateRangePicker.tsx',
-      sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function DateRangePicker({ id, label, value, onChange }) {\n  // start/end date inputs, auto-clears end if start > end\n}\n\nexport function TimePicker({ id, label, value, onChange, step = 60 }) {}`,
+      description:
+        'Two-month popover for picking a start → end date range. Shares the same Calendar core as DatePicker; locale-aware, fully keyboard navigable, with min/max/disabledDates. Pixel-identical EJS sibling at modules/ui/DatePicker/DateRangePicker.ejs.',
+      filePath: 'modules/ui/DatePicker/index.tsx',
+      sourceCode: `'use client';
+import { DateRangePicker } from '@/modules/ui/DateRangePicker';
+import type { DateRange } from '@/modules/ui/DatePicker';
+
+const [range, setRange] = useState<DateRange>({ start: null, end: null });
+<DateRangePicker
+  id="dr"
+  label="Date range"
+  value={range}
+  onChange={setRange}
+  locale="en"
+/>`,
       variants: [
         {
           title: 'Date range',
           layout: 'stack' as const,
           preview: <DateRangeDemo />,
-          code: `function Demo() {\n  const [range, setRange] = useState({ start: null, end: null });\n  return <DateRangePicker id="dr" label="Date range" value={range} onChange={setRange} />;\n}`,
+          code: `function Demo() {\n  const [range, setRange] = useState<DateRange>({ start: null, end: null });\n  return <DateRangePicker id="dr" label="Date range" value={range} onChange={setRange} />;\n}`,
+        },
+        {
+          title: 'With value (EN locale)',
+          layout: 'stack' as const,
+          preview: <DateRangeValueDemo />,
+          code: `<DateRangePicker id="dr" label="Booking window"\n  value={{ start: new Date('2026-06-01'), end: new Date('2026-06-15') }}\n  onChange={setRange} locale="en" />`,
         },
         {
           title: 'Time picker',

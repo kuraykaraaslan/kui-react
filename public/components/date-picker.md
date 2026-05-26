@@ -3,30 +3,18 @@
 - **id:** `date-picker`
 - **layer:** ui
 - **category:** Molecule
-- **filePath:** `modules/ui/DatePicker.tsx`
+- **filePath:** `modules/ui/DatePicker/index.tsx`
 - **status:** stable
 - **since:** 2025-02
 
-Native date input with label + hint + error anatomy. Supports min/max constraints and a disabled state.
-
-## Design tokens consumed
-
-- `--border`
-- `--border-focus`
-- `--error`
-- `--error-subtle`
-- `--primary`
-- `--secondary`
-- `--surface-base`
-- `--surface-sunken`
-- `--text-primary`
-- `--text-secondary`
+Popover-based date picker with a locale-aware calendar grid (TR / EN), quick month / year jump from the header, min / max / disabledDates support, and full keyboard navigation (Arrow / PageUp/Down / Shift+Page / Home / End / Enter / Esc). Pixel-identical EJS sibling at modules/ui/DatePicker/DatePicker.ejs.
 
 ## Variants
 
 ### Default
 
 ```tsx
+const [date, setDate] = useState<Date | null>(null);
 <DatePicker id="date" label="Appointment date" hint="Select a future date." value={date} onChange={setDate} />
 ```
 
@@ -43,29 +31,48 @@ Native date input with label + hint + error anatomy. Supports min/max constraint
 <DatePicker id="locked" label="Locked date" value={date} disabled />
 ```
 
+### Locale: Türkçe + custom messages
+
+```tsx
+<DatePicker
+  locale="tr"
+  value={date}
+  onChange={setDate}
+  messages={{ today: 'Bugün seç', clear: 'Temizle' }}
+/>
+```
+
 ## Full source
 
 ```tsx
 'use client';
-import { cn } from '@/libs/utils/cn';
+import { DatePicker } from '@/modules/ui/DatePicker';
 
-export function DatePicker({ id, label, hint, error, value, onChange, disabled, required, min, max, className }) {
-  const formatted = value && !isNaN(value.getTime()) ? value.toISOString().split('T')[0] : '';
-  function handleChange(e) {
-    if (!e.target.value) { onChange(null); return; }
-    const d = new Date(e.target.value);
-    onChange(isNaN(d.getTime()) ? null : d);
-  }
-  return (
-    <div className={cn('space-y-1', className)}>
-      <label htmlFor={id} className="block text-sm font-medium text-text-primary">
-        {label}{required && <span className="text-error ml-1" aria-hidden="true">*</span>}
-      </label>
-      <input id={id} type="date" value={formatted} onChange={handleChange} disabled={disabled} required={required} min={min} max={max} aria-invalid={!!error}
-        className={cn('block w-full rounded-md border px-3 py-2 text-sm transition-colors text-text-primary bg-surface-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-surface-sunken', error ? 'border-error ring-1 ring-error bg-error-subtle' : 'border-border')} />
-      {hint && !error && <p className="text-xs text-text-secondary">{hint}</p>}
-      {error && <p className="text-xs text-error" role="alert">{error}</p>}
-    </div>
-  );
-}
+// Single-date popover — defaults to Turkish locale (Monday-first, GG.AA.YYYY).
+const [date, setDate] = useState<Date | null>(null);
+<DatePicker
+  id="appointment"
+  label="Appointment date"
+  value={date}
+  onChange={setDate}
+  hint="Select a future date."
+/>
+
+// English locale, min/max constraints + disabledDates predicate.
+<DatePicker
+  locale="en"
+  value={date}
+  onChange={setDate}
+  min={new Date('2026-06-01')}
+  max={new Date('2026-06-30')}
+  disabledDates={(d) => d.getDay() === 0 /* no Sundays */}
+/>
+
+// Override individual messages.
+<DatePicker
+  locale="tr"
+  value={date}
+  onChange={setDate}
+  messages={{ today: 'Bugün seç', clear: 'Temizle' }}
+/>
 ```

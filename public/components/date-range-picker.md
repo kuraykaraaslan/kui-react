@@ -3,11 +3,11 @@
 - **id:** `date-range-picker`
 - **layer:** ui
 - **category:** Molecule
-- **filePath:** `modules/ui/DateRangePicker.tsx`
+- **filePath:** `modules/ui/DatePicker/index.tsx`
 - **status:** stable
 - **since:** 2025-03
 
-fieldset-based dual native date inputs. Start/end auto-constrain each other (min/max) with accessible sr-only labels.
+Two-month popover for picking a start → end date range. Shares the same Calendar core as DatePicker; locale-aware, fully keyboard navigable, with min/max/disabledDates. Pixel-identical EJS sibling at modules/ui/DatePicker/DateRangePicker.ejs.
 
 ## Variants
 
@@ -15,9 +15,17 @@ fieldset-based dual native date inputs. Start/end auto-constrain each other (min
 
 ```tsx
 function Demo() {
-  const [range, setRange] = useState({ start: null, end: null });
+  const [range, setRange] = useState<DateRange>({ start: null, end: null });
   return <DateRangePicker id="dr" label="Date range" value={range} onChange={setRange} />;
 }
+```
+
+### With value (EN locale)
+
+```tsx
+<DateRangePicker id="dr" label="Booking window"
+  value={{ start: new Date('2026-06-01'), end: new Date('2026-06-15') }}
+  onChange={setRange} locale="en" />
 ```
 
 ### Time picker
@@ -33,11 +41,15 @@ function Demo() {
 
 ```tsx
 'use client';
-import { cn } from '@/libs/utils/cn';
+import { DateRangePicker } from '@/modules/ui/DateRangePicker';
+import type { DateRange } from '@/modules/ui/DatePicker';
 
-export function DateRangePicker({ id, label, value, onChange }) {
-  // start/end date inputs, auto-clears end if start > end
-}
-
-export function TimePicker({ id, label, value, onChange, step = 60 }) {}
+const [range, setRange] = useState<DateRange>({ start: null, end: null });
+<DateRangePicker
+  id="dr"
+  label="Date range"
+  value={range}
+  onChange={setRange}
+  locale="en"
+/>
 ```
