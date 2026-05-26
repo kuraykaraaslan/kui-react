@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-26T14:13:43.386Z",
+  "generatedAt": "2026-05-26T14:32:48.929Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -1052,10 +1052,10 @@
       "name": "FileInput",
       "layer": "ui",
       "category": "Molecule",
-      "filePath": "modules/ui/FileInput.tsx",
+      "filePath": "modules/ui/FileInput/index.tsx",
       "abbr": "Fi",
-      "description": "Drag-and-drop file upload with validation, file list, and individual remove actions.",
-      "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useRef, useState } from 'react';\n\nexport function FileInput({ id, label, multiple, accept, maxSizeBytes, allowedTypes, disabled }) {\n  // drag-and-drop + browse, validates size/type, lists files with errors\n}",
+      "description": "Drag-and-drop file upload with validation, file list, and individual remove actions. M1 adds paste-from-clipboard, `accept` MIME-pattern + extension validation, and `maxFiles` enforcement with i18n messages. Pixel-identical EJS sibling at modules/ui/FileInput/FileInput.ejs.",
+      "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useRef, useState, useEffect } from 'react';\n\nexport function FileInput({ id, label, multiple, accept, maxSizeBytes, maxFiles, allowedTypes, disabled, enablePaste, onFiles, onUpload, messages }) {\n  // drag-and-drop + browse + paste, validates size/type/count, lists files with errors\n}",
       "variants": [
         {
           "title": "Single file",
@@ -1068,6 +1068,10 @@
         {
           "title": "With upload action",
           "code": "<FileInput id=\"attachments\" label=\"Project attachments\" multiple maxSizeBytes={5242880}\n  onUpload={uploadFiles} uploadLabel=\"Upload\" />"
+        },
+        {
+          "title": "Paste from clipboard",
+          "code": "<FileInput id=\"screenshots\" label=\"Screenshot drop\" multiple enablePaste\n  accept=\"image/*\" maxFiles={4} maxSizeBytes={4 * 1024 * 1024}\n  hint=\"Drop, browse, or paste a screenshot (Cmd/Ctrl + V).\" />"
         },
         {
           "title": "Disabled",
@@ -1238,10 +1242,10 @@
       "name": "Slider",
       "layer": "ui",
       "category": "Molecule",
-      "filePath": "modules/ui/Slider.tsx",
+      "filePath": "modules/ui/Slider/index.tsx",
       "abbr": "Sl",
       "description": "Accessible carousel. Includes role=\"region\" + aria-roledescription=\"carousel\" and per-slide aria labels. Supports autoplay, arrow keys, and dot navigation.",
-      "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState, useEffect, useCallback, useRef } from 'react';\n\nexport function Slider({ slides, autoPlay = false, autoPlayInterval = 4000, showDots = true, showArrows = true, loop = true, className, slideClassName }) {\n  const [current, setCurrent] = useState(0);\n  const total = slides.length;\n  const goTo = useCallback((index) => setCurrent(loop ? ((index + total) % total) : Math.max(0, Math.min(index, total - 1))), [loop, total]);\n  const prev = () => goTo(current - 1);\n  const next = () => goTo(current + 1);\n  useEffect(() => {\n    if (!autoPlay || total <= 1) return;\n    const t = setInterval(() => setCurrent((c) => (c + 1) % total), autoPlayInterval);\n    return () => clearInterval(t);\n  }, [autoPlay, autoPlayInterval, total]);\n  return (\n    <div className={cn('relative overflow-hidden rounded-xl', className)} role=\"region\" aria-label=\"Content slider\" aria-roledescription=\"carousel\">\n      <div className=\"flex transition-transform duration-350 ease-in-out\" style={{ transform: `translateX(-${current * 100}%)` }}>\n        {slides.map((slide, i) => (\n          <div key={i} role=\"group\" aria-roledescription=\"slide\" aria-label={`Slide ${i + 1} of ${total}`} aria-hidden={i !== current} className={cn('w-full shrink-0', slideClassName)}>{slide}</div>\n        ))}\n      </div>\n      {showArrows && (loop || current > 0) && <button onClick={prev} aria-label=\"Previous slide\" className=\"absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center\">‹</button>}\n      {showArrows && (loop || current < total - 1) && <button onClick={next} aria-label=\"Next slide\" className=\"absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center\">›</button>}\n      {showDots && total > 1 && (\n        <div className=\"absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10\" role=\"tablist\" aria-label=\"Slide indicators\">\n          {slides.map((_, i) => <button key={i} role=\"tab\" aria-selected={i === current} aria-label={`Go to slide ${i + 1}`} onClick={() => goTo(i)} className={cn('h-2 rounded-full transition-all', i === current ? 'w-5 bg-white' : 'w-2 bg-white/40')} />)}\n        </div>\n      )}\n    </div>\n  );\n}",
+      "source": "'use client';\nimport { useCallback, useState } from 'react';\nimport { cn } from '@/libs/utils/cn';\nimport { Track } from './parts/Track';\nimport { Slide } from './parts/Slide';\nimport { Arrows } from './parts/Arrows';\nimport { Dots } from './parts/Dots';\nimport { useDrag } from './hooks/useDrag';\nimport { useAutoPlay } from './hooks/useAutoPlay';\n\n// M1 — PointerEvent drag (touch+mouse+pen) with dragThreshold (50 px default),\n// velocity momentum (0.5 px/ms = +1 slide), and edge resistance (×0.4) when\n// loop is disabled. See modules/ui/Slider/hooks/useDrag.ts for the math.\nexport function Slider({ slides, autoPlay = false, autoPlayInterval = 4000, showDots = true, showArrows = true, loop = true, dragThreshold = 50, className, slideClassName, ariaLabel = 'Content slider' }) {\n  const [current, setCurrent] = useState(0);\n  const [isTransitioning, setIsTransitioning] = useState(false);\n  const total = slides.length;\n  const goTo = useCallback((index) => {\n    if (isTransitioning) return;\n    const target = loop ? ((index % total) + total) % total : Math.max(0, Math.min(index, total - 1));\n    if (target === current) return;\n    setIsTransitioning(true);\n    setCurrent(target);\n    setTimeout(() => setIsTransitioning(false), 350);\n  }, [current, isTransitioning, loop, total]);\n  const { dragState, handlers } = useDrag({ current, total, loop, dragThreshold, goTo });\n  useAutoPlay({ enabled: autoPlay, interval: autoPlayInterval, total, onTick: useCallback(() => { if (dragState.isDragging) return; setCurrent((c) => (c + 1) % total); }, [dragState.isDragging, total]) });\n  if (total === 0) return null;\n  const canPrev = loop || current > 0;\n  const canNext = loop || current < total - 1;\n  return (\n    <div className={cn('relative overflow-hidden rounded-xl', className)} role=\"region\" aria-label={ariaLabel} aria-roledescription=\"carousel\">\n      <Track current={current} isDragging={dragState.isDragging} offsetPx={dragState.offsetPx} pointerHandlers={handlers}>\n        {slides.map((slide, i) => (<Slide key={i} index={i} total={total} isActive={i === current} className={slideClassName}>{slide}</Slide>))}\n      </Track>\n      {showArrows && total > 1 && <Arrows canPrev={canPrev} canNext={canNext} onPrev={() => goTo(current - 1)} onNext={() => goTo(current + 1)} />}\n      {showDots && total > 1 && <Dots total={total} current={current} onSelect={goTo} />}\n    </div>\n  );\n}",
       "variants": [
         {
           "title": "Default",
@@ -1250,6 +1254,10 @@
         {
           "title": "Auto-play",
           "code": "<Slider slides={slides} autoPlay autoPlayInterval={2000} />"
+        },
+        {
+          "title": "Touch swipe + momentum",
+          "code": "<Slider\n  slides={slides}\n  loop={false}\n  dragThreshold={50}\n  // Drag past 50 px = 1 slide.\n  // Flick > 0.5 px/ms = +1 extra slide per 0.5 px/ms of release velocity.\n  // Edge resistance (×0.4) keeps you on the rails when loop is off.\n/>"
         },
         {
           "title": "No arrows / no loop",
@@ -1607,9 +1615,9 @@
       "name": "Modal",
       "layer": "ui",
       "category": "Organism",
-      "filePath": "modules/ui/Modal.tsx",
+      "filePath": "modules/ui/Overlays/Modal/index.tsx",
       "abbr": "Md",
-      "description": "Focus-trapped dialog. Closes on Escape and backdrop click. Requires role=\"dialog\" + aria-modal + aria-labelledby; supports sm/md/lg sizes.",
+      "description": "Focus-trapped dialog. Closes on Escape and backdrop click. Requires role=\"dialog\" + aria-modal + aria-labelledby; supports sm/md/lg sizes. Uses the shared Overlays focus-trap, scroll-lock and presence hooks; nested modals are layer-aware so Escape only dismisses the topmost panel.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useEffect, useRef } from 'react';\n\nexport function Modal({ open, onClose, title, description, children, footer, size = 'md', className }) {\n  const panelRef = useRef(null);\n  useEffect(() => { if (!open) return; const prev = document.activeElement; panelRef.current?.focus(); return () => prev?.focus(); }, [open]);\n  useEffect(() => { if (!open) return; const onKey = (e) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', onKey); return () => document.removeEventListener('keydown', onKey); }, [open, onClose]);\n  if (!open) return null;\n  const sizeClass = { sm: 'max-w-sm', md: 'max-w-md', lg: 'max-w-lg' }[size];\n  return (\n    <div className=\"fixed inset-0 z-50 flex items-center justify-center p-4\" aria-modal=\"true\" role=\"dialog\" aria-labelledby=\"modal-title\">\n      <div className=\"absolute inset-0 bg-black/50\" onClick={onClose} aria-hidden=\"true\" />\n      <div ref={panelRef} tabIndex={-1} className={cn('relative z-10 w-full rounded-xl border border-border bg-surface-raised shadow-xl flex flex-col focus-visible:outline-none', sizeClass, className)}>\n        <div className=\"flex items-start justify-between gap-3 px-6 py-4 border-b border-border\">\n          <h2 id=\"modal-title\" className=\"text-base font-semibold text-text-primary\">{title}</h2>\n          <button type=\"button\" onClick={onClose} aria-label=\"Close dialog\" className=\"text-text-disabled hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded\">✕</button>\n        </div>\n        {children && <div className=\"px-6 py-4 flex-1\">{children}</div>}\n        {footer && <div className=\"px-6 py-4 border-t border-border flex justify-end gap-2\">{footer}</div>}\n      </div>\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1627,6 +1635,10 @@
         {
           "title": "Fullscreen",
           "code": "<Modal open={open} onClose={onClose} title=\"Fullscreen Dialog\" fullscreen>...</Modal>"
+        },
+        {
+          "title": "Nested modals (layer-aware Escape)",
+          "code": "// Opens a second modal on top — Escape only dismisses the inner one.\nconst [outer, setOuter] = useState(false);\nconst [inner, setInner] = useState(false);\n<Modal open={outer} onClose={() => setOuter(false)} title=\"Outer\">\n  <Button onClick={() => setInner(true)}>Open Nested</Button>\n</Modal>\n<Modal open={inner} onClose={() => setInner(false)} title=\"Nested\" size=\"sm\">\n  ...\n</Modal>"
         }
       ],
       "status": "stable",
@@ -1648,9 +1660,9 @@
       "name": "Drawer",
       "layer": "ui",
       "category": "Organism",
-      "filePath": "modules/ui/Drawer.tsx",
+      "filePath": "modules/ui/Overlays/Drawer/index.tsx",
       "abbr": "Dr",
-      "description": "Side panel sliding in from the screen edge. Left / right placement with focus management and Escape close.",
+      "description": "Side panel sliding in from the screen edge. Left / right placement with focus management and Escape close. Body scroll is locked while open via the shared Overlays useScrollLock hook (iOS rubber-band safe). Accepts closeOnRouteChange (M6 stub).",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useEffect, useRef } from 'react';\n\nexport function Drawer({ open, onClose, title, side = 'right', children, footer, className }) {\n  // focus trap + Escape key handler\n  return (\n    <div className={cn('fixed inset-0 z-50 flex', !open && 'pointer-events-none')} aria-modal=\"true\" role=\"dialog\" aria-label={title}>\n      <div className={cn('absolute inset-0 bg-black/50 transition-opacity duration-200', open ? 'opacity-100' : 'opacity-0')} onClick={onClose} aria-hidden=\"true\" />\n      <div className={cn('relative flex flex-col w-80 max-w-full h-full bg-surface-raised shadow-xl transition-transform duration-200 focus-visible:outline-none', side === 'right' ? 'ml-auto border-l border-border' : 'mr-auto border-r border-border', open ? 'translate-x-0' : side === 'right' ? 'translate-x-full' : '-translate-x-full', className)}>\n        <div className=\"flex items-center justify-between gap-3 px-4 py-4 border-b border-border shrink-0\">\n          <h2 className=\"text-base font-semibold text-text-primary\">{title}</h2>\n          <button type=\"button\" onClick={onClose} aria-label=\"Close drawer\" className=\"text-text-disabled hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded\">✕</button>\n        </div>\n        <div className=\"flex-1 overflow-y-auto px-4 py-4\">{children}</div>\n        {footer && <div className=\"px-4 py-4 border-t border-border shrink-0 flex justify-end gap-2\">{footer}</div>}\n      </div>\n    </div>\n  );\n}",
       "variants": [
         {
@@ -1660,6 +1672,10 @@
         {
           "title": "Left drawer",
           "code": "<Drawer open={open} onClose={() => setOpen(false)} title=\"Navigation\" side=\"left\">...</Drawer>"
+        },
+        {
+          "title": "Route-aware close (M6 stub)",
+          "code": "// closeOnRouteChange is accepted in M1 and reserved for M6 router-events integration.\n<Drawer\n  open={open}\n  onClose={() => setOpen(false)}\n  title=\"Route-aware drawer\"\n  side=\"right\"\n  closeOnRouteChange\n>\n  ...\n</Drawer>"
         }
       ],
       "status": "stable",
@@ -1741,9 +1757,9 @@
       "name": "Popover",
       "layer": "ui",
       "category": "Organism",
-      "filePath": "modules/ui/Popover.tsx",
+      "filePath": "modules/ui/Overlays/Popover/index.tsx",
       "abbr": "Po",
-      "description": "Anchor-based contextual panel. Closes on outside click and Escape key. Supports top/bottom/left/right placement.",
+      "description": "Anchor-based contextual panel. Closes on outside click (capture-phase pointerdown) and Escape, layered with sibling overlays. Supports top/bottom/left/right placement. Built-in focus trap (focusTrap prop) keeps Tab cycling inside the panel.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useEffect, useRef, useState } from 'react';\n\nexport function Popover({ trigger, children, placement = 'bottom' }) {\n  // manages open state, outside-click + Escape close, focus management\n}",
       "variants": [
         {
@@ -1753,6 +1769,10 @@
         {
           "title": "Placements",
           "code": "<Popover placement=\"top\" trigger={<Button>Top</Button>}><div>...</div></Popover>\n<Popover placement=\"right\" trigger={<Button>Right</Button>}><div>...</div></Popover>"
+        },
+        {
+          "title": "Focus trap inside Popover",
+          "code": "<Popover focusTrap placement=\"bottom\" trigger={<Button>Quick edit</Button>}>\n  <form onSubmit={(e) => e.preventDefault()} className=\"p-4 space-y-3 w-64\">\n    <input type=\"text\" placeholder=\"Title\" />\n    <input type=\"text\" placeholder=\"Tag\" />\n    <Button type=\"submit\">Save</Button>\n  </form>\n</Popover>"
         }
       ],
       "status": "stable",
@@ -2279,6 +2299,29 @@
       ],
       "status": "stable",
       "since": "2025-03",
+      "designTokens": []
+    },
+    {
+      "id": "file-upload-section",
+      "name": "FileUploadSection",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/FileUploadSection/index.tsx",
+      "abbr": "FU",
+      "description": "High-level upload organism: drop zone + file list + remove. M1 implements drag/drop, paste-from-clipboard, accept-pattern + maxSize + maxFiles validation. M2 will add image thumbnails + crop dialog; M3 chunked + resumable uploads. Pixel-identical EJS sibling at modules/app/FileUploadSection/FileUploadSection.ejs.",
+      "source": "'use client';\nimport { FileUploadSection } from '@/modules/app/FileUploadSection';\n\nexport function Demo() {\n  return (\n    <FileUploadSection\n      title=\"Project attachments\"\n      hint=\"Drop files or paste a screenshot\"\n      multiple\n      enablePaste\n      accept=\"image/*,.pdf\"\n      maxFiles={6}\n      maxSizeBytes={5 * 1024 * 1024}\n    />\n  );\n}",
+      "variants": [
+        {
+          "title": "Basic drop zone",
+          "code": "<FileUploadSection title=\"Project attachments\" hint=\"PDF, images up to 5 MB each\"\n  multiple accept=\"image/*,.pdf\" maxSizeBytes={5242880} />"
+        },
+        {
+          "title": "Paste from clipboard",
+          "code": "<FileUploadSection title=\"Bug report screenshots\" multiple enablePaste\n  accept=\"image/*\" maxFiles={5} maxSizeBytes={4 * 1024 * 1024}\n  hint=\"Drop, browse, or paste (Cmd/Ctrl + V while focused)\" />"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-05",
       "designTokens": []
     },
     {

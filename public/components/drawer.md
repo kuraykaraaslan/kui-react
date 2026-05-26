@@ -3,11 +3,11 @@
 - **id:** `drawer`
 - **layer:** ui
 - **category:** Organism
-- **filePath:** `modules/ui/Drawer.tsx`
+- **filePath:** `modules/ui/Overlays/Drawer/index.tsx`
 - **status:** stable
 - **since:** 2025-02
 
-Side panel sliding in from the screen edge. Left / right placement with focus management and Escape close.
+Side panel sliding in from the screen edge. Left / right placement with focus management and Escape close. Body scroll is locked while open via the shared Overlays useScrollLock hook (iOS rubber-band safe). Accepts closeOnRouteChange (M6 stub).
 
 ## Design tokens consumed
 
@@ -35,6 +35,21 @@ const [open, setOpen] = useState(false);
 
 ```tsx
 <Drawer open={open} onClose={() => setOpen(false)} title="Navigation" side="left">...</Drawer>
+```
+
+### Route-aware close (M6 stub)
+
+```tsx
+// closeOnRouteChange is accepted in M1 and reserved for M6 router-events integration.
+<Drawer
+  open={open}
+  onClose={() => setOpen(false)}
+  title="Route-aware drawer"
+  side="right"
+  closeOnRouteChange
+>
+  ...
+</Drawer>
 ```
 
 ## Full source

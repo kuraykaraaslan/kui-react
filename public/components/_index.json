@@ -371,6 +371,12 @@
     "category": "App",
     "file": "filter-bar.md"
   },
+  "file-upload-section": {
+    "name": "FileUploadSection",
+    "layer": "app",
+    "category": "App",
+    "file": "file-upload-section.md"
+  },
   "detail-header": {
     "name": "DetailHeader",
     "layer": "app",

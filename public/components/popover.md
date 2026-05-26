@@ -3,11 +3,11 @@
 - **id:** `popover`
 - **layer:** ui
 - **category:** Organism
-- **filePath:** `modules/ui/Popover.tsx`
+- **filePath:** `modules/ui/Overlays/Popover/index.tsx`
 - **status:** stable
 - **since:** 2025-03
 
-Anchor-based contextual panel. Closes on outside click and Escape key. Supports top/bottom/left/right placement.
+Anchor-based contextual panel. Closes on outside click (capture-phase pointerdown) and Escape, layered with sibling overlays. Supports top/bottom/left/right placement. Built-in focus trap (focusTrap prop) keeps Tab cycling inside the panel.
 
 ## Variants
 
@@ -27,6 +27,18 @@ Anchor-based contextual panel. Closes on outside click and Escape key. Supports 
 ```tsx
 <Popover placement="top" trigger={<Button>Top</Button>}><div>...</div></Popover>
 <Popover placement="right" trigger={<Button>Right</Button>}><div>...</div></Popover>
+```
+
+### Focus trap inside Popover
+
+```tsx
+<Popover focusTrap placement="bottom" trigger={<Button>Quick edit</Button>}>
+  <form onSubmit={(e) => e.preventDefault()} className="p-4 space-y-3 w-64">
+    <input type="text" placeholder="Title" />
+    <input type="text" placeholder="Tag" />
+    <Button type="submit">Save</Button>
+  </form>
+</Popover>
 ```
 
 ## Full source

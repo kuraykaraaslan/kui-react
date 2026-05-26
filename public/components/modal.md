@@ -3,11 +3,11 @@
 - **id:** `modal`
 - **layer:** ui
 - **category:** Organism
-- **filePath:** `modules/ui/Modal.tsx`
+- **filePath:** `modules/ui/Overlays/Modal/index.tsx`
 - **status:** stable
 - **since:** 2025-02
 
-Focus-trapped dialog. Closes on Escape and backdrop click. Requires role="dialog" + aria-modal + aria-labelledby; supports sm/md/lg sizes.
+Focus-trapped dialog. Closes on Escape and backdrop click. Requires role="dialog" + aria-modal + aria-labelledby; supports sm/md/lg sizes. Uses the shared Overlays focus-trap, scroll-lock and presence hooks; nested modals are layer-aware so Escape only dismisses the topmost panel.
 
 ## Used by
 
@@ -57,6 +57,20 @@ const [open, setOpen] = useState(false);
 
 ```tsx
 <Modal open={open} onClose={onClose} title="Fullscreen Dialog" fullscreen>...</Modal>
+```
+
+### Nested modals (layer-aware Escape)
+
+```tsx
+// Opens a second modal on top — Escape only dismisses the inner one.
+const [outer, setOuter] = useState(false);
+const [inner, setInner] = useState(false);
+<Modal open={outer} onClose={() => setOuter(false)} title="Outer">
+  <Button onClick={() => setInner(true)}>Open Nested</Button>
+</Modal>
+<Modal open={inner} onClose={() => setInner(false)} title="Nested" size="sm">
+  ...
+</Modal>
 ```
 
 ## Full source

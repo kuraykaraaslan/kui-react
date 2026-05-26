@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-26T14:13:43.386Z",
+  "generatedAt": "2026-05-26T14:32:48.929Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -608,13 +608,13 @@
       "name": "FileInput",
       "layer": "ui",
       "category": "Molecule",
-      "filePath": "modules/ui/FileInput.tsx",
+      "filePath": "modules/ui/FileInput/index.tsx",
       "abbr": "Fi",
-      "description": "Drag-and-drop file upload with validation, file list, and individual remove actions.",
+      "description": "Drag-and-drop file upload with validation, file list, and individual remove actions. M1 adds paste-from-clipboard, `accept` MIME-pattern + extension validation, and `maxFiles` enforcement with i18n messages. Pixel-identical EJS sibling at modules/ui/FileInput/FileInput.ejs.",
       "status": "stable",
       "since": "2025-02",
       "designTokens": [],
-      "variantCount": 4
+      "variantCount": 5
     },
     {
       "id": "color-picker",
@@ -718,13 +718,13 @@
       "name": "Slider",
       "layer": "ui",
       "category": "Molecule",
-      "filePath": "modules/ui/Slider.tsx",
+      "filePath": "modules/ui/Slider/index.tsx",
       "abbr": "Sl",
       "description": "Accessible carousel. Includes role=\"region\" + aria-roledescription=\"carousel\" and per-slide aria labels. Supports autoplay, arrow keys, and dot navigation.",
       "status": "stable",
       "since": "2025-03",
       "designTokens": [],
-      "variantCount": 3
+      "variantCount": 4
     },
     {
       "id": "stat-card",
@@ -911,9 +911,9 @@
       "name": "Modal",
       "layer": "ui",
       "category": "Organism",
-      "filePath": "modules/ui/Modal.tsx",
+      "filePath": "modules/ui/Overlays/Modal/index.tsx",
       "abbr": "Md",
-      "description": "Focus-trapped dialog. Closes on Escape and backdrop click. Requires role=\"dialog\" + aria-modal + aria-labelledby; supports sm/md/lg sizes.",
+      "description": "Focus-trapped dialog. Closes on Escape and backdrop click. Requires role=\"dialog\" + aria-modal + aria-labelledby; supports sm/md/lg sizes. Uses the shared Overlays focus-trap, scroll-lock and presence hooks; nested modals are layer-aware so Escape only dismisses the topmost panel.",
       "status": "stable",
       "since": "2025-02",
       "designTokens": [
@@ -927,16 +927,16 @@
       "usedBy": [
         "rich-text-editor"
       ],
-      "variantCount": 4
+      "variantCount": 5
     },
     {
       "id": "drawer",
       "name": "Drawer",
       "layer": "ui",
       "category": "Organism",
-      "filePath": "modules/ui/Drawer.tsx",
+      "filePath": "modules/ui/Overlays/Drawer/index.tsx",
       "abbr": "Dr",
-      "description": "Side panel sliding in from the screen edge. Left / right placement with focus management and Escape close.",
+      "description": "Side panel sliding in from the screen edge. Left / right placement with focus management and Escape close. Body scroll is locked while open via the shared Overlays useScrollLock hook (iOS rubber-band safe). Accepts closeOnRouteChange (M6 stub).",
       "status": "stable",
       "since": "2025-02",
       "designTokens": [
@@ -947,7 +947,7 @@
         "--text-disabled",
         "--text-primary"
       ],
-      "variantCount": 2
+      "variantCount": 3
     },
     {
       "id": "tooltip",
@@ -993,13 +993,13 @@
       "name": "Popover",
       "layer": "ui",
       "category": "Organism",
-      "filePath": "modules/ui/Popover.tsx",
+      "filePath": "modules/ui/Overlays/Popover/index.tsx",
       "abbr": "Po",
-      "description": "Anchor-based contextual panel. Closes on outside click and Escape key. Supports top/bottom/left/right placement.",
+      "description": "Anchor-based contextual panel. Closes on outside click (capture-phase pointerdown) and Escape, layered with sibling overlays. Supports top/bottom/left/right placement. Built-in focus trap (focusTrap prop) keeps Tab cycling inside the panel.",
       "status": "stable",
       "since": "2025-03",
       "designTokens": [],
-      "variantCount": 2
+      "variantCount": 3
     },
     {
       "id": "table",
@@ -1310,6 +1310,19 @@
       "description": "Select, multiselect, daterange and text-based filter panel. Supports URL-based filtering via GET form submit.",
       "status": "stable",
       "since": "2025-03",
+      "designTokens": [],
+      "variantCount": 2
+    },
+    {
+      "id": "file-upload-section",
+      "name": "FileUploadSection",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/FileUploadSection/index.tsx",
+      "abbr": "FU",
+      "description": "High-level upload organism: drop zone + file list + remove. M1 implements drag/drop, paste-from-clipboard, accept-pattern + maxSize + maxFiles validation. M2 will add image thumbnails + crop dialog; M3 chunked + resumable uploads. Pixel-identical EJS sibling at modules/app/FileUploadSection/FileUploadSection.ejs.",
+      "status": "stable",
+      "since": "2026-05",
       "designTokens": [],
       "variantCount": 2
     },

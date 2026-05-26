@@ -3,7 +3,7 @@
 - **id:** `slider`
 - **layer:** ui
 - **category:** Molecule
-- **filePath:** `modules/ui/Slider.tsx`
+- **filePath:** `modules/ui/Slider/index.tsx`
 - **status:** stable
 - **since:** 2025-03
 
@@ -29,6 +29,19 @@ Accessible carousel. Includes role="region" + aria-roledescription="carousel" an
 <Slider slides={slides} autoPlay autoPlayInterval={2000} />
 ```
 
+### Touch swipe + momentum
+
+```tsx
+<Slider
+  slides={slides}
+  loop={false}
+  dragThreshold={50}
+  // Drag past 50 px = 1 slide.
+  // Flick > 0.5 px/ms = +1 extra slide per 0.5 px/ms of release velocity.
+  // Edge resistance (×0.4) keeps you on the rails when loop is off.
+/>
+```
+
 ### No arrows / no loop
 
 ```tsx
@@ -39,34 +52,42 @@ Accessible carousel. Includes role="region" + aria-roledescription="carousel" an
 
 ```tsx
 'use client';
+import { useCallback, useState } from 'react';
 import { cn } from '@/libs/utils/cn';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { Track } from './parts/Track';
+import { Slide } from './parts/Slide';
+import { Arrows } from './parts/Arrows';
+import { Dots } from './parts/Dots';
+import { useDrag } from './hooks/useDrag';
+import { useAutoPlay } from './hooks/useAutoPlay';
 
-export function Slider({ slides, autoPlay = false, autoPlayInterval = 4000, showDots = true, showArrows = true, loop = true, className, slideClassName }) {
+// M1 — PointerEvent drag (touch+mouse+pen) with dragThreshold (50 px default),
+// velocity momentum (0.5 px/ms = +1 slide), and edge resistance (×0.4) when
+// loop is disabled. See modules/ui/Slider/hooks/useDrag.ts for the math.
+export function Slider({ slides, autoPlay = false, autoPlayInterval = 4000, showDots = true, showArrows = true, loop = true, dragThreshold = 50, className, slideClassName, ariaLabel = 'Content slider' }) {
   const [current, setCurrent] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const total = slides.length;
-  const goTo = useCallback((index) => setCurrent(loop ? ((index + total) % total) : Math.max(0, Math.min(index, total - 1))), [loop, total]);
-  const prev = () => goTo(current - 1);
-  const next = () => goTo(current + 1);
-  useEffect(() => {
-    if (!autoPlay || total <= 1) return;
-    const t = setInterval(() => setCurrent((c) => (c + 1) % total), autoPlayInterval);
-    return () => clearInterval(t);
-  }, [autoPlay, autoPlayInterval, total]);
+  const goTo = useCallback((index) => {
+    if (isTransitioning) return;
+    const target = loop ? ((index % total) + total) % total : Math.max(0, Math.min(index, total - 1));
+    if (target === current) return;
+    setIsTransitioning(true);
+    setCurrent(target);
+    setTimeout(() => setIsTransitioning(false), 350);
+  }, [current, isTransitioning, loop, total]);
+  const { dragState, handlers } = useDrag({ current, total, loop, dragThreshold, goTo });
+  useAutoPlay({ enabled: autoPlay, interval: autoPlayInterval, total, onTick: useCallback(() => { if (dragState.isDragging) return; setCurrent((c) => (c + 1) % total); }, [dragState.isDragging, total]) });
+  if (total === 0) return null;
+  const canPrev = loop || current > 0;
+  const canNext = loop || current < total - 1;
   return (
-    <div className={cn('relative overflow-hidden rounded-xl', className)} role="region" aria-label="Content slider" aria-roledescription="carousel">
-      <div className="flex transition-transform duration-350 ease-in-out" style={{ transform: `translateX(-${current * 100}%)` }}>
-        {slides.map((slide, i) => (
-          <div key={i} role="group" aria-roledescription="slide" aria-label={`Slide ${i + 1} of ${total}`} aria-hidden={i !== current} className={cn('w-full shrink-0', slideClassName)}>{slide}</div>
-        ))}
-      </div>
-      {showArrows && (loop || current > 0) && <button onClick={prev} aria-label="Previous slide" className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center">‹</button>}
-      {showArrows && (loop || current < total - 1) && <button onClick={next} aria-label="Next slide" className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center">›</button>}
-      {showDots && total > 1 && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10" role="tablist" aria-label="Slide indicators">
-          {slides.map((_, i) => <button key={i} role="tab" aria-selected={i === current} aria-label={`Go to slide ${i + 1}`} onClick={() => goTo(i)} className={cn('h-2 rounded-full transition-all', i === current ? 'w-5 bg-white' : 'w-2 bg-white/40')} />)}
-        </div>
-      )}
+    <div className={cn('relative overflow-hidden rounded-xl', className)} role="region" aria-label={ariaLabel} aria-roledescription="carousel">
+      <Track current={current} isDragging={dragState.isDragging} offsetPx={dragState.offsetPx} pointerHandlers={handlers}>
+        {slides.map((slide, i) => (<Slide key={i} index={i} total={total} isActive={i === current} className={slideClassName}>{slide}</Slide>))}
+      </Track>
+      {showArrows && total > 1 && <Arrows canPrev={canPrev} canNext={canNext} onPrev={() => goTo(current - 1)} onNext={() => goTo(current + 1)} />}
+      {showDots && total > 1 && <Dots total={total} current={current} onSelect={goTo} />}
     </div>
   );
 }
