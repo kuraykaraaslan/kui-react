@@ -26,6 +26,25 @@ function SliderAutoPlayDemo() {
   return <Slider slides={slides} autoPlay autoPlayInterval={2000} />;
 }
 
+function SliderSwipeDemo() {
+  // M1 — touch/mouse/pen swipe with velocity momentum.
+  //
+  // A drag past `dragThreshold` (default 50 px) advances exactly one slide,
+  // but a *fast flick* (release velocity > 0.5 px/ms) carries through extra
+  // slides — every additional 0.5 px/ms of velocity adds one more slide
+  // of travel in the flick direction.
+  //
+  // When `loop={false}` and the gesture pulls past the first/last slide the
+  // track rubber-bands (×0.4 dampening) but never escapes its bounds.
+  const slides = [
+    <div key="a" className="h-40 bg-gradient-to-br from-primary to-secondary flex items-center justify-center rounded-xl"><span className="text-lg font-semibold text-white">Swipe me</span></div>,
+    <div key="b" className="h-40 bg-gradient-to-br from-success to-info flex items-center justify-center rounded-xl"><span className="text-lg font-semibold text-white">Flick fast</span></div>,
+    <div key="c" className="h-40 bg-gradient-to-br from-warning to-error flex items-center justify-center rounded-xl"><span className="text-lg font-semibold text-white">Multi-skip</span></div>,
+    <div key="d" className="h-40 bg-gradient-to-br from-info to-primary flex items-center justify-center rounded-xl"><span className="text-lg font-semibold text-white">Edge bounce</span></div>,
+  ];
+  return <Slider slides={slides} loop={false} dragThreshold={50} />;
+}
+
 export function buildContainerData(): ShowcaseComponent[] {
   return [
     {
@@ -274,8 +293,8 @@ export function PageHeader({ title, subtitle, badge, actions, className }) {
       category: 'Molecule',
       abbr: 'Sl',
       description: 'Accessible carousel. Includes role="region" + aria-roledescription="carousel" and per-slide aria labels. Supports autoplay, arrow keys, and dot navigation.',
-      filePath: 'modules/ui/Slider.tsx',
-      sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState, useEffect, useCallback, useRef } from 'react';\n\nexport function Slider({ slides, autoPlay = false, autoPlayInterval = 4000, showDots = true, showArrows = true, loop = true, className, slideClassName }) {\n  const [current, setCurrent] = useState(0);\n  const total = slides.length;\n  const goTo = useCallback((index) => setCurrent(loop ? ((index + total) % total) : Math.max(0, Math.min(index, total - 1))), [loop, total]);\n  const prev = () => goTo(current - 1);\n  const next = () => goTo(current + 1);\n  useEffect(() => {\n    if (!autoPlay || total <= 1) return;\n    const t = setInterval(() => setCurrent((c) => (c + 1) % total), autoPlayInterval);\n    return () => clearInterval(t);\n  }, [autoPlay, autoPlayInterval, total]);\n  return (\n    <div className={cn('relative overflow-hidden rounded-xl', className)} role="region" aria-label="Content slider" aria-roledescription="carousel">\n      <div className="flex transition-transform duration-350 ease-in-out" style={{ transform: \`translateX(-\${current * 100}%)\` }}>\n        {slides.map((slide, i) => (\n          <div key={i} role="group" aria-roledescription="slide" aria-label={\`Slide \${i + 1} of \${total}\`} aria-hidden={i !== current} className={cn('w-full shrink-0', slideClassName)}>{slide}</div>\n        ))}\n      </div>\n      {showArrows && (loop || current > 0) && <button onClick={prev} aria-label="Previous slide" className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center">‹</button>}\n      {showArrows && (loop || current < total - 1) && <button onClick={next} aria-label="Next slide" className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center">›</button>}\n      {showDots && total > 1 && (\n        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10" role="tablist" aria-label="Slide indicators">\n          {slides.map((_, i) => <button key={i} role="tab" aria-selected={i === current} aria-label={\`Go to slide \${i + 1}\`} onClick={() => goTo(i)} className={cn('h-2 rounded-full transition-all', i === current ? 'w-5 bg-white' : 'w-2 bg-white/40')} />)}\n        </div>\n      )}\n    </div>\n  );\n}`,
+      filePath: 'modules/ui/Slider/index.tsx',
+      sourceCode: `'use client';\nimport { useCallback, useState } from 'react';\nimport { cn } from '@/libs/utils/cn';\nimport { Track } from './parts/Track';\nimport { Slide } from './parts/Slide';\nimport { Arrows } from './parts/Arrows';\nimport { Dots } from './parts/Dots';\nimport { useDrag } from './hooks/useDrag';\nimport { useAutoPlay } from './hooks/useAutoPlay';\n\n// M1 — PointerEvent drag (touch+mouse+pen) with dragThreshold (50 px default),\n// velocity momentum (0.5 px/ms = +1 slide), and edge resistance (×0.4) when\n// loop is disabled. See modules/ui/Slider/hooks/useDrag.ts for the math.\nexport function Slider({ slides, autoPlay = false, autoPlayInterval = 4000, showDots = true, showArrows = true, loop = true, dragThreshold = 50, className, slideClassName, ariaLabel = 'Content slider' }) {\n  const [current, setCurrent] = useState(0);\n  const [isTransitioning, setIsTransitioning] = useState(false);\n  const total = slides.length;\n  const goTo = useCallback((index) => {\n    if (isTransitioning) return;\n    const target = loop ? ((index % total) + total) % total : Math.max(0, Math.min(index, total - 1));\n    if (target === current) return;\n    setIsTransitioning(true);\n    setCurrent(target);\n    setTimeout(() => setIsTransitioning(false), 350);\n  }, [current, isTransitioning, loop, total]);\n  const { dragState, handlers } = useDrag({ current, total, loop, dragThreshold, goTo });\n  useAutoPlay({ enabled: autoPlay, interval: autoPlayInterval, total, onTick: useCallback(() => { if (dragState.isDragging) return; setCurrent((c) => (c + 1) % total); }, [dragState.isDragging, total]) });\n  if (total === 0) return null;\n  const canPrev = loop || current > 0;\n  const canNext = loop || current < total - 1;\n  return (\n    <div className={cn('relative overflow-hidden rounded-xl', className)} role="region" aria-label={ariaLabel} aria-roledescription="carousel">\n      <Track current={current} isDragging={dragState.isDragging} offsetPx={dragState.offsetPx} pointerHandlers={handlers}>\n        {slides.map((slide, i) => (<Slide key={i} index={i} total={total} isActive={i === current} className={slideClassName}>{slide}</Slide>))}\n      </Track>\n      {showArrows && total > 1 && <Arrows canPrev={canPrev} canNext={canNext} onPrev={() => goTo(current - 1)} onNext={() => goTo(current + 1)} />}\n      {showDots && total > 1 && <Dots total={total} current={current} onSelect={goTo} />}\n    </div>\n  );\n}`,
       variants: [
         {
           title: 'Default',
@@ -296,6 +315,21 @@ export function PageHeader({ title, subtitle, badge, actions, className }) {
             </div>
           ),
           code: `<Slider slides={slides} autoPlay autoPlayInterval={2000} />`,
+        },
+        {
+          title: 'Touch swipe + momentum',
+          layout: 'stack' as const,
+          preview: (
+            <div className="w-full max-w-md">
+              <SliderSwipeDemo />
+            </div>
+          ),
+          // M1 — momentum: a release velocity > 0.5 px/ms advances *more*
+          // than one slide. Every additional 0.5 px/ms of velocity = +1
+          // extra slide of travel. Below the dragThreshold the gesture
+          // snaps back, and (because loop=false here) the track also
+          // rubber-bands at the first and last slide with ×0.4 resistance.
+          code: `<Slider\n  slides={slides}\n  loop={false}\n  dragThreshold={50}\n  // Drag past 50 px = 1 slide.\n  // Flick > 0.5 px/ms = +1 extra slide per 0.5 px/ms of release velocity.\n  // Edge resistance (×0.4) keeps you on the rails when loop is off.\n/>`,
         },
         {
           title: 'No arrows / no loop',
