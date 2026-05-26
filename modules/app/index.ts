@@ -64,6 +64,14 @@ export { SplashScreen } from './SplashScreen';
 
 // Cross-cutting providers / utilities
 export { NotificationProvider, notify, toast } from './NotificationSystem';
+export { NotificationCenter, Bell } from './NotificationCenter';
+export type {
+  Notification,
+  NotificationVariant,
+  NotificationCenterProps,
+  NotificationCenterMessages,
+  BellProps,
+} from './NotificationCenter';
 export {
   Announcer,
   LiveRegion,
