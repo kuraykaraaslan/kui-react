@@ -24,7 +24,7 @@ export function buildImageGalleryData(): ShowcaseComponent[] {
       abbr: 'IG',
       description:
         'Responsive image grid with a full-screen lightbox, right-click context menu (open, copy URL, move to first/last, remove), and drag-to-reorder. Supports 2–4 columns, square / video / portrait / auto aspect ratios, optional captions, zoom toggle, thumbnail strip, and full keyboard navigation (← → Escape).',
-      filePath: 'modules/app/ImageGallery.tsx',
+      filePath: 'modules/app/ImageGallery/index.tsx',
       sourceCode: `'use client';
 import { ImageGallery } from '@/modules/app/ImageGallery';
 

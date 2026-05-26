@@ -3,7 +3,7 @@
 - **id:** `image-gallery`
 - **layer:** app
 - **category:** Organism
-- **filePath:** `modules/app/ImageGallery.tsx`
+- **filePath:** `modules/app/ImageGallery/index.tsx`
 - **status:** stable
 - **since:** 2026-05
 
