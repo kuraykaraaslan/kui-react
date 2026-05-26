@@ -3,7 +3,7 @@
 - **id:** `advanced-data-table`
 - **layer:** ui
 - **category:** Organism
-- **filePath:** `modules/ui/AdvancedDataTable.tsx`
+- **filePath:** `modules/ui/Table/index.tsx`
 - **status:** beta
 - **since:** 2025-03
 

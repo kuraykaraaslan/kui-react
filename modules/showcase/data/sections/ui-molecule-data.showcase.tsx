@@ -6,8 +6,84 @@ import { Table } from '@/modules/ui/Table';
 import { DataTable } from '@/modules/ui/DataTable';
 import { ContentScoreBar, type ScoreRule } from '@/modules/ui/ContentScoreBar';
 import { AdvancedDataTable } from '@/modules/ui/AdvancedDataTable';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
+import type {
+  DataTableFetchArgs,
+  DataTableFetchResult,
+} from '@/modules/ui/Table';
+
+type ServerUser = { id: string; name: string; email: string; team: string; joined: string; [key: string]: unknown };
+
+const SERVER_USERS: ServerUser[] = Array.from({ length: 32 }, (_, i) => ({
+  id:     `u-${i + 1}`,
+  name:   ['Alice', 'Bob', 'Carol', 'Dave', 'Eve', 'Frank', 'Grace', 'Hank'][i % 8] + ` #${i + 1}`,
+  email:  `user${i + 1}@example.com`,
+  team:   ['Platform', 'Growth', 'Ops', 'Design'][i % 4],
+  joined: `2024-${String((i % 12) + 1).padStart(2, '0')}-15`,
+}));
+
+function ServerModeDemo() {
+  const fetchPage = useCallback(
+    (args: DataTableFetchArgs): Promise<DataTableFetchResult<ServerUser>> => {
+      return new Promise((resolve) => {
+        // Simulate latency.
+        setTimeout(() => {
+          let filtered = SERVER_USERS;
+          const q = args.search.trim().toLowerCase();
+          if (q) {
+            filtered = filtered.filter((u) =>
+              [u.name, u.email, u.team, u.joined]
+                .some((v) => v.toLowerCase().includes(q)),
+            );
+          }
+          if (args.sort.length) {
+            const sorted = [...filtered].sort((a, b) => {
+              for (const s of args.sort) {
+                const av = String(a[s.key as keyof ServerUser] ?? '');
+                const bv = String(b[s.key as keyof ServerUser] ?? '');
+                const cmp = av.localeCompare(bv, undefined, { numeric: true });
+                if (cmp !== 0) return s.dir === 'asc' ? cmp : -cmp;
+              }
+              return 0;
+            });
+            filtered = sorted;
+          }
+          const total = filtered.length;
+          const start = (args.page - 1) * args.pageSize;
+          resolve({
+            rows: filtered.slice(start, start + args.pageSize),
+            total,
+          });
+        }, 200);
+      });
+    },
+    [],
+  );
+
+  return (
+    <div className="w-full">
+      <DataTable<ServerUser>
+        mode="server"
+        fetchPage={fetchPage}
+        caption="Server-paged users"
+        pageSize={5}
+        searchPlaceholder="Search users…"
+        columns={[
+          { key: 'name',   header: 'Name',   sortable: true },
+          { key: 'email',  header: 'Email',  sortable: true, filter: { kind: 'text', placeholder: 'Contains…' } },
+          { key: 'team',   header: 'Team',   sortable: true, filter: { kind: 'select', options: [
+            { label: 'Platform', value: 'platform' },
+            { label: 'Growth',   value: 'growth' },
+            { label: 'Ops',      value: 'ops' },
+            { label: 'Design',   value: 'design' },
+          ] } },
+          { key: 'joined', header: 'Joined', sortable: true },
+        ]}
+      />
+    </div>
+  );
+}
 
 function AdvancedTableDemo() {
   const rows = [
@@ -41,7 +117,7 @@ export function buildDataData(): ShowcaseComponent[] {
       category: 'Organism',
       abbr: 'Tb',
       description: 'Responsive table. scope="col" headers, hover row highlight, empty-state message, and custom cell render support.',
-      filePath: 'modules/ui/Table.tsx',
+      filePath: 'modules/ui/Table/Table.tsx',
       sourceCode: `import { cn } from '@/libs/utils/cn';
 
 export function Table({ columns, rows, caption, emptyMessage = 'No results found.', className }) {
@@ -125,8 +201,8 @@ export function Table({ columns, rows, caption, emptyMessage = 'No results found
       title: 'DataTable',
       category: 'Organism',
       abbr: 'Dt',
-      description: 'Table + SearchBar + Pagination in a single component. Client-side search and pagination with filtered result counter and rows-per-page selector.',
-      filePath: 'modules/ui/DataTable.tsx',
+      description: 'Unified table with `mode="static" | "paginated" | "server"`. Multi-column sort (Shift+click), global search, per-column filter (text + select), pagination, and unified loading/empty/error state.',
+      filePath: 'modules/ui/Table/DataTable.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
 import { useMemo, useState } from 'react';
@@ -231,6 +307,12 @@ export function DataTable({ columns, rows, caption, searchable = true, searchPla
           })(),
           code: `<DataTable\n  rows={products}\n  columns={[\n    { key: 'name',  header: 'Product',  sortable: true },\n    { key: 'price', header: 'Price',    sortable: true, align: 'right' },\n  ]}\n/>`,
         },
+        {
+          title: 'Server mode (mode="server")',
+          layout: 'stack' as const,
+          preview: <ServerModeDemo />,
+          code: `// Unified server-side data flow — the component owns sort/filter/pagination state\n// and calls \`fetchPage\` whenever it changes.\n<DataTable<User>\n  mode="server"\n  fetchPage={async ({ page, pageSize, sort, search, filters }) => {\n    const res = await fetch(buildUrl({ page, pageSize, sort, search, filters }));\n    const { rows, total } = await res.json();\n    return { rows, total };\n  }}\n  pageSize={5}\n  searchPlaceholder="Search users…"\n  columns={[\n    { key: 'name',  header: 'Name',  sortable: true },\n    { key: 'email', header: 'Email', sortable: true, filter: { kind: 'text' } },\n    { key: 'team',  header: 'Team',  sortable: true, filter: { kind: 'select', options: [\n      { label: 'Platform', value: 'platform' },\n      { label: 'Growth',   value: 'growth' },\n    ] } },\n  ]}\n/>`,
+        },
       ],
     },
     {
@@ -239,7 +321,7 @@ export function DataTable({ columns, rows, caption, searchable = true, searchPla
       category: 'Organism',
       abbr: 'At',
       description: 'Enhanced table with row selection (with indeterminate header), expandable rows, and optional sticky header.',
-      filePath: 'modules/ui/AdvancedDataTable.tsx',
+      filePath: 'modules/ui/Table/index.tsx',
       sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\n\nexport function AdvancedDataTable({ columns, rows, selectable, stickyHeader, onSelectionChange }) {\n  // row selection with indeterminate header, expandable rows, sticky header\n}`,
       variants: [
         {

@@ -3,11 +3,11 @@
 - **id:** `data-table`
 - **layer:** ui
 - **category:** Organism
-- **filePath:** `modules/ui/DataTable.tsx`
+- **filePath:** `modules/ui/Table/DataTable.tsx`
 - **status:** stable
 - **since:** 2025-03
 
-Table + SearchBar + Pagination in a single component. Client-side search and pagination with filtered result counter and rows-per-page selector.
+Unified table with `mode="static" | "paginated" | "server"`. Multi-column sort (Shift+click), global search, per-column filter (text + select), pagination, and unified loading/empty/error state.
 
 ## Design tokens consumed
 
@@ -44,6 +44,31 @@ Table + SearchBar + Pagination in a single component. Client-side search and pag
   columns={[
     { key: 'name',  header: 'Product',  sortable: true },
     { key: 'price', header: 'Price',    sortable: true, align: 'right' },
+  ]}
+/>
+```
+
+### Server mode (mode="server")
+
+```tsx
+// Unified server-side data flow — the component owns sort/filter/pagination state
+// and calls `fetchPage` whenever it changes.
+<DataTable<User>
+  mode="server"
+  fetchPage={async ({ page, pageSize, sort, search, filters }) => {
+    const res = await fetch(buildUrl({ page, pageSize, sort, search, filters }));
+    const { rows, total } = await res.json();
+    return { rows, total };
+  }}
+  pageSize={5}
+  searchPlaceholder="Search users…"
+  columns={[
+    { key: 'name',  header: 'Name',  sortable: true },
+    { key: 'email', header: 'Email', sortable: true, filter: { kind: 'text' } },
+    { key: 'team',  header: 'Team',  sortable: true, filter: { kind: 'select', options: [
+      { label: 'Platform', value: 'platform' },
+      { label: 'Growth',   value: 'growth' },
+    ] } },
   ]}
 />
 ```

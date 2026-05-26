@@ -3,7 +3,7 @@
 - **id:** `table`
 - **layer:** ui
 - **category:** Organism
-- **filePath:** `modules/ui/Table.tsx`
+- **filePath:** `modules/ui/Table/Table.tsx`
 - **status:** stable
 - **since:** 2025-02
 
