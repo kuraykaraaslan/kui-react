@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-26T12:57:48.555Z",
+  "generatedAt": "2026-05-26T13:31:17.810Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -582,37 +582,26 @@
       "name": "DatePicker",
       "layer": "ui",
       "category": "Molecule",
-      "filePath": "modules/ui/DatePicker.tsx",
+      "filePath": "modules/ui/DatePicker/index.tsx",
       "abbr": "Dp",
-      "description": "Native date input with label + hint + error anatomy. Supports min/max constraints and a disabled state.",
+      "description": "Popover-based date picker with a locale-aware calendar grid (TR / EN), quick month / year jump from the header, min / max / disabledDates support, and full keyboard navigation (Arrow / PageUp/Down / Shift+Page / Home / End / Enter / Esc). Pixel-identical EJS sibling at modules/ui/DatePicker/DatePicker.ejs.",
       "status": "stable",
       "since": "2025-02",
-      "designTokens": [
-        "--border",
-        "--border-focus",
-        "--error",
-        "--error-subtle",
-        "--primary",
-        "--secondary",
-        "--surface-base",
-        "--surface-sunken",
-        "--text-primary",
-        "--text-secondary"
-      ],
-      "variantCount": 3
+      "designTokens": [],
+      "variantCount": 4
     },
     {
       "id": "date-range-picker",
       "name": "DateRangePicker",
       "layer": "ui",
       "category": "Molecule",
-      "filePath": "modules/ui/DateRangePicker.tsx",
+      "filePath": "modules/ui/DatePicker/index.tsx",
       "abbr": "Dr",
-      "description": "fieldset-based dual native date inputs. Start/end auto-constrain each other (min/max) with accessible sr-only labels.",
+      "description": "Two-month popover for picking a start → end date range. Shares the same Calendar core as DatePicker; locale-aware, fully keyboard navigable, with min/max/disabledDates. Pixel-identical EJS sibling at modules/ui/DatePicker/DateRangePicker.ejs.",
       "status": "stable",
       "since": "2025-03",
       "designTokens": [],
-      "variantCount": 2
+      "variantCount": 3
     },
     {
       "id": "file-input",
@@ -1017,7 +1006,7 @@
       "name": "Table",
       "layer": "ui",
       "category": "Organism",
-      "filePath": "modules/ui/Table.tsx",
+      "filePath": "modules/ui/Table/Table.tsx",
       "abbr": "Tb",
       "description": "Responsive table. scope=\"col\" headers, hover row highlight, empty-state message, and custom cell render support.",
       "status": "stable",
@@ -1039,9 +1028,9 @@
       "name": "DataTable",
       "layer": "ui",
       "category": "Organism",
-      "filePath": "modules/ui/DataTable.tsx",
+      "filePath": "modules/ui/Table/DataTable.tsx",
       "abbr": "Dt",
-      "description": "Table + SearchBar + Pagination in a single component. Client-side search and pagination with filtered result counter and rows-per-page selector.",
+      "description": "Unified table with `mode=\"static\" | \"paginated\" | \"server\"`. Multi-column sort (Shift+click), global search, per-column filter (text + select), pagination, and unified loading/empty/error state.",
       "status": "stable",
       "since": "2025-03",
       "designTokens": [
@@ -1050,14 +1039,14 @@
         "--surface-base",
         "--text-secondary"
       ],
-      "variantCount": 2
+      "variantCount": 3
     },
     {
       "id": "advanced-data-table",
       "name": "AdvancedDataTable",
       "layer": "ui",
       "category": "Organism",
-      "filePath": "modules/ui/AdvancedDataTable.tsx",
+      "filePath": "modules/ui/Table/index.tsx",
       "abbr": "At",
       "description": "Enhanced table with row selection (with indeterminate header), expandable rows, and optional sticky header.",
       "status": "beta",
@@ -2490,7 +2479,7 @@
       "name": "MapView",
       "layer": "ui",
       "category": "Molecule",
-      "filePath": "modules/ui/MapView.tsx",
+      "filePath": "modules/ui/MapView/index.tsx",
       "abbr": "Mp",
       "description": "Leaflet-based interactive map. Tooltip-enabled markers, predefined zones (polygon), route lines (polyline), and click-to-add marker mode.",
       "status": "beta",
