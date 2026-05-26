@@ -11,6 +11,7 @@ User profile photo or initials indicator. 5 sizes with optional status dot. When
 
 ## Used by
 
+- `kanban-board`
 - `reviews-review-card`
 
 ## Design tokens consumed

@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-26T17:21:16.914Z",
+  "generatedAt": "2026-05-26T17:40:07.087Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -208,6 +208,7 @@
         "--warning-subtle"
       ],
       "usedBy": [
+        "kanban-board",
         "reviews-review-card"
       ],
       "variantCount": 9
@@ -228,6 +229,7 @@
         "--primary-subtle"
       ],
       "usedBy": [
+        "kanban-board",
         "reviews-review-card"
       ],
       "variantCount": 5
@@ -664,6 +666,50 @@
         "--text-disabled",
         "--border",
         "--border-focus"
+      ],
+      "variantCount": 4
+    },
+    {
+      "id": "diff-viewer",
+      "name": "DiffViewer",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/DiffViewer/index.tsx",
+      "abbr": "Dv",
+      "description": "Line-based text diff viewer with unified (GitHub-style) and split (yan yana) modes. M1 ships a zero-dep LCS algorithm, hunk headers in `@@ -old,n +new,n @@` form, old/new line-number gutters, configurable context window, and optional collapsible unchanged regions. Pixel-identical EJS sibling at modules/ui/DiffViewer/DiffViewer.ejs.",
+      "status": "stable",
+      "since": "2026-05",
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "region",
+          "separator"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Tab",
+            "action": "Move focus into the diff region"
+          },
+          {
+            "keys": "Enter",
+            "action": "Expand a collapsed unchanged run (when collapsible=true)"
+          }
+        ],
+        "notes": "TODO M5: J/K next/prev change, N/P next/prev file, full roving tabindex + screen-reader line announcements."
+      },
+      "designTokens": [
+        "--surface-base",
+        "--surface-overlay",
+        "--surface-sunken",
+        "--text-primary",
+        "--text-secondary",
+        "--text-disabled",
+        "--border",
+        "--border-focus",
+        "--success",
+        "--success-subtle",
+        "--error",
+        "--error-subtle"
       ],
       "variantCount": 4
     },
@@ -1615,6 +1661,117 @@
         "quill"
       ],
       "variantCount": 8
+    },
+    {
+      "id": "kanban-board",
+      "name": "KanbanBoard",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/KanbanBoard/index.tsx",
+      "abbr": "KB",
+      "description": "Trello / Linear-style kanban board. M1 ships HTML5-native drag and drop between columns with an inline drop-position indicator (thin line between cards) and full optimistic-UI rewind on rejected onCardMove. Use the canMove hook to gate transitions client-side, or throw from onCardMove to revert. Future milestones: column reorder + collapse + WIP limits (M2), swimlanes + filters + search (M3), inline edit + bulk select + card detail panel (M4), keyboard nav + ARIA announcements (M5), virtualization + auto-archive + dependencies (M6). Pixel-identical EJS sibling at modules/app/KanbanBoard/KanbanBoard.ejs.",
+      "status": "beta",
+      "since": "2026-05",
+      "composes": [
+        "badge",
+        "avatar"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "region",
+          "list",
+          "listitem",
+          "application"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Tab",
+            "action": "Move focus across cards / columns"
+          },
+          {
+            "keys": "Drag (mouse)",
+            "action": "Pick up a card and drop on any column slot"
+          }
+        ],
+        "notes": "M1 uses HTML5 drag-and-drop; each column is role=\"region\" with aria-label, the list is role=\"list\", cards are role=\"listitem\". aria-grabbed (deprecated but still announced by some screen readers) flips on the active card; aria-dropeffect=\"move\" is set on all columns while a drag is in flight. Full keyboard parity ships in M5."
+      },
+      "designTokens": [
+        "--surface-base",
+        "--surface-raised",
+        "--surface-overlay",
+        "--text-primary",
+        "--text-secondary",
+        "--text-disabled",
+        "--border",
+        "--border-strong",
+        "--border-focus",
+        "--primary",
+        "--primary-subtle",
+        "--info-subtle",
+        "--warning-subtle",
+        "--error-subtle",
+        "--success-subtle"
+      ],
+      "variantCount": 3
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/Calendar/index.tsx",
+      "abbr": "Cl",
+      "description": "Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, and TR/EN locales. Agenda + resource view, drag-create/move/resize, RRULE recurrence, multi-calendar overlay and full a11y/i18n/perf polish land in M2-M6.",
+      "status": "beta",
+      "since": "2026-05",
+      "composes": [],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "Grid (month)",
+          "Tablist (view switcher)",
+          "Region (week/day)"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Page Up",
+            "action": "Previous period (month / week / day)"
+          },
+          {
+            "keys": "Page Down",
+            "action": "Next period (month / week / day)"
+          },
+          {
+            "keys": "T",
+            "action": "Jump to today"
+          },
+          {
+            "keys": "Tab",
+            "action": "Focus the next interactive element (events, nav buttons)"
+          }
+        ],
+        "notes": "Month view uses role=\"grid\" with role=\"gridcell\" per day. View switcher uses role=\"tablist\". Today cell is marked aria-selected=\"true\". Full WAI-ARIA polish + screen-reader text (\"Tuesday March 5, 2 events\") arrives in M6."
+      },
+      "designTokens": [
+        "--primary",
+        "--primary-fg",
+        "--success",
+        "--success-fg",
+        "--warning",
+        "--error",
+        "--info",
+        "--secondary",
+        "--surface-base",
+        "--surface-raised",
+        "--surface-overlay",
+        "--border",
+        "--border-focus",
+        "--text-primary",
+        "--text-secondary",
+        "--text-disabled"
+      ],
+      "variantCount": 3
     },
     {
       "id": "common-login-form",

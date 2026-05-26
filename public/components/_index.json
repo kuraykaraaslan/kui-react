@@ -143,6 +143,12 @@
     "category": "Molecule",
     "file": "color-picker.md"
   },
+  "diff-viewer": {
+    "name": "DiffViewer",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "diff-viewer.md"
+  },
   "chart": {
     "name": "Chart",
     "layer": "ui",
@@ -448,6 +454,18 @@
     "layer": "app",
     "category": "App",
     "file": "rich-text-editor.md"
+  },
+  "kanban-board": {
+    "name": "KanbanBoard",
+    "layer": "app",
+    "category": "App",
+    "file": "kanban-board.md"
+  },
+  "calendar": {
+    "name": "Calendar",
+    "layer": "app",
+    "category": "App",
+    "file": "calendar.md"
   },
   "common-login-form": {
     "name": "LoginForm",
