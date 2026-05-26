@@ -56,6 +56,32 @@ function DrawerDemo({ side }: { side?: 'left' | 'right' }) {
   );
 }
 
+function DrawerRouteAwareDemo() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <Button variant="outline" onClick={() => setOpen(true)}>Open Route-Aware Drawer</Button>
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Route-aware drawer"
+        side="right"
+        closeOnRouteChange
+        footer={<Button onClick={() => setOpen(false)}>Close</Button>}
+      >
+        <div className="space-y-3 text-sm text-text-secondary">
+          <p>
+            The <code className="font-mono text-xs">closeOnRouteChange</code> prop is accepted in M1
+            and reserved for the M6 router-events integration. For now it is a no-op stub so the
+            public API stays stable across milestones.
+          </p>
+          <p>Body scroll is locked while this drawer is open (try scrolling the page behind it).</p>
+        </div>
+      </Drawer>
+    </div>
+  );
+}
+
 function ModalScrollableDemo() {
   const [open, setOpen] = useState(false);
   return (
@@ -106,6 +132,42 @@ function ModalSizesDemo() {
   );
 }
 
+function ModalNestedDemo() {
+  const [outerOpen, setOuterOpen] = useState(false);
+  const [innerOpen, setInnerOpen] = useState(false);
+  return (
+    <div>
+      <Button variant="outline" onClick={() => setOuterOpen(true)}>Open Outer Modal</Button>
+      <Modal
+        open={outerOpen}
+        onClose={() => setOuterOpen(false)}
+        title="Outer dialog"
+        description="Escape closes only the topmost overlay — try opening the nested one."
+        footer={<Button onClick={() => setOuterOpen(false)}>Close outer</Button>}
+      >
+        <div className="space-y-3">
+          <p className="text-sm text-text-secondary">
+            Layered focus trap demo: pressing Escape with the nested modal open only
+            dismisses the nested one, leaving this outer modal intact.
+          </p>
+          <Button variant="primary" onClick={() => setInnerOpen(true)}>Open Nested Modal</Button>
+        </div>
+      </Modal>
+      <Modal
+        open={innerOpen}
+        onClose={() => setInnerOpen(false)}
+        title="Nested dialog"
+        size="sm"
+        footer={<Button onClick={() => setInnerOpen(false)}>Close nested</Button>}
+      >
+        <p className="text-sm text-text-secondary">
+          This nested modal owns the top focus layer. Tab cycles only within this panel.
+        </p>
+      </Modal>
+    </div>
+  );
+}
+
 function PopoverDemo() {
   return (
     <Popover
@@ -121,6 +183,37 @@ function PopoverDemo() {
   );
 }
 
+function PopoverFocusTrapDemo() {
+  return (
+    <Popover
+      trigger={<Button variant="outline">Focus-trapped Popover</Button>}
+      placement="bottom"
+      focusTrap
+    >
+      <form
+        className="p-4 space-y-3 w-64"
+        onSubmit={(e) => e.preventDefault()}
+      >
+        <p className="text-sm font-semibold text-text-primary">Quick edit</p>
+        <input
+          type="text"
+          placeholder="Title"
+          className="w-full rounded-md border border-border bg-surface-base px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+        />
+        <input
+          type="text"
+          placeholder="Tag"
+          className="w-full rounded-md border border-border bg-surface-base px-2 py-1 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+        />
+        <div className="flex justify-end gap-2 pt-1">
+          <Button type="button" variant="ghost" size="sm">Cancel</Button>
+          <Button type="submit" variant="primary" size="sm">Save</Button>
+        </div>
+      </form>
+    </Popover>
+  );
+}
+
 export function buildOverlayData(): ShowcaseComponent[] {
   return [
     {
@@ -128,8 +221,8 @@ export function buildOverlayData(): ShowcaseComponent[] {
       title: 'Modal',
       category: 'Organism',
       abbr: 'Md',
-      description: 'Focus-trapped dialog. Closes on Escape and backdrop click. Requires role="dialog" + aria-modal + aria-labelledby; supports sm/md/lg sizes.',
-      filePath: 'modules/ui/Modal.tsx',
+      description: 'Focus-trapped dialog. Closes on Escape and backdrop click. Requires role="dialog" + aria-modal + aria-labelledby; supports sm/md/lg sizes. Uses the shared Overlays focus-trap, scroll-lock and presence hooks; nested modals are layer-aware so Escape only dismisses the topmost panel.',
+      filePath: 'modules/ui/Overlays/Modal/index.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
 import { useEffect, useRef } from 'react';
@@ -175,6 +268,11 @@ export function Modal({ open, onClose, title, description, children, footer, siz
           preview: <ModalFullscreenDemo />,
           code: `<Modal open={open} onClose={onClose} title="Fullscreen Dialog" fullscreen>...</Modal>`,
         },
+        {
+          title: 'Nested modals (layer-aware Escape)',
+          preview: <ModalNestedDemo />,
+          code: `// Opens a second modal on top — Escape only dismisses the inner one.\nconst [outer, setOuter] = useState(false);\nconst [inner, setInner] = useState(false);\n<Modal open={outer} onClose={() => setOuter(false)} title="Outer">\n  <Button onClick={() => setInner(true)}>Open Nested</Button>\n</Modal>\n<Modal open={inner} onClose={() => setInner(false)} title="Nested" size="sm">\n  ...\n</Modal>`,
+        },
       ],
     },
     {
@@ -182,8 +280,8 @@ export function Modal({ open, onClose, title, description, children, footer, siz
       title: 'Drawer',
       category: 'Organism',
       abbr: 'Dr',
-      description: 'Side panel sliding in from the screen edge. Left / right placement with focus management and Escape close.',
-      filePath: 'modules/ui/Drawer.tsx',
+      description: 'Side panel sliding in from the screen edge. Left / right placement with focus management and Escape close. Body scroll is locked while open via the shared Overlays useScrollLock hook (iOS rubber-band safe). Accepts closeOnRouteChange (M6 stub).',
+      filePath: 'modules/ui/Overlays/Drawer/index.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
 import { useEffect, useRef } from 'react';
@@ -214,6 +312,11 @@ export function Drawer({ open, onClose, title, side = 'right', children, footer,
           title: 'Left drawer',
           preview: <DrawerDemo side="left" />,
           code: `<Drawer open={open} onClose={() => setOpen(false)} title="Navigation" side="left">...</Drawer>`,
+        },
+        {
+          title: 'Route-aware close (M6 stub)',
+          preview: <DrawerRouteAwareDemo />,
+          code: `// closeOnRouteChange is accepted in M1 and reserved for M6 router-events integration.\n<Drawer\n  open={open}\n  onClose={() => setOpen(false)}\n  title="Route-aware drawer"\n  side="right"\n  closeOnRouteChange\n>\n  ...\n</Drawer>`,
         },
       ],
     },
@@ -386,8 +489,8 @@ export function DropdownMenu({ trigger, items, align = 'left', className }) {
       title: 'Popover',
       category: 'Organism',
       abbr: 'Po',
-      description: 'Anchor-based contextual panel. Closes on outside click and Escape key. Supports top/bottom/left/right placement.',
-      filePath: 'modules/ui/Popover.tsx',
+      description: 'Anchor-based contextual panel. Closes on outside click (capture-phase pointerdown) and Escape, layered with sibling overlays. Supports top/bottom/left/right placement. Built-in focus trap (focusTrap prop) keeps Tab cycling inside the panel.',
+      filePath: 'modules/ui/Overlays/Popover/index.tsx',
       sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useEffect, useRef, useState } from 'react';\n\nexport function Popover({ trigger, children, placement = 'bottom' }) {\n  // manages open state, outside-click + Escape close, focus management\n}`,
       variants: [
         {
@@ -408,6 +511,11 @@ export function DropdownMenu({ trigger, items, align = 'left', className }) {
             </div>
           ),
           code: `<Popover placement="top" trigger={<Button>Top</Button>}><div>...</div></Popover>\n<Popover placement="right" trigger={<Button>Right</Button>}><div>...</div></Popover>`,
+        },
+        {
+          title: 'Focus trap inside Popover',
+          preview: <PopoverFocusTrapDemo />,
+          code: `<Popover focusTrap placement="bottom" trigger={<Button>Quick edit</Button>}>\n  <form onSubmit={(e) => e.preventDefault()} className="p-4 space-y-3 w-64">\n    <input type="text" placeholder="Title" />\n    <input type="text" placeholder="Tag" />\n    <Button type="submit">Save</Button>\n  </form>\n</Popover>`,
         },
       ],
     },

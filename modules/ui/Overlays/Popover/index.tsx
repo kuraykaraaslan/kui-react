@@ -1,0 +1,69 @@
+'use client';
+import { cn } from '@/libs/utils/cn';
+import { useRef, useState } from 'react';
+import { useFocusTrap } from '../shared/useFocusTrap';
+import { useDismiss } from '../shared/useDismiss';
+import { type Placement, placementClasses } from '../shared/positioning';
+
+export type PopoverProps = {
+  trigger: React.ReactNode;
+  children: React.ReactNode;
+  placement?: Placement;
+  className?: string;
+  /**
+   * Built-in focus trap on the panel (M1). For M4 this will be
+   * conditional on the `as` prop (no trap for tooltips).
+   */
+  focusTrap?: boolean;
+};
+
+export function Popover({
+  trigger,
+  children,
+  placement = 'bottom',
+  className,
+  focusTrap = true,
+}: PopoverProps) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // useDismiss replaces the old hand-rolled mousedown / keydown wiring.
+  // Outside pointerdown + Escape, layered z-index aware.
+  useDismiss({
+    active: open,
+    ref: containerRef,
+    onDismiss: () => setOpen(false),
+  });
+
+  // M1 baseline: panel keeps role="dialog". M4 will switch role based
+  // on the `as` prop (tooltip / menu / popover).
+  useFocusTrap(panelRef, {
+    active: open && focusTrap,
+    onEscape: () => setOpen(false),
+    // useDismiss already handles Escape — avoid double handling.
+    handleEscape: false,
+  });
+
+  return (
+    <div ref={containerRef} className="relative inline-block">
+      <div onClick={() => setOpen((o) => !o)}>{trigger}</div>
+      {open && (
+        <div
+          ref={panelRef}
+          role="dialog"
+          tabIndex={-1}
+          data-state={open ? 'open' : 'closed'}
+          className={cn(
+            'absolute z-[70] min-w-[12rem] rounded-lg border border-border bg-surface-raised shadow-xl',
+            'focus-visible:outline-none',
+            placementClasses[placement],
+            className,
+          )}
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
