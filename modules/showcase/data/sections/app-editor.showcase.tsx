@@ -1,6 +1,6 @@
 'use client';
-import { useState } from 'react';
-import { RichTextEditor } from '@/modules/app/RichTextEditor';
+import { useRef, useState } from 'react';
+import { RichTextEditor, type RichTextEditorHandle, type SlashCommand } from '@/modules/app/RichTextEditor';
 import type { ShowcaseComponent } from '../showcase.types';
 
 const SAMPLE_HTML = `<h1>Release notes</h1>
@@ -14,39 +14,37 @@ const SAMPLE_HTML = `<h1>Release notes</h1>
 <blockquote>Pixel parity between the React and EJS sibling components is now enforced.</blockquote>
 <p>Read the <a href="https://example.com/changelog">full changelog</a> for the rest.</p>`;
 
+const SAMPLE_MENTIONS = [
+  { id: 'u1', label: 'Jane Doe',     description: 'Product designer' },
+  { id: 'u2', label: 'John Smith',   description: 'Engineer' },
+  { id: 'u3', label: 'Ada Lovelace', description: 'CTO' },
+  { id: 'u4', label: 'Alan Turing',  description: 'Founder' },
+  { id: 'u5', label: 'Grace Hopper', description: 'VP Engineering' },
+];
+
 function EmptyDemo() {
   const [html, setHtml] = useState('');
   return (
-    <div className="grid gap-3 md:grid-cols-[1fr_220px] w-full">
-      <RichTextEditor
-        id="rte-empty"
-        label="Article body"
-        hint="Use the toolbar to format your text."
-        value={html}
-        onChange={setHtml}
-        placeholder="Start writing your article…"
-      />
-      <pre className="text-[10px] leading-snug bg-surface-sunken text-text-secondary p-2 rounded-md overflow-auto max-h-[260px] whitespace-pre-wrap break-words">
-        {html || '<empty>'}
-      </pre>
-    </div>
+    <RichTextEditor
+      id="rte-empty"
+      label="Article body"
+      hint="Use the toolbar — markdown shortcuts work too: try **bold** or # heading."
+      value={html}
+      onChange={setHtml}
+      placeholder="Start writing your article…"
+      showCounter
+      showWordCount
+    />
   );
 }
 
 function PrepopulatedDemo() {
-  const [html, setHtml] = useState(SAMPLE_HTML);
   return (
-    <div className="grid gap-3 md:grid-cols-[1fr_220px] w-full">
-      <RichTextEditor
-        id="rte-prefilled"
-        label="Release notes"
-        defaultValue={SAMPLE_HTML}
-        onChange={setHtml}
-      />
-      <pre className="text-[10px] leading-snug bg-surface-sunken text-text-secondary p-2 rounded-md overflow-auto max-h-[260px] whitespace-pre-wrap break-words">
-        {html}
-      </pre>
-    </div>
+    <RichTextEditor
+      id="rte-prefilled"
+      label="Release notes"
+      defaultValue={SAMPLE_HTML}
+    />
   );
 }
 
@@ -62,6 +60,114 @@ function ReadOnlyDemo() {
   );
 }
 
+function MaxLengthDemo() {
+  const [html, setHtml] = useState('');
+  return (
+    <RichTextEditor
+      id="rte-maxlen"
+      label="Short summary"
+      hint="Maximum 200 characters."
+      value={html}
+      onChange={setHtml}
+      maxLength={200}
+      showCounter
+      minHeight={120}
+    />
+  );
+}
+
+function MentionSlashDemo() {
+  const [html, setHtml] = useState('');
+  const slashItems: SlashCommand[] = [
+    { id: 'h1',   label: 'Heading 1',   description: 'Big section title', action: (q) => q.format('header', 1, 'user') },
+    { id: 'h2',   label: 'Heading 2',   description: 'Medium title',      action: (q) => q.format('header', 2, 'user') },
+    { id: 'list', label: 'Bullet list', description: 'Unordered list',    action: (q) => q.format('list', 'bullet', 'user') },
+    { id: 'quote',label: 'Quote',       description: 'Block quote',       action: (q) => q.format('blockquote', true, 'user') },
+    { id: 'code', label: 'Code block',  description: 'Monospaced block',  action: (q) => q.format('code-block', true, 'user') },
+    { id: 'hr',   label: 'Divider',     description: 'Horizontal rule',   action: (q) => q.clipboard.dangerouslyPasteHTML('<hr/>', 'user') },
+  ];
+  return (
+    <RichTextEditor
+      id="rte-mention-slash"
+      label="Comment"
+      hint="Type @ to mention a teammate, or / to insert a block."
+      value={html}
+      onChange={setHtml}
+      mentions={SAMPLE_MENTIONS}
+      slashItems={slashItems}
+      placeholder="Try typing @ or / …"
+    />
+  );
+}
+
+function ImperativeDemo() {
+  const ref = useRef<RichTextEditorHandle>(null);
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => ref.current?.focus()}
+          className="px-3 py-1.5 text-sm rounded-md border border-border hover:bg-surface-overlay">Focus</button>
+        <button type="button" onClick={() => ref.current?.clear()}
+          className="px-3 py-1.5 text-sm rounded-md border border-border hover:bg-surface-overlay">Clear</button>
+        <button type="button" onClick={() => ref.current?.insertHTML('<p><strong>Inserted</strong> via ref API.</p>')}
+          className="px-3 py-1.5 text-sm rounded-md border border-border hover:bg-surface-overlay">Insert HTML</button>
+        <button type="button" onClick={() => alert(ref.current?.getText())}
+          className="px-3 py-1.5 text-sm rounded-md border border-border hover:bg-surface-overlay">Read plain text</button>
+      </div>
+      <RichTextEditor
+        ref={ref}
+        id="rte-imperative"
+        label="Imperative handle"
+        defaultValue="<p>Click the buttons above to drive this editor programmatically.</p>"
+      />
+    </div>
+  );
+}
+
+function FormDemo() {
+  const [submitted, setSubmitted] = useState<string | null>(null);
+  return (
+    <form
+      className="space-y-2"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const data = new FormData(e.currentTarget);
+        setSubmitted(String(data.get('body') ?? ''));
+      }}
+    >
+      <RichTextEditor
+        id="rte-form"
+        name="body"
+        label="Description"
+        defaultValue="<p>This editor syncs to a hidden input.</p>"
+        minHeight={120}
+      />
+      <button type="submit"
+        className="px-4 py-2 rounded-md bg-primary text-primary-fg hover:bg-primary-hover text-sm font-medium">
+        Submit
+      </button>
+      {submitted !== null && (
+        <pre className="text-[10px] leading-snug bg-surface-sunken text-text-secondary p-2 rounded-md overflow-auto max-h-[200px] whitespace-pre-wrap break-words">
+          {submitted}
+        </pre>
+      )}
+    </form>
+  );
+}
+
+function AutosaveDemo() {
+  return (
+    <RichTextEditor
+      id="rte-autosave"
+      label="Draft (auto-saved to localStorage)"
+      hint="Your changes survive page refresh — key: 'demo-draft'."
+      autosaveKey="demo-draft"
+      placeholder="Type, then refresh the page to verify autosave…"
+      minHeight={140}
+    />
+  );
+}
+
 export function buildAppEditorData(): ShowcaseComponent[] {
   return [
     {
@@ -70,73 +176,105 @@ export function buildAppEditorData(): ShowcaseComponent[] {
       category: 'App',
       abbr: 'RT',
       description:
-        'WYSIWYG editor for long-form prose. Built on Quill 2.x — single shared library on both the React and EJS sibling repos so output HTML is identical. Toolbar covers bold/italic/underline/strike/inline code, headings, blockquote, code block, lists, link, image (via Modal + FileInput), text align, clear formatting, undo/redo.',
-      filePath: 'modules/app/RichTextEditor.tsx',
-      sourceCode: `import { RichTextEditor } from '@/modules/app/RichTextEditor';
+        'Quill 2.x WYSIWYG editor with token-tinted snow theme. Production features: controlled value, imperative ref API, onBlur, name+hidden-form-sync, drag-and-drop image upload with onImageUpload callback, paste sanitization (Word / GDocs cleanup), char + word counter with maxLength, autosave to localStorage, markdown shortcuts, color + highlight, sub/sup, indent/outdent, horizontal rule, tables, emoji picker, @-mentions, /-slash command menu, selection bubble menu, image resize/align overlay, fullscreen mode. Pixel-identical EJS sibling at modules/app/RichTextEditor.ejs.',
+      filePath: 'modules/app/RichTextEditor/index.tsx',
+      sourceCode: `import { useRef, useState } from 'react';
+import { RichTextEditor, type RichTextEditorHandle } from '@/modules/app/RichTextEditor';
 
+// Controlled with counter + maxLength:
 const [body, setBody] = useState('');
-
 <RichTextEditor
   id="article-body"
   label="Article body"
-  hint="Use the toolbar to format your text."
   value={body}
   onChange={setBody}
-  placeholder="Start writing your article…"
+  maxLength={2000}
+  showCounter
+  showWordCount
 />
 
-// Pre-populated, uncontrolled:
+// Imperative handle:
+const ref = useRef<RichTextEditorHandle>(null);
+<RichTextEditor ref={ref} id="reply" />
+ref.current?.focus();
+ref.current?.insertHTML('<p>Hi!</p>');
+
+// Form integration (hidden input synced to 'body'):
+<form>
+  <RichTextEditor id="post" name="body" defaultValue={savedHtml} />
+  <button type="submit">Save</button>
+</form>
+
+// Image upload to CDN instead of base64:
 <RichTextEditor
-  id="release-notes"
-  label="Release notes"
-  defaultValue={initialHtml}
-  onChange={setBody}
+  id="cms"
+  onImageUpload={async (file) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    const r = await fetch('/api/upload', { method: 'POST', body: fd });
+    const { url } = await r.json();
+    return url;
+  }}
 />
 
-// Read-only (toolbar hidden):
-<RichTextEditor id="archived" defaultValue={savedHtml} readOnly />`,
+// Autosave to localStorage:
+<RichTextEditor id="draft" autosaveKey="my-draft" />
+
+// Mentions + slash commands:
+<RichTextEditor
+  id="comment"
+  mentions={[{ id: 'u1', label: 'Jane Doe', description: 'Designer' }]}
+  slashItems={[{
+    id: 'h1', label: 'Heading 1',
+    action: (q) => q.format('header', 1, 'user'),
+  }]}
+/>`,
       since: '2026-05',
       composes: ['modal', 'input', 'button'],
       dependencies: ['quill'],
       designTokens: [
-        '--surface-base', '--surface-sunken', '--surface-raised',
+        '--surface-base', '--surface-sunken', '--surface-raised', '--surface-overlay',
         '--text-primary', '--text-secondary', '--text-disabled',
-        '--border', '--border-focus', '--primary', '--error',
+        '--border', '--border-focus', '--primary', '--primary-subtle', '--error',
       ],
       a11y: {
         wcagLevel: 'AA',
-        ariaPatterns: ['textbox', 'toolbar'],
+        ariaPatterns: ['textbox', 'toolbar', 'dialog', 'listbox'],
         keyboardInteractions: [
-          { keys: 'Ctrl/Cmd + B', action: 'Bold selection' },
-          { keys: 'Ctrl/Cmd + I', action: 'Italic selection' },
-          { keys: 'Ctrl/Cmd + U', action: 'Underline selection' },
-          { keys: 'Ctrl/Cmd + Z', action: 'Undo' },
+          { keys: 'Ctrl/Cmd + B',         action: 'Bold selection' },
+          { keys: 'Ctrl/Cmd + I',         action: 'Italic selection' },
+          { keys: 'Ctrl/Cmd + U',         action: 'Underline selection' },
+          { keys: 'Ctrl/Cmd + Z',         action: 'Undo' },
           { keys: 'Ctrl/Cmd + Shift + Z', action: 'Redo' },
+          { keys: 'Tab / Shift+Tab',      action: 'Indent / outdent in lists' },
+          { keys: '@',                    action: 'Open mention suggestions' },
+          { keys: '/',                    action: 'Open slash-command menu (at line start)' },
+          { keys: '** ** / * * / ` `',    action: 'Markdown bold / italic / code' },
+          { keys: '# / ## / ###',         action: 'Markdown headings' },
+          { keys: '- / * / 1.',           action: 'Markdown bullet / numbered list' },
+          { keys: '> ',                   action: 'Markdown blockquote' },
         ],
       },
       variants: [
         {
-          title: 'Empty',
+          title: 'Empty + counter',
           layout: 'stack' as const,
           preview: <EmptyDemo />,
           code: `const [body, setBody] = useState('');
-
 <RichTextEditor
   id="article-body"
   label="Article body"
-  hint="Use the toolbar to format your text."
   value={body}
   onChange={setBody}
-  placeholder="Start writing your article…"
+  showCounter
+  showWordCount
 />`,
         },
         {
           title: 'Pre-populated',
           layout: 'stack' as const,
           preview: <PrepopulatedDemo />,
-          code: `const initial = '<h1>Release notes</h1><p>...</p>';
-
-<RichTextEditor
+          code: `<RichTextEditor
   id="release-notes"
   label="Release notes"
   defaultValue={initial}
@@ -149,10 +287,64 @@ const [body, setBody] = useState('');
           preview: <ReadOnlyDemo />,
           code: `<RichTextEditor
   id="archived"
-  label="Archived document"
-  hint="This document is read-only."
   defaultValue={savedHtml}
   readOnly
+/>`,
+        },
+        {
+          title: 'Max length (200 chars)',
+          layout: 'stack' as const,
+          preview: <MaxLengthDemo />,
+          code: `<RichTextEditor
+  id="short-summary"
+  maxLength={200}
+  showCounter
+/>`,
+        },
+        {
+          title: 'Mentions + slash commands',
+          layout: 'stack' as const,
+          preview: <MentionSlashDemo />,
+          code: `<RichTextEditor
+  id="comment"
+  mentions={[
+    { id: 'u1', label: 'Jane Doe', description: 'Designer' },
+    { id: 'u2', label: 'John Smith', description: 'Engineer' },
+  ]}
+  slashItems={[
+    { id: 'h1', label: 'Heading 1', action: (q) => q.format('header', 1, 'user') },
+    { id: 'list', label: 'Bullet list', action: (q) => q.format('list', 'bullet', 'user') },
+  ]}
+/>`,
+        },
+        {
+          title: 'Imperative ref API',
+          layout: 'stack' as const,
+          preview: <ImperativeDemo />,
+          code: `const ref = useRef<RichTextEditorHandle>(null);
+<RichTextEditor ref={ref} id="reply" />
+ref.current?.focus();
+ref.current?.clear();
+ref.current?.insertHTML('<p>Hi!</p>');
+const text = ref.current?.getText();`,
+        },
+        {
+          title: 'Form integration',
+          layout: 'stack' as const,
+          preview: <FormDemo />,
+          code: `<form action="/api/post" method="post">
+  <RichTextEditor id="post" name="body" defaultValue={savedHtml} />
+  <button type="submit">Save</button>
+</form>`,
+        },
+        {
+          title: 'Autosave',
+          layout: 'stack' as const,
+          preview: <AutosaveDemo />,
+          code: `<RichTextEditor
+  id="draft"
+  autosaveKey="my-draft"
+  placeholder="Survives page refresh…"
 />`,
         },
       ],

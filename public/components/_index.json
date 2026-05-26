@@ -137,6 +137,12 @@
     "category": "Molecule",
     "file": "file-input.md"
   },
+  "color-picker": {
+    "name": "ColorPicker",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "color-picker.md"
+  },
   "card": {
     "name": "Card",
     "layer": "ui",

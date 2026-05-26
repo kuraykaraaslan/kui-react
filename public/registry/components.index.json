@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-25T21:03:23.827Z",
+  "generatedAt": "2026-05-26T11:35:24.422Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -175,6 +175,7 @@
         "--text-primary"
       ],
       "usedBy": [
+        "color-picker",
         "reviews-review-submit-form",
         "rich-text-editor"
       ],
@@ -625,6 +626,57 @@
       "since": "2025-02",
       "designTokens": [],
       "variantCount": 4
+    },
+    {
+      "id": "color-picker",
+      "name": "ColorPicker",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/ColorPicker.tsx",
+      "abbr": "Cp",
+      "description": "Color selection control with a 32-swatch preset palette plus optional hex input and native browser color picker for unlimited colors. Pixel-identical EJS sibling at modules/ui/ColorPicker.ejs. Used by RichTextEditor for text + highlight colors.",
+      "status": "stable",
+      "since": "2026-05",
+      "composes": [
+        "button"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "button",
+          "dialog"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Enter / Space",
+            "action": "Open / close the picker"
+          },
+          {
+            "keys": "Tab",
+            "action": "Move between swatches"
+          },
+          {
+            "keys": "Enter (in hex)",
+            "action": "Commit hex value"
+          },
+          {
+            "keys": "Escape",
+            "action": "Close picker"
+          }
+        ]
+      },
+      "designTokens": [
+        "--surface-base",
+        "--surface-raised",
+        "--surface-overlay",
+        "--surface-sunken",
+        "--text-primary",
+        "--text-secondary",
+        "--text-disabled",
+        "--border",
+        "--border-focus"
+      ],
+      "variantCount": 3
     },
     {
       "id": "card",
@@ -1396,9 +1448,9 @@
       "name": "RichTextEditor",
       "layer": "app",
       "category": "App",
-      "filePath": "modules/app/RichTextEditor.tsx",
+      "filePath": "modules/app/RichTextEditor/index.tsx",
       "abbr": "RT",
-      "description": "WYSIWYG editor for long-form prose. Built on Quill 2.x — single shared library on both the React and EJS sibling repos so output HTML is identical. Toolbar covers bold/italic/underline/strike/inline code, headings, blockquote, code block, lists, link, image (via Modal + FileInput), text align, clear formatting, undo/redo.",
+      "description": "Quill 2.x WYSIWYG editor with token-tinted snow theme. Production features: controlled value, imperative ref API, onBlur, name+hidden-form-sync, drag-and-drop image upload with onImageUpload callback, paste sanitization (Word / GDocs cleanup), char + word counter with maxLength, autosave to localStorage, markdown shortcuts, color + highlight, sub/sup, indent/outdent, horizontal rule, tables, emoji picker, @-mentions, /-slash command menu, selection bubble menu, image resize/align overlay, fullscreen mode. Pixel-identical EJS sibling at modules/app/RichTextEditor.ejs.",
       "status": "stable",
       "since": "2026-05",
       "composes": [
@@ -1410,7 +1462,9 @@
         "wcagLevel": "AA",
         "ariaPatterns": [
           "textbox",
-          "toolbar"
+          "toolbar",
+          "dialog",
+          "listbox"
         ],
         "keyboardInteractions": [
           {
@@ -1432,6 +1486,34 @@
           {
             "keys": "Ctrl/Cmd + Shift + Z",
             "action": "Redo"
+          },
+          {
+            "keys": "Tab / Shift+Tab",
+            "action": "Indent / outdent in lists"
+          },
+          {
+            "keys": "@",
+            "action": "Open mention suggestions"
+          },
+          {
+            "keys": "/",
+            "action": "Open slash-command menu (at line start)"
+          },
+          {
+            "keys": "** ** / * * / ` `",
+            "action": "Markdown bold / italic / code"
+          },
+          {
+            "keys": "# / ## / ###",
+            "action": "Markdown headings"
+          },
+          {
+            "keys": "- / * / 1.",
+            "action": "Markdown bullet / numbered list"
+          },
+          {
+            "keys": "> ",
+            "action": "Markdown blockquote"
           }
         ]
       },
@@ -1439,18 +1521,20 @@
         "--surface-base",
         "--surface-sunken",
         "--surface-raised",
+        "--surface-overlay",
         "--text-primary",
         "--text-secondary",
         "--text-disabled",
         "--border",
         "--border-focus",
         "--primary",
+        "--primary-subtle",
         "--error"
       ],
       "dependencies": [
         "quill"
       ],
-      "variantCount": 3
+      "variantCount": 8
     },
     {
       "id": "common-login-form",

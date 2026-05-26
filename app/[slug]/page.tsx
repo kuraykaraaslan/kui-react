@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ShowcaseShell } from '@/modules/showcase/ui/ShowcaseShell';
+import { ShowcaseDetail } from '@/modules/showcase/ui/ShowcaseDetail';
 import NAV_GROUPS from '@/modules/showcase/data/showcase.menu';
 import { buildPageTitle } from '@/libs/config/showcase.config';
 
@@ -15,5 +15,5 @@ export async function generateMetadata({
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  return <ShowcaseShell selectedId={slug} />;
+  return <ShowcaseDetail slug={slug} />;
 }

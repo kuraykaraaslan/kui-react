@@ -6,6 +6,7 @@ import {
   SHOWCASE_LINKS,
   buildShowcaseColorCss,
 } from "@/libs/config/showcase.config";
+import { ConditionalShell } from "@/modules/app/ConditionalShell";
 
 /* =========================================================
    FONTS
@@ -173,6 +174,8 @@ const structuredData = {
 
 const colorOverrideCss = buildShowcaseColorCss();
 
+const themeBootstrapScript = `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark'||((!t||t==='system')&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: {
@@ -182,7 +185,13 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
         {colorOverrideCss && (
           <style
@@ -192,7 +201,9 @@ export default function RootLayout({
         )}
 
         {/* APP SHELL (OPTIONAL) */}
-        <main className="flex-1">{children}</main>
+        <main className="flex-1">
+          <ConditionalShell>{children}</ConditionalShell>
+        </main>
 
         {/* STRUCTURED DATA */}
         <script

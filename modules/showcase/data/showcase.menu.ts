@@ -51,6 +51,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'checkbox-group',    title: 'CheckboxGroup',   category: 'Molecule', abbr: 'Cg', since: '2025-02' },
       { id: 'tag-input',         title: 'TagInput',        category: 'Molecule', abbr: 'Ti', since: '2025-03' },
       { id: 'file-input',        title: 'FileInput',       category: 'Molecule', abbr: 'Fi', since: '2025-02' },
+      { id: 'color-picker',      title: 'ColorPicker',     category: 'Molecule', abbr: 'Cp', since: '2026-05' },
     ],
   },
   {

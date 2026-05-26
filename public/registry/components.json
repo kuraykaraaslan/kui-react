@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-25T21:03:23.827Z",
+  "generatedAt": "2026-05-26T11:35:24.422Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -226,6 +226,7 @@
         "--text-primary"
       ],
       "usedBy": [
+        "color-picker",
         "reviews-review-submit-form",
         "rich-text-editor"
       ]
@@ -1075,6 +1076,71 @@
       "status": "stable",
       "since": "2025-02",
       "designTokens": []
+    },
+    {
+      "id": "color-picker",
+      "name": "ColorPicker",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/ColorPicker.tsx",
+      "abbr": "Cp",
+      "description": "Color selection control with a 32-swatch preset palette plus optional hex input and native browser color picker for unlimited colors. Pixel-identical EJS sibling at modules/ui/ColorPicker.ejs. Used by RichTextEditor for text + highlight colors.",
+      "source": "'use client';\nimport { ColorPicker } from '@/modules/ui/ColorPicker';\n\nconst [color, setColor] = useState<string | null>('#3b82f6');\n\n<ColorPicker\n  label=\"Brand color\"\n  value={color}\n  onChange={setColor}\n  showNoColor\n/>\n\n// Compact (swatches only):\n<ColorPicker\n  value={color}\n  onChange={setColor}\n  showHexInput={false}\n  showNativePicker={false}\n/>\n\n// Custom palette + hex / native only:\n<ColorPicker\n  value={color}\n  onChange={setColor}\n  swatches={['#ff0000', '#00ff00', '#0000ff']}\n  showHexInput\n  showNativePicker\n/>",
+      "variants": [
+        {
+          "title": "Default",
+          "code": "const [c, setC] = useState<string | null>('#3b82f6');\n<ColorPicker label=\"Brand color\" value={c} onChange={setC} showNoColor />"
+        },
+        {
+          "title": "Compact (swatches only)",
+          "code": "<ColorPicker\n  value={c}\n  onChange={setC}\n  showHexInput={false}\n  showNativePicker={false}\n/>"
+        },
+        {
+          "title": "Hex + native picker only (no swatches)",
+          "code": "<ColorPicker\n  label=\"Background\"\n  value={c}\n  onChange={setC}\n  swatches={[]}\n  showHexInput\n  showNativePicker\n  showNoColor\n/>"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-05",
+      "composes": [
+        "button"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "button",
+          "dialog"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Enter / Space",
+            "action": "Open / close the picker"
+          },
+          {
+            "keys": "Tab",
+            "action": "Move between swatches"
+          },
+          {
+            "keys": "Enter (in hex)",
+            "action": "Commit hex value"
+          },
+          {
+            "keys": "Escape",
+            "action": "Close picker"
+          }
+        ]
+      },
+      "designTokens": [
+        "--surface-base",
+        "--surface-raised",
+        "--surface-overlay",
+        "--surface-sunken",
+        "--text-primary",
+        "--text-secondary",
+        "--text-disabled",
+        "--border",
+        "--border-focus"
+      ]
     },
     {
       "id": "card",
@@ -2424,22 +2490,42 @@
       "name": "RichTextEditor",
       "layer": "app",
       "category": "App",
-      "filePath": "modules/app/RichTextEditor.tsx",
+      "filePath": "modules/app/RichTextEditor/index.tsx",
       "abbr": "RT",
-      "description": "WYSIWYG editor for long-form prose. Built on Quill 2.x — single shared library on both the React and EJS sibling repos so output HTML is identical. Toolbar covers bold/italic/underline/strike/inline code, headings, blockquote, code block, lists, link, image (via Modal + FileInput), text align, clear formatting, undo/redo.",
-      "source": "import { RichTextEditor } from '@/modules/app/RichTextEditor';\n\nconst [body, setBody] = useState('');\n\n<RichTextEditor\n  id=\"article-body\"\n  label=\"Article body\"\n  hint=\"Use the toolbar to format your text.\"\n  value={body}\n  onChange={setBody}\n  placeholder=\"Start writing your article…\"\n/>\n\n// Pre-populated, uncontrolled:\n<RichTextEditor\n  id=\"release-notes\"\n  label=\"Release notes\"\n  defaultValue={initialHtml}\n  onChange={setBody}\n/>\n\n// Read-only (toolbar hidden):\n<RichTextEditor id=\"archived\" defaultValue={savedHtml} readOnly />",
+      "description": "Quill 2.x WYSIWYG editor with token-tinted snow theme. Production features: controlled value, imperative ref API, onBlur, name+hidden-form-sync, drag-and-drop image upload with onImageUpload callback, paste sanitization (Word / GDocs cleanup), char + word counter with maxLength, autosave to localStorage, markdown shortcuts, color + highlight, sub/sup, indent/outdent, horizontal rule, tables, emoji picker, @-mentions, /-slash command menu, selection bubble menu, image resize/align overlay, fullscreen mode. Pixel-identical EJS sibling at modules/app/RichTextEditor.ejs.",
+      "source": "import { useRef, useState } from 'react';\nimport { RichTextEditor, type RichTextEditorHandle } from '@/modules/app/RichTextEditor';\n\n// Controlled with counter + maxLength:\nconst [body, setBody] = useState('');\n<RichTextEditor\n  id=\"article-body\"\n  label=\"Article body\"\n  value={body}\n  onChange={setBody}\n  maxLength={2000}\n  showCounter\n  showWordCount\n/>\n\n// Imperative handle:\nconst ref = useRef<RichTextEditorHandle>(null);\n<RichTextEditor ref={ref} id=\"reply\" />\nref.current?.focus();\nref.current?.insertHTML('<p>Hi!</p>');\n\n// Form integration (hidden input synced to 'body'):\n<form>\n  <RichTextEditor id=\"post\" name=\"body\" defaultValue={savedHtml} />\n  <button type=\"submit\">Save</button>\n</form>\n\n// Image upload to CDN instead of base64:\n<RichTextEditor\n  id=\"cms\"\n  onImageUpload={async (file) => {\n    const fd = new FormData();\n    fd.append('file', file);\n    const r = await fetch('/api/upload', { method: 'POST', body: fd });\n    const { url } = await r.json();\n    return url;\n  }}\n/>\n\n// Autosave to localStorage:\n<RichTextEditor id=\"draft\" autosaveKey=\"my-draft\" />\n\n// Mentions + slash commands:\n<RichTextEditor\n  id=\"comment\"\n  mentions={[{ id: 'u1', label: 'Jane Doe', description: 'Designer' }]}\n  slashItems={[{\n    id: 'h1', label: 'Heading 1',\n    action: (q) => q.format('header', 1, 'user'),\n  }]}\n/>",
       "variants": [
         {
-          "title": "Empty",
-          "code": "const [body, setBody] = useState('');\n\n<RichTextEditor\n  id=\"article-body\"\n  label=\"Article body\"\n  hint=\"Use the toolbar to format your text.\"\n  value={body}\n  onChange={setBody}\n  placeholder=\"Start writing your article…\"\n/>"
+          "title": "Empty + counter",
+          "code": "const [body, setBody] = useState('');\n<RichTextEditor\n  id=\"article-body\"\n  label=\"Article body\"\n  value={body}\n  onChange={setBody}\n  showCounter\n  showWordCount\n/>"
         },
         {
           "title": "Pre-populated",
-          "code": "const initial = '<h1>Release notes</h1><p>...</p>';\n\n<RichTextEditor\n  id=\"release-notes\"\n  label=\"Release notes\"\n  defaultValue={initial}\n  onChange={setBody}\n/>"
+          "code": "<RichTextEditor\n  id=\"release-notes\"\n  label=\"Release notes\"\n  defaultValue={initial}\n  onChange={setBody}\n/>"
         },
         {
           "title": "Read-only",
-          "code": "<RichTextEditor\n  id=\"archived\"\n  label=\"Archived document\"\n  hint=\"This document is read-only.\"\n  defaultValue={savedHtml}\n  readOnly\n/>"
+          "code": "<RichTextEditor\n  id=\"archived\"\n  defaultValue={savedHtml}\n  readOnly\n/>"
+        },
+        {
+          "title": "Max length (200 chars)",
+          "code": "<RichTextEditor\n  id=\"short-summary\"\n  maxLength={200}\n  showCounter\n/>"
+        },
+        {
+          "title": "Mentions + slash commands",
+          "code": "<RichTextEditor\n  id=\"comment\"\n  mentions={[\n    { id: 'u1', label: 'Jane Doe', description: 'Designer' },\n    { id: 'u2', label: 'John Smith', description: 'Engineer' },\n  ]}\n  slashItems={[\n    { id: 'h1', label: 'Heading 1', action: (q) => q.format('header', 1, 'user') },\n    { id: 'list', label: 'Bullet list', action: (q) => q.format('list', 'bullet', 'user') },\n  ]}\n/>"
+        },
+        {
+          "title": "Imperative ref API",
+          "code": "const ref = useRef<RichTextEditorHandle>(null);\n<RichTextEditor ref={ref} id=\"reply\" />\nref.current?.focus();\nref.current?.clear();\nref.current?.insertHTML('<p>Hi!</p>');\nconst text = ref.current?.getText();"
+        },
+        {
+          "title": "Form integration",
+          "code": "<form action=\"/api/post\" method=\"post\">\n  <RichTextEditor id=\"post\" name=\"body\" defaultValue={savedHtml} />\n  <button type=\"submit\">Save</button>\n</form>"
+        },
+        {
+          "title": "Autosave",
+          "code": "<RichTextEditor\n  id=\"draft\"\n  autosaveKey=\"my-draft\"\n  placeholder=\"Survives page refresh…\"\n/>"
         }
       ],
       "status": "stable",
@@ -2453,7 +2539,9 @@
         "wcagLevel": "AA",
         "ariaPatterns": [
           "textbox",
-          "toolbar"
+          "toolbar",
+          "dialog",
+          "listbox"
         ],
         "keyboardInteractions": [
           {
@@ -2475,6 +2563,34 @@
           {
             "keys": "Ctrl/Cmd + Shift + Z",
             "action": "Redo"
+          },
+          {
+            "keys": "Tab / Shift+Tab",
+            "action": "Indent / outdent in lists"
+          },
+          {
+            "keys": "@",
+            "action": "Open mention suggestions"
+          },
+          {
+            "keys": "/",
+            "action": "Open slash-command menu (at line start)"
+          },
+          {
+            "keys": "** ** / * * / ` `",
+            "action": "Markdown bold / italic / code"
+          },
+          {
+            "keys": "# / ## / ###",
+            "action": "Markdown headings"
+          },
+          {
+            "keys": "- / * / 1.",
+            "action": "Markdown bullet / numbered list"
+          },
+          {
+            "keys": "> ",
+            "action": "Markdown blockquote"
           }
         ]
       },
@@ -2482,12 +2598,14 @@
         "--surface-base",
         "--surface-sunken",
         "--surface-raised",
+        "--surface-overlay",
         "--text-primary",
         "--text-secondary",
         "--text-disabled",
         "--border",
         "--border-focus",
         "--primary",
+        "--primary-subtle",
         "--error"
       ],
       "dependencies": [

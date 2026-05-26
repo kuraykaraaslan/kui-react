@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo, useTransition } from 'react';
+import Link from 'next/link';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
@@ -245,15 +246,26 @@ function NavContent({ groups, selectedId, onSelect, collapsed }: NavContentProps
                     return (
                       <li key={item.id}>
                         {item.href ? (
-                          <a
-                            href={item.href}
-                            target={isExternal ? '_blank' : undefined}
-                            rel={isExternal ? 'noopener noreferrer' : undefined}
-                            title={collapsed ? `${item.title} (${item.category})` : undefined}
-                            className={sharedClassName}
-                          >
-                            {sharedContent}
-                          </a>
+                          isExternal ? (
+                            <a
+                              href={item.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={collapsed ? `${item.title} (${item.category})` : undefined}
+                              className={sharedClassName}
+                            >
+                              {sharedContent}
+                            </a>
+                          ) : (
+                            <Link
+                              href={item.href}
+                              aria-current={isActive ? 'page' : undefined}
+                              title={collapsed ? `${item.title} (${item.category})` : undefined}
+                              className={sharedClassName}
+                            >
+                              {sharedContent}
+                            </Link>
+                          )
                         ) : (
                           <button
                             type="button"

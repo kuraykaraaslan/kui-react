@@ -3,8 +3,22 @@ import React from 'react';
 import { DatePicker } from '@/modules/ui/DatePicker';
 import { DateRangePicker, TimePicker } from '@/modules/ui/DateRangePicker';
 import { FileInput } from '@/modules/ui/FileInput';
+import { ColorPicker } from '@/modules/ui/ColorPicker';
 import { useState } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
+
+function ColorPickerDemo() {
+  const [c, setC] = useState<string | null>('#3b82f6');
+  return <ColorPicker label="Brand color" value={c} onChange={setC} showNoColor />;
+}
+function ColorPickerCompactDemo() {
+  const [c, setC] = useState<string | null>('#22c55e');
+  return <ColorPicker value={c} onChange={setC} showHexInput={false} showNativePicker={false} />;
+}
+function ColorPickerNativeDemo() {
+  const [c, setC] = useState<string | null>(null);
+  return <ColorPicker label="Background" value={c} onChange={setC} showNoColor showHexInput showNativePicker swatches={[]} />;
+}
 
 function DateRangeDemo() {
   const [range, setRange] = useState<{ start: Date | null; end: Date | null }>({ start: null, end: null });
@@ -125,6 +139,94 @@ export function DatePicker({ id, label, hint, error, value, onChange, disabled, 
           layout: 'stack' as const,
           preview: <FileInput id="fi-disabled" label="Disabled upload" disabled />,
           code: `<FileInput id="upload" label="Disabled upload" disabled />`,
+        },
+      ],
+    },
+    {
+      id: 'color-picker',
+      title: 'ColorPicker',
+      category: 'Molecule',
+      abbr: 'Cp',
+      description:
+        'Color selection control with a 32-swatch preset palette plus optional hex input and native browser color picker for unlimited colors. Pixel-identical EJS sibling at modules/ui/ColorPicker.ejs. Used by RichTextEditor for text + highlight colors.',
+      filePath: 'modules/ui/ColorPicker.tsx',
+      sourceCode: `'use client';
+import { ColorPicker } from '@/modules/ui/ColorPicker';
+
+const [color, setColor] = useState<string | null>('#3b82f6');
+
+<ColorPicker
+  label="Brand color"
+  value={color}
+  onChange={setColor}
+  showNoColor
+/>
+
+// Compact (swatches only):
+<ColorPicker
+  value={color}
+  onChange={setColor}
+  showHexInput={false}
+  showNativePicker={false}
+/>
+
+// Custom palette + hex / native only:
+<ColorPicker
+  value={color}
+  onChange={setColor}
+  swatches={['#ff0000', '#00ff00', '#0000ff']}
+  showHexInput
+  showNativePicker
+/>`,
+      since: '2026-05',
+      composes: ['button'],
+      designTokens: [
+        '--surface-base', '--surface-raised', '--surface-overlay', '--surface-sunken',
+        '--text-primary', '--text-secondary', '--text-disabled',
+        '--border', '--border-focus',
+      ],
+      a11y: {
+        wcagLevel: 'AA',
+        ariaPatterns: ['button', 'dialog'],
+        keyboardInteractions: [
+          { keys: 'Enter / Space', action: 'Open / close the picker' },
+          { keys: 'Tab',            action: 'Move between swatches' },
+          { keys: 'Enter (in hex)', action: 'Commit hex value' },
+          { keys: 'Escape',         action: 'Close picker' },
+        ],
+      },
+      variants: [
+        {
+          title: 'Default',
+          layout: 'stack' as const,
+          preview: <ColorPickerDemo />,
+          code: `const [c, setC] = useState<string | null>('#3b82f6');
+<ColorPicker label="Brand color" value={c} onChange={setC} showNoColor />`,
+        },
+        {
+          title: 'Compact (swatches only)',
+          layout: 'stack' as const,
+          preview: <ColorPickerCompactDemo />,
+          code: `<ColorPicker
+  value={c}
+  onChange={setC}
+  showHexInput={false}
+  showNativePicker={false}
+/>`,
+        },
+        {
+          title: 'Hex + native picker only (no swatches)',
+          layout: 'stack' as const,
+          preview: <ColorPickerNativeDemo />,
+          code: `<ColorPicker
+  label="Background"
+  value={c}
+  onChange={setC}
+  swatches={[]}
+  showHexInput
+  showNativePicker
+  showNoColor
+/>`,
         },
       ],
     },

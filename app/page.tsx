@@ -1,5 +1,5 @@
-import { ShowcaseShell } from '@/modules/showcase/ui/ShowcaseShell';
+import { HomePanel } from '@/modules/showcase/ui/HomePanel';
 
 export default function Page() {
-  return <ShowcaseShell selectedId={null} />;
+  return <HomePanel />;
 }

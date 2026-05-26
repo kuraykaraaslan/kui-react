@@ -3,11 +3,11 @@
 - **id:** `rich-text-editor`
 - **layer:** app
 - **category:** App
-- **filePath:** `modules/app/RichTextEditor.tsx`
+- **filePath:** `modules/app/RichTextEditor/index.tsx`
 - **status:** stable
 - **since:** 2026-05
 
-WYSIWYG editor for long-form prose. Built on Quill 2.x — single shared library on both the React and EJS sibling repos so output HTML is identical. Toolbar covers bold/italic/underline/strike/inline code, headings, blockquote, code block, lists, link, image (via Modal + FileInput), text align, clear formatting, undo/redo.
+Quill 2.x WYSIWYG editor with token-tinted snow theme. Production features: controlled value, imperative ref API, onBlur, name+hidden-form-sync, drag-and-drop image upload with onImageUpload callback, paste sanitization (Word / GDocs cleanup), char + word counter with maxLength, autosave to localStorage, markdown shortcuts, color + highlight, sub/sup, indent/outdent, horizontal rule, tables, emoji picker, @-mentions, /-slash command menu, selection bubble menu, image resize/align overlay, fullscreen mode. Pixel-identical EJS sibling at modules/app/RichTextEditor.ejs.
 
 ## Depends on
 
@@ -18,49 +18,55 @@ WYSIWYG editor for long-form prose. Built on Quill 2.x — single shared library
 ## Accessibility
 
 - WCAG: AA
-- ARIA patterns: textbox, toolbar
+- ARIA patterns: textbox, toolbar, dialog, listbox
 - Keyboard:
   - `Ctrl/Cmd + B` — Bold selection
   - `Ctrl/Cmd + I` — Italic selection
   - `Ctrl/Cmd + U` — Underline selection
   - `Ctrl/Cmd + Z` — Undo
   - `Ctrl/Cmd + Shift + Z` — Redo
+  - `Tab / Shift+Tab` — Indent / outdent in lists
+  - `@` — Open mention suggestions
+  - `/` — Open slash-command menu (at line start)
+  - `** ** / * * / ` `` — Markdown bold / italic / code
+  - `# / ## / ###` — Markdown headings
+  - `- / * / 1.` — Markdown bullet / numbered list
+  - `> ` — Markdown blockquote
 
 ## Design tokens consumed
 
 - `--surface-base`
 - `--surface-sunken`
 - `--surface-raised`
+- `--surface-overlay`
 - `--text-primary`
 - `--text-secondary`
 - `--text-disabled`
 - `--border`
 - `--border-focus`
 - `--primary`
+- `--primary-subtle`
 - `--error`
 
 ## Variants
 
-### Empty
+### Empty + counter
 
 ```tsx
 const [body, setBody] = useState('');
-
 <RichTextEditor
   id="article-body"
   label="Article body"
-  hint="Use the toolbar to format your text."
   value={body}
   onChange={setBody}
-  placeholder="Start writing your article…"
+  showCounter
+  showWordCount
 />
 ```
 
 ### Pre-populated
 
 ```tsx
-const initial = '<h1>Release notes</h1><p>...</p>';
-
 <RichTextEditor
   id="release-notes"
   label="Release notes"
@@ -74,37 +80,119 @@ const initial = '<h1>Release notes</h1><p>...</p>';
 ```tsx
 <RichTextEditor
   id="archived"
-  label="Archived document"
-  hint="This document is read-only."
   defaultValue={savedHtml}
   readOnly
+/>
+```
+
+### Max length (200 chars)
+
+```tsx
+<RichTextEditor
+  id="short-summary"
+  maxLength={200}
+  showCounter
+/>
+```
+
+### Mentions + slash commands
+
+```tsx
+<RichTextEditor
+  id="comment"
+  mentions={[
+    { id: 'u1', label: 'Jane Doe', description: 'Designer' },
+    { id: 'u2', label: 'John Smith', description: 'Engineer' },
+  ]}
+  slashItems={[
+    { id: 'h1', label: 'Heading 1', action: (q) => q.format('header', 1, 'user') },
+    { id: 'list', label: 'Bullet list', action: (q) => q.format('list', 'bullet', 'user') },
+  ]}
+/>
+```
+
+### Imperative ref API
+
+```tsx
+const ref = useRef<RichTextEditorHandle>(null);
+<RichTextEditor ref={ref} id="reply" />
+ref.current?.focus();
+ref.current?.clear();
+ref.current?.insertHTML('<p>Hi!</p>');
+const text = ref.current?.getText();
+```
+
+### Form integration
+
+```tsx
+<form action="/api/post" method="post">
+  <RichTextEditor id="post" name="body" defaultValue={savedHtml} />
+  <button type="submit">Save</button>
+</form>
+```
+
+### Autosave
+
+```tsx
+<RichTextEditor
+  id="draft"
+  autosaveKey="my-draft"
+  placeholder="Survives page refresh…"
 />
 ```
 
 ## Full source
 
 ```tsx
-import { RichTextEditor } from '@/modules/app/RichTextEditor';
+import { useRef, useState } from 'react';
+import { RichTextEditor, type RichTextEditorHandle } from '@/modules/app/RichTextEditor';
 
+// Controlled with counter + maxLength:
 const [body, setBody] = useState('');
-
 <RichTextEditor
   id="article-body"
   label="Article body"
-  hint="Use the toolbar to format your text."
   value={body}
   onChange={setBody}
-  placeholder="Start writing your article…"
+  maxLength={2000}
+  showCounter
+  showWordCount
 />
 
-// Pre-populated, uncontrolled:
+// Imperative handle:
+const ref = useRef<RichTextEditorHandle>(null);
+<RichTextEditor ref={ref} id="reply" />
+ref.current?.focus();
+ref.current?.insertHTML('<p>Hi!</p>');
+
+// Form integration (hidden input synced to 'body'):
+<form>
+  <RichTextEditor id="post" name="body" defaultValue={savedHtml} />
+  <button type="submit">Save</button>
+</form>
+
+// Image upload to CDN instead of base64:
 <RichTextEditor
-  id="release-notes"
-  label="Release notes"
-  defaultValue={initialHtml}
-  onChange={setBody}
+  id="cms"
+  onImageUpload={async (file) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    const r = await fetch('/api/upload', { method: 'POST', body: fd });
+    const { url } = await r.json();
+    return url;
+  }}
 />
 
-// Read-only (toolbar hidden):
-<RichTextEditor id="archived" defaultValue={savedHtml} readOnly />
+// Autosave to localStorage:
+<RichTextEditor id="draft" autosaveKey="my-draft" />
+
+// Mentions + slash commands:
+<RichTextEditor
+  id="comment"
+  mentions={[{ id: 'u1', label: 'Jane Doe', description: 'Designer' }]}
+  slashItems={[{
+    id: 'h1', label: 'Heading 1',
+    action: (q) => q.format('header', 1, 'user'),
+  }]}
+/>
 ```
