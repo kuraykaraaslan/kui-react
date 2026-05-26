@@ -105,6 +105,34 @@ function TreeViewFlatDemo() {
   );
 }
 
+function TreeViewMultiSelectDemo() {
+  const [ids, setIds] = useState<string[]>(['Card']);
+  return (
+    <TreeView
+      label="Project files (multi-select + type-ahead)"
+      selectionMode="multi"
+      selectedIds={ids}
+      onSelectionChange={setIds}
+      nodes={[
+        { id: 'docs', label: 'Documents', children: [
+          { id: 'spec', label: 'spec.md' },
+          { id: 'roadmap', label: 'roadmap.md' },
+        ]},
+        { id: 'src', label: 'src', children: [
+          { id: 'Button', label: 'Button.tsx' },
+          { id: 'Card', label: 'Card.tsx' },
+          { id: 'Drawer', label: 'Drawer.tsx' },
+          { id: 'TreeView', label: 'TreeView.tsx' },
+        ]},
+        { id: 'tests', label: 'tests', children: [
+          { id: 'unit', label: 'unit' },
+          { id: 'e2e', label: 'e2e' },
+        ]},
+      ]}
+    />
+  );
+}
+
 export function buildNavigationData(): ShowcaseComponent[] {
   return [
     {
@@ -386,8 +414,8 @@ export function Breadcrumb({ items, className }) {
       category: 'Organism',
       abbr: 'Tv',
       description: 'Collapsible tree with keyboard navigation, selection, and aria-tree roles.',
-      filePath: 'modules/ui/TreeView.tsx',
-      sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\n\nexport function TreeView({ nodes, selectedId, onSelect, label }) {\n  // recursive treeitem rendering, arrow-key expand/collapse\n}`,
+      filePath: 'modules/ui/TreeView/index.tsx',
+      sourceCode: `'use client';\nimport { useTreeState } from './hooks/useTreeState';\nimport { useKeyboardNav } from './hooks/useKeyboardNav';\nimport { TreeNodeRow } from './parts/Node';\n\nexport function TreeView({ nodes, selectedId, selectedIds, onSelect, onSelectionChange, selectionMode = 'single', ... }) {\n  // M1: expand all / collapse all, single + multi (Cmd/Shift-click) selection,\n  //      arrow keys, Home/End, type-ahead jump, Space toggle, Enter activate.\n  // M2-M5: drag-drop, lazy load, virtualize, context menu, full ARIA polish.\n}`,
       variants: [
         {
           title: 'File tree',
@@ -403,6 +431,11 @@ export function Breadcrumb({ items, className }) {
           title: 'Flat list',
           preview: <TreeViewFlatDemo />,
           code: `function Demo() {\n  const [sel, setSel] = useState('ts');\n  return (\n    <TreeView label="Language selector" selectedId={sel} onSelect={setSel}\n      nodes={[\n        { id: 'ts', label: 'TypeScript' },\n        { id: 'js', label: 'JavaScript' },\n        { id: 'py', label: 'Python' },\n        { id: 'go', label: 'Go' },\n      ]}\n    />\n  );\n}`,
+        },
+        {
+          title: 'Multi-select + type-ahead',
+          preview: <TreeViewMultiSelectDemo />,
+          code: `function Demo() {\n  const [ids, setIds] = useState<string[]>(['Card']);\n  return (\n    <TreeView\n      label="Project files"\n      selectionMode="multi"\n      selectedIds={ids}\n      onSelectionChange={setIds}\n      nodes={[\n        { id: 'docs', label: 'Documents', children: [\n          { id: 'spec', label: 'spec.md' },\n          { id: 'roadmap', label: 'roadmap.md' },\n        ]},\n        { id: 'src', label: 'src', children: [\n          { id: 'Button', label: 'Button.tsx' },\n          { id: 'Card', label: 'Card.tsx' },\n          { id: 'Drawer', label: 'Drawer.tsx' },\n          { id: 'TreeView', label: 'TreeView.tsx' },\n        ]},\n      ]}\n    />\n  );\n}\n\n// Try it:\n//  - Cmd/Ctrl-click       → toggle individual rows\n//  - Shift-click          → range-select between anchor and clicked row\n//  - Type "tre"           → focus jumps to "TreeView.tsx"\n//  - Cmd/Ctrl+A           → select all visible rows\n//  - Arrow keys / Home/End / Space / Enter — full keyboard nav.`,
         },
       ],
     },
