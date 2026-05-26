@@ -467,12 +467,6 @@
     "category": "App",
     "file": "calendar.md"
   },
-  "notification-center": {
-    "name": "NotificationCenter",
-    "layer": "app",
-    "category": "App",
-    "file": "notification-center.md"
-  },
   "gantt": {
     "name": "Gantt",
     "layer": "app",

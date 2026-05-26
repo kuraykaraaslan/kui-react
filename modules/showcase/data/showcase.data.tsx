@@ -26,7 +26,6 @@ import { buildReviewsDomainData } from './sections/domain-reviews.showcase';
 import { buildPrimitiveChartsData } from './sections/ui-primitive-charts.showcase';
 import { buildAppKanbanBoardData } from './sections/app-kanban-board.showcase';
 import { buildAppCalendarData } from './sections/app-calendar.showcase';
-import { buildAppNotificationCenterData } from './sections/app-notification-center.showcase';
 import { buildAppGanttData } from './sections/app-gantt.showcase';
 import { buildAppFormBuilderData } from './sections/app-form-builder.showcase';
 import { buildMoleculeDiffViewerData } from './sections/ui-molecule-diff-viewer.showcase';
@@ -41,7 +40,6 @@ export function buildShowcaseData() {
     ...buildAppPatternsData(),
     ...buildAppKanbanBoardData(),
     ...buildAppCalendarData(),
-    ...buildAppNotificationCenterData(),
     ...buildAppGanttData(),
     ...buildAppFormBuilderData(),
     ...buildCommonDomainData(),
