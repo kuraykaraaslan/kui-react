@@ -97,7 +97,7 @@ function GlobalSearchLoadingDemo() {
   );
 }
 
-function AppCommandBarDemo({ custom }: { custom?: boolean }) {
+function AppCommandBarDemo({ variant }: { variant?: 'default' | 'custom' | 'fuzzy' }) {
   const customItems: CommandItem[] = [
     { icon: '🛍️', label: 'View Orders',    shortcut: 'G O', category: 'Navigation' },
     { icon: '📦', label: 'Inventory',      shortcut: 'G I', category: 'Navigation' },
@@ -107,9 +107,25 @@ function AppCommandBarDemo({ custom }: { custom?: boolean }) {
     { icon: '🕑', label: 'Customer: Acme', category: 'Recent' },
   ];
 
+  // M1 — bespoke groups + fuzzy-search-resistant labels. Try typing
+  // "kbd", "asgn" or "rls" to exercise the subsequence matcher.
+  const fuzzyItems: CommandItem[] = [
+    { icon: '⌨️', label: 'Open Keyboard Shortcuts',    shortcut: '?',   category: 'Help',         keywords: ['kbd', 'shortcuts'] },
+    { icon: '📚', label: 'Browse Documentation',       shortcut: 'G H', category: 'Help' },
+    { icon: '🔔', label: 'Notification Preferences',   shortcut: 'G N', category: 'Preferences' },
+    { icon: '🎨', label: 'Switch Theme: Solarized',    shortcut: 'T S', category: 'Preferences' },
+    { icon: '🛠️', label: 'Assign Reviewer to PR-42',  shortcut: 'A R', category: 'Workflows',    keywords: ['asgn', 'review'] },
+    { icon: '🚀', label: 'Release & Tag v1.4.0',       shortcut: 'R T', category: 'Workflows',    keywords: ['rls', 'deploy'] },
+    { icon: '🐛', label: 'Triage Latest Bug Reports',  category: 'Workflows' },
+  ];
+
+  let items: CommandItem[] | undefined;
+  if (variant === 'custom') items = customItems;
+  else if (variant === 'fuzzy') items = fuzzyItems;
+
   return (
     <AppCommandBar
-      items={custom ? customItems : undefined}
+      items={items}
       onSelect={() => {}}
     />
   );
@@ -236,9 +252,9 @@ export function Demo() {
       category: 'App',
       abbr: 'CB',
       description: 'Keyboard-first command palette. Opens with ⌘K; an items prop accepts custom commands while a default navigation/actions/recent set is included.',
-      filePath: 'modules/app/AppCommandBar.tsx',
+      filePath: 'modules/app/CommandPalette/index.tsx',
       sourceCode: `'use client';
-import { AppCommandBar } from '@/modules/app/AppCommandBar';
+import { AppCommandBar } from '@/modules/app/CommandPalette';
 
 // With default commands:
 <AppCommandBar onSelect={(item) => router.push(item.href)} />
@@ -261,12 +277,26 @@ import { AppCommandBar } from '@/modules/app/AppCommandBar';
         },
         {
           title: 'Özel items + trigger',
-          preview: <AppCommandBarDemo custom />,
+          preview: <AppCommandBarDemo variant="custom" />,
           code: `<AppCommandBar
   items={customItems}
   trigger={<Button variant="ghost" size="sm" iconRight={<Badge variant="neutral" size="sm">⌘K</Badge>}>Search…</Button>}
   onSelect={handleSelect}
 />`,
+        },
+        {
+          title: 'Fuzzy search + özel gruplar',
+          preview: <AppCommandBarDemo variant="fuzzy" />,
+          code: `// Try typing "kbd", "asgn" or "rls" to exercise the subsequence matcher.
+const fuzzyItems = [
+  { icon: '⌨️', label: 'Open Keyboard Shortcuts',  shortcut: '?',   category: 'Help',        keywords: ['kbd'] },
+  { icon: '📚', label: 'Browse Documentation',     shortcut: 'G H', category: 'Help' },
+  { icon: '🔔', label: 'Notification Preferences', shortcut: 'G N', category: 'Preferences' },
+  { icon: '🛠️', label: 'Assign Reviewer to PR-42', shortcut: 'A R', category: 'Workflows',   keywords: ['asgn'] },
+  { icon: '🚀', label: 'Release & Tag v1.4.0',     shortcut: 'R T', category: 'Workflows',   keywords: ['rls'] },
+];
+
+<AppCommandBar items={fuzzyItems} />`,
         },
       ],
     },
