@@ -44,6 +44,12 @@ export type { FilterField, FilterValues } from './FilterBar';
 export { StepFlow } from './StepFlow';
 export type { StepFlowStep } from './StepFlow';
 export { StepShell } from './StepShell';
+export { FileUploadSection } from './FileUploadSection';
+export type {
+  FileItem,
+  FileUploadSectionProps,
+  FileUploadSectionMessages,
+} from './FileUploadSection';
 
 // Content / detail
 export { DetailHeader } from './DetailHeader';

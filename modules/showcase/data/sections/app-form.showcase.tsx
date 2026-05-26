@@ -9,6 +9,7 @@ import { MultiSelect } from '@/modules/ui/MultiSelect';
 import { Toggle } from '@/modules/ui/Toggle';
 import { Textarea } from '@/modules/ui/Textarea';
 import { FilterBar, type FilterField, type FilterValues } from '@/modules/app/FilterBar';
+import { FileUploadSection } from '@/modules/app/FileUploadSection';
 import { Button } from '@/modules/ui/Button';
 import { useState } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
@@ -379,6 +380,63 @@ export function Demo() {
           layout: 'stack' as const,
           preview: <FilterBarDemo compact />,
           code: `<FilterBar fields={fields.slice(0, 2)} values={values} onChange={handleChange} />`,
+        },
+      ],
+    },
+    {
+      id: 'file-upload-section',
+      title: 'FileUploadSection',
+      category: 'App',
+      abbr: 'FU',
+      description:
+        'High-level upload organism: drop zone + file list + remove. M1 implements drag/drop, paste-from-clipboard, accept-pattern + maxSize + maxFiles validation. M2 will add image thumbnails + crop dialog; M3 chunked + resumable uploads. Pixel-identical EJS sibling at modules/app/FileUploadSection/FileUploadSection.ejs.',
+      filePath: 'modules/app/FileUploadSection/index.tsx',
+      sourceCode: `'use client';
+import { FileUploadSection } from '@/modules/app/FileUploadSection';
+
+export function Demo() {
+  return (
+    <FileUploadSection
+      title="Project attachments"
+      hint="Drop files or paste a screenshot"
+      multiple
+      enablePaste
+      accept="image/*,.pdf"
+      maxFiles={6}
+      maxSizeBytes={5 * 1024 * 1024}
+    />
+  );
+}`,
+      variants: [
+        {
+          title: 'Basic drop zone',
+          layout: 'stack' as const,
+          preview: (
+            <FileUploadSection
+              title="Project attachments"
+              hint="PDF, images up to 5 MB each"
+              multiple
+              accept="image/*,.pdf"
+              maxSizeBytes={5 * 1024 * 1024}
+            />
+          ),
+          code: `<FileUploadSection title="Project attachments" hint="PDF, images up to 5 MB each"\n  multiple accept="image/*,.pdf" maxSizeBytes={5242880} />`,
+        },
+        {
+          title: 'Paste from clipboard',
+          layout: 'stack' as const,
+          preview: (
+            <FileUploadSection
+              title="Bug report screenshots"
+              hint="Drop, browse, or paste (Cmd/Ctrl + V while focused)"
+              multiple
+              enablePaste
+              accept="image/*"
+              maxFiles={5}
+              maxSizeBytes={4 * 1024 * 1024}
+            />
+          ),
+          code: `<FileUploadSection title="Bug report screenshots" multiple enablePaste\n  accept="image/*" maxFiles={5} maxSizeBytes={4 * 1024 * 1024}\n  hint="Drop, browse, or paste (Cmd/Ctrl + V while focused)" />`,
         },
       ],
     },

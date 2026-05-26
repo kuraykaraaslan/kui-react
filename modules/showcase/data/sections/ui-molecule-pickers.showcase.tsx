@@ -199,9 +199,10 @@ const [range, setRange] = useState<DateRange>({ start: null, end: null });
       title: 'FileInput',
       category: 'Molecule',
       abbr: 'Fi',
-      description: 'Drag-and-drop file upload with validation, file list, and individual remove actions.',
-      filePath: 'modules/ui/FileInput.tsx',
-      sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useRef, useState } from 'react';\n\nexport function FileInput({ id, label, multiple, accept, maxSizeBytes, allowedTypes, disabled }) {\n  // drag-and-drop + browse, validates size/type, lists files with errors\n}`,
+      description:
+        'Drag-and-drop file upload with validation, file list, and individual remove actions. M1 adds paste-from-clipboard, `accept` MIME-pattern + extension validation, and `maxFiles` enforcement with i18n messages. Pixel-identical EJS sibling at modules/ui/FileInput/FileInput.ejs.',
+      filePath: 'modules/ui/FileInput/index.tsx',
+      sourceCode: `'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useRef, useState, useEffect } from 'react';\n\nexport function FileInput({ id, label, multiple, accept, maxSizeBytes, maxFiles, allowedTypes, disabled, enablePaste, onFiles, onUpload, messages }) {\n  // drag-and-drop + browse + paste, validates size/type/count, lists files with errors\n}`,
       variants: [
         {
           title: 'Single file',
@@ -220,6 +221,23 @@ const [range, setRange] = useState<DateRange>({ start: null, end: null });
           layout: 'stack' as const,
           preview: <FileInput id="fi-upload" label="Project attachments" multiple hint="Up to 5 MB each" maxSizeBytes={5 * 1024 * 1024} onUpload={async (files) => { await new Promise((r) => setTimeout(r, 800)); console.log('uploaded', files); }} uploadLabel="Upload" />,
           code: `<FileInput id="attachments" label="Project attachments" multiple maxSizeBytes={5242880}\n  onUpload={uploadFiles} uploadLabel="Upload" />`,
+        },
+        {
+          title: 'Paste from clipboard',
+          layout: 'stack' as const,
+          preview: (
+            <FileInput
+              id="fi-paste"
+              label="Screenshot drop"
+              multiple
+              enablePaste
+              accept="image/*"
+              maxFiles={4}
+              maxSizeBytes={4 * 1024 * 1024}
+              hint="Drop, browse, or paste a screenshot from your clipboard (Cmd/Ctrl + V while this card is focused)."
+            />
+          ),
+          code: `<FileInput id="screenshots" label="Screenshot drop" multiple enablePaste\n  accept="image/*" maxFiles={4} maxSizeBytes={4 * 1024 * 1024}\n  hint="Drop, browse, or paste a screenshot (Cmd/Ctrl + V)." />`,
         },
         {
           title: 'Disabled',

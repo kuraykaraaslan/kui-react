@@ -262,6 +262,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'theme-switcher',  title: 'ThemeSwitcher', category: 'App', abbr: 'TS', since: '2026-05' },
       { id: 'rich-text-editor',title: 'RichTextEditor',category: 'App', abbr: 'RT', since: '2026-05' },
       { id: 'context-menu',   title: 'ContextMenu',   category: 'App', abbr: 'CM', since: '2026-05' },
+      { id: 'file-upload-section', title: 'FileUploadSection', category: 'App', abbr: 'FU', since: '2026-05' },
     ],
   },
   {
