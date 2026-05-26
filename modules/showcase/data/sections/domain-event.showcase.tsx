@@ -766,7 +766,7 @@ export function buildEventDomainData(): ShowcaseComponent[] {
       category: 'Domain',
       abbr: 'SM',
       description: 'Görsel koltuk seçim haritası: section/subsection sekme desteği, sıra-koltuk grid, renk kodlu durum, erişilebilirlik göstergesi.',
-      filePath: 'modules/domains/event/SeatMapPicker.tsx',
+      filePath: 'modules/domains/event/SeatMapPicker/index.tsx',
       sourceCode: `import { SeatMapPicker, buildSectionTree } from '@/modules/domains/event/SeatMapPicker';
 
 // Flat veriden ağaç oluştur

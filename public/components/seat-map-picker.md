@@ -3,7 +3,7 @@
 - **id:** `seat-map-picker`
 - **layer:** domain
 - **category:** Domain
-- **filePath:** `modules/domains/event/SeatMapPicker.tsx`
+- **filePath:** `modules/domains/event/SeatMapPicker/index.tsx`
 - **status:** beta
 - **since:** 2025-04
 
