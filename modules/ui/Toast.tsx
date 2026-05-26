@@ -1,267 +1,32 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { cn } from '@/libs/utils/cn';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleCheck, faTriangleExclamation, faCircleXmark, faCircleInfo, faSpinner, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { useToastStore, getEffectiveDuration, type ToastVariant, type ToastItem } from './Toast.store';
+// modules/ui/Toast.tsx
+//
+// Thin re-export shim — the real implementation now lives in the
+// directory-style module `./Toast/`. Existing imports such as
+//   import { ToastProvider, toast, useToastStore } from '@/modules/ui/Toast';
+// continue to resolve through this barrel.
+//
+// M1 milestone — see PLANS/26-Toast.md.
 
-export { useToastStore, toast } from './Toast.store';
-export type { ToastItem, ToastVariant, ToastItemAction } from './Toast.store';
+export {
+  Toaster,
+  ToastProvider,
+  ToastRegion,
+  Toast,
+  toast,
+  useToast,
+  useToastStore,
+  getEffectiveDuration,
+} from './Toast/index';
 
-/** @deprecated */
-export type ToastAction = { label: string; onClick: () => void };
-
-// ─── Variant config ────────────────────────────────────────────────────────────
-
-type VariantConfig = { container: string; iconColor: string; progressColor: string; defaultIcon: React.ReactNode };
-
-const variantMap: Record<ToastVariant, VariantConfig> = {
-  success: {
-    container:     'bg-success-subtle border-success',
-    iconColor:     'text-success-fg',
-    progressColor: 'bg-success',
-    defaultIcon:   <FontAwesomeIcon icon={faCircleCheck} className="size-4 shrink-0" />,
-  },
-  warning: {
-    container:     'bg-warning-subtle border-warning',
-    iconColor:     'text-warning',
-    progressColor: 'bg-warning',
-    defaultIcon:   <FontAwesomeIcon icon={faTriangleExclamation} className="size-4 shrink-0" />,
-  },
-  error: {
-    container:     'bg-error-subtle border-error',
-    iconColor:     'text-error',
-    progressColor: 'bg-error',
-    defaultIcon:   <FontAwesomeIcon icon={faCircleXmark} className="size-4 shrink-0" />,
-  },
-  info: {
-    container:     'bg-info-subtle border-info',
-    iconColor:     'text-info',
-    progressColor: 'bg-info',
-    defaultIcon:   <FontAwesomeIcon icon={faCircleInfo} className="size-4 shrink-0" />,
-  },
-  loading: {
-    container:     'bg-surface-raised border-border',
-    iconColor:     'text-text-secondary',
-    progressColor: 'bg-primary',
-    defaultIcon:   <FontAwesomeIcon icon={faSpinner} className="size-4 shrink-0 animate-spin" />,
-  },
-};
-
-// ─── ToastCard ─────────────────────────────────────────────────────────────────
-
-const TICK_MS = 50;
-
-function ToastCard({ item, onRemove }: { item: ToastItem; onRemove: () => void }) {
-  const duration = getEffectiveDuration(item);
-  const hasDuration = duration !== null;
-
-  const [progress, setProgress] = useState(100);
-  const [paused, setPaused]     = useState(false);
-  const [show, setShow]         = useState(false);
-  const [exiting, setExiting]   = useState(false);
-
-  const remainingRef  = useRef(duration ?? 0);
-  const lastTickRef   = useRef(0);
-
-  // Enter animation
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setShow(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
-
-  const dismiss = useCallback(() => {
-    setExiting(true);
-    setTimeout(onRemove, 250);
-  }, [onRemove]);
-
-  // Countdown tick
-  useEffect(() => {
-    if (!hasDuration || paused || exiting) return;
-    lastTickRef.current = Date.now();
-    const id = setInterval(() => {
-      const elapsed = Date.now() - lastTickRef.current;
-      lastTickRef.current = Date.now();
-      remainingRef.current = Math.max(0, remainingRef.current - elapsed);
-      setProgress((remainingRef.current / duration!) * 100);
-      if (remainingRef.current <= 0) { clearInterval(id); dismiss(); }
-    }, TICK_MS);
-    return () => clearInterval(id);
-  }, [hasDuration, paused, exiting, duration, dismiss]);
-
-  // Pause when browser tab loses focus
-  useEffect(() => {
-    if (!hasDuration) return;
-    const handler = () => setPaused(document.hidden);
-    document.addEventListener('visibilitychange', handler);
-    return () => document.removeEventListener('visibilitychange', handler);
-  }, [hasDuration]);
-
-  // Re-sync remaining when duration changes (e.g. loading → success)
-  useEffect(() => {
-    remainingRef.current = duration ?? 0;
-    setProgress(100);
-    setExiting(false);
-  }, [duration]);
-
-  const { container, iconColor, progressColor, defaultIcon } = variantMap[item.variant];
-  const icon = item.icon ?? defaultIcon;
-  const showClose = item.closeButton !== false;
-
-  return (
-    <div
-      role={item.variant === 'error' ? 'alert' : 'status'}
-      aria-live={item.variant === 'error' ? 'assertive' : 'polite'}
-      onMouseEnter={() => hasDuration && setPaused(true)}
-      onMouseLeave={() => hasDuration && setPaused(false)}
-      className={cn(
-        'relative w-80 rounded-xl border shadow-lg overflow-hidden pointer-events-auto',
-        'transition-all duration-250 ease-out',
-        show && !exiting ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-3 scale-95',
-        container,
-      )}
-    >
-      {/* Body */}
-      <div className="flex items-start gap-3 px-4 pt-4 pb-3">
-        {/* Icon */}
-        <span className={cn('mt-0.5', iconColor)} aria-hidden="true">{icon}</span>
-
-        {/* Text */}
-        <div className="flex-1 min-w-0">
-          {item.title && (
-            <p className="text-sm font-semibold text-text-primary leading-snug">{item.title}</p>
-          )}
-          <p className={cn('text-sm text-text-secondary leading-snug', item.title && 'mt-0.5')}>
-            {item.message}
-          </p>
-
-          {/* Actions */}
-          {item.actions && item.actions.length > 0 && (
-            <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2.5">
-              {item.actions.map((action, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => action.onClick(dismiss)}
-                  className={cn(
-                    'text-xs font-semibold rounded transition-opacity hover:opacity-70',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
-                    action.variant === 'danger' ? 'text-error' : 'text-text-primary underline underline-offset-2',
-                  )}
-                >
-                  {action.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Close */}
-        {showClose && (
-          <button
-            type="button"
-            aria-label="Dismiss"
-            onClick={dismiss}
-            className={cn(
-              'shrink-0 mt-0.5 rounded text-text-secondary hover:text-text-primary transition-colors',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
-            )}
-          >
-            <FontAwesomeIcon icon={faXmark} className="size-3.5" />
-          </button>
-        )}
-      </div>
-
-      {/* Progress bar */}
-      {hasDuration && (
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black/5">
-          <div
-            className={cn('h-full rounded-full transition-none', progressColor)}
-            style={{ width: `${progress}%`, opacity: 0.5 }}
-          />
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Position ──────────────────────────────────────────────────────────────────
-
-export type ToastPosition = 'top-right' | 'top-left' | 'top-center' | 'bottom-right' | 'bottom-left' | 'bottom-center';
-
-const positionMap: Record<ToastPosition, string> = {
-  'top-right':     'top-4 right-4 items-end',
-  'top-left':      'top-4 left-4 items-start',
-  'top-center':    'top-4 left-1/2 -translate-x-1/2 items-center',
-  'bottom-right':  'bottom-4 right-4 items-end',
-  'bottom-left':   'bottom-4 left-4 items-start',
-  'bottom-center': 'bottom-4 left-1/2 -translate-x-1/2 items-center',
-};
-
-// ─── ToastProvider ─────────────────────────────────────────────────────────────
-
-export function ToastProvider({ position = 'top-right' }: { position?: ToastPosition }) {
-  const { toasts, remove } = useToastStore();
-
-  return (
-    <div
-      className={cn(
-        'fixed z-[90] flex flex-col gap-2 pointer-events-none',
-        positionMap[position],
-      )}
-    >
-      {toasts.map((t) => (
-        <ToastCard key={t.id} item={t} onRemove={() => remove(t.id)} />
-      ))}
-    </div>
-  );
-}
-
-// ─── Deprecated compat exports ─────────────────────────────────────────────────
-
-/** @deprecated Use ToastProvider + toast helper instead */
-export function Toast({
-  variant = 'info',
-  message,
-  duration,
-  onDismiss,
-  action,
-}: {
-  variant?: ToastVariant;
-  message: string;
-  duration?: number;
-  onDismiss?: () => void;
-  action?: { label: string; onClick: () => void };
-}) {
-  const item: ToastItem = {
-    id: '',
-    variant,
-    message,
-    duration,
-    actions: action ? [{ label: action.label, onClick: (d) => { action.onClick(); d(); } }] : undefined,
-  };
-  return <ToastCard item={item} onRemove={onDismiss ?? (() => {})} />;
-}
-
-/** @deprecated Use ToastProvider instead */
-export function ToastRegion({
-  children,
-  position = 'top-right',
-  className,
-}: {
-  children?: React.ReactNode;
-  position?: ToastPosition;
-  className?: string;
-}) {
-  return (
-    <div
-      className={cn(
-        'fixed z-50 flex flex-col gap-2 pointer-events-none',
-        positionMap[position],
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
-}
+export type {
+  ToastApi,
+  ToastItem,
+  ToastItemAction,
+  ToastMessages,
+  ToastOptions,
+  ToastPosition,
+  ToastVariant,
+  ToastAction,
+  ToasterProps,
+} from './Toast/index';

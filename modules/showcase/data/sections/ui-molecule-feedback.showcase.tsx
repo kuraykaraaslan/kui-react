@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/modules/ui/Button';
 import { AlertBanner } from '@/modules/ui/AlertBanner';
-import { ToastProvider, toast, useToastStore } from '@/modules/ui/Toast';
+import { Toaster, toast, useToastStore } from '@/modules/ui/Toast';
 import { EmptyState } from '@/modules/ui/EmptyState';
 import { useState } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
@@ -17,7 +17,7 @@ function ToastVariantsDemo() {
         <Button size="sm" variant="danger"    onClick={() => toast.error('Kaydetme başarısız oldu.')}>Error</Button>
         <Button size="sm" variant="ghost"     onClick={clear}>Temizle</Button>
       </div>
-      <ToastProvider position="top-right" />
+      <Toaster position="top-right" />
     </div>
   );
 }
@@ -84,6 +84,42 @@ function ToastLoadingDemo() {
       <Button size="sm" variant="danger"  onClick={fireError}>promise() → error</Button>
       <Button size="sm" variant="outline" onClick={() => toast.loading('İşleniyor...')}>loading()</Button>
       <Button size="sm" variant="ghost"   onClick={clear}>Temizle</Button>
+    </div>
+  );
+}
+
+// Dedicated demo for the post-M1 `toast.promise(p, { loading, success, error })`
+// API. Single helper that fires a happy-path + an error-path promise so the
+// loading → success / loading → error transitions are easy to compare.
+function ToastPromiseApiDemo() {
+  const { clear } = useToastStore();
+  type User = { id: number; name: string };
+
+  function fetchUser(): Promise<User> {
+    return new Promise((res) => setTimeout(() => res({ id: 42, name: 'Ada Lovelace' }), 2000));
+  }
+  function fetchBroken(): Promise<User> {
+    return new Promise((_, rej) => setTimeout(() => rej(new Error('500 Server Error')), 1800));
+  }
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Button size="sm" variant="primary" onClick={() =>
+        toast.promise(fetchUser(), {
+          loading: 'Kullanıcı yükleniyor...',
+          success: (u) => `${u.name} (#${u.id}) yüklendi.`,
+          error:   (e) => `Hata: ${(e as Error).message}`,
+        })
+      }>promise() happy path</Button>
+      <Button size="sm" variant="danger" onClick={() =>
+        toast.promise(fetchBroken(), {
+          loading: 'İstek gönderiliyor...',
+          success: 'Tamamlandı!',
+          error:   (e) => `Başarısız: ${(e as Error).message}`,
+        })
+      }>promise() error path</Button>
+      <Button size="sm" variant="ghost" onClick={clear}>Temizle</Button>
+      <Toaster position="bottom-right" max={5} />
     </div>
   );
 }
@@ -190,9 +226,9 @@ export function AlertBanner({ variant = 'info', title, message, dismissible = fa
       category: 'Organism',
       abbr: 'To',
       description: 'Notification system with success/warning/error/info/loading variants. Hover-to-freeze, progress bar, title, actions, and promise support.',
-      filePath: 'modules/ui/Toast.tsx',
+      filePath: 'modules/ui/Toast/index.tsx',
       sourceCode: `// Mount once at app root
-<ToastProvider position="top-right" />
+<Toaster position="top-right" max={5} />
 
 // Fire from anywhere
 import { toast } from '@/modules/ui/Toast';
@@ -242,6 +278,25 @@ const { clear } = useToastStore();`,
           layout: 'stack' as const,
           preview: <ToastLoadingDemo />,
           code: `// Loading state (persistent until updated)\ntoast.loading('İşleniyor...');\n\n// Promise: auto-transitions loading → success/error\ntoast.promise(fetchData(), {\n  loading: 'Yükleniyor...',\n  success: (data) => \`\${data.name} hazır.\`,\n  error: 'Yüklenemedi.',\n});`,
+        },
+        {
+          title: 'toast.promise() API',
+          layout: 'stack' as const,
+          preview: <ToastPromiseApiDemo />,
+          code: `// Single call drives one toast through loading → success | error.
+// Strings or value-aware functions are accepted for success/error.
+toast.promise(fetchUser(), {
+  loading: 'Kullanıcı yükleniyor...',
+  success: (u) => \`\${u.name} (#\${u.id}) yüklendi.\`,
+  error:   (e) => \`Hata: \${(e as Error).message}\`,
+});
+
+// Error path resolves to an assertive role="alert" toast.
+toast.promise(fetchBroken(), {
+  loading: 'İstek gönderiliyor...',
+  success: 'Tamamlandı!',
+  error:   (e) => \`Başarısız: \${(e as Error).message}\`,
+});`,
         },
       ],
     },
