@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-26T14:32:48.929Z",
+  "generatedAt": "2026-05-26T17:21:16.914Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -1152,6 +1152,64 @@
       ]
     },
     {
+      "id": "chart",
+      "name": "Chart",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/Chart/index.ts",
+      "abbr": "Ch",
+      "description": "Token-aware primitive chart library at @/modules/ui/Chart. M1 ships seven SVG-based charts (Line, Bar, Area, Pie, Donut, Scatter, SparkLine) that consume a unified `Series` data shape. Colors auto-resolve from --primary / --secondary / --success / --warning / --error / --info, so dark mode and theme swaps work without any extra work. Pixel-identical EJS sibling at modules/ui/Chart/Chart.ejs. M3+ stubs (BubbleChart, HeatmapChart, TreemapChart, RadarChart, FunnelChart, SankeyChart, CandlestickChart, GaugeChart) are exported but render null until implemented; see PLANS/38-Charts.md.",
+      "source": "'use client';\nimport { LineChart, BarChart, AreaChart, PieChart, DonutChart, ScatterChart, SparkLine, type Series } from '@/modules/ui/Chart';\n\nconst series: Series[] = [\n  { id: 'a', name: 'Active', data: [{ x: 'Mon', y: 12 }, { x: 'Tue', y: 19 }] },\n];\n\n<LineChart series={series} height={240} />\n<BarChart series={series} />\n<AreaChart series={series} />\n<PieChart series={series} />\n<DonutChart series={series} innerRadius={0.6} />\n<SparkLine values={[12, 14, 11, 17, 19]} />",
+      "variants": [
+        {
+          "title": "LineChart",
+          "code": "<LineChart\n  series={[\n    { id: 'active',  name: 'Active users', data: [{ x: 'Mon', y: 1200 }, /* … */] },\n    { id: 'signups', name: 'New signups',  data: [{ x: 'Mon', y: 300 },  /* … */] },\n  ]}\n  height={220}\n/>"
+        },
+        {
+          "title": "BarChart",
+          "code": "<BarChart\n  series={[\n    { id: 'revenue',  name: 'Revenue',  data: [{ x: 'Jan', y: 4200 }, /* … */] },\n    { id: 'expenses', name: 'Expenses', data: [{ x: 'Jan', y: 2800 }, /* … */] },\n  ]}\n  radius={4}\n/>"
+        },
+        {
+          "title": "AreaChart",
+          "code": "<AreaChart series={series} smooth fillOpacity={0.18} />"
+        },
+        {
+          "title": "PieChart",
+          "code": "<PieChart\n  series={[{\n    id: 'share', name: 'Category share',\n    data: [\n      { x: 'Electronics', y: 35 },\n      { x: 'Clothing',    y: 25 },\n      { x: 'Food',        y: 20 },\n      { x: 'Books',       y: 12 },\n      { x: 'Other',       y: 8 },\n    ],\n  }]}\n/>"
+        },
+        {
+          "title": "DonutChart",
+          "code": "<DonutChart series={pieSeries} innerRadius={0.62} />"
+        },
+        {
+          "title": "SparkLine",
+          "code": "<SparkLine values={[12, 14, 11, 17, 19, 16, 22]} width={120} height={28} filled />\n<SparkLine values={[5, 7, 6, 9, 8, 11]} width={120} height={28} />"
+        }
+      ],
+      "status": "beta",
+      "since": "2026-05",
+      "composes": [],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "img"
+        ],
+        "notes": "Each chart SVG uses role=\"img\" + aria-label. M5 will add a visually hidden data table for screen-reader parity and keyboard navigation between data points."
+      },
+      "designTokens": [
+        "--primary",
+        "--secondary",
+        "--success",
+        "--warning",
+        "--error",
+        "--info",
+        "--surface-raised",
+        "--border",
+        "--text-primary",
+        "--text-secondary"
+      ]
+    },
+    {
       "id": "card",
       "name": "Card",
       "layer": "ui",
@@ -2170,10 +2228,10 @@
       "name": "AppCommandBar",
       "layer": "app",
       "category": "App",
-      "filePath": "modules/app/AppCommandBar.tsx",
+      "filePath": "modules/app/CommandPalette/index.tsx",
       "abbr": "CB",
       "description": "Keyboard-first command palette. Opens with ⌘K; an items prop accepts custom commands while a default navigation/actions/recent set is included.",
-      "source": "'use client';\nimport { AppCommandBar } from '@/modules/app/AppCommandBar';\n\n// With default commands:\n<AppCommandBar onSelect={(item) => router.push(item.href)} />\n\n// With custom commands:\n<AppCommandBar\n  items={[\n    { icon: '🏠', label: 'Dashboard', shortcut: 'G D', category: 'Navigation' },\n    { icon: '➕', label: 'New Project', shortcut: '⌘N', category: 'Actions', onClick: handleNew },\n    { icon: '🕐', label: 'Recent Item', category: 'Recent' },\n  ]}\n  trigger={<Button variant=\"outline\" size=\"sm\">⌘K</Button>}\n  onSelect={handleSelect}\n/>",
+      "source": "'use client';\nimport { AppCommandBar } from '@/modules/app/CommandPalette';\n\n// With default commands:\n<AppCommandBar onSelect={(item) => router.push(item.href)} />\n\n// With custom commands:\n<AppCommandBar\n  items={[\n    { icon: '🏠', label: 'Dashboard', shortcut: 'G D', category: 'Navigation' },\n    { icon: '➕', label: 'New Project', shortcut: '⌘N', category: 'Actions', onClick: handleNew },\n    { icon: '🕐', label: 'Recent Item', category: 'Recent' },\n  ]}\n  trigger={<Button variant=\"outline\" size=\"sm\">⌘K</Button>}\n  onSelect={handleSelect}\n/>",
       "variants": [
         {
           "title": "Varsayılan komutlar",
@@ -2182,6 +2240,10 @@
         {
           "title": "Özel items + trigger",
           "code": "<AppCommandBar\n  items={customItems}\n  trigger={<Button variant=\"ghost\" size=\"sm\" iconRight={<Badge variant=\"neutral\" size=\"sm\">⌘K</Badge>}>Search…</Button>}\n  onSelect={handleSelect}\n/>"
+        },
+        {
+          "title": "Fuzzy search + özel gruplar",
+          "code": "// Try typing \"kbd\", \"asgn\" or \"rls\" to exercise the subsequence matcher.\nconst fuzzyItems = [\n  { icon: '⌨️', label: 'Open Keyboard Shortcuts',  shortcut: '?',   category: 'Help',        keywords: ['kbd'] },\n  { icon: '📚', label: 'Browse Documentation',     shortcut: 'G H', category: 'Help' },\n  { icon: '🔔', label: 'Notification Preferences', shortcut: 'G N', category: 'Preferences' },\n  { icon: '🛠️', label: 'Assign Reviewer to PR-42', shortcut: 'A R', category: 'Workflows',   keywords: ['asgn'] },\n  { icon: '🚀', label: 'Release & Tag v1.4.0',     shortcut: 'R T', category: 'Workflows',   keywords: ['rls'] },\n];\n\n<AppCommandBar items={fuzzyItems} />"
         }
       ],
       "status": "beta",
@@ -2544,6 +2606,62 @@
       "status": "stable",
       "since": "2026-05",
       "designTokens": []
+    },
+    {
+      "id": "code-editor",
+      "name": "CodeEditor",
+      "layer": "ui",
+      "category": "App",
+      "filePath": "modules/ui/CodeEditor/index.tsx",
+      "abbr": "CE",
+      "description": "Engine-agnostic code editor primitive. M1 ships a lightweight CodeMirror-style fallback engine (textarea + line-number gutter + active-line + theme + readonly + placeholder) so the public API is stable today. Future milestones: Monaco (VSCode) lazy engine, find/replace, multi-cursor, diagnostics (markers), custom autocomplete + hover, minimap, code folding, vim/emacs keymap. Pixel-identical EJS sibling at modules/ui/CodeEditor/CodeEditor.ejs. Used by RulesetEditor M3 + RichTextEditor code-block insert (planned).",
+      "source": "import { CodeEditor } from '@/modules/ui/CodeEditor';\n\n// Read-only snippet:\n<CodeEditor\n  id=\"example\"\n  language=\"js\"\n  theme=\"light\"\n  value={source}\n  readonly\n/>\n\n// Editable markdown (controlled):\nconst [src, setSrc] = useState('');\n<CodeEditor\n  id=\"readme\"\n  name=\"readme\"\n  label=\"README.md\"\n  language=\"markdown\"\n  theme=\"dark\"\n  value={src}\n  onChange={setSrc}\n  placeholder=\"Start typing markdown…\"\n/>\n\n// Opt-in Monaco engine (lazy — M2):\n<CodeEditor engine=\"monaco\" language=\"ts\" value={code} onChange={setCode} />",
+      "variants": [
+        {
+          "title": "JavaScript readonly",
+          "code": "<CodeEditor\n  id=\"example\"\n  label=\"example.js\"\n  language=\"js\"\n  theme=\"light\"\n  value={source}\n  readonly\n  showLineNumbers\n/>"
+        },
+        {
+          "title": "Markdown editable",
+          "code": "const [src, setSrc] = useState('# Hello');\n<CodeEditor\n  id=\"readme\"\n  name=\"readme\"\n  label=\"README.md\"\n  language=\"markdown\"\n  theme=\"dark\"\n  value={src}\n  onChange={setSrc}\n  placeholder=\"Start typing markdown…\"\n/>"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-05",
+      "composes": [],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "textbox"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Tab",
+            "action": "Move focus into / out of the editor"
+          },
+          {
+            "keys": "Arrow keys",
+            "action": "Move caret + sync active line gutter"
+          },
+          {
+            "keys": "Ctrl/Cmd + Z",
+            "action": "Browser-native undo (M1 textarea fallback)"
+          }
+        ]
+      },
+      "designTokens": [
+        "--surface-base",
+        "--surface-raised",
+        "--surface-overlay",
+        "--surface-sunken",
+        "--text-primary",
+        "--text-secondary",
+        "--text-disabled",
+        "--border",
+        "--border-strong",
+        "--border-focus",
+        "--error"
+      ]
     },
     {
       "id": "rich-text-editor",

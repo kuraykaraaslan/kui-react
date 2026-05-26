@@ -143,6 +143,12 @@
     "category": "Molecule",
     "file": "color-picker.md"
   },
+  "chart": {
+    "name": "Chart",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "chart.md"
+  },
   "card": {
     "name": "Card",
     "layer": "ui",
@@ -430,6 +436,12 @@
     "layer": "app",
     "category": "App",
     "file": "context-menu.md"
+  },
+  "code-editor": {
+    "name": "CodeEditor",
+    "layer": "ui",
+    "category": "App",
+    "file": "code-editor.md"
   },
   "rich-text-editor": {
     "name": "RichTextEditor",

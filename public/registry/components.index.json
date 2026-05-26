@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-26T14:32:48.929Z",
+  "generatedAt": "2026-05-26T17:21:16.914Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -668,6 +668,38 @@
       "variantCount": 4
     },
     {
+      "id": "chart",
+      "name": "Chart",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/Chart/index.ts",
+      "abbr": "Ch",
+      "description": "Token-aware primitive chart library at @/modules/ui/Chart. M1 ships seven SVG-based charts (Line, Bar, Area, Pie, Donut, Scatter, SparkLine) that consume a unified `Series` data shape. Colors auto-resolve from --primary / --secondary / --success / --warning / --error / --info, so dark mode and theme swaps work without any extra work. Pixel-identical EJS sibling at modules/ui/Chart/Chart.ejs. M3+ stubs (BubbleChart, HeatmapChart, TreemapChart, RadarChart, FunnelChart, SankeyChart, CandlestickChart, GaugeChart) are exported but render null until implemented; see PLANS/38-Charts.md.",
+      "status": "beta",
+      "since": "2026-05",
+      "composes": [],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "img"
+        ],
+        "notes": "Each chart SVG uses role=\"img\" + aria-label. M5 will add a visually hidden data table for screen-reader parity and keyboard navigation between data points."
+      },
+      "designTokens": [
+        "--primary",
+        "--secondary",
+        "--success",
+        "--warning",
+        "--error",
+        "--info",
+        "--surface-raised",
+        "--border",
+        "--text-primary",
+        "--text-secondary"
+      ],
+      "variantCount": 6
+    },
+    {
       "id": "card",
       "name": "Card",
       "layer": "ui",
@@ -1234,13 +1266,13 @@
       "name": "AppCommandBar",
       "layer": "app",
       "category": "App",
-      "filePath": "modules/app/AppCommandBar.tsx",
+      "filePath": "modules/app/CommandPalette/index.tsx",
       "abbr": "CB",
       "description": "Keyboard-first command palette. Opens with ⌘K; an items prop accepts custom commands while a default navigation/actions/recent set is included.",
       "status": "beta",
       "since": "2025-04",
       "designTokens": [],
-      "variantCount": 2
+      "variantCount": 3
     },
     {
       "id": "section-card",
@@ -1444,6 +1476,52 @@
       "since": "2026-05",
       "designTokens": [],
       "variantCount": 3
+    },
+    {
+      "id": "code-editor",
+      "name": "CodeEditor",
+      "layer": "ui",
+      "category": "App",
+      "filePath": "modules/ui/CodeEditor/index.tsx",
+      "abbr": "CE",
+      "description": "Engine-agnostic code editor primitive. M1 ships a lightweight CodeMirror-style fallback engine (textarea + line-number gutter + active-line + theme + readonly + placeholder) so the public API is stable today. Future milestones: Monaco (VSCode) lazy engine, find/replace, multi-cursor, diagnostics (markers), custom autocomplete + hover, minimap, code folding, vim/emacs keymap. Pixel-identical EJS sibling at modules/ui/CodeEditor/CodeEditor.ejs. Used by RulesetEditor M3 + RichTextEditor code-block insert (planned).",
+      "status": "stable",
+      "since": "2026-05",
+      "composes": [],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "textbox"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Tab",
+            "action": "Move focus into / out of the editor"
+          },
+          {
+            "keys": "Arrow keys",
+            "action": "Move caret + sync active line gutter"
+          },
+          {
+            "keys": "Ctrl/Cmd + Z",
+            "action": "Browser-native undo (M1 textarea fallback)"
+          }
+        ]
+      },
+      "designTokens": [
+        "--surface-base",
+        "--surface-raised",
+        "--surface-overlay",
+        "--surface-sunken",
+        "--text-primary",
+        "--text-secondary",
+        "--text-disabled",
+        "--border",
+        "--border-strong",
+        "--border-focus",
+        "--error"
+      ],
+      "variantCount": 2
     },
     {
       "id": "rich-text-editor",
