@@ -3,11 +3,11 @@
 - **id:** `color-picker`
 - **layer:** ui
 - **category:** Molecule
-- **filePath:** `modules/ui/ColorPicker.tsx`
+- **filePath:** `modules/ui/ColorPicker/index.tsx`
 - **status:** stable
 - **since:** 2026-05
 
-Color selection control with a 32-swatch preset palette plus optional hex input and native browser color picker for unlimited colors. Pixel-identical EJS sibling at modules/ui/ColorPicker.ejs. Used by RichTextEditor for text + highlight colors.
+Color selection control with a 32-swatch preset palette plus optional hex input and native browser color picker for unlimited colors. M1 adds a HEX / RGBA / HSLA / HWB / OKLCH format-switcher with per-format input + copy. Pixel-identical EJS sibling at modules/ui/ColorPicker/ColorPicker.ejs. Used by RichTextEditor for text + highlight colors.
 
 ## Depends on
 
@@ -69,6 +69,29 @@ const [c, setC] = useState<string | null>('#3b82f6');
 />
 ```
 
+### Format switcher — HEX / RGBA / HSLA / HWB / OKLCH (M1)
+
+```tsx
+<ColorPicker
+  label="Theme color"
+  value={c}
+  onChange={setC}
+  showFormatSwitcher
+  defaultFormat="hex"
+  showHexInput={false}
+  showNativePicker
+/>
+
+// onChange receives the value formatted in the active format:
+//   '#3b82f6'                              (HEX)
+//   'rgb(59, 130, 246)'                    (RGBA)
+//   'hsl(217.2, 91.2%, 59.8%)'             (HSLA)
+//   'hwb(217.2 23.1% 3.5%)'                (HWB)
+//   'oklch(0.6228 0.1808 257.84)'          (OKLCH)
+//
+// Each tab has its own validated text input + a Copy button (faCopy → faCheck).
+```
+
 ## Full source
 
 ```tsx
@@ -98,6 +121,17 @@ const [color, setColor] = useState<string | null>('#3b82f6');
   onChange={setColor}
   swatches={['#ff0000', '#00ff00', '#0000ff']}
   showHexInput
+  showNativePicker
+/>
+
+// M1 — HEX / RGBA / HSLA / HWB / OKLCH format-switcher:
+<ColorPicker
+  label="Theme color"
+  value={color}
+  onChange={setColor}
+  showFormatSwitcher
+  defaultFormat="hex"
+  showHexInput={false}
   showNativePicker
 />
 ```

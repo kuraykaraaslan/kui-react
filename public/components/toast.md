@@ -3,7 +3,7 @@
 - **id:** `toast`
 - **layer:** ui
 - **category:** Organism
-- **filePath:** `modules/ui/Toast.tsx`
+- **filePath:** `modules/ui/Toast/index.tsx`
 - **status:** stable
 - **since:** 2025-02
 
@@ -53,11 +53,30 @@ toast.promise(fetchData(), {
 });
 ```
 
+### toast.promise() API
+
+```tsx
+// Single call drives one toast through loading → success | error.
+// Strings or value-aware functions are accepted for success/error.
+toast.promise(fetchUser(), {
+  loading: 'Kullanıcı yükleniyor...',
+  success: (u) => `${u.name} (#${u.id}) yüklendi.`,
+  error:   (e) => `Hata: ${(e as Error).message}`,
+});
+
+// Error path resolves to an assertive role="alert" toast.
+toast.promise(fetchBroken(), {
+  loading: 'İstek gönderiliyor...',
+  success: 'Tamamlandı!',
+  error:   (e) => `Başarısız: ${(e as Error).message}`,
+});
+```
+
 ## Full source
 
 ```tsx
 // Mount once at app root
-<ToastProvider position="top-right" />
+<Toaster position="top-right" max={5} />
 
 // Fire from anywhere
 import { toast } from '@/modules/ui/Toast';

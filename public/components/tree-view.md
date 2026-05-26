@@ -3,7 +3,7 @@
 - **id:** `tree-view`
 - **layer:** ui
 - **category:** Organism
-- **filePath:** `modules/ui/TreeView.tsx`
+- **filePath:** `modules/ui/TreeView/index.tsx`
 - **status:** stable
 - **since:** 2025-03
 
@@ -69,14 +69,52 @@ function Demo() {
 }
 ```
 
+### Multi-select + type-ahead
+
+```tsx
+function Demo() {
+  const [ids, setIds] = useState<string[]>(['Card']);
+  return (
+    <TreeView
+      label="Project files"
+      selectionMode="multi"
+      selectedIds={ids}
+      onSelectionChange={setIds}
+      nodes={[
+        { id: 'docs', label: 'Documents', children: [
+          { id: 'spec', label: 'spec.md' },
+          { id: 'roadmap', label: 'roadmap.md' },
+        ]},
+        { id: 'src', label: 'src', children: [
+          { id: 'Button', label: 'Button.tsx' },
+          { id: 'Card', label: 'Card.tsx' },
+          { id: 'Drawer', label: 'Drawer.tsx' },
+          { id: 'TreeView', label: 'TreeView.tsx' },
+        ]},
+      ]}
+    />
+  );
+}
+
+// Try it:
+//  - Cmd/Ctrl-click       → toggle individual rows
+//  - Shift-click          → range-select between anchor and clicked row
+//  - Type "tre"           → focus jumps to "TreeView.tsx"
+//  - Cmd/Ctrl+A           → select all visible rows
+//  - Arrow keys / Home/End / Space / Enter — full keyboard nav.
+```
+
 ## Full source
 
 ```tsx
 'use client';
-import { cn } from '@/libs/utils/cn';
-import { useState } from 'react';
+import { useTreeState } from './hooks/useTreeState';
+import { useKeyboardNav } from './hooks/useKeyboardNav';
+import { TreeNodeRow } from './parts/Node';
 
-export function TreeView({ nodes, selectedId, onSelect, label }) {
-  // recursive treeitem rendering, arrow-key expand/collapse
+export function TreeView({ nodes, selectedId, selectedIds, onSelect, onSelectionChange, selectionMode = 'single', ... }) {
+  // M1: expand all / collapse all, single + multi (Cmd/Shift-click) selection,
+  //      arrow keys, Home/End, type-ahead jump, Space toggle, Enter activate.
+  // M2-M5: drag-drop, lazy load, virtualize, context menu, full ARIA polish.
 }
 ```

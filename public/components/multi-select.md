@@ -63,9 +63,9 @@ function Demo() {
 ```tsx
 'use client';
 import { cn } from '@/libs/utils/cn';
-import { useEffect, useRef, useState } from 'react';
+import { useFilter, useAsync, useLoadMore } from './ComboBox/hooks';
 
-export function MultiSelect({ id, label, options, value, onChange, placeholder = 'Select…' }) {
-  // ... (controlled/uncontrolled multi-select with chip tags)
+export function MultiSelect({ id, label, options, value, onChange, onSearch, onLoadMore, debounceMs = 300 }) {
+  // shares filter/async/load-more hooks with ComboBox; chip strip stays local.
 }
 ```

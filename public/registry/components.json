@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-26T13:31:17.810Z",
+  "generatedAt": "2026-05-26T14:13:43.386Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -939,7 +939,7 @@
       "filePath": "modules/ui/MultiSelect.tsx",
       "abbr": "Ms",
       "description": "Chip-based multi-select popover with searchable filter, keyboard navigation, and disabled-option support.",
-      "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useEffect, useRef, useState } from 'react';\n\nexport function MultiSelect({ id, label, options, value, onChange, placeholder = 'Select…' }) {\n  // ... (controlled/uncontrolled multi-select with chip tags)\n}",
+      "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useFilter, useAsync, useLoadMore } from './ComboBox/hooks';\n\nexport function MultiSelect({ id, label, options, value, onChange, onSearch, onLoadMore, debounceMs = 300 }) {\n  // shares filter/async/load-more hooks with ComboBox; chip strip stays local.\n}",
       "variants": [
         {
           "title": "Controlled",
@@ -967,10 +967,10 @@
       "name": "ComboBox",
       "layer": "ui",
       "category": "Molecule",
-      "filePath": "modules/ui/ComboBox.tsx",
+      "filePath": "modules/ui/ComboBox/index.tsx",
       "abbr": "Cb",
       "description": "Searchable autocomplete single-select with keyboard navigation, described options, and a clearable button.",
-      "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\n\nexport function ComboBox({ id, label, options, value, onChange, onSearch }) {\n  // searchable single-select combobox with async search support\n}",
+      "source": "'use client';\nimport { Trigger } from './parts/Trigger';\nimport { Listbox } from './parts/Listbox';\nimport { useFilter } from './hooks/useFilter';\nimport { useAsync } from './hooks/useAsync';\nimport { useLoadMore } from './hooks/useLoadMore';\n\nexport function ComboBox({ id, label, options, value, onChange, onSearch, onLoadMore, debounceMs = 300, virtualize }) {\n  // M1: debounced async + AbortController + 5min cache + IO-backed pagination + manual windowing.\n}",
       "variants": [
         {
           "title": "Controlled selection",
@@ -979,6 +979,10 @@
         {
           "title": "Async search",
           "code": "<ComboBox id=\"search\" label=\"Async search\" options={COMBO_OPTIONS} onSearch={search} value={value} onChange={setValue} />"
+        },
+        {
+          "title": "Debounced async suggestions",
+          "code": "async function suggest(query, signal) {\n  const res = await fetch('/api/suggest?q=' + encodeURIComponent(query), { signal });\n  return res.json();\n}\n\n<ComboBox\n  id=\"cb-async-debounced\"\n  label=\"Debounced suggestions\"\n  options={[]}\n  value={value}\n  onChange={setValue}\n  onSearch={suggest}      // signature: (q, signal) => Promise<Option[]>\n  debounceMs={300}        // useAsync debounces & cancels in-flight\n  placeholder=\"Type to search…\"\n/>"
         }
       ],
       "status": "beta",
@@ -1079,10 +1083,10 @@
       "name": "ColorPicker",
       "layer": "ui",
       "category": "Molecule",
-      "filePath": "modules/ui/ColorPicker.tsx",
+      "filePath": "modules/ui/ColorPicker/index.tsx",
       "abbr": "Cp",
-      "description": "Color selection control with a 32-swatch preset palette plus optional hex input and native browser color picker for unlimited colors. Pixel-identical EJS sibling at modules/ui/ColorPicker.ejs. Used by RichTextEditor for text + highlight colors.",
-      "source": "'use client';\nimport { ColorPicker } from '@/modules/ui/ColorPicker';\n\nconst [color, setColor] = useState<string | null>('#3b82f6');\n\n<ColorPicker\n  label=\"Brand color\"\n  value={color}\n  onChange={setColor}\n  showNoColor\n/>\n\n// Compact (swatches only):\n<ColorPicker\n  value={color}\n  onChange={setColor}\n  showHexInput={false}\n  showNativePicker={false}\n/>\n\n// Custom palette + hex / native only:\n<ColorPicker\n  value={color}\n  onChange={setColor}\n  swatches={['#ff0000', '#00ff00', '#0000ff']}\n  showHexInput\n  showNativePicker\n/>",
+      "description": "Color selection control with a 32-swatch preset palette plus optional hex input and native browser color picker for unlimited colors. M1 adds a HEX / RGBA / HSLA / HWB / OKLCH format-switcher with per-format input + copy. Pixel-identical EJS sibling at modules/ui/ColorPicker/ColorPicker.ejs. Used by RichTextEditor for text + highlight colors.",
+      "source": "'use client';\nimport { ColorPicker } from '@/modules/ui/ColorPicker';\n\nconst [color, setColor] = useState<string | null>('#3b82f6');\n\n<ColorPicker\n  label=\"Brand color\"\n  value={color}\n  onChange={setColor}\n  showNoColor\n/>\n\n// Compact (swatches only):\n<ColorPicker\n  value={color}\n  onChange={setColor}\n  showHexInput={false}\n  showNativePicker={false}\n/>\n\n// Custom palette + hex / native only:\n<ColorPicker\n  value={color}\n  onChange={setColor}\n  swatches={['#ff0000', '#00ff00', '#0000ff']}\n  showHexInput\n  showNativePicker\n/>\n\n// M1 — HEX / RGBA / HSLA / HWB / OKLCH format-switcher:\n<ColorPicker\n  label=\"Theme color\"\n  value={color}\n  onChange={setColor}\n  showFormatSwitcher\n  defaultFormat=\"hex\"\n  showHexInput={false}\n  showNativePicker\n/>",
       "variants": [
         {
           "title": "Default",
@@ -1095,6 +1099,10 @@
         {
           "title": "Hex + native picker only (no swatches)",
           "code": "<ColorPicker\n  label=\"Background\"\n  value={c}\n  onChange={setC}\n  swatches={[]}\n  showHexInput\n  showNativePicker\n  showNoColor\n/>"
+        },
+        {
+          "title": "Format switcher — HEX / RGBA / HSLA / HWB / OKLCH (M1)",
+          "code": "<ColorPicker\n  label=\"Theme color\"\n  value={c}\n  onChange={setC}\n  showFormatSwitcher\n  defaultFormat=\"hex\"\n  showHexInput={false}\n  showNativePicker\n/>\n\n// onChange receives the value formatted in the active format:\n//   '#3b82f6'                              (HEX)\n//   'rgb(59, 130, 246)'                    (RGBA)\n//   'hsl(217.2, 91.2%, 59.8%)'             (HSLA)\n//   'hwb(217.2 23.1% 3.5%)'                (HWB)\n//   'oklch(0.6228 0.1808 257.84)'          (OKLCH)\n//\n// Each tab has its own validated text input + a Copy button (faCopy → faCheck)."
         }
       ],
       "status": "stable",
@@ -1334,10 +1342,10 @@
       "name": "Toast",
       "layer": "ui",
       "category": "Organism",
-      "filePath": "modules/ui/Toast.tsx",
+      "filePath": "modules/ui/Toast/index.tsx",
       "abbr": "To",
       "description": "Notification system with success/warning/error/info/loading variants. Hover-to-freeze, progress bar, title, actions, and promise support.",
-      "source": "// Mount once at app root\n<ToastProvider position=\"top-right\" />\n\n// Fire from anywhere\nimport { toast } from '@/modules/ui/Toast';\n\ntoast.success('Kaydedildi.');\ntoast.error('Hata oluştu.', { title: 'Bağlantı hatası' });\ntoast.loading('İşleniyor...');\ntoast.promise(fetchData(), {\n  loading: 'Yükleniyor...',\n  success: (d) => `${d.name} yüklendi.`,\n  error:   'Yüklenemedi.',\n});\n\n// With actions\ntoast.info('Öğe silindi.', {\n  actions: [\n    { label: 'Geri Al', onClick: (dismiss) => { undo(); dismiss(); } },\n    { label: 'Kalıcı sil', onClick: (d) => { purge(); d(); }, variant: 'danger' },\n  ],\n});\n\n// Programmatic control\ntoast.update(id, { message: 'Güncellendi.' });\ntoast.dismiss(id);\nconst { clear } = useToastStore();",
+      "source": "// Mount once at app root\n<Toaster position=\"top-right\" max={5} />\n\n// Fire from anywhere\nimport { toast } from '@/modules/ui/Toast';\n\ntoast.success('Kaydedildi.');\ntoast.error('Hata oluştu.', { title: 'Bağlantı hatası' });\ntoast.loading('İşleniyor...');\ntoast.promise(fetchData(), {\n  loading: 'Yükleniyor...',\n  success: (d) => `${d.name} yüklendi.`,\n  error:   'Yüklenemedi.',\n});\n\n// With actions\ntoast.info('Öğe silindi.', {\n  actions: [\n    { label: 'Geri Al', onClick: (dismiss) => { undo(); dismiss(); } },\n    { label: 'Kalıcı sil', onClick: (d) => { purge(); d(); }, variant: 'danger' },\n  ],\n});\n\n// Programmatic control\ntoast.update(id, { message: 'Güncellendi.' });\ntoast.dismiss(id);\nconst { clear } = useToastStore();",
       "variants": [
         {
           "title": "Variants",
@@ -1354,6 +1362,10 @@
         {
           "title": "Loading & Promise",
           "code": "// Loading state (persistent until updated)\ntoast.loading('İşleniyor...');\n\n// Promise: auto-transitions loading → success/error\ntoast.promise(fetchData(), {\n  loading: 'Yükleniyor...',\n  success: (data) => `${data.name} hazır.`,\n  error: 'Yüklenemedi.',\n});"
+        },
+        {
+          "title": "toast.promise() API",
+          "code": "// Single call drives one toast through loading → success | error.\n// Strings or value-aware functions are accepted for success/error.\ntoast.promise(fetchUser(), {\n  loading: 'Kullanıcı yükleniyor...',\n  success: (u) => `${u.name} (#${u.id}) yüklendi.`,\n  error:   (e) => `Hata: ${(e as Error).message}`,\n});\n\n// Error path resolves to an assertive role=\"alert\" toast.\ntoast.promise(fetchBroken(), {\n  loading: 'İstek gönderiliyor...',\n  success: 'Tamamlandı!',\n  error:   (e) => `Başarısız: ${(e as Error).message}`,\n});"
         }
       ],
       "status": "stable",
@@ -1518,10 +1530,10 @@
       "name": "TreeView",
       "layer": "ui",
       "category": "Organism",
-      "filePath": "modules/ui/TreeView.tsx",
+      "filePath": "modules/ui/TreeView/index.tsx",
       "abbr": "Tv",
       "description": "Collapsible tree with keyboard navigation, selection, and aria-tree roles.",
-      "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\n\nexport function TreeView({ nodes, selectedId, onSelect, label }) {\n  // recursive treeitem rendering, arrow-key expand/collapse\n}",
+      "source": "'use client';\nimport { useTreeState } from './hooks/useTreeState';\nimport { useKeyboardNav } from './hooks/useKeyboardNav';\nimport { TreeNodeRow } from './parts/Node';\n\nexport function TreeView({ nodes, selectedId, selectedIds, onSelect, onSelectionChange, selectionMode = 'single', ... }) {\n  // M1: expand all / collapse all, single + multi (Cmd/Shift-click) selection,\n  //      arrow keys, Home/End, type-ahead jump, Space toggle, Enter activate.\n  // M2-M5: drag-drop, lazy load, virtualize, context menu, full ARIA polish.\n}",
       "variants": [
         {
           "title": "File tree",
@@ -1534,6 +1546,10 @@
         {
           "title": "Flat list",
           "code": "function Demo() {\n  const [sel, setSel] = useState('ts');\n  return (\n    <TreeView label=\"Language selector\" selectedId={sel} onSelect={setSel}\n      nodes={[\n        { id: 'ts', label: 'TypeScript' },\n        { id: 'js', label: 'JavaScript' },\n        { id: 'py', label: 'Python' },\n        { id: 'go', label: 'Go' },\n      ]}\n    />\n  );\n}"
+        },
+        {
+          "title": "Multi-select + type-ahead",
+          "code": "function Demo() {\n  const [ids, setIds] = useState<string[]>(['Card']);\n  return (\n    <TreeView\n      label=\"Project files\"\n      selectionMode=\"multi\"\n      selectedIds={ids}\n      onSelectionChange={setIds}\n      nodes={[\n        { id: 'docs', label: 'Documents', children: [\n          { id: 'spec', label: 'spec.md' },\n          { id: 'roadmap', label: 'roadmap.md' },\n        ]},\n        { id: 'src', label: 'src', children: [\n          { id: 'Button', label: 'Button.tsx' },\n          { id: 'Card', label: 'Card.tsx' },\n          { id: 'Drawer', label: 'Drawer.tsx' },\n          { id: 'TreeView', label: 'TreeView.tsx' },\n        ]},\n      ]}\n    />\n  );\n}\n\n// Try it:\n//  - Cmd/Ctrl-click       → toggle individual rows\n//  - Shift-click          → range-select between anchor and clicked row\n//  - Type \"tre\"           → focus jumps to \"TreeView.tsx\"\n//  - Cmd/Ctrl+A           → select all visible rows\n//  - Arrow keys / Home/End / Space / Enter — full keyboard nav."
         }
       ],
       "status": "stable",
