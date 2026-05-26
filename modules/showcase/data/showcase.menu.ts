@@ -268,6 +268,9 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'file-upload-section', title: 'FileUploadSection', category: 'App', abbr: 'FU', since: '2026-05' },
       { id: 'kanban-board',    title: 'KanbanBoard',   category: 'App', abbr: 'KB', since: '2026-05', status: 'beta' },
       { id: 'calendar',        title: 'Calendar',      category: 'App', abbr: 'Cl', since: '2026-05', status: 'beta' },
+      { id: 'notification-center', title: 'NotificationCenter', category: 'App', abbr: 'NC', since: '2026-05', status: 'beta' },
+      { id: 'gantt',           title: 'Gantt',         category: 'App', abbr: 'Gt', since: '2026-05', status: 'beta' },
+      { id: 'form-builder',    title: 'FormBuilder',   category: 'App', abbr: 'FB', since: '2026-05', status: 'beta' },
     ],
   },
   {
