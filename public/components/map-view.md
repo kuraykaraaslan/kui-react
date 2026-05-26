@@ -3,7 +3,7 @@
 - **id:** `map-view`
 - **layer:** ui
 - **category:** Molecule
-- **filePath:** `modules/ui/MapView.tsx`
+- **filePath:** `modules/ui/MapView/index.tsx`
 - **status:** beta
 - **since:** 2025-04
 

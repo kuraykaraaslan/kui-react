@@ -206,7 +206,7 @@ export function buildMapData(): ShowcaseComponent[] {
       abbr: 'Mp',
       description:
         'Leaflet-based interactive map. Tooltip-enabled markers, predefined zones (polygon), route lines (polyline), and click-to-add marker mode.',
-      filePath: 'modules/ui/MapView.tsx',
+      filePath: 'modules/ui/MapView/index.tsx',
       sourceCode: `'use client';
 import { MapView } from '@/modules/ui/MapView';
 
