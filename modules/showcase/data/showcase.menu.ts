@@ -52,6 +52,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'tag-input',         title: 'TagInput',        category: 'Molecule', abbr: 'Ti', since: '2025-03' },
       { id: 'file-input',        title: 'FileInput',       category: 'Molecule', abbr: 'Fi', since: '2025-02' },
       { id: 'color-picker',      title: 'ColorPicker',     category: 'Molecule', abbr: 'Cp', since: '2026-05' },
+      { id: 'chart',             title: 'Chart',           category: 'Molecule', abbr: 'Ch', since: '2026-05', status: 'beta' },
     ],
   },
   {
@@ -261,6 +262,7 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'app-footer',      title: 'AppFooter',     category: 'App', abbr: 'AFt',since: '2026-05' },
       { id: 'theme-switcher',  title: 'ThemeSwitcher', category: 'App', abbr: 'TS', since: '2026-05' },
       { id: 'rich-text-editor',title: 'RichTextEditor',category: 'App', abbr: 'RT', since: '2026-05' },
+      { id: 'code-editor',     title: 'CodeEditor',    category: 'App', abbr: 'CE', since: '2026-05' },
       { id: 'context-menu',   title: 'ContextMenu',   category: 'App', abbr: 'CM', since: '2026-05' },
       { id: 'file-upload-section', title: 'FileUploadSection', category: 'App', abbr: 'FU', since: '2026-05' },
     ],

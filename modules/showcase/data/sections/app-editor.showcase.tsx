@@ -1,6 +1,7 @@
 'use client';
 import { useRef, useState } from 'react';
 import { RichTextEditor, type RichTextEditorHandle, type SlashCommand } from '@/modules/app/RichTextEditor';
+import { CodeEditor } from '@/modules/ui/CodeEditor';
 import type { ShowcaseComponent } from '../showcase.types';
 
 const SAMPLE_HTML = `<h1>Release notes</h1>
@@ -168,8 +169,143 @@ function AutosaveDemo() {
   );
 }
 
+const SAMPLE_JS = `// Fibonacci sequence
+function fib(n) {
+  if (n < 2) return n;
+  return fib(n - 1) + fib(n - 2);
+}
+
+for (let i = 0; i < 10; i++) {
+  console.log(fib(i));
+}`;
+
+function CodeEditorJsDemo() {
+  return (
+    <CodeEditor
+      id="ce-js-readonly"
+      label="example.js"
+      hint="Read-only JavaScript snippet with line numbers."
+      value={SAMPLE_JS}
+      language="js"
+      theme="light"
+      readonly
+      showLineNumbers
+      minHeight={220}
+    />
+  );
+}
+
+function CodeEditorMarkdownDemo() {
+  const [src, setSrc] = useState(`# Hello CodeEditor
+
+Edit this markdown — line numbers update live.
+
+- Lightweight CodeMirror fallback engine
+- Token-based theming via CSS variables
+- Future: Monaco opt-in, diagnostics, autocomplete
+`);
+  return (
+    <CodeEditor
+      id="ce-md-editable"
+      name="readme"
+      label="README.md"
+      hint="Editable markdown. The hidden form input is synced to the value."
+      value={src}
+      onChange={setSrc}
+      language="markdown"
+      theme="dark"
+      placeholder="Start typing markdown…"
+      showLineNumbers
+      minHeight={220}
+    />
+  );
+}
+
 export function buildAppEditorData(): ShowcaseComponent[] {
   return [
+    {
+      id: 'code-editor',
+      title: 'CodeEditor',
+      category: 'App',
+      abbr: 'CE',
+      description:
+        'Engine-agnostic code editor primitive. M1 ships a lightweight CodeMirror-style fallback engine (textarea + line-number gutter + active-line + theme + readonly + placeholder) so the public API is stable today. Future milestones: Monaco (VSCode) lazy engine, find/replace, multi-cursor, diagnostics (markers), custom autocomplete + hover, minimap, code folding, vim/emacs keymap. Pixel-identical EJS sibling at modules/ui/CodeEditor/CodeEditor.ejs. Used by RulesetEditor M3 + RichTextEditor code-block insert (planned).',
+      filePath: 'modules/ui/CodeEditor/index.tsx',
+      sourceCode: `import { CodeEditor } from '@/modules/ui/CodeEditor';
+
+// Read-only snippet:
+<CodeEditor
+  id="example"
+  language="js"
+  theme="light"
+  value={source}
+  readonly
+/>
+
+// Editable markdown (controlled):
+const [src, setSrc] = useState('');
+<CodeEditor
+  id="readme"
+  name="readme"
+  label="README.md"
+  language="markdown"
+  theme="dark"
+  value={src}
+  onChange={setSrc}
+  placeholder="Start typing markdown…"
+/>
+
+// Opt-in Monaco engine (lazy — M2):
+<CodeEditor engine="monaco" language="ts" value={code} onChange={setCode} />`,
+      since: '2026-05',
+      composes: [],
+      designTokens: [
+        '--surface-base', '--surface-raised', '--surface-overlay', '--surface-sunken',
+        '--text-primary', '--text-secondary', '--text-disabled',
+        '--border', '--border-strong', '--border-focus', '--error',
+      ],
+      a11y: {
+        wcagLevel: 'AA',
+        ariaPatterns: ['textbox'],
+        keyboardInteractions: [
+          { keys: 'Tab',         action: 'Move focus into / out of the editor' },
+          { keys: 'Arrow keys',  action: 'Move caret + sync active line gutter' },
+          { keys: 'Ctrl/Cmd + Z', action: 'Browser-native undo (M1 textarea fallback)' },
+        ],
+      },
+      variants: [
+        {
+          title: 'JavaScript readonly',
+          layout: 'stack' as const,
+          preview: <CodeEditorJsDemo />,
+          code: `<CodeEditor
+  id="example"
+  label="example.js"
+  language="js"
+  theme="light"
+  value={source}
+  readonly
+  showLineNumbers
+/>`,
+        },
+        {
+          title: 'Markdown editable',
+          layout: 'stack' as const,
+          preview: <CodeEditorMarkdownDemo />,
+          code: `const [src, setSrc] = useState('# Hello');
+<CodeEditor
+  id="readme"
+  name="readme"
+  label="README.md"
+  language="markdown"
+  theme="dark"
+  value={src}
+  onChange={setSrc}
+  placeholder="Start typing markdown…"
+/>`,
+        },
+      ],
+    },
     {
       id: 'rich-text-editor',
       title: 'RichTextEditor',
