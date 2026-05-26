@@ -3,7 +3,7 @@
 - **id:** `video-player`
 - **layer:** ui
 - **category:** Molecule
-- **filePath:** `modules/ui/VideoPlayer.tsx`
+- **filePath:** `modules/ui/VideoPlayer/index.tsx`
 - **status:** beta
 - **since:** 2025-04
 

@@ -119,7 +119,7 @@ export function buildMediaData(): ShowcaseComponent[] {
       abbr: 'Vp',
       description:
         'Custom HTML5 video player. Quality, subtitle, audio track, and playback rate selection; custom WebVTT subtitle overlay; auto-hiding controls; programmatic API. Keyboard shortcuts: Space/K=play, ←→=±10s, ↑↓=volume, M=mute, F=fullscreen.',
-      filePath: 'modules/ui/VideoPlayer.tsx',
+      filePath: 'modules/ui/VideoPlayer/index.tsx',
       sourceCode: `'use client';
 import { VideoPlayer } from '@/modules/ui/VideoPlayer';
 
