@@ -9,6 +9,10 @@
 
 Label + select + hint + error anatomy. appearance-none overrides the native dropdown style and renders a chevron icon.
 
+## Used by
+
+- `form-builder`
+
 ## Design tokens consumed
 
 - `--border`

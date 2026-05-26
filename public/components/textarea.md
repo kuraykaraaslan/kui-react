@@ -11,6 +11,7 @@ Label + textarea + hint + error anatomy. Vertical resizing is enabled via resize
 
 ## Used by
 
+- `form-builder`
 - `reviews-review-submit-form`
 
 ## Design tokens consumed

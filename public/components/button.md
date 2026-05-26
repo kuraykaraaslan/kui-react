@@ -12,6 +12,8 @@ Core interactive element. Supports 5 visual styles (variants) and 5 sizes. disab
 ## Used by
 
 - `color-picker`
+- `form-builder`
+- `gantt`
 - `reviews-review-submit-form`
 - `rich-text-editor`
 

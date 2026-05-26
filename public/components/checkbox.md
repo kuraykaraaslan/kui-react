@@ -9,6 +9,10 @@
 
 Label + checkbox + optional hint / error message. aria-describedby is wired up and border-error is applied on the error state.
 
+## Used by
+
+- `form-builder`
+
 ## Design tokens consumed
 
 - `--border`

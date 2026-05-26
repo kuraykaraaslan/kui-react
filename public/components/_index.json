@@ -467,6 +467,24 @@
     "category": "App",
     "file": "calendar.md"
   },
+  "notification-center": {
+    "name": "NotificationCenter",
+    "layer": "app",
+    "category": "App",
+    "file": "notification-center.md"
+  },
+  "gantt": {
+    "name": "Gantt",
+    "layer": "app",
+    "category": "App",
+    "file": "gantt.md"
+  },
+  "form-builder": {
+    "name": "FormBuilder",
+    "layer": "app",
+    "category": "App",
+    "file": "form-builder.md"
+  },
   "common-login-form": {
     "name": "LoginForm",
     "layer": "domain",
