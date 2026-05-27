@@ -35,12 +35,30 @@
 - `onDependencyDelete(id)` invoked on Delete-key on selected dependency.
 - `dependencies` prop now seeds the overlay (previously stubbed).
 
-## M3 — Critical Path + Tooltip 🟡 (future)
+## M3 — Critical Path + Tooltip ✅
 
-- Forward / backward pass CPM (`useCriticalPath`)
-- `task.critical = true` → bar gets `var(--error)` border + warning fill; critical dependencies stroke `var(--error)`
-- Hover tooltip (portal) with task name, range, duration, owner, progress, predecessors
-- Two-row header (e.g. days under weeks) for day & week scales
+**Behaviour**
+- Toolbar **Critical path** toggle button (uses `aria-pressed`, lit `var(--error)` when on).
+- Bars on the critical path render with `bg-error-subtle` track + `bg-error` progress fill + `border-error/60`.
+- Dependency arrows whose both endpoints are critical stroke `var(--error)` with a red arrowhead marker; selection still wins over critical styling.
+- Hover a bar for ~200ms → portal-rendered tooltip with name, start/end, duration, owner, progress, predecessors, plus a **Critical** badge when applicable. Tooltip flips below the bar when too close to the viewport top, clamps horizontally to the viewport.
+- Tooltip suppressed while a drag or dependency-draw is in flight (no flicker).
+
+**Algorithm (`useCriticalPath`)**
+- Build successor / predecessor adjacency from `dependencies`. Lag is added to edge weight.
+- Cycle-detect via Kahn's algorithm; on a cycle return an empty set (renders nothing).
+- Forward longest-path pass: `lengthFromStart[i] = max(lengthFromStart[pred] + lag) + duration[i]`.
+- Backward longest-path pass: `lengthToEnd[i] = duration[i] + max(lag + lengthToEnd[succ])`.
+- Project length `L = max(lengthFromStart[i] + lengthToEnd[i] - duration[i])` over all tasks.
+- A task is critical iff its through-path equals `L` (within sub-day rounding).
+- Treats SS / FF / SF as FS for path length — close enough for visualisation; M5+ can refine.
+
+**Public API**
+- `criticalPath?: boolean` — sets the initial toggle state; toolbar toggle controls the live value.
+
+## M3.5 — Two-row header 🟡 (future)
+
+- Optional secondary header row (e.g. day numbers under week labels) for the day + week scales.
 
 ## M4 — Milestones + Baselines + Weekends 🟡 (future)
 
@@ -83,17 +101,17 @@ modules/app/Gantt/
 │   ├── useZoom.ts                ← M1
 │   ├── useTaskDrag.ts            ← M2 (real impl)
 │   ├── useDependencyDraw.ts      ← M2 (real impl)
-│   └── useCriticalPath.ts        ← M3 stub
+│   └── useCriticalPath.ts        ← M3 (real impl)
 └── parts/
-    ├── GanttToolbar.tsx          ← M2 (split from index)
-    ├── GanttBody.tsx             ← M2 (split from index)
+    ├── GanttToolbar.tsx          ← M2 + M3 critical toggle
+    ├── GanttBody.tsx             ← M2 + M3 tooltip plumbing
     ├── TaskListSide.tsx          ← M1
     ├── TimelineHeader.tsx        ← M1
-    ├── TaskBar.tsx               ← M1 + M2 handles
+    ├── TaskBar.tsx               ← M1 + M2 handles + M3 critical styling
     ├── TodayLine.tsx             ← M1
-    ├── DependencyLayer.tsx       ← M2
-    ├── DependencyArrow.tsx       ← M2 (real impl)
+    ├── DependencyLayer.tsx       ← M2 + M3 critical arrows
+    ├── DependencyArrow.tsx       ← M2 + M3 critical styling
     ├── BaselineGhost.tsx         ← M4 stub
     ├── Milestone.tsx             ← M4 stub
-    └── HoverTooltip.tsx          ← M3 stub
+    └── HoverTooltip.tsx          ← M3 (real impl, portal)
 ```

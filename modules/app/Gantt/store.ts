@@ -29,6 +29,8 @@ export type GanttState = {
   drag: DragState | null;
   depDraw: DepDrawState | null;
   selectedDepId: string | null;
+  /** M3 — critical-path highlight toggle. */
+  criticalPath: boolean;
 };
 
 export type GanttActions = {
@@ -57,6 +59,8 @@ export type GanttActions = {
   selectDep: (id: string | null) => void;
   /** Remove a dependency locally; returns the removed id or null. */
   removeDependency: (id: string) => string | null;
+  /** Toggle (or set) the critical-path highlight. */
+  setCriticalPath: (v: boolean) => void;
 };
 
 export type GanttStore = GanttState & GanttActions;
@@ -101,6 +105,7 @@ export function createGanttStore(opts: {
   tasks: Task[];
   dependencies: Dependency[];
   scale: TimeUnit;
+  criticalPath?: boolean;
   onTelemetry?: (e: GanttTelemetry) => void;
 }) {
   const initialCollapsed = new Set<TaskId>();
@@ -114,6 +119,7 @@ export function createGanttStore(opts: {
     drag: null,
     depDraw: null,
     selectedDepId: null,
+    criticalPath: opts.criticalPath ?? false,
 
     setScale: (s) => {
       set({ scale: s });
@@ -203,6 +209,7 @@ export function createGanttStore(opts: {
     cancelDepDraw: () => set({ depDraw: null }),
 
     selectDep: (id) => set({ selectedDepId: id }),
+    setCriticalPath: (v) => set({ criticalPath: v }),
     removeDependency: (id) => {
       const deps = get().dependencies;
       if (!deps.some((d) => d.id === id)) return null;

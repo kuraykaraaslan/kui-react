@@ -64,6 +64,20 @@ function DependenciesDemo() {
   );
 }
 
+function CriticalPathDemo() {
+  return (
+    <div className="w-full">
+      <Gantt
+        tasks={PROJECT_TASKS}
+        dependencies={SEED_DEPENDENCIES}
+        scale="week"
+        criticalPath
+        ariaLabel="Plan with critical path highlighted"
+      />
+    </div>
+  );
+}
+
 function InteractiveDemo() {
   const [tasks, setTasks] = useState<Task[]>(PROJECT_TASKS);
   const [deps, setDeps]   = useState<Dependency[]>(SEED_DEPENDENCIES);
@@ -95,7 +109,7 @@ export function buildAppGanttData(): ShowcaseComponent[] {
       category: 'App',
       abbr: 'Gt',
       description:
-        'MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale switcher (day / week / month / quarter / year), a vertical Today line, WBS tree with expand/collapse on the left panel, sticky timeline header with synchronised horizontal + vertical scroll, and absolutely-positioned task bars with a %-progress fill. M2 adds full interactivity: drag a bar to reschedule (snap to day), drag the left/right edges to resize, drag the white progress thumb to change %, and drag from the right-edge blue dot to another bar to draw an FS dependency. Dependencies render as orthogonal SVG arrows with a marker-end arrowhead; click an arrow then press Delete to remove it. All mutations are optimistic and roll back automatically if `onTaskUpdate` / `onDependencyCreate` rejects. Internal state is owned by a per-instance Zustand store (`store.ts`). Public props for `baselines`, `criticalPath`, `workingDays`, `holidays`, `exportFormats`, and `reducedMotion` are accepted but not yet wired — they become live in M3 (CPM highlight + hover tooltip), M4 (milestones + baselines + weekends), M5 (export + working-day calendar), and M6 (full keyboard nav + locale + virtualisation).',
+        'MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale switcher (day / week / month / quarter / year), a vertical Today line, WBS tree with expand/collapse on the left panel, sticky timeline header with synchronised horizontal + vertical scroll, and absolutely-positioned task bars with a %-progress fill. M2 adds full interactivity: drag a bar to reschedule (snap to day), drag the left/right edges to resize, drag the white progress thumb to change %, and drag from the right-edge blue dot to another bar to draw an FS dependency. Dependencies render as orthogonal SVG arrows with a marker-end arrowhead; click an arrow then press Delete to remove it. M3 adds a Critical Path toggle in the toolbar — tasks on the longest dependency chain switch to var(--error) styling and their connecting arrows turn red, computed by a forward + backward longest-path pass on the dependency DAG (cycles render nothing instead of crashing). Hovering a bar after a short delay shows a tooltip with name, start/end, duration, owner, % complete, predecessors, and a Critical badge when applicable. All mutations are optimistic and roll back automatically if `onTaskUpdate` / `onDependencyCreate` rejects. Internal state is owned by a per-instance Zustand store (`store.ts`). Public props for `baselines`, `workingDays`, `holidays`, `exportFormats`, and `reducedMotion` are accepted but not yet wired — they become live in M4 (milestones + baselines + weekends), M5 (export + working-day calendar), and M6 (full keyboard nav + locale + virtualisation).',
       filePath: 'modules/app/Gantt/index.tsx',
       sourceCode: `import { Gantt, type Dependency, type Task } from '@/modules/app/Gantt';
 import { useState } from 'react';
@@ -137,6 +151,8 @@ export function MyPlan() {
         '--primary-subtle',
         '--primary-fg',
         '--warning',
+        '--error',
+        '--error-subtle',
       ],
       a11y: {
         wcagLevel: 'AA',
@@ -182,6 +198,21 @@ const tasks = base.map((t) => t.id === 'impl' ? { ...t, collapsed: true } : t);
 ];
 
 <Gantt tasks={tasks} dependencies={dependencies} scale="week" />`,
+        },
+        {
+          title: 'Critical path (CPM)',
+          layout: 'stack' as const,
+          preview: <CriticalPathDemo />,
+          code: `// Critical-path highlight uses a forward + backward longest-path pass
+// over the dependency DAG. Tasks with zero float switch to error styling
+// and their connecting arrows turn red. The toolbar toggle lets users
+// switch it on / off; passing the prop sets the initial value.
+<Gantt
+  tasks={tasks}
+  dependencies={dependencies}
+  scale="week"
+  criticalPath
+/>`,
         },
         {
           title: 'Interactive (drag + dependencies)',

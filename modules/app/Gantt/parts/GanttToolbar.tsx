@@ -1,7 +1,7 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar, faBolt } from '@fortawesome/free-solid-svg-icons';
 import type { GanttMessages, TimeUnit } from '../types';
 import { useGanttStore } from '../store';
 
@@ -10,11 +10,14 @@ const SCALES: TimeUnit[] = ['day', 'week', 'month', 'quarter', 'year'];
 type GanttToolbarProps = {
   messages: GanttMessages;
   controlledScale?: TimeUnit;
+  showCriticalPathToggle?: boolean;
 };
 
-export function GanttToolbar({ messages, controlledScale }: GanttToolbarProps) {
+export function GanttToolbar({ messages, controlledScale, showCriticalPathToggle }: GanttToolbarProps) {
   const storeScale = useGanttStore((s) => s.scale);
   const setScale = useGanttStore((s) => s.setScale);
+  const criticalPath = useGanttStore((s) => s.criticalPath);
+  const setCriticalPath = useGanttStore((s) => s.setCriticalPath);
   const effective = controlledScale ?? storeScale;
 
   return (
@@ -28,11 +31,29 @@ export function GanttToolbar({ messages, controlledScale }: GanttToolbarProps) {
           </span>
         </h2>
       </div>
-      <div
-        role="tablist"
-        aria-label="Timeline scale"
-        className="inline-flex items-center rounded-md border border-border bg-surface-base p-0.5"
-      >
+      <div className="flex items-center gap-2">
+        {showCriticalPathToggle && (
+          <button
+            type="button"
+            aria-pressed={criticalPath}
+            onClick={() => setCriticalPath(!criticalPath)}
+            className={cn(
+              'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-medium transition-colors',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+              criticalPath
+                ? 'bg-error-subtle border-error/40 text-error'
+                : 'bg-surface-base border-border text-text-secondary hover:text-text-primary hover:bg-surface-overlay',
+            )}
+          >
+            <FontAwesomeIcon icon={faBolt} className="w-3 h-3" aria-hidden="true" />
+            Critical path
+          </button>
+        )}
+        <div
+          role="tablist"
+          aria-label="Timeline scale"
+          className="inline-flex items-center rounded-md border border-border bg-surface-base p-0.5"
+        >
         {SCALES.map((s) => {
           const active = s === effective;
           const label = ({
@@ -61,10 +82,10 @@ export function GanttToolbar({ messages, controlledScale }: GanttToolbarProps) {
             </button>
           );
         })}
+        </div>
       </div>
       {/*
         TODO M5: export menu (PNG / PDF / CSV).
-        TODO M3: critical-path toggle button.
         TODO M6: zoom + / − keyboard hints.
       */}
     </div>

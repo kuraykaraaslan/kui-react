@@ -1,5 +1,5 @@
 'use client';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/libs/utils/cn';
 import type { Dependency, GanttMessages, Task, TaskId, TimeUnit } from '../types';
 import { ROW_HEIGHT } from '../types';
@@ -7,12 +7,14 @@ import { useTimelineScale } from '../hooks/useTimelineScale';
 import { useScroll } from '../hooks/useScroll';
 import { useTaskDrag } from '../hooks/useTaskDrag';
 import { useDependencyDraw } from '../hooks/useDependencyDraw';
+import { useCriticalPath } from '../hooks/useCriticalPath';
 import { useGanttStore } from '../store';
 import { TaskListSide } from './TaskListSide';
 import { TimelineHeader } from './TimelineHeader';
 import { TaskBar } from './TaskBar';
 import { TodayLine } from './TodayLine';
 import { DependencyLayer } from './DependencyLayer';
+import { HoverTooltip } from './HoverTooltip';
 
 /** Depth-first flatten of the parent/child tree, skipping collapsed subtrees. */
 function flattenTree(
@@ -57,8 +59,10 @@ export function GanttBody({
   const storeScale   = useGanttStore((s) => s.scale);
   const collapsed    = useGanttStore((s) => s.collapsed);
   const workingTasks = useGanttStore((s) => s.workingTasks);
+  const dependencies = useGanttStore((s) => s.dependencies);
   const drag         = useGanttStore((s) => s.drag);
   const depDraw      = useGanttStore((s) => s.depDraw);
+  const criticalPathOn = useGanttStore((s) => s.criticalPath);
   const toggleCollapse = useGanttStore((s) => s.toggleCollapse);
 
   const effectiveScale = controlledScale ?? storeScale;
@@ -101,6 +105,51 @@ export function GanttBody({
 
   const { onBarPointerDown } = useTaskDrag({ pixelsPerDay: timeline.pixelsPerDay, onTaskUpdate });
   const { beginFromTask }    = useDependencyDraw({ bodyRef: timelineRef, onDependencyCreate, onDependencyDelete });
+
+  const criticalSet = useCriticalPath({
+    tasks: workingTasks,
+    dependencies,
+    enabled: criticalPathOn,
+  });
+
+  // Hover tooltip state. A short delay avoids flicker while panning.
+  const [hover, setHover] = useState<{ taskId: TaskId; rect: DOMRect } | null>(null);
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+  }, []);
+
+  // Suppress tooltip while a drag or dep-draw is in flight.
+  useEffect(() => {
+    if (drag || depDraw) {
+      if (hoverTimerRef.current) {
+        clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = null;
+      }
+      setHover(null);
+    }
+  }, [drag, depDraw]);
+
+  const onBarHoverEnter = (e: React.PointerEvent<HTMLElement>, taskId: TaskId) => {
+    if (drag || depDraw) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => setHover({ taskId, rect }), 200);
+  };
+  const onBarHoverLeave = () => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = null;
+    setHover(null);
+  };
+
+  const hoveredTask = hover ? tasksToRender.find((t) => t.id === hover.taskId) ?? null : null;
+  const predecessorNames = useMemo(() => {
+    if (!hover) return [];
+    return dependencies
+      .filter((d) => d.to === hover.taskId)
+      .map((d) => tasksToRender.find((t) => t.id === d.from)?.name)
+      .filter((n): n is string => !!n);
+  }, [hover, dependencies, tasksToRender]);
 
   const totalHeight = flatRows.length * ROW_HEIGHT;
 
@@ -161,11 +210,14 @@ export function GanttBody({
                 pixelsPerDay={timeline.pixelsPerDay}
                 rowIndex={i}
                 isDepHoverTarget={depDraw?.hoverTargetId === row.task.id}
+                isCritical={criticalSet.has(row.task.id)}
                 onMoveDown={(e, id, w) => onBarPointerDown(e, id, 'move', w)}
                 onResizeStartDown={(e, id) => onBarPointerDown(e, id, 'resize-start', 0)}
                 onResizeEndDown={(e, id) => onBarPointerDown(e, id, 'resize-end', 0)}
                 onProgressDown={(e, id, w) => onBarPointerDown(e, id, 'progress', w)}
                 onDepSourceDown={(e, id) => beginFromTask(e, id)}
+                onHoverEnter={onBarHoverEnter}
+                onHoverLeave={onBarHoverLeave}
               />
             ))}
 
@@ -177,14 +229,18 @@ export function GanttBody({
               pixelsPerDay={timeline.pixelsPerDay}
               totalWidth={timeline.totalWidth}
               totalHeight={totalHeight}
+              criticalSet={criticalSet}
             />
-            {/*
-              TODO M4: <BaselineGhost /> per task with a baseline entry.
-              TODO M3: <HoverTooltip /> portal.
-            */}
+            {/* TODO M4: <BaselineGhost /> per task with a baseline entry. */}
           </div>
         </div>
       </div>
+      <HoverTooltip
+        task={hoveredTask}
+        anchorRect={hover?.rect ?? null}
+        predecessorNames={predecessorNames}
+        isCritical={hoveredTask ? criticalSet.has(hoveredTask.id) : false}
+      />
     </div>
   );
 }

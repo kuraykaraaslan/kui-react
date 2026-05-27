@@ -13,6 +13,7 @@ type DependencyLayerProps = {
   pixelsPerDay: number;
   totalWidth: number;
   totalHeight: number;
+  criticalSet?: Set<TaskId>;
 };
 
 /**
@@ -27,6 +28,7 @@ export function DependencyLayer({
   pixelsPerDay,
   totalWidth,
   totalHeight,
+  criticalSet,
 }: DependencyLayerProps) {
   const dependencies  = useGanttStore((s) => s.dependencies);
   const selectedDepId = useGanttStore((s) => s.selectedDepId);
@@ -77,19 +79,34 @@ export function DependencyLayer({
         >
           <path d="M 0 0 L 10 5 L 0 10 z" className="fill-primary" />
         </marker>
+        <marker
+          id="gantt-arrow-critical"
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto-start-reverse"
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" className="fill-error" />
+        </marker>
       </defs>
-      {dependencies.map((dep) => (
-        <DependencyArrow
-          key={dep.id}
-          dep={dep}
-          tasks={tasks}
-          rangeStart={rangeStart}
-          pixelsPerDay={pixelsPerDay}
-          taskRowIndex={flatRowIndex}
-          selected={dep.id === selectedDepId}
-          onSelect={selectDep}
-        />
-      ))}
+      {dependencies.map((dep) => {
+        const isCritical = !!criticalSet && criticalSet.has(dep.from) && criticalSet.has(dep.to);
+        return (
+          <DependencyArrow
+            key={dep.id}
+            dep={dep}
+            tasks={tasks}
+            rangeStart={rangeStart}
+            pixelsPerDay={pixelsPerDay}
+            taskRowIndex={flatRowIndex}
+            selected={dep.id === selectedDepId}
+            isCritical={isCritical}
+            onSelect={selectDep}
+          />
+        );
+      })}
       {ghost && (
         <path
           d={ghost}

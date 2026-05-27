@@ -28,8 +28,7 @@ export function Gantt({
   // workingDays / holidays (TODO M5 stub).
   workingDays: _workingDays,
   holidays: _holidays,
-  // criticalPath toggle (TODO M3 stub).
-  criticalPath: _criticalPath,
+  criticalPath,
   onTaskUpdate,
   onDependencyCreate,
   onDependencyDelete,
@@ -55,6 +54,7 @@ export function Gantt({
       tasks,
       dependencies: dependencies ?? [],
       scale: scale ?? 'week',
+      criticalPath: criticalPath ?? false,
       onTelemetry: (e) => onTelemetryRef.current?.(e),
     }),
   );
@@ -65,6 +65,11 @@ export function Gantt({
   useEffect(() => {
     if (scale && scale !== store.getState().scale) store.setState({ scale });
   }, [scale, store]);
+  useEffect(() => {
+    if (typeof criticalPath === 'boolean' && criticalPath !== store.getState().criticalPath) {
+      store.setState({ criticalPath });
+    }
+  }, [criticalPath, store]);
 
   return (
     <GanttStoreProvider store={store}>
@@ -76,7 +81,11 @@ export function Gantt({
           className,
         )}
       >
-        <GanttToolbar messages={messages} controlledScale={scale} />
+        <GanttToolbar
+          messages={messages}
+          controlledScale={scale}
+          showCriticalPathToggle
+        />
         <GanttBody
           messages={messages}
           controlledScale={scale}

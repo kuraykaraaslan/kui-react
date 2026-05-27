@@ -13,6 +13,7 @@ type DependencyArrowProps = {
   pixelsPerDay: number;
   taskRowIndex: Record<string, number>;
   selected: boolean;
+  isCritical?: boolean;
   onSelect: (id: string) => void;
 };
 
@@ -53,6 +54,7 @@ export function DependencyArrow({
   pixelsPerDay,
   taskRowIndex,
   selected,
+  isCritical,
   onSelect,
 }: DependencyArrowProps) {
   const from = tasks.find((t) => t.id === dep.from);
@@ -91,10 +93,18 @@ export function DependencyArrow({
           'transition-colors',
           selected
             ? 'stroke-primary'
-            : 'stroke-text-secondary group-hover:stroke-primary',
+            : isCritical
+              ? 'stroke-error'
+              : 'stroke-text-secondary group-hover:stroke-primary',
         )}
-        strokeWidth={selected ? 2 : 1.5}
-        markerEnd={selected ? 'url(#gantt-arrow-active)' : 'url(#gantt-arrow)'}
+        strokeWidth={selected || isCritical ? 2 : 1.5}
+        markerEnd={
+          selected
+            ? 'url(#gantt-arrow-active)'
+            : isCritical
+              ? 'url(#gantt-arrow-critical)'
+              : 'url(#gantt-arrow)'
+        }
       />
     </g>
   );

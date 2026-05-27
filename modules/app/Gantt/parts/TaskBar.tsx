@@ -10,11 +10,14 @@ type TaskBarProps = {
   pixelsPerDay: number;
   rowIndex: number;
   isDepHoverTarget?: boolean;
+  isCritical?: boolean;
   onMoveDown: (e: React.PointerEvent<HTMLElement>, taskId: string, barWidth: number) => void;
   onResizeStartDown: (e: React.PointerEvent<HTMLElement>, taskId: string) => void;
   onResizeEndDown: (e: React.PointerEvent<HTMLElement>, taskId: string) => void;
   onProgressDown: (e: React.PointerEvent<HTMLElement>, taskId: string, barWidth: number) => void;
   onDepSourceDown: (e: React.PointerEvent<HTMLElement>, taskId: string) => void;
+  onHoverEnter?: (e: React.PointerEvent<HTMLElement>, taskId: string) => void;
+  onHoverLeave?: (e: React.PointerEvent<HTMLElement>, taskId: string) => void;
 };
 
 export function TaskBar({
@@ -23,11 +26,14 @@ export function TaskBar({
   pixelsPerDay,
   rowIndex,
   isDepHoverTarget,
+  isCritical,
   onMoveDown,
   onResizeStartDown,
   onResizeEndDown,
   onProgressDown,
   onDepSourceDown,
+  onHoverEnter,
+  onHoverLeave,
 }: TaskBarProps) {
   const startOffsetDays = diffDays(rangeStart, task.start);
   const durationDays    = Math.max(1, diffDays(task.start, task.end));
@@ -44,17 +50,23 @@ export function TaskBar({
       data-task-id={task.id}
       className={cn(
         'gantt-task-bar group absolute rounded-md overflow-visible',
-        'bg-primary-subtle border border-primary/40',
         'shadow-sm select-none',
+        isCritical
+          ? 'bg-error-subtle border border-error/60'
+          : 'bg-primary-subtle border border-primary/40',
         isDepHoverTarget && 'ring-2 ring-primary',
-        // TODO M3: when task.critical -> red border + warning fill.
       )}
       style={{ left, width, top, height: BAR_HEIGHT }}
+      onPointerEnter={onHoverEnter ? (e) => onHoverEnter(e, task.id) : undefined}
+      onPointerLeave={onHoverLeave ? (e) => onHoverLeave(e, task.id) : undefined}
     >
       {/* Progress fill */}
       <div
         aria-hidden="true"
-        className="absolute inset-y-0 left-0 bg-primary rounded-l-md overflow-hidden"
+        className={cn(
+          'absolute inset-y-0 left-0 rounded-l-md overflow-hidden',
+          isCritical ? 'bg-error' : 'bg-primary',
+        )}
         style={{ width: `${progress}%` }}
       />
 
