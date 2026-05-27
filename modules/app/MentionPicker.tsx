@@ -90,7 +90,7 @@ export function MentionPicker({
     if (!open || !onCancel) return;
     function onClick(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        onCancel();
+        onCancel?.();
       }
     }
     document.addEventListener('mousedown', onClick);
