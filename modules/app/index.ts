@@ -70,3 +70,19 @@ export {
   SkipLink,
   Tooltip,
 } from './AccessibilityKit';
+
+// Status / chrome
+export { MaintenancePage } from './MaintenancePage';
+export type { MaintenancePageProps } from './MaintenancePage';
+
+// Collaboration
+export { ShareDialog } from './ShareDialog';
+export type { ShareDialogProps, ShareInvitee, SharePermission } from './ShareDialog';
+export { CommentThread } from './CommentThread';
+export type { CommentThreadProps, CommentThreadItem } from './CommentThread';
+export { MentionPicker } from './MentionPicker';
+export type { MentionPickerProps, MentionPickerUser } from './MentionPicker';
+
+// Onboarding / flows
+export { OnboardingWizard } from './OnboardingWizard';
+export type { OnboardingWizardProps, OnboardingStep } from './OnboardingWizard';

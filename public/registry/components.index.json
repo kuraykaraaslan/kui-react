@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-26T18:50:19.227Z",
+  "generatedAt": "2026-05-27T13:05:56.863Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -176,10 +176,13 @@
       ],
       "usedBy": [
         "color-picker",
+        "comment-thread",
         "form-builder",
         "gantt",
+        "onboarding-wizard",
         "reviews-review-submit-form",
-        "rich-text-editor"
+        "rich-text-editor",
+        "share-dialog"
       ],
       "variantCount": 12
     },
@@ -211,6 +214,7 @@
       ],
       "usedBy": [
         "kanban-board",
+        "maintenance-page",
         "reviews-review-card"
       ],
       "variantCount": 9
@@ -231,8 +235,11 @@
         "--primary-subtle"
       ],
       "usedBy": [
+        "comment-thread",
         "kanban-board",
-        "reviews-review-card"
+        "mention-picker",
+        "reviews-review-card",
+        "share-dialog"
       ],
       "variantCount": 5
     },
@@ -1013,7 +1020,9 @@
         "--text-primary"
       ],
       "usedBy": [
-        "rich-text-editor"
+        "onboarding-wizard",
+        "rich-text-editor",
+        "share-dialog"
       ],
       "variantCount": 5
     },
@@ -1415,6 +1424,46 @@
       "variantCount": 2
     },
     {
+      "id": "onboarding-wizard",
+      "name": "OnboardingWizard",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/OnboardingWizard.tsx",
+      "abbr": "OW",
+      "description": "Multi-step onboarding flow with dots/bar progress, optional skip, and page or modal presentation. Each step renders its own content slot.",
+      "status": "stable",
+      "since": "2026-05",
+      "composes": [
+        "button",
+        "modal"
+      ],
+      "relatedTo": [
+        "step-flow",
+        "step-shell"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "role=\"progressbar\""
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Enter / Click",
+            "action": "Activate Next / Previous / Skip / Complete"
+          }
+        ],
+        "notes": "Progress is announced via role=\"progressbar\" with aria-valuenow updating on step change."
+      },
+      "designTokens": [
+        "--primary",
+        "--surface-sunken",
+        "--text-primary",
+        "--text-secondary",
+        "--border"
+      ],
+      "variantCount": 2
+    },
+    {
       "id": "detail-header",
       "name": "DetailHeader",
       "layer": "app",
@@ -1482,6 +1531,36 @@
       "variantCount": 3
     },
     {
+      "id": "maintenance-page",
+      "name": "MaintenancePage",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/MaintenancePage.tsx",
+      "abbr": "Mp",
+      "description": "Full-page maintenance screen. Optional ETA countdown badge and external status-page link. Use for planned downtime or unplanned outages.",
+      "status": "stable",
+      "since": "2026-05",
+      "composes": [
+        "badge"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "role=\"status\"",
+          "aria-live=\"polite\""
+        ],
+        "notes": "Screen reader announces the maintenance state via the live region; countdown updates without re-announcing."
+      },
+      "designTokens": [
+        "--warning",
+        "--primary",
+        "--surface-base",
+        "--text-primary",
+        "--text-secondary"
+      ],
+      "variantCount": 2
+    },
+    {
       "id": "app-breadcrumbs",
       "name": "AppBreadcrumbs",
       "layer": "app",
@@ -1532,6 +1611,128 @@
       "since": "2026-05",
       "designTokens": [],
       "variantCount": 3
+    },
+    {
+      "id": "share-dialog",
+      "name": "ShareDialog",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/ShareDialog.tsx",
+      "abbr": "SD",
+      "description": "Share modal: copyable link, email invitation with permission picker, and a list of current invitees with permission/remove controls.",
+      "status": "stable",
+      "since": "2026-05",
+      "composes": [
+        "modal",
+        "avatar",
+        "button"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "role=\"dialog\"",
+          "aria-modal=\"true\"",
+          "aria-labelledby",
+          "aria-describedby"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Escape",
+            "action": "Close dialog"
+          },
+          {
+            "keys": "Tab",
+            "action": "Cycle focus among interactive controls"
+          }
+        ]
+      },
+      "designTokens": [
+        "--primary",
+        "--surface-base",
+        "--surface-raised",
+        "--border",
+        "--text-primary",
+        "--text-secondary"
+      ],
+      "variantCount": 2
+    },
+    {
+      "id": "comment-thread",
+      "name": "CommentThread",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/CommentThread.tsx",
+      "abbr": "CT",
+      "description": "Generic threaded comments with replies, like counts, delete-own actions, and a composer. Domain-agnostic — pass comments + handlers.",
+      "status": "stable",
+      "since": "2026-05",
+      "composes": [
+        "avatar",
+        "button"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "aria-label=\"Comments\"",
+          "aria-pressed (like)",
+          "aria-expanded (reply)"
+        ]
+      },
+      "designTokens": [
+        "--surface-overlay",
+        "--surface-base",
+        "--border",
+        "--text-primary",
+        "--text-secondary",
+        "--text-disabled",
+        "--primary"
+      ],
+      "variantCount": 2
+    },
+    {
+      "id": "mention-picker",
+      "name": "MentionPicker",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/MentionPicker.tsx",
+      "abbr": "MP",
+      "description": "@-trigger autocomplete picker. Headless: takes users + query + position, fires onSelect. Keyboard nav (ArrowUp/Down, Enter/Tab, Escape).",
+      "status": "stable",
+      "since": "2026-05",
+      "composes": [
+        "avatar"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "role=\"listbox\"",
+          "role=\"option\"",
+          "aria-selected"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "ArrowDown / ArrowUp",
+            "action": "Move selection"
+          },
+          {
+            "keys": "Enter / Tab",
+            "action": "Insert highlighted mention"
+          },
+          {
+            "keys": "Escape",
+            "action": "Cancel picker"
+          }
+        ]
+      },
+      "designTokens": [
+        "--surface-raised",
+        "--surface-overlay",
+        "--border",
+        "--text-primary",
+        "--text-secondary",
+        "--text-disabled"
+      ],
+      "variantCount": 2
     },
     {
       "id": "code-editor",
@@ -1732,7 +1933,7 @@
       "category": "App",
       "filePath": "modules/app/Calendar/index.tsx",
       "abbr": "Cl",
-      "description": "Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, and TR/EN locales. Agenda + resource view, drag-create/move/resize, RRULE recurrence, multi-calendar overlay and full a11y/i18n/perf polish land in M2-M6.",
+      "description": "Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, and full interactions — click event for an anchored popover (Edit/Delete), drag a timed event to move, drag the bottom edge to resize, drag an empty range to create. RRULE recurrence, resource/multi-calendar overlay, agenda + mini, and full a11y/i18n/perf polish land in M3-M6.",
       "status": "beta",
       "since": "2026-05",
       "composes": [],
@@ -1781,7 +1982,7 @@
         "--text-secondary",
         "--text-disabled"
       ],
-      "variantCount": 3
+      "variantCount": 4
     },
     {
       "id": "gantt",
@@ -1790,7 +1991,7 @@
       "category": "App",
       "filePath": "modules/app/Gantt/index.tsx",
       "abbr": "Gt",
-      "description": "MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale switcher (day / week / month / quarter / year), a vertical Today line, WBS tree with expand/collapse on the left panel, sticky timeline header with synchronised horizontal + vertical scroll, and absolutely-positioned task bars with a %-progress fill (bg-primary over bg-primary-subtle). Public props for `dependencies`, `baselines`, `criticalPath`, `workingDays`, `holidays`, `onTaskUpdate`, `onDependencyCreate/Delete`, `exportFormats`, `messages`, and `reducedMotion` are accepted but not yet visually wired — they become live in M2 (drag-to-schedule + dependency drawing), M3 (CPM critical-path highlight + hover tooltip), M4 (milestones + baselines + group rollup), M5 (resource leveling + export PNG/PDF/CSV + working-day calendar), and M6 (full keyboard nav + screen-reader announcements + locale). Pixel-identical EJS sibling at modules/app/Gantt/Gantt.ejs.",
+      "description": "MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale switcher (day / week / month / quarter / year), a vertical Today line, WBS tree with expand/collapse on the left panel, sticky timeline header with synchronised horizontal + vertical scroll, and absolutely-positioned task bars with a %-progress fill. M2 adds full interactivity: drag a bar to reschedule (snap to day), drag the left/right edges to resize, drag the white progress thumb to change %, and drag from the right-edge blue dot to another bar to draw an FS dependency. Dependencies render as orthogonal SVG arrows with a marker-end arrowhead; click an arrow then press Delete to remove it. All mutations are optimistic and roll back automatically if `onTaskUpdate` / `onDependencyCreate` rejects. Internal state is owned by a per-instance Zustand store (`store.ts`). Public props for `baselines`, `criticalPath`, `workingDays`, `holidays`, `exportFormats`, and `reducedMotion` are accepted but not yet wired — they become live in M3 (CPM highlight + hover tooltip), M4 (milestones + baselines + weekends), M5 (export + working-day calendar), and M6 (full keyboard nav + locale + virtualisation).",
       "status": "beta",
       "since": "2026-05",
       "composes": [
@@ -1809,14 +2010,22 @@
         "keyboardInteractions": [
           {
             "keys": "Tab",
-            "action": "Move focus across scale tabs and collapse buttons"
+            "action": "Move focus across scale tabs, collapse buttons, and dependency arrows"
           },
           {
             "keys": "Space / Enter",
             "action": "Activate scale tab or expand/collapse a WBS group"
+          },
+          {
+            "keys": "Delete",
+            "action": "Remove the currently selected dependency arrow"
+          },
+          {
+            "keys": "Escape",
+            "action": "Cancel an in-flight drag or dependency draw"
           }
         ],
-        "notes": "Root carries role=\"grid\" with aria-rowcount + aria-colcount; the timeline header row is role=\"row\" with aria-rowindex=\"1\" and each cell is role=\"columnheader\" with aria-colindex. Task bars are role=\"gridcell\" labelled with the task name, dates, and % complete. Scale switcher is a role=\"tablist\"/role=\"tab\" pair so screen readers announce the active scale."
+        "notes": "Root carries role=\"grid\"; the timeline header row is role=\"row\" with each cell role=\"columnheader\". Task bars are role=\"gridcell\" labelled with the task name, dates, and % complete. Resize handles and the progress thumb are <button> elements so they are reachable by assistive tech. Dependency arrows are role=\"button\" with keyboard-activatable selection. Scale switcher is a role=\"tablist\"/role=\"tab\" pair."
       },
       "designTokens": [
         "--surface-base",
@@ -1831,7 +2040,7 @@
         "--primary-fg",
         "--warning"
       ],
-      "variantCount": 3
+      "variantCount": 5
     },
     {
       "id": "form-builder",

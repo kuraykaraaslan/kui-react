@@ -10,6 +10,7 @@ import { Toggle } from '@/modules/ui/Toggle';
 import { Textarea } from '@/modules/ui/Textarea';
 import { FilterBar, type FilterField, type FilterValues } from '@/modules/app/FilterBar';
 import { FileUploadSection } from '@/modules/app/FileUploadSection';
+import { OnboardingWizard, type OnboardingStep } from '@/modules/app/OnboardingWizard';
 import { Button } from '@/modules/ui/Button';
 import { useState } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
@@ -440,5 +441,121 @@ export function Demo() {
         },
       ],
     },
+    {
+      id: 'onboarding-wizard',
+      title: 'OnboardingWizard',
+      category: 'App',
+      abbr: 'OW',
+      since: '2026-05',
+      description: 'Multi-step onboarding flow with dots/bar progress, optional skip, and page or modal presentation. Each step renders its own content slot.',
+      filePath: 'modules/app/OnboardingWizard.tsx',
+      sourceCode: `'use client';
+import { OnboardingWizard, type OnboardingStep } from '@/modules/app/OnboardingWizard';
+
+const steps: OnboardingStep[] = [
+  { id: 'welcome', title: 'Welcome', description: 'Set up your workspace.', content: <WelcomeCopy /> },
+  { id: 'profile', title: 'Profile',  content: <ProfileForm /> },
+  { id: 'done',    title: 'All set!', content: <DoneCopy /> },
+];
+
+<OnboardingWizard
+  steps={steps}
+  indicator="dots"
+  allowSkip
+  onComplete={() => router.push('/dashboard')}
+  onSkip={() => router.push('/dashboard')}
+/>`,
+      variants: [
+        {
+          title: 'Dots indicator (page mode)',
+          layout: 'stack' as const,
+          preview: <OnboardingDotsDemo />,
+          code: `<OnboardingWizard
+  steps={steps}
+  indicator="dots"
+  allowSkip
+  onComplete={() => {}}
+/>`,
+        },
+        {
+          title: 'Progress bar indicator',
+          layout: 'stack' as const,
+          preview: <OnboardingBarDemo />,
+          code: `<OnboardingWizard
+  steps={steps}
+  indicator="bar"
+  allowSkip={false}
+  onComplete={() => {}}
+/>`,
+        },
+      ],
+      composes: ['button', 'modal'],
+      relatedTo: ['step-flow', 'step-shell'],
+      designTokens: ['--primary', '--surface-sunken', '--text-primary', '--text-secondary', '--border'],
+      a11y: {
+        wcagLevel: 'AA',
+        ariaPatterns: ['role="progressbar"'],
+        keyboardInteractions: [
+          { keys: 'Enter / Click', action: 'Activate Next / Previous / Skip / Complete' },
+        ],
+        notes: 'Progress is announced via role="progressbar" with aria-valuenow updating on step change.',
+      },
+    },
   ];
+}
+
+function OnboardingDotsDemo() {
+  const steps: OnboardingStep[] = [
+    {
+      id: 'welcome',
+      title: 'Welcome',
+      description: "Let's set up your workspace quickly.",
+      content: (
+        <p className="text-sm text-text-secondary leading-relaxed">
+          We have a few questions for a personalized experience. Three steps in total.
+        </p>
+      ),
+    },
+    {
+      id: 'profile',
+      title: 'Complete Your Profile',
+      description: 'Your name and role will be visible to your team.',
+      content: <p className="text-sm text-text-secondary">Form fields go here.</p>,
+    },
+    {
+      id: 'done',
+      title: 'All Set',
+      content: (
+        <p className="text-sm text-text-secondary">
+          You&apos;re ready to begin. Click the button below.
+        </p>
+      ),
+    },
+  ];
+  return (
+    <OnboardingWizard
+      steps={steps}
+      indicator="dots"
+      allowSkip
+      onComplete={() => undefined}
+      onSkip={() => undefined}
+    />
+  );
+}
+
+function OnboardingBarDemo() {
+  const steps: OnboardingStep[] = [
+    { id: '1', title: 'Workspace',    content: <p className="text-sm text-text-secondary">Workspace name.</p> },
+    { id: '2', title: 'Invite Members', content: <p className="text-sm text-text-secondary">Invite your team members.</p> },
+    { id: '3', title: 'Integration',  content: <p className="text-sm text-text-secondary">Connect a tool.</p> },
+    { id: '4', title: 'Finish',       content: <p className="text-sm text-text-secondary">All steps completed.</p> },
+  ];
+  return (
+    <OnboardingWizard
+      steps={steps}
+      indicator="bar"
+      allowSkip={false}
+      onComplete={() => undefined}
+    />
+  );
 }

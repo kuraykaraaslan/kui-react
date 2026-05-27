@@ -1,8 +1,12 @@
 'use client';
+import { useState } from 'react';
 import { AppBreadcrumbs } from '@/modules/app/AppBreadcrumbs';
 import { AppFooter } from '@/modules/app/AppFooter';
 import { ThemeSwitcher } from '@/modules/app/ThemeSwitcher';
 import { ContextMenu } from '@/modules/app/ContextMenu';
+import { ShareDialog, type ShareInvitee, type SharePermission } from '@/modules/app/ShareDialog';
+import { CommentThread, type CommentThreadItem } from '@/modules/app/CommentThread';
+import { MentionPicker, type MentionPickerUser } from '@/modules/app/MentionPicker';
 import { Badge } from '@/modules/ui/Badge';
 import { BrandLogo } from '@/modules/ui/BrandLogo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -343,5 +347,329 @@ const items: ContextMenuItem[] = [
         },
       ],
     },
+    {
+      id: 'share-dialog',
+      title: 'ShareDialog',
+      category: 'App',
+      abbr: 'SD',
+      since: '2026-05',
+      description: 'Share modal: copyable link, email invitation with permission picker, and a list of current invitees with permission/remove controls.',
+      filePath: 'modules/app/ShareDialog.tsx',
+      sourceCode: `'use client';
+import { ShareDialog } from '@/modules/app/ShareDialog';
+
+<ShareDialog
+  open={open}
+  onClose={() => setOpen(false)}
+  shareUrl="https://app.example.com/docs/x4y9"
+  invitees={invitees}
+  onInvite={(email, perm) => addInvitee(email, perm)}
+  onRemove={(id) => removeInvitee(id)}
+  onPermissionChange={(id, p) => updatePermission(id, p)}
+/>`,
+      variants: [
+        {
+          title: 'With invitees',
+          layout: 'stack' as const,
+          preview: <ShareDialogDemo />,
+          code: `<ShareDialog
+  open
+  onClose={() => {}}
+  shareUrl="https://app.example.com/docs/x4y9"
+  invitees={[
+    { id: '1', name: 'Alice Brooks',  email: 'alice@example.com', permission: 'owner' },
+    { id: '2', name: 'Marcus Reed',   email: 'marcus@example.com', permission: 'editor' },
+  ]}
+/>`,
+        },
+        {
+          title: 'Empty / link only',
+          layout: 'stack' as const,
+          preview: <ShareDialogEmptyDemo />,
+          code: `<ShareDialog
+  open
+  onClose={() => {}}
+  shareUrl="https://app.example.com/docs/x4y9"
+  invitees={[]}
+/>`,
+        },
+      ],
+      composes: ['modal', 'avatar', 'button'],
+      designTokens: ['--primary', '--surface-base', '--surface-raised', '--border', '--text-primary', '--text-secondary'],
+      a11y: {
+        wcagLevel: 'AA',
+        ariaPatterns: ['role="dialog"', 'aria-modal="true"', 'aria-labelledby', 'aria-describedby'],
+        keyboardInteractions: [
+          { keys: 'Escape', action: 'Close dialog' },
+          { keys: 'Tab',    action: 'Cycle focus among interactive controls' },
+        ],
+      },
+    },
+    {
+      id: 'comment-thread',
+      title: 'CommentThread',
+      category: 'App',
+      abbr: 'CT',
+      since: '2026-05',
+      description: 'Generic threaded comments with replies, like counts, delete-own actions, and a composer. Domain-agnostic — pass comments + handlers.',
+      filePath: 'modules/app/CommentThread.tsx',
+      sourceCode: `'use client';
+import { CommentThread, type CommentThreadItem } from '@/modules/app/CommentThread';
+
+<CommentThread
+  comments={comments}
+  currentUserId="me"
+  onReply={(parentId, body) => addComment(parentId, body)}
+  onLike={(id, liked) => toggleLike(id, liked)}
+  onDelete={(id) => removeComment(id)}
+/>`,
+      variants: [
+        {
+          title: 'With replies',
+          layout: 'stack' as const,
+          preview: <CommentThreadDemo />,
+          code: `<CommentThread comments={comments} currentUserId="me" onReply={addComment} onLike={toggle} onDelete={remove} />`,
+        },
+        {
+          title: 'Empty state',
+          layout: 'stack' as const,
+          preview: <CommentThreadEmptyDemo />,
+          code: `<CommentThread comments={[]} onReply={addComment} />`,
+        },
+      ],
+      composes: ['avatar', 'button'],
+      designTokens: ['--surface-overlay', '--surface-base', '--border', '--text-primary', '--text-secondary', '--text-disabled', '--primary'],
+      a11y: {
+        wcagLevel: 'AA',
+        ariaPatterns: ['aria-label="Comments"', 'aria-pressed (like)', 'aria-expanded (reply)'],
+      },
+    },
+    {
+      id: 'mention-picker',
+      title: 'MentionPicker',
+      category: 'App',
+      abbr: 'MP',
+      since: '2026-05',
+      description: '@-trigger autocomplete picker. Headless: takes users + query + position, fires onSelect. Keyboard nav (ArrowUp/Down, Enter/Tab, Escape).',
+      filePath: 'modules/app/MentionPicker.tsx',
+      sourceCode: `'use client';
+import { MentionPicker } from '@/modules/app/MentionPicker';
+
+<MentionPicker
+  users={users}
+  query={query}
+  position={{ top, left }}
+  onSelect={(u) => insertMention(u)}
+  onCancel={() => closePicker()}
+/>`,
+      variants: [
+        {
+          title: 'Filtered list',
+          layout: 'stack' as const,
+          preview: <MentionPickerDemo />,
+          code: `<MentionPicker users={users} query="ay" onSelect={(u) => {}} onCancel={() => {}} />`,
+        },
+        {
+          title: 'Empty results',
+          layout: 'stack' as const,
+          preview: <MentionPickerEmptyDemo />,
+          code: `<MentionPicker users={users} query="zzz" onSelect={(u) => {}} onCancel={() => {}} />`,
+        },
+      ],
+      composes: ['avatar'],
+      designTokens: ['--surface-raised', '--surface-overlay', '--border', '--text-primary', '--text-secondary', '--text-disabled'],
+      a11y: {
+        wcagLevel: 'AA',
+        ariaPatterns: ['role="listbox"', 'role="option"', 'aria-selected'],
+        keyboardInteractions: [
+          { keys: 'ArrowDown / ArrowUp', action: 'Move selection' },
+          { keys: 'Enter / Tab',          action: 'Insert highlighted mention' },
+          { keys: 'Escape',               action: 'Cancel picker' },
+        ],
+      },
+    },
   ];
+}
+
+const SAMPLE_INVITEES: ShareInvitee[] = [
+  { id: '1', name: 'Alice Brooks',  email: 'alice@example.com',  avatarUrl: null, permission: 'owner' },
+  { id: '2', name: 'Marcus Reed',   email: 'marcus@example.com', avatarUrl: null, permission: 'editor' },
+  { id: '3', name: 'Priya Sharma',  email: 'priya@example.com',  avatarUrl: null, permission: 'viewer' },
+];
+
+function ShareDialogDemo() {
+  const [invitees, setInvitees] = useState<ShareInvitee[]>(SAMPLE_INVITEES);
+  return (
+    <div
+      id="share-dialog-preview-with"
+      className="relative w-full rounded-xl overflow-hidden border border-border bg-surface-base"
+      style={{ minHeight: 620, transform: 'translateZ(0)' }}
+    >
+      <ShareDialog
+        open
+        onClose={() => undefined}
+        shareUrl="https://app.example.com/docs/x4y9-zk7"
+        invitees={invitees}
+        onInvite={(email, permission) => {
+          setInvitees((prev) => [
+            ...prev,
+            { id: String(prev.length + 1), name: email.split('@')[0], email, avatarUrl: null, permission },
+          ]);
+        }}
+        onRemove={(id) => setInvitees((prev) => prev.filter((i) => i.id !== id))}
+        onPermissionChange={(id, permission: SharePermission) =>
+          setInvitees((prev) => prev.map((i) => (i.id === id ? { ...i, permission } : i)))
+        }
+        portalTarget="#share-dialog-preview-with"
+      />
+    </div>
+  );
+}
+
+function ShareDialogEmptyDemo() {
+  return (
+    <div
+      id="share-dialog-preview-empty"
+      className="relative w-full rounded-xl overflow-hidden border border-border bg-surface-base"
+      style={{ minHeight: 360, transform: 'translateZ(0)' }}
+    >
+      <ShareDialog
+        open
+        onClose={() => undefined}
+        shareUrl="https://app.example.com/projects/empty-share"
+        invitees={[]}
+        portalTarget="#share-dialog-preview-empty"
+      />
+    </div>
+  );
+}
+
+const SAMPLE_COMMENTS: CommentThreadItem[] = [
+  {
+    id: 'c1',
+    author: { id: 'u1', name: 'Alice Brooks', avatarUrl: null },
+    body: 'I think this feature would be great for the landing page.',
+    createdAt: new Date(Date.now() - 1000 * 60 * 30),
+    likeCount: 4,
+    likedByMe: true,
+    replies: [
+      {
+        id: 'c2',
+        author: { id: 'me', name: 'You', avatarUrl: null },
+        body: 'Agreed. I can open a PR.',
+        createdAt: new Date(Date.now() - 1000 * 60 * 12),
+        likeCount: 1,
+      },
+    ],
+  },
+  {
+    id: 'c3',
+    author: { id: 'u2', name: 'Marcus Reed', avatarUrl: null },
+    body: 'The mobile breakpoint should be reviewed as well.',
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
+    likeCount: 0,
+  },
+];
+
+function CommentThreadDemo() {
+  const [comments, setComments] = useState<CommentThreadItem[]>(SAMPLE_COMMENTS);
+  return (
+    <div className="w-full">
+      <CommentThread
+        comments={comments}
+        currentUserId="me"
+        onReply={(parentId, body) => {
+          const next: CommentThreadItem = {
+            id: 'r' + Math.random().toString(36).slice(2, 8),
+            author: { id: 'me', name: 'You', avatarUrl: null },
+            body,
+            createdAt: new Date(),
+          };
+          if (!parentId) {
+            setComments((prev) => [...prev, next]);
+            return;
+          }
+          function attach(list: CommentThreadItem[]): CommentThreadItem[] {
+            return list.map((c) =>
+              c.id === parentId
+                ? { ...c, replies: [...(c.replies ?? []), next] }
+                : c.replies
+                ? { ...c, replies: attach(c.replies) }
+                : c,
+            );
+          }
+          setComments((prev) => attach(prev));
+        }}
+        onLike={(id, liked) => {
+          function walk(list: CommentThreadItem[]): CommentThreadItem[] {
+            return list.map((c) =>
+              c.id === id
+                ? { ...c, likedByMe: liked, likeCount: (c.likeCount ?? 0) + (liked ? 1 : -1) }
+                : c.replies
+                ? { ...c, replies: walk(c.replies) }
+                : c,
+            );
+          }
+          setComments(walk);
+        }}
+      />
+    </div>
+  );
+}
+
+function CommentThreadEmptyDemo() {
+  return (
+    <CommentThread
+      comments={[]}
+      currentUserId="me"
+      onReply={() => undefined}
+    />
+  );
+}
+
+const SAMPLE_USERS: MentionPickerUser[] = [
+  { id: 'u1', name: 'Alice Brooks',   handle: 'aliceb',  avatarUrl: null },
+  { id: 'u2', name: 'Marcus Reed',    handle: 'marcusr', avatarUrl: null },
+  { id: 'u3', name: 'Priya Sharma',   handle: 'priyas',  avatarUrl: null },
+  { id: 'u4', name: 'Diego Alvarez',  handle: 'diegoa',  avatarUrl: null },
+];
+
+function MentionPickerDemo() {
+  const [query, setQuery] = useState('al');
+  return (
+    <div className="flex flex-col items-center gap-4 py-6">
+      <div className="w-full max-w-xs">
+        <label htmlFor="mp-query" className="block text-sm font-medium text-text-primary mb-1">
+          Query
+        </label>
+        <input
+          id="mp-query"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="w-full rounded-md border border-border bg-surface-base px-3 py-2 text-sm text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+        />
+      </div>
+      <div className="relative">
+        <MentionPicker
+          users={SAMPLE_USERS}
+          query={query}
+          onSelect={() => undefined}
+          onCancel={() => undefined}
+        />
+      </div>
+    </div>
+  );
+}
+
+function MentionPickerEmptyDemo() {
+  return (
+    <div className="flex justify-center py-6">
+      <MentionPicker
+        users={SAMPLE_USERS}
+        query="zzz"
+        onSelect={() => undefined}
+        onCancel={() => undefined}
+      />
+    </div>
+  );
 }

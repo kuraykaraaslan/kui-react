@@ -1,6 +1,6 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
-import type { Event, WorkingHours } from '../types';
+import type { CalendarTelemetry, Event, WorkingHours } from '../types';
 import { EventCard } from '../parts/EventCard';
 import { TimeGrid } from '../parts/TimeGrid';
 import { eventOnDay, isSameDay, rangeDays, startOfWeek } from '../date-utils';
@@ -13,7 +13,10 @@ type WeekViewProps = {
   today: Date;
   workingHours?: WorkingHours;
   slotMinutes?: 5 | 15 | 30 | 60;
-  onEventClick?: (e: Event) => void;
+  onEventClick?: (e: Event, anchorRect: DOMRect) => void;
+  onEventCreate?: (range: { start: Date; end: Date }) => void | Promise<void>;
+  onEventUpdate?: (event: Event) => void | Promise<void>;
+  onTelemetry?: (e: CalendarTelemetry) => void;
 };
 
 export function WeekView({
@@ -24,6 +27,9 @@ export function WeekView({
   workingHours,
   slotMinutes,
   onEventClick,
+  onEventCreate,
+  onEventUpdate,
+  onTelemetry,
 }: WeekViewProps) {
   const start = startOfWeek(date, locale.weekStart);
   const days = rangeDays(start, 7);
@@ -97,6 +103,9 @@ export function WeekView({
         workingHours={workingHours}
         slotMinutes={slotMinutes}
         onEventClick={onEventClick}
+        onEventCreate={onEventCreate}
+        onEventUpdate={onEventUpdate}
+        onTelemetry={onTelemetry}
       />
     </div>
   );

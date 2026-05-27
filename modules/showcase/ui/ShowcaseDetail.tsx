@@ -22,7 +22,7 @@ function SourceBlock({ filePath, sourceCode }: { filePath: string; sourceCode: s
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bg-surface-raised border border-border rounded-xl overflow-hidden">
+    <div className="mt-6 bg-surface-raised border border-border rounded-xl overflow-hidden">
       <div className="widget-drag-handle flex items-center justify-between gap-3 px-4 py-3 border-b border-border bg-surface-overlay">
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-text-disabled text-xs shrink-0 select-none" aria-hidden="true">⠿</span>

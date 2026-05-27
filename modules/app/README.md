@@ -14,6 +14,7 @@ AppNav.tsx
 AppShell.tsx
 AppSidebar.tsx
 AppTopBar.tsx
+CommentThread.tsx
 DetailHeader.tsx
 EmptyErrorState.tsx
 FilterBar.tsx
@@ -22,10 +23,14 @@ FormField.tsx
 GlobalSearch.tsx
 InlineAlert.tsx
 LoadingState.tsx
+MaintenancePage.tsx
+MentionPicker.tsx
 NavDrawer.tsx
 NotFoundPage.tsx
 NotificationSystem.tsx
+OnboardingWizard.tsx
 SectionCard.tsx
+ShareDialog.tsx
 SplashScreen.tsx
 StepFlow.tsx
 StepShell.tsx
@@ -35,7 +40,15 @@ index.ts
 
 ## Parity
 
-NextJS-only. EJS layouts under `/home/kuray/02_EJS_Components/views/layouts/` and `views/theme/common/` cover equivalent ground via server-rendered templates.
+NextJS-first. The following organisms have pixel-parity EJS partials under `/home/kuray/02_EJS_Components/modules/app/`:
+
+- `MaintenancePage.tsx` ↔ `MaintenancePage.ejs`
+- `ShareDialog.tsx` ↔ `ShareDialog.ejs`
+- `CommentThread.tsx` ↔ `CommentThread.ejs` (recursive via self-include)
+- `MentionPicker.tsx` ↔ `MentionPicker.ejs` (server-render + inline keyboard handler)
+- `OnboardingWizard.tsx` ↔ `OnboardingWizard.ejs` (server-rendered, `?step=N` query)
+
+EJS layouts under `views/layouts/` and `views/theme/common/` cover the remaining shells.
 
 ## Conventions
 

@@ -1,0 +1,243 @@
+'use client';
+/* =========================================================
+   PER-INSTANCE ZUSTAND STORE
+   Each <Gantt> creates its own store via `createGanttStore()`
+   and provides it through `GanttStoreContext`. Sub-components
+   read state via the `useGanttStore` hook.
+   ========================================================= */
+
+import { createContext, createElement, useContext } from 'react';
+import { create, type StoreApi, type UseBoundStore } from 'zustand';
+import type {
+  DepDrawState,
+  Dependency,
+  DragMode,
+  DragState,
+  GanttTelemetry,
+  Task,
+  TaskId,
+  TimeUnit,
+} from './types';
+
+export type GanttState = {
+  scale: TimeUnit;
+  collapsed: Set<TaskId>;
+  /** Local working copy of tasks — drag commits mutate this, then bubble out via onTaskUpdate. */
+  workingTasks: Task[];
+  /** Local working copy of dependencies — local create/delete, then bubble out. */
+  dependencies: Dependency[];
+  drag: DragState | null;
+  depDraw: DepDrawState | null;
+  selectedDepId: string | null;
+};
+
+export type GanttActions = {
+  setScale: (s: TimeUnit) => void;
+  toggleCollapse: (id: TaskId) => boolean;
+  /** Seed from props — called on prop change. */
+  seedTasks: (tasks: Task[]) => void;
+  seedDependencies: (deps: Dependency[]) => void;
+  /** Begin a drag — captures origin values. */
+  beginDrag: (
+    taskId: TaskId,
+    mode: DragMode,
+    pointerStartX: number,
+  ) => void;
+  /** Update drag with current pointer dx in pixels, converted to days. */
+  updateDrag: (deltaDays: number, progressOverride: number | null) => void;
+  /** Commit drag → apply to workingTasks, return updated task or null. */
+  commitDrag: () => Task | null;
+  /** Cancel drag (Escape or rollback). */
+  cancelDrag: () => void;
+  beginDepDraw: (sourceId: TaskId, x: number, y: number) => void;
+  updateDepDraw: (x: number, y: number, hoverTargetId: TaskId | null) => void;
+  /** Commit dependency draw → return created Dependency or null if no target. */
+  commitDepDraw: () => Dependency | null;
+  cancelDepDraw: () => void;
+  selectDep: (id: string | null) => void;
+  /** Remove a dependency locally; returns the removed id or null. */
+  removeDependency: (id: string) => string | null;
+};
+
+export type GanttStore = GanttState & GanttActions;
+
+function clampProgress(n: number): number {
+  return Math.max(0, Math.min(100, n));
+}
+
+function applyDragToTask(task: Task, drag: DragState): Task {
+  const { mode, deltaDays, originStart, originEnd, progressOverride } = drag;
+  const msPerDay = 86400000;
+  switch (mode) {
+    case 'move': {
+      return {
+        ...task,
+        start: new Date(originStart.getTime() + deltaDays * msPerDay),
+        end: new Date(originEnd.getTime() + deltaDays * msPerDay),
+      };
+    }
+    case 'resize-start': {
+      const newStart = new Date(originStart.getTime() + deltaDays * msPerDay);
+      // Min 1-day duration.
+      if (newStart.getTime() >= originEnd.getTime()) {
+        return { ...task, start: new Date(originEnd.getTime() - msPerDay), end: originEnd };
+      }
+      return { ...task, start: newStart, end: originEnd };
+    }
+    case 'resize-end': {
+      const newEnd = new Date(originEnd.getTime() + deltaDays * msPerDay);
+      if (newEnd.getTime() <= originStart.getTime()) {
+        return { ...task, start: originStart, end: new Date(originStart.getTime() + msPerDay) };
+      }
+      return { ...task, start: originStart, end: newEnd };
+    }
+    case 'progress': {
+      return { ...task, progress: clampProgress(progressOverride ?? task.progress ?? 0) };
+    }
+  }
+}
+
+export function createGanttStore(opts: {
+  tasks: Task[];
+  dependencies: Dependency[];
+  scale: TimeUnit;
+  onTelemetry?: (e: GanttTelemetry) => void;
+}) {
+  const initialCollapsed = new Set<TaskId>();
+  for (const t of opts.tasks) if (t.collapsed) initialCollapsed.add(t.id);
+
+  return create<GanttStore>((set, get) => ({
+    scale: opts.scale,
+    collapsed: initialCollapsed,
+    workingTasks: opts.tasks,
+    dependencies: opts.dependencies,
+    drag: null,
+    depDraw: null,
+    selectedDepId: null,
+
+    setScale: (s) => {
+      set({ scale: s });
+      opts.onTelemetry?.({ kind: 'scale-change', scale: s });
+    },
+
+    toggleCollapse: (id) => {
+      const prev = get().collapsed;
+      const next = new Set(prev);
+      const wasCollapsed = next.has(id);
+      if (wasCollapsed) next.delete(id);
+      else next.add(id);
+      set({ collapsed: next });
+      opts.onTelemetry?.({ kind: 'task-toggle', taskId: id, collapsed: !wasCollapsed });
+      return !wasCollapsed;
+    },
+
+    seedTasks: (tasks) => set({ workingTasks: tasks }),
+    seedDependencies: (deps) => set({ dependencies: deps }),
+
+    beginDrag: (taskId, mode, pointerStartX) => {
+      const task = get().workingTasks.find((t) => t.id === taskId);
+      if (!task) return;
+      set({
+        drag: {
+          taskId,
+          mode,
+          pointerStartX,
+          originStart: task.start,
+          originEnd: task.end,
+          originProgress: task.progress ?? 0,
+          deltaDays: 0,
+          progressOverride: null,
+        },
+      });
+    },
+
+    updateDrag: (deltaDays, progressOverride) => {
+      const drag = get().drag;
+      if (!drag) return;
+      set({ drag: { ...drag, deltaDays, progressOverride } });
+    },
+
+    commitDrag: () => {
+      const drag = get().drag;
+      if (!drag) return null;
+      const tasks = get().workingTasks;
+      const idx = tasks.findIndex((t) => t.id === drag.taskId);
+      if (idx === -1) {
+        set({ drag: null });
+        return null;
+      }
+      const updated = applyDragToTask(tasks[idx], drag);
+      const next = tasks.slice();
+      next[idx] = updated;
+      set({ workingTasks: next, drag: null });
+      opts.onTelemetry?.({ kind: 'task-drag-commit', taskId: updated.id, mode: drag.mode });
+      return updated;
+    },
+
+    cancelDrag: () => set({ drag: null }),
+
+    beginDepDraw: (sourceId, x, y) => set({ depDraw: { sourceId, x, y, hoverTargetId: null } }),
+    updateDepDraw: (x, y, hoverTargetId) => {
+      const cur = get().depDraw;
+      if (!cur) return;
+      set({ depDraw: { ...cur, x, y, hoverTargetId } });
+    },
+    commitDepDraw: () => {
+      const cur = get().depDraw;
+      if (!cur) {
+        return null;
+      }
+      const targetId = cur.hoverTargetId;
+      set({ depDraw: null });
+      if (!targetId || targetId === cur.sourceId) return null;
+      const dep: Dependency = {
+        id: `dep-${cur.sourceId}-${targetId}-${Date.now()}`,
+        from: cur.sourceId,
+        to: targetId,
+        type: 'FS',
+      };
+      set({ dependencies: [...get().dependencies, dep] });
+      opts.onTelemetry?.({ kind: 'dependency-create', dependencyId: dep.id });
+      return dep;
+    },
+    cancelDepDraw: () => set({ depDraw: null }),
+
+    selectDep: (id) => set({ selectedDepId: id }),
+    removeDependency: (id) => {
+      const deps = get().dependencies;
+      if (!deps.some((d) => d.id === id)) return null;
+      set({
+        dependencies: deps.filter((d) => d.id !== id),
+        selectedDepId: null,
+      });
+      opts.onTelemetry?.({ kind: 'dependency-delete', dependencyId: id });
+      return id;
+    },
+  }));
+}
+
+export type GanttStoreHook = UseBoundStore<StoreApi<GanttStore>>;
+
+const GanttStoreContext = createContext<GanttStoreHook | null>(null);
+
+export function GanttStoreProvider({
+  store,
+  children,
+}: {
+  store: GanttStoreHook;
+  children: React.ReactNode;
+}) {
+  return createElement(GanttStoreContext.Provider, { value: store }, children);
+}
+
+export function useGanttStore<T>(selector: (s: GanttStore) => T): T {
+  const store = useContext(GanttStoreContext);
+  if (!store) throw new Error('useGanttStore must be used inside <GanttStoreProvider>');
+  return store(selector);
+}
+
+export function useGanttStoreApi(): GanttStoreHook {
+  const store = useContext(GanttStoreContext);
+  if (!store) throw new Error('useGanttStoreApi must be used inside <GanttStoreProvider>');
+  return store;
+}

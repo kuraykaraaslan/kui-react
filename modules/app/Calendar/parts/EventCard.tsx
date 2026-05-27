@@ -11,7 +11,7 @@ type EventCardProps = {
   event: Event;
   /** Visual style. "pill" = month grid, "bar" = all-day in week/day, "stack" = timed slot card. */
   variant?: Variant;
-  onClick?: (e: Event) => void;
+  onClick?: (e: Event, anchorRect: DOMRect) => void;
   className?: string;
 };
 
@@ -27,7 +27,7 @@ export function EventCard({ event, variant = 'pill', onClick, className }: Event
   return (
     <button
       type="button"
-      onClick={() => onClick?.(event)}
+      onClick={(e) => onClick?.(event, (e.currentTarget as HTMLElement).getBoundingClientRect())}
       aria-label={ariaLabel}
       data-event-id={event.id}
       className={cn(

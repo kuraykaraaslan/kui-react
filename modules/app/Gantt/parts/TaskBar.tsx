@@ -9,51 +9,133 @@ type TaskBarProps = {
   rangeStart: Date;
   pixelsPerDay: number;
   rowIndex: number;
+  isDepHoverTarget?: boolean;
+  onMoveDown: (e: React.PointerEvent<HTMLElement>, taskId: string, barWidth: number) => void;
+  onResizeStartDown: (e: React.PointerEvent<HTMLElement>, taskId: string) => void;
+  onResizeEndDown: (e: React.PointerEvent<HTMLElement>, taskId: string) => void;
+  onProgressDown: (e: React.PointerEvent<HTMLElement>, taskId: string, barWidth: number) => void;
+  onDepSourceDown: (e: React.PointerEvent<HTMLElement>, taskId: string) => void;
 };
 
-/**
- * Single task bar — absolutely positioned inside the timeline body.
- * The progress fill is rendered as a darker `bg-primary` overlay on top of
- * the `bg-primary-subtle` track, clipped via `width: <progress>%`.
- */
-export function TaskBar({ task, rangeStart, pixelsPerDay, rowIndex }: TaskBarProps) {
+export function TaskBar({
+  task,
+  rangeStart,
+  pixelsPerDay,
+  rowIndex,
+  isDepHoverTarget,
+  onMoveDown,
+  onResizeStartDown,
+  onResizeEndDown,
+  onProgressDown,
+  onDepSourceDown,
+}: TaskBarProps) {
   const startOffsetDays = diffDays(rangeStart, task.start);
   const durationDays    = Math.max(1, diffDays(task.start, task.end));
   const left  = startOffsetDays * pixelsPerDay;
   const width = durationDays    * pixelsPerDay;
   const top   = (rowIndex * ROW_HEIGHT) + (ROW_HEIGHT - BAR_HEIGHT) / 2;
   const progress = Math.max(0, Math.min(100, task.progress ?? 0));
+  const progressX = (progress / 100) * width;
 
   return (
     <div
       role="gridcell"
       aria-label={`${task.name}: ${task.start.toDateString()} to ${task.end.toDateString()}, ${progress}% complete`}
+      data-task-id={task.id}
       className={cn(
-        'gantt-task-bar absolute rounded-md overflow-hidden',
+        'gantt-task-bar group absolute rounded-md overflow-visible',
         'bg-primary-subtle border border-primary/40',
         'shadow-sm select-none',
+        isDepHoverTarget && 'ring-2 ring-primary',
         // TODO M3: when task.critical -> red border + warning fill.
       )}
       style={{ left, width, top, height: BAR_HEIGHT }}
-      data-task-id={task.id}
     >
       {/* Progress fill */}
       <div
         aria-hidden="true"
-        className="absolute inset-y-0 left-0 bg-primary"
+        className="absolute inset-y-0 left-0 bg-primary rounded-l-md overflow-hidden"
         style={{ width: `${progress}%` }}
       />
-      {/* Label */}
-      <div className="relative h-full flex items-center px-2 text-[11px] font-medium text-text-primary truncate">
+
+      {/* Move zone — entire bar body (excluding handles below) */}
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label="Move task"
+        className={cn(
+          'absolute inset-0 cursor-grab active:cursor-grabbing',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+          'rounded-md',
+        )}
+        style={{ background: 'transparent' }}
+        onPointerDown={(e) => onMoveDown(e, task.id, width)}
+      />
+
+      {/* Label (visual only — sits above the move button) */}
+      <div className="relative h-full flex items-center px-2 text-[11px] font-medium text-text-primary truncate pointer-events-none">
         <span className="truncate">{task.name}</span>
         <span className="ml-auto pl-2 tabular-nums text-text-secondary">
           {progress}%
         </span>
       </div>
-      {/*
-        TODO M2: resize handles on left + right edges; drag handle to move;
-        progress thumb on the boundary between filled and unfilled.
-      */}
+
+      {/* Resize handles */}
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label="Resize start date"
+        className={cn(
+          'absolute top-0 bottom-0 left-0 w-1.5 cursor-ew-resize',
+          'hover:bg-primary/30 rounded-l-md',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+        )}
+        onPointerDown={(e) => onResizeStartDown(e, task.id)}
+      />
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label="Resize end date"
+        className={cn(
+          'absolute top-0 bottom-0 right-0 w-1.5 cursor-ew-resize',
+          'hover:bg-primary/30 rounded-r-md',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+        )}
+        onPointerDown={(e) => onResizeEndDown(e, task.id)}
+      />
+
+      {/* Progress thumb — only visible when progress > 0 and < 100 */}
+      {progress > 0 && progress < 100 && (
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-label="Adjust progress"
+          className={cn(
+            'absolute top-1/2 -translate-y-1/2 -translate-x-1/2',
+            'w-3 h-3 rounded-full bg-surface-base border-2 border-primary',
+            'cursor-ew-resize shadow',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+          )}
+          style={{ left: progressX }}
+          onPointerDown={(e) => onProgressDown(e, task.id, width)}
+        />
+      )}
+
+      {/* Dependency source handle — small dot floating right of the bar's end */}
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label="Create dependency from this task"
+        className={cn(
+          'absolute top-1/2 -translate-y-1/2',
+          'w-3 h-3 rounded-full bg-primary border-2 border-surface-base shadow',
+          'cursor-crosshair opacity-0 hover:opacity-100 group-hover:opacity-100',
+          'focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+          'transition-opacity',
+        )}
+        style={{ right: -6 }}
+        onPointerDown={(e) => onDepSourceDown(e, task.id)}
+      />
     </div>
   );
 }

@@ -7,7 +7,7 @@
 - **status:** beta
 - **since:** 2026-05
 
-Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, and TR/EN locales. Agenda + resource view, drag-create/move/resize, RRULE recurrence, multi-calendar overlay and full a11y/i18n/perf polish land in M2-M6.
+Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, and full interactions — click event for an anchored popover (Edit/Delete), drag a timed event to move, drag the bottom edge to resize, drag an empty range to create. RRULE recurrence, resource/multi-calendar overlay, agenda + mini, and full a11y/i18n/perf polish land in M3-M6.
 
 ## Accessibility
 
@@ -80,6 +80,27 @@ Month view uses role="grid" with role="gridcell" per day. View switcher uses rol
 />
 ```
 
+### Interactive — drag, resize, popover
+
+```tsx
+<Calendar
+  events={events}
+  view="week"
+  defaultDate={new Date(2026, 4, 13)}
+  slotMinutes={30}
+  workingHours={{ start: 9, end: 18, days: [1, 2, 3, 4, 5] }}
+  onEventCreate={({ start, end }) =>
+    setEvents((prev) => [...prev, { id: `n${Date.now()}`, title: 'New event', start, end }])
+  }
+  onEventUpdate={(updated) =>
+    setEvents((prev) => prev.map((e) => (e.id === updated.id ? updated : e)))
+  }
+  onEventDelete={(id) =>
+    setEvents((prev) => prev.filter((e) => e.id !== id))
+  }
+/>
+```
+
 ## Full source
 
 ```tsx
@@ -113,6 +134,9 @@ const events: Event[] = [
   defaultDate={new Date(2026, 4, 13)}
   onViewChange={setView}
   onEventClick={(e) => console.log(e)}
+  onEventCreate={({ start, end }) => api.create({ start, end })}
+  onEventUpdate={(event) => api.update(event)}
+  onEventDelete={(id) => api.remove(id)}
   locale="tr"                    // 'tr' (default) | 'en'
   workingHours={{ start: 9, end: 18, days: [1,2,3,4,5] }}
   slotMinutes={30}

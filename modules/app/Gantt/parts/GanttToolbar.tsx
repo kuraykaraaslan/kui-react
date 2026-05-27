@@ -1,0 +1,72 @@
+'use client';
+import { cn } from '@/libs/utils/cn';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendar } from '@fortawesome/free-solid-svg-icons';
+import type { GanttMessages, TimeUnit } from '../types';
+import { useGanttStore } from '../store';
+
+const SCALES: TimeUnit[] = ['day', 'week', 'month', 'quarter', 'year'];
+
+type GanttToolbarProps = {
+  messages: GanttMessages;
+  controlledScale?: TimeUnit;
+};
+
+export function GanttToolbar({ messages, controlledScale }: GanttToolbarProps) {
+  const storeScale = useGanttStore((s) => s.scale);
+  const setScale = useGanttStore((s) => s.setScale);
+  const effective = controlledScale ?? storeScale;
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 border-b border-border bg-surface-raised">
+      <div className="flex items-center gap-2 text-text-primary">
+        <FontAwesomeIcon icon={faCalendar} className="w-3.5 h-3.5 text-text-secondary" aria-hidden="true" />
+        <h2 className="text-sm font-semibold">
+          {messages.today}:{' '}
+          <span className="tabular-nums font-normal text-text-secondary">
+            {new Date().toLocaleDateString()}
+          </span>
+        </h2>
+      </div>
+      <div
+        role="tablist"
+        aria-label="Timeline scale"
+        className="inline-flex items-center rounded-md border border-border bg-surface-base p-0.5"
+      >
+        {SCALES.map((s) => {
+          const active = s === effective;
+          const label = ({
+            day:     messages.scaleDay,
+            week:    messages.scaleWeek,
+            month:   messages.scaleMonth,
+            quarter: messages.scaleQuarter,
+            year:    messages.scaleYear,
+          } as const)[s];
+          return (
+            <button
+              key={s}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => setScale(s)}
+              className={cn(
+                'px-2.5 py-1 text-xs font-medium rounded transition-colors',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+                active
+                  ? 'bg-primary text-primary-fg'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-surface-overlay',
+              )}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+      {/*
+        TODO M5: export menu (PNG / PDF / CSV).
+        TODO M3: critical-path toggle button.
+        TODO M6: zoom + / − keyboard hints.
+      */}
+    </div>
+  );
+}

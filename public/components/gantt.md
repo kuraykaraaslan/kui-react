@@ -7,7 +7,7 @@
 - **status:** beta
 - **since:** 2026-05
 
-MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale switcher (day / week / month / quarter / year), a vertical Today line, WBS tree with expand/collapse on the left panel, sticky timeline header with synchronised horizontal + vertical scroll, and absolutely-positioned task bars with a %-progress fill (bg-primary over bg-primary-subtle). Public props for `dependencies`, `baselines`, `criticalPath`, `workingDays`, `holidays`, `onTaskUpdate`, `onDependencyCreate/Delete`, `exportFormats`, `messages`, and `reducedMotion` are accepted but not yet visually wired — they become live in M2 (drag-to-schedule + dependency drawing), M3 (CPM critical-path highlight + hover tooltip), M4 (milestones + baselines + group rollup), M5 (resource leveling + export PNG/PDF/CSV + working-day calendar), and M6 (full keyboard nav + screen-reader announcements + locale). Pixel-identical EJS sibling at modules/app/Gantt/Gantt.ejs.
+MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale switcher (day / week / month / quarter / year), a vertical Today line, WBS tree with expand/collapse on the left panel, sticky timeline header with synchronised horizontal + vertical scroll, and absolutely-positioned task bars with a %-progress fill. M2 adds full interactivity: drag a bar to reschedule (snap to day), drag the left/right edges to resize, drag the white progress thumb to change %, and drag from the right-edge blue dot to another bar to draw an FS dependency. Dependencies render as orthogonal SVG arrows with a marker-end arrowhead; click an arrow then press Delete to remove it. All mutations are optimistic and roll back automatically if `onTaskUpdate` / `onDependencyCreate` rejects. Internal state is owned by a per-instance Zustand store (`store.ts`). Public props for `baselines`, `criticalPath`, `workingDays`, `holidays`, `exportFormats`, and `reducedMotion` are accepted but not yet wired — they become live in M3 (CPM highlight + hover tooltip), M4 (milestones + baselines + weekends), M5 (export + working-day calendar), and M6 (full keyboard nav + locale + virtualisation).
 
 ## Depends on
 
@@ -18,10 +18,12 @@ MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale s
 - WCAG: AA
 - ARIA patterns: grid, row, columnheader, gridcell, tablist, tab
 - Keyboard:
-  - `Tab` — Move focus across scale tabs and collapse buttons
+  - `Tab` — Move focus across scale tabs, collapse buttons, and dependency arrows
   - `Space / Enter` — Activate scale tab or expand/collapse a WBS group
+  - `Delete` — Remove the currently selected dependency arrow
+  - `Escape` — Cancel an in-flight drag or dependency draw
 
-Root carries role="grid" with aria-rowcount + aria-colcount; the timeline header row is role="row" with aria-rowindex="1" and each cell is role="columnheader" with aria-colindex. Task bars are role="gridcell" labelled with the task name, dates, and % complete. Scale switcher is a role="tablist"/role="tab" pair so screen readers announce the active scale.
+Root carries role="grid"; the timeline header row is role="row" with each cell role="columnheader". Task bars are role="gridcell" labelled with the task name, dates, and % complete. Resize handles and the progress thumb are <button> elements so they are reachable by assistive tech. Dependency arrows are role="button" with keyboard-activatable selection. Scale switcher is a role="tablist"/role="tab" pair.
 
 ## Design tokens consumed
 
@@ -59,32 +61,59 @@ const tasks = base.map((t) => t.id === 'impl' ? { ...t, collapsed: true } : t);
 <Gantt tasks={tasks} scale="week" />
 ```
 
-## Full source
+### Dependencies (FS + SS)
 
 ```tsx
-import { Gantt, type Task } from '@/modules/app/Gantt';
-
-const tasks: Task[] = [
-  { id: 'g1', name: 'Design phase',     isGroup: true, start: new Date('2026-05-01'), end: new Date('2026-05-15'), progress: 70 },
-  { id: 't1', name: 'Wireframes',       parentId: 'g1', start: new Date('2026-05-01'), end: new Date('2026-05-08'), progress: 100 },
-  { id: 't2', name: 'Visual design',    parentId: 'g1', start: new Date('2026-05-08'), end: new Date('2026-05-15'), progress: 80 },
-  { id: 'm1', name: 'Launch',           start: new Date('2026-06-01'), end: new Date('2026-06-01'), isMilestone: true },
+const dependencies = [
+  { id: 'd-t1-t2', from: 't1', to: 't2', type: 'FS' }, // Finish-to-Start
+  { id: 'd-t4-t5', from: 't4', to: 't5', type: 'SS' }, // Start-to-Start
 ];
+
+<Gantt tasks={tasks} dependencies={dependencies} scale="week" />
+```
+
+### Interactive (drag + dependencies)
+
+```tsx
+const [tasks, setTasks] = useState<Task[]>(initial);
+const [deps,  setDeps]  = useState<Dependency[]>([]);
 
 <Gantt
   tasks={tasks}
+  dependencies={deps}
   scale="week"
-  ariaLabel="Q2 release plan"
-  // M2 (stubs accepted, not yet visualised):
-  // dependencies={[{ id: 'd1', from: 't1', to: 't2', type: 'FS' }]}
-  // M3:
-  // criticalPath
-  // M4:
-  // baselines={[{ taskId: 't1', start: ..., end: ... }]}
-  // M5:
-  // workingDays={[1,2,3,4,5]} holidays={[new Date('2026-05-05')]}
-  // exportFormats={['png','csv']}
-  // M2 callbacks:
-  // onTaskUpdate={async (t) => fetch('/api/tasks/' + t.id, { method: 'PATCH', body: JSON.stringify(t) })}
+  onTaskUpdate={(t) => setTasks((prev) => prev.map((p) => (p.id === t.id ? t : p)))}
+  onDependencyCreate={(d) => setDeps((prev) => [...prev, d])}
+  onDependencyDelete={(id) => setDeps((prev) => prev.filter((d) => d.id !== id))}
 />
+```
+
+## Full source
+
+```tsx
+import { Gantt, type Dependency, type Task } from '@/modules/app/Gantt';
+import { useState } from 'react';
+
+export function MyPlan() {
+  const [tasks, setTasks] = useState<Task[]>([
+    { id: 't1', name: 'Wireframes',   start: new Date('2026-05-01'), end: new Date('2026-05-08'), progress: 100 },
+    { id: 't2', name: 'Visual design', start: new Date('2026-05-08'), end: new Date('2026-05-15'), progress: 60 },
+    { id: 't3', name: 'Launch',       start: new Date('2026-06-01'), end: new Date('2026-06-01'), isMilestone: true },
+  ]);
+  const [deps, setDeps] = useState<Dependency[]>([
+    { id: 'd1', from: 't1', to: 't2', type: 'FS' },
+  ]);
+
+  return (
+    <Gantt
+      tasks={tasks}
+      dependencies={deps}
+      scale="week"
+      ariaLabel="Q2 release plan"
+      onTaskUpdate={(t) => setTasks((prev) => prev.map((p) => (p.id === t.id ? t : p)))}
+      onDependencyCreate={(d) => setDeps((prev) => [...prev, d])}
+      onDependencyDelete={(id) => setDeps((prev) => prev.filter((d) => d.id !== id))}
+    />
+  );
+}
 ```

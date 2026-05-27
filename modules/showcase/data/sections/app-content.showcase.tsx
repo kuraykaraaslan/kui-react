@@ -4,6 +4,7 @@ import { DetailHeader } from '@/modules/app/DetailHeader';
 import { ErrorState, NotFoundState } from '@/modules/app/EmptyErrorState';
 import { LoadingState } from '@/modules/app/LoadingState';
 import { SplashScreen } from '@/modules/app/SplashScreen';
+import { MaintenancePage } from '@/modules/app/MaintenancePage';
 import { Button } from '@/modules/ui/Button';
 import type { ShowcaseComponent } from '../showcase.types';
 
@@ -290,7 +291,83 @@ import { SplashScreen } from '@/modules/app/SplashScreen';
         },
       ],
     },
+    {
+      id: 'maintenance-page',
+      title: 'MaintenancePage',
+      category: 'App',
+      abbr: 'Mp',
+      since: '2026-05',
+      description: 'Full-page maintenance screen. Optional ETA countdown badge and external status-page link. Use for planned downtime or unplanned outages.',
+      filePath: 'modules/app/MaintenancePage.tsx',
+      sourceCode: `'use client';
+import { MaintenancePage } from '@/modules/app/MaintenancePage';
+
+<MaintenancePage
+  title="System Maintenance"
+  description="We're performing a short maintenance to improve service quality. We'll be back shortly."
+  eta={new Date(Date.now() + 30 * 60 * 1000)}
+  statusUrl="https://status.example.com"
+/>`,
+      variants: [
+        {
+          title: 'Plain (no ETA)',
+          layout: 'stack' as const,
+          preview: <MaintenancePagePlainDemo />,
+          code: `<MaintenancePage
+  title="System Maintenance"
+  description="We're performing a short maintenance."
+/>`,
+        },
+        {
+          title: 'With ETA + status link',
+          layout: 'stack' as const,
+          preview: <MaintenancePageEtaDemo />,
+          code: `<MaintenancePage
+  title="System Maintenance"
+  description="We're shipping new features."
+  eta={new Date(Date.now() + 45 * 60 * 1000)}
+  statusUrl="https://status.example.com"
+  statusLabel="Status Page"
+/>`,
+        },
+      ],
+      composes: ['badge'],
+      designTokens: ['--warning', '--primary', '--surface-base', '--text-primary', '--text-secondary'],
+      a11y: {
+        wcagLevel: 'AA',
+        ariaPatterns: ['role="status"', 'aria-live="polite"'],
+        notes: 'Screen reader announces the maintenance state via the live region; countdown updates without re-announcing.',
+      },
+    },
   ];
+}
+
+function MaintenancePagePlainDemo() {
+  return (
+    <div className="relative w-full rounded-xl overflow-hidden border border-border bg-surface-base" style={{ height: 360 }}>
+      <MaintenancePage
+        title="System Maintenance"
+        description="We're performing a short maintenance to improve service quality. We'll be back shortly."
+        className="!min-h-0 absolute inset-0"
+      />
+    </div>
+  );
+}
+
+function MaintenancePageEtaDemo() {
+  const [eta] = useState(() => new Date(Date.now() + 45 * 60 * 1000));
+  return (
+    <div className="relative w-full rounded-xl overflow-hidden border border-border bg-surface-base" style={{ height: 420 }}>
+      <MaintenancePage
+        title="System Maintenance"
+        description="We're shipping new features. Estimated return time below."
+        eta={eta}
+        statusUrl="https://status.example.com"
+        statusLabel="Status Page"
+        className="!min-h-0 absolute inset-0"
+      />
+    </div>
+  );
 }
 
 function ErrorStateDefaultDemo() {

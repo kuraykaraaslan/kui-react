@@ -12,6 +12,7 @@ Status, category or label indicator. 6 semantic variants, 3 sizes, dot and dismi
 ## Used by
 
 - `kanban-board`
+- `maintenance-page`
 - `reviews-review-card`
 
 ## Design tokens consumed

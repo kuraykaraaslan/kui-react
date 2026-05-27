@@ -125,6 +125,64 @@ function CalendarDayDemo() {
   );
 }
 
+function CalendarInteractiveDemo() {
+  const [view, setView] = useState<View>('week');
+  const [events, setEvents] = useState<Event[]>(() => makeEvents());
+  const [log, setLog] = useState<string[]>([]);
+  const append = (msg: string) =>
+    setLog((prev) => [`${new Date().toLocaleTimeString()}  ${msg}`, ...prev].slice(0, 6));
+
+  return (
+    <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-3 items-start">
+      <Calendar
+        events={events}
+        view={view}
+        defaultDate={DEMO_ANCHOR}
+        onViewChange={setView}
+        locale="en"
+        slotMinutes={30}
+        workingHours={{ start: 9, end: 18, days: [1, 2, 3, 4, 5] }}
+        onEventCreate={({ start, end }) => {
+          const ev: Event = {
+            id: `n${Date.now()}`,
+            title: 'New event',
+            start,
+            end,
+            color: 'info',
+          };
+          setEvents((prev) => [...prev, ev]);
+          append(`create  ${ev.title}  ${start.toLocaleTimeString()} – ${end.toLocaleTimeString()}`);
+        }}
+        onEventUpdate={(updated) => {
+          setEvents((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
+          append(`update  ${updated.title}  → ${updated.start.toLocaleTimeString()}`);
+        }}
+        onEventDelete={(id) => {
+          setEvents((prev) => prev.filter((e) => e.id !== id));
+          append(`delete  ${id}`);
+        }}
+      />
+      <aside className="rounded-md border border-border bg-surface-raised p-3 text-xs flex flex-col gap-1.5">
+        <h4 className="font-semibold text-text-primary">Event log</h4>
+        <p className="text-text-secondary">
+          Click an event for the popover. Drag to move, grab the bottom edge to resize, drag an
+          empty slot to create.
+        </p>
+        <div className="border-t border-border my-1" />
+        {log.length === 0 ? (
+          <span className="text-text-disabled italic">no events yet…</span>
+        ) : (
+          log.map((line, i) => (
+            <code key={i} className="text-[11px] font-mono text-text-secondary truncate">
+              {line}
+            </code>
+          ))
+        )}
+      </aside>
+    </div>
+  );
+}
+
 export function buildAppCalendarData(): ShowcaseComponent[] {
   return [
     {
@@ -133,7 +191,7 @@ export function buildAppCalendarData(): ShowcaseComponent[] {
       category: 'App',
       abbr: 'Cl',
       description:
-        'Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, and TR/EN locales. Agenda + resource view, drag-create/move/resize, RRULE recurrence, multi-calendar overlay and full a11y/i18n/perf polish land in M2-M6.',
+        'Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, and full interactions — click event for an anchored popover (Edit/Delete), drag a timed event to move, drag the bottom edge to resize, drag an empty range to create. RRULE recurrence, resource/multi-calendar overlay, agenda + mini, and full a11y/i18n/perf polish land in M3-M6.',
       filePath: 'modules/app/Calendar/index.tsx',
       since: '2026-05',
       status: 'beta',
@@ -167,6 +225,9 @@ const events: Event[] = [
   defaultDate={new Date(2026, 4, 13)}
   onViewChange={setView}
   onEventClick={(e) => console.log(e)}
+  onEventCreate={({ start, end }) => api.create({ start, end })}
+  onEventUpdate={(event) => api.update(event)}
+  onEventDelete={(id) => api.remove(id)}
   locale="tr"                    // 'tr' (default) | 'en'
   workingHours={{ start: 9, end: 18, days: [1,2,3,4,5] }}
   slotMinutes={30}
@@ -229,6 +290,27 @@ const events: Event[] = [
   onViewChange={setView}
   locale="en"
   workingHours={{ start: 9, end: 18, days: [1,2,3,4,5] }}
+/>`,
+        },
+        {
+          title: 'Interactive — drag, resize, popover',
+          layout: 'stack',
+          preview: <CalendarInteractiveDemo />,
+          code: `<Calendar
+  events={events}
+  view="week"
+  defaultDate={new Date(2026, 4, 13)}
+  slotMinutes={30}
+  workingHours={{ start: 9, end: 18, days: [1, 2, 3, 4, 5] }}
+  onEventCreate={({ start, end }) =>
+    setEvents((prev) => [...prev, { id: \`n\${Date.now()}\`, title: 'New event', start, end }])
+  }
+  onEventUpdate={(updated) =>
+    setEvents((prev) => prev.map((e) => (e.id === updated.id ? updated : e)))
+  }
+  onEventDelete={(id) =>
+    setEvents((prev) => prev.filter((e) => e.id !== id))
+  }
 />`,
         },
       ],

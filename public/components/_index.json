@@ -389,6 +389,12 @@
     "category": "App",
     "file": "file-upload-section.md"
   },
+  "onboarding-wizard": {
+    "name": "OnboardingWizard",
+    "layer": "app",
+    "category": "App",
+    "file": "onboarding-wizard.md"
+  },
   "detail-header": {
     "name": "DetailHeader",
     "layer": "app",
@@ -419,6 +425,12 @@
     "category": "App",
     "file": "splash-screen.md"
   },
+  "maintenance-page": {
+    "name": "MaintenancePage",
+    "layer": "app",
+    "category": "App",
+    "file": "maintenance-page.md"
+  },
   "app-breadcrumbs": {
     "name": "AppBreadcrumbs",
     "layer": "app",
@@ -442,6 +454,24 @@
     "layer": "app",
     "category": "App",
     "file": "context-menu.md"
+  },
+  "share-dialog": {
+    "name": "ShareDialog",
+    "layer": "app",
+    "category": "App",
+    "file": "share-dialog.md"
+  },
+  "comment-thread": {
+    "name": "CommentThread",
+    "layer": "app",
+    "category": "App",
+    "file": "comment-thread.md"
+  },
+  "mention-picker": {
+    "name": "MentionPicker",
+    "layer": "app",
+    "category": "App",
+    "file": "mention-picker.md"
   },
   "code-editor": {
     "name": "CodeEditor",

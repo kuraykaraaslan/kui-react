@@ -1,9 +1,10 @@
 'use client';
-// TODO M2: render an SVG arrow connecting two task bars. Path can be
-// orthogonal (default for MS Project / GanttPRO) or cubic Bezier. CPM-marked
-// dependencies render in `var(--error)` (TODO M3). Stub kept for stable
-// import graph.
+import { cn } from '@/libs/utils/cn';
 import type { Dependency, Task } from '../types';
+import { BAR_HEIGHT, ROW_HEIGHT } from '../types';
+import { diffDays } from '../hooks/useTimelineScale';
+
+type Anchor = { x: number; y: number };
 
 type DependencyArrowProps = {
   dep: Dependency;
@@ -11,11 +12,90 @@ type DependencyArrowProps = {
   rangeStart: Date;
   pixelsPerDay: number;
   taskRowIndex: Record<string, number>;
+  selected: boolean;
+  onSelect: (id: string) => void;
 };
 
-export function DependencyArrow(_props: DependencyArrowProps) {
-  // TODO M2: compute start (from-task bar end) and end (to-task bar start)
-  // anchor points, then emit <path d="M ... L ... L ..." /> with a marker-end
-  // arrowhead.
-  return null;
+function anchors(
+  dep: Dependency,
+  from: Task,
+  to: Task,
+  rangeStart: Date,
+  pixelsPerDay: number,
+  fromRow: number,
+  toRow: number,
+): { start: Anchor; end: Anchor } {
+  const fromStartX = diffDays(rangeStart, from.start) * pixelsPerDay;
+  const fromEndX = diffDays(rangeStart, from.end) * pixelsPerDay;
+  const toStartX = diffDays(rangeStart, to.start) * pixelsPerDay;
+  const toEndX = diffDays(rangeStart, to.end) * pixelsPerDay;
+  const fromY = fromRow * ROW_HEIGHT + (ROW_HEIGHT + BAR_HEIGHT) / 2 - BAR_HEIGHT / 2;
+  const toY = toRow * ROW_HEIGHT + (ROW_HEIGHT + BAR_HEIGHT) / 2 - BAR_HEIGHT / 2;
+  switch (dep.type ?? 'FS') {
+    case 'SS': return { start: { x: fromStartX, y: fromY }, end: { x: toStartX, y: toY } };
+    case 'FF': return { start: { x: fromEndX,   y: fromY }, end: { x: toEndX,   y: toY } };
+    case 'SF': return { start: { x: fromStartX, y: fromY }, end: { x: toEndX,   y: toY } };
+    case 'FS':
+    default:   return { start: { x: fromEndX,   y: fromY }, end: { x: toStartX, y: toY } };
+  }
+}
+
+function orthogonalPath(start: Anchor, end: Anchor): string {
+  // Step out 8px, drop to target row, step in 8px.
+  const midX = end.x - 8 > start.x + 8 ? (start.x + end.x) / 2 : start.x + 12;
+  return `M ${start.x} ${start.y} L ${midX} ${start.y} L ${midX} ${end.y} L ${end.x} ${end.y}`;
+}
+
+export function DependencyArrow({
+  dep,
+  tasks,
+  rangeStart,
+  pixelsPerDay,
+  taskRowIndex,
+  selected,
+  onSelect,
+}: DependencyArrowProps) {
+  const from = tasks.find((t) => t.id === dep.from);
+  const to   = tasks.find((t) => t.id === dep.to);
+  const fromRow = taskRowIndex[dep.from];
+  const toRow   = taskRowIndex[dep.to];
+  if (!from || !to || fromRow == null || toRow == null) return null;
+
+  const { start, end } = anchors(dep, from, to, rangeStart, pixelsPerDay, fromRow, toRow);
+  const d = orthogonalPath(start, end);
+
+  return (
+    <g
+      role="button"
+      aria-label={`Dependency from ${from.name} to ${to.name} (${dep.type ?? 'FS'})`}
+      tabIndex={0}
+      className="gantt-dep cursor-pointer"
+      style={{ pointerEvents: 'auto' }}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect(dep.id);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect(dep.id);
+        }
+      }}
+    >
+      {/* Wide invisible hit area for easier clicking. */}
+      <path d={d} fill="none" stroke="transparent" strokeWidth={10} />
+      <path
+        d={d}
+        fill="none"
+        className={cn(
+          'transition-colors',
+          selected
+            ? 'stroke-primary'
+            : 'stroke-text-secondary group-hover:stroke-primary',
+        )}
+        strokeWidth={selected ? 2 : 1.5}
+        markerEnd={selected ? 'url(#gantt-arrow-active)' : 'url(#gantt-arrow)'}
+      />
+    </g>
+  );
 }

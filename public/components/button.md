@@ -12,10 +12,13 @@ Core interactive element. Supports 5 visual styles (variants) and 5 sizes. disab
 ## Used by
 
 - `color-picker`
+- `comment-thread`
 - `form-builder`
 - `gantt`
+- `onboarding-wizard`
 - `reviews-review-submit-form`
 - `rich-text-editor`
+- `share-dialog`
 
 ## Design tokens consumed
 

@@ -11,8 +11,11 @@ User profile photo or initials indicator. 5 sizes with optional status dot. When
 
 ## Used by
 
+- `comment-thread`
 - `kanban-board`
+- `mention-picker`
 - `reviews-review-card`
+- `share-dialog`
 
 ## Design tokens consumed
 

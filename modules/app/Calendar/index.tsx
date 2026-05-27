@@ -1,8 +1,9 @@
 'use client';
-import { useMemo, useRef, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useCallback } from 'react';
 import { cn } from '@/libs/utils/cn';
 import type { CalendarProps, View } from './types';
 import { HeaderBar } from './parts/HeaderBar';
+import { EventPopover } from './parts/EventPopover';
 import { MonthView } from './views/MonthView';
 import { WeekView } from './views/WeekView';
 import { DayView } from './views/DayView';
@@ -16,38 +17,80 @@ import {
 } from './date-utils';
 import { mergeMessages, resolveLocale } from './locale';
 import { useKeyboardNav } from './hooks/useKeyboardNav';
+import {
+  CalendarStoreProvider,
+  createCalendarStore,
+  useCalStore,
+  type CalendarStoreHook,
+} from './store';
 
-export type { CalendarProps, Event, View, Resource, EventColor, CalendarMessages, WorkingHours, CalendarTelemetry, CalendarHandle } from './types';
+export type {
+  CalendarProps,
+  Event,
+  View,
+  Resource,
+  EventColor,
+  CalendarMessages,
+  WorkingHours,
+  CalendarTelemetry,
+  CalendarHandle,
+} from './types';
 
-export function Calendar({
+export function Calendar(props: CalendarProps) {
+  // One store per <Calendar> instance — ref keeps it stable across re-renders.
+  const storeRef = useRef<CalendarStoreHook | null>(null);
+  if (storeRef.current === null) {
+    storeRef.current = createCalendarStore({
+      date: props.defaultDate ?? new Date(),
+      view: props.view ?? 'month',
+    });
+  }
+
+  // Reflect controlled `view` prop into the store.
+  useEffect(() => {
+    if (props.view) storeRef.current?.getState().setView(props.view);
+  }, [props.view]);
+
+  return (
+    <CalendarStoreProvider store={storeRef.current}>
+      <CalendarInner {...props} />
+    </CalendarStoreProvider>
+  );
+}
+
+function CalendarInner({
   events,
   view = 'month',
-  defaultDate,
   onViewChange,
   onDateChange,
   onEventClick,
+  onEventCreate,
+  onEventUpdate,
+  onEventDelete,
   locale,
   messages: messageOverrides,
   workingHours,
   slotMinutes = 30,
   onTelemetry,
   className,
-  // The following props are accepted but only meaningful in later milestones:
-  // resources, calendars, recurrence, timezone, reducedMotion.
+  // resources, calendars, recurrence, timezone, reducedMotion → M3–M6
 }: CalendarProps) {
+  const date = useCalStore((s) => s.date);
+  const setStoreDate = useCalStore((s) => s.setDate);
+  const openPopover = useCalStore((s) => s.openPopover);
+
   const localeBundle = useMemo(() => resolveLocale(locale), [locale]);
   const messages = useMemo(
     () => mergeMessages(localeBundle.messages, messageOverrides),
     [localeBundle, messageOverrides],
   );
 
-  const [internalDate, setInternalDate] = useState<Date>(() => defaultDate ?? new Date());
   const today = useMemo(() => new Date(), []);
   const rootRef = useRef<HTMLDivElement>(null);
 
   // Period label, e.g. "May 2026" / "Mayıs 2026" / "5 — 11 Mayıs 2026" / "5 Mayıs 2026"
   const periodLabel = useMemo(() => {
-    const d = internalDate;
+    const d = date;
     const monthName = localeBundle.monthNames[d.getMonth()];
     if (view === 'month' || view === 'agenda' || view === 'resource') {
       return `${monthName} ${d.getFullYear()}`;
@@ -61,38 +104,37 @@ export function Calendar({
       }
       return `${s.getDate()} ${localeBundle.monthNames[s.getMonth()]} – ${e.getDate()} ${localeBundle.monthNames[e.getMonth()]} ${e.getFullYear()}`;
     }
-    // day
     return `${d.getDate()} ${monthName} ${d.getFullYear()}`;
-  }, [view, internalDate, localeBundle]);
+  }, [view, date, localeBundle]);
 
   const setDate = useCallback(
     (next: Date, direction: 'prev' | 'next' | 'today') => {
-      setInternalDate(next);
+      setStoreDate(next);
       onDateChange?.(next);
       onTelemetry?.({ type: 'nav', date: next, direction });
     },
-    [onDateChange, onTelemetry],
+    [setStoreDate, onDateChange, onTelemetry],
   );
 
   const goPrev = useCallback(() => {
     if (view === 'month' || view === 'agenda' || view === 'resource') {
-      setDate(addMonths(internalDate, -1), 'prev');
+      setDate(addMonths(date, -1), 'prev');
     } else if (view === 'week') {
-      setDate(addDays(internalDate, -7), 'prev');
+      setDate(addDays(date, -7), 'prev');
     } else {
-      setDate(addDays(internalDate, -1), 'prev');
+      setDate(addDays(date, -1), 'prev');
     }
-  }, [view, internalDate, setDate]);
+  }, [view, date, setDate]);
 
   const goNext = useCallback(() => {
     if (view === 'month' || view === 'agenda' || view === 'resource') {
-      setDate(addMonths(internalDate, 1), 'next');
+      setDate(addMonths(date, 1), 'next');
     } else if (view === 'week') {
-      setDate(addDays(internalDate, 7), 'next');
+      setDate(addDays(date, 7), 'next');
     } else {
-      setDate(addDays(internalDate, 1), 'next');
+      setDate(addDays(date, 1), 'next');
     }
-  }, [view, internalDate, setDate]);
+  }, [view, date, setDate]);
 
   const goToday = useCallback(() => {
     setDate(new Date(), 'today');
@@ -107,11 +149,12 @@ export function Calendar({
   );
 
   const handleEventClick = useCallback(
-    (e: Parameters<NonNullable<CalendarProps['onEventClick']>>[0]) => {
-      onEventClick?.(e);
-      onTelemetry?.({ type: 'event-click', eventId: e.id });
+    (event: Parameters<NonNullable<CalendarProps['onEventClick']>>[0], rect?: DOMRect) => {
+      if (rect) openPopover(event, rect);
+      onEventClick?.(event);
+      onTelemetry?.({ type: 'event-click', eventId: event.id });
     },
-    [onEventClick, onTelemetry],
+    [openPopover, onEventClick, onTelemetry],
   );
 
   useKeyboardNav({ rootRef, onPrev: goPrev, onNext: goNext, onToday: goToday });
@@ -139,7 +182,7 @@ export function Calendar({
 
       {view === 'month' && (
         <MonthView
-          date={internalDate}
+          date={date}
           events={events}
           locale={{ ...localeBundle, messages }}
           today={today}
@@ -148,28 +191,41 @@ export function Calendar({
       )}
       {view === 'week' && (
         <WeekView
-          date={internalDate}
+          date={date}
           events={events}
           locale={{ ...localeBundle, messages }}
           today={today}
           workingHours={workingHours}
           slotMinutes={slotMinutes}
           onEventClick={handleEventClick}
+          onEventCreate={onEventCreate}
+          onEventUpdate={onEventUpdate}
+          onTelemetry={onTelemetry}
         />
       )}
       {view === 'day' && (
         <DayView
-          date={internalDate}
+          date={date}
           events={events}
           locale={{ ...localeBundle, messages }}
           today={today}
           workingHours={workingHours}
           slotMinutes={slotMinutes}
           onEventClick={handleEventClick}
+          onEventCreate={onEventCreate}
+          onEventUpdate={onEventUpdate}
+          onTelemetry={onTelemetry}
         />
       )}
       {view === 'agenda' && <AgendaView />}
       {view === 'resource' && <ResourceView />}
+
+      <EventPopover
+        messages={messages}
+        onEventUpdate={onEventUpdate}
+        onEventDelete={onEventDelete}
+        onTelemetry={onTelemetry}
+      />
     </div>
   );
 }

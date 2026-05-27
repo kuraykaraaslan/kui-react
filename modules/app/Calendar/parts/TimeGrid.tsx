@@ -1,11 +1,18 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
-import type { Event, WorkingHours } from '../types';
+import type { CalendarTelemetry, Event, WorkingHours } from '../types';
 import { EVENT_COLOR_CLASSES, resolveColor } from '../colors';
-import { fmtTime, isSameDay, minutesIntoDay } from '../date-utils';
-
-const HOUR_HEIGHT = 48; // px per hour — keep aligned across NextJS/EJS
-const MIN_EVENT_HEIGHT = 18;
+import {
+  fmtTime,
+  HOUR_HEIGHT,
+  isSameDay,
+  MIN_EVENT_HEIGHT,
+  minutesIntoDay,
+} from '../date-utils';
+import { useCalStore } from '../store';
+import { useDragMove } from '../hooks/useDragMove';
+import { useResize } from '../hooks/useResize';
+import { useDragCreate } from '../hooks/useDragCreate';
 
 type TimeGridProps = {
   /** Days rendered as columns. Length 1 (day view) or 7 (week view). */
@@ -13,14 +20,41 @@ type TimeGridProps = {
   /** Timed (non-all-day) events. */
   events: Event[];
   workingHours?: WorkingHours;
-  /** Slot granularity — visual hint only in M1. */
+  /** Slot granularity. Drives drag/resize/create snap. */
   slotMinutes?: 5 | 15 | 30 | 60;
-  onEventClick?: (e: Event) => void;
+  onEventClick?: (e: Event, anchorRect: DOMRect) => void;
+  onEventCreate?: (range: { start: Date; end: Date }) => void | Promise<void>;
+  onEventUpdate?: (event: Event) => void | Promise<void>;
+  onTelemetry?: (e: CalendarTelemetry) => void;
 };
 
-export function TimeGrid({ days, events, workingHours, onEventClick }: TimeGridProps) {
+function eventTop(start: Date) {
+  return (minutesIntoDay(start) / 60) * HOUR_HEIGHT;
+}
+
+function eventHeight(start: Date, end: Date) {
+  const startMin = minutesIntoDay(start);
+  const endMin = Math.min(24 * 60, minutesIntoDay(end) || 24 * 60);
+  return Math.max(MIN_EVENT_HEIGHT, ((endMin - startMin) / 60) * HOUR_HEIGHT);
+}
+
+export function TimeGrid({
+  days,
+  events,
+  workingHours,
+  slotMinutes = 30,
+  onEventClick,
+  onEventCreate,
+  onEventUpdate,
+  onTelemetry,
+}: TimeGridProps) {
   const hours = Array.from({ length: 24 }, (_, i) => i);
   const totalHeight = 24 * HOUR_HEIGHT;
+
+  const drag = useCalStore((s) => s.drag);
+  const moveDownFor = useDragMove({ days, slotMinutes, onEventUpdate, onTelemetry });
+  const resizeDownFor = useResize({ slotMinutes, onEventUpdate, onTelemetry });
+  const createDownFor = useDragCreate({ days, slotMinutes, onEventCreate, onTelemetry });
 
   return (
     <div className="flex w-full overflow-x-auto" role="region" aria-label="Time grid">
@@ -40,21 +74,36 @@ export function TimeGrid({ days, events, workingHours, onEventClick }: TimeGridP
 
       {/* Day columns */}
       <div className="flex-1 flex min-w-0">
-        {days.map((day) => {
+        {days.map((day, dayIndex) => {
           const dayEvents = events.filter((e) => !e.allDay && isSameDay(e.start, day));
           const isWorkingDay = workingHours?.days.includes(day.getDay()) ?? true;
+
+          // Ghost rendering — only on the column the pointer is over.
+          const ghost = (() => {
+            if (drag.kind === 'create' && drag.dayIndex === dayIndex) {
+              return { top: eventTop(drag.ghostStart), height: eventHeight(drag.ghostStart, drag.ghostEnd), label: `${fmtTime(drag.ghostStart)} – ${fmtTime(drag.ghostEnd)}` };
+            }
+            if (drag.kind === 'move' && drag.dayIndex === dayIndex) {
+              return { top: eventTop(drag.ghostStart), height: eventHeight(drag.ghostStart, drag.ghostEnd), label: `${fmtTime(drag.ghostStart)} – ${fmtTime(drag.ghostEnd)}` };
+            }
+            return null;
+          })();
+
           return (
             <div
               key={day.toISOString()}
+              data-cal-day-index={dayIndex}
               className="flex-1 min-w-0 border-r border-border last:border-r-0 relative"
             >
-              {/* Header */}
-              <div className="h-8 border-b border-border bg-surface-raised flex items-center justify-center text-xs font-medium text-text-secondary">
-                {fmtTime(day) /* never used — actual header lives in WeekView */}
-              </div>
+              {/* Header — actual labels live in WeekView / DayView; this keeps row heights aligned. */}
+              <div className="h-8 border-b border-border bg-surface-raised flex items-center justify-center text-xs font-medium text-text-secondary" />
 
-              {/* Slot lines + working-hours shading */}
-              <div className="relative" style={{ height: totalHeight }}>
+              {/* Slot lines + working-hours shading + drag-create surface */}
+              <div
+                className="relative touch-none select-none"
+                style={{ height: totalHeight }}
+                onPointerDown={createDownFor(dayIndex)}
+              >
                 {hours.map((h) => {
                   const inWorking =
                     isWorkingDay &&
@@ -75,10 +124,22 @@ export function TimeGrid({ days, events, workingHours, onEventClick }: TimeGridP
 
                 {/* Events absolutely positioned */}
                 {dayEvents.map((e) => {
-                  const startMin = minutesIntoDay(e.start);
-                  const endMin = Math.min(24 * 60, minutesIntoDay(e.end) || 24 * 60);
-                  const top = (startMin / 60) * HOUR_HEIGHT;
-                  const height = Math.max(MIN_EVENT_HEIGHT, ((endMin - startMin) / 60) * HOUR_HEIGHT);
+                  const isBeingMoved =
+                    drag.kind === 'move' && drag.eventId === e.id;
+                  const isBeingResized =
+                    drag.kind === 'resize' && drag.eventId === e.id;
+                  const liveStart = isBeingMoved && drag.dayIndex === dayIndex ? drag.ghostStart : e.start;
+                  const liveEnd =
+                    isBeingResized
+                      ? drag.ghostEnd
+                      : isBeingMoved && drag.dayIndex === dayIndex
+                        ? drag.ghostEnd
+                        : e.end;
+                  // Hide source while dragged onto a different day (ghost shows on that column).
+                  if (isBeingMoved && drag.dayIndex !== dayIndex) return null;
+
+                  const top = eventTop(liveStart);
+                  const height = eventHeight(liveStart, liveEnd);
                   const color = resolveColor(e.color);
                   const styles = EVENT_COLOR_CLASSES[color];
                   return (
@@ -86,22 +147,54 @@ export function TimeGrid({ days, events, workingHours, onEventClick }: TimeGridP
                       key={e.id}
                       type="button"
                       data-event-id={e.id}
-                      aria-label={`${e.title} ${fmtTime(e.start)} – ${fmtTime(e.end)}`}
-                      onClick={() => onEventClick?.(e)}
+                      aria-label={`${e.title} ${fmtTime(liveStart)} – ${fmtTime(liveEnd)}`}
+                      onPointerDown={moveDownFor(e, dayIndex)}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        onEventClick?.(e, (ev.currentTarget as HTMLElement).getBoundingClientRect());
+                      }}
                       style={{ top, height, left: 4, right: 4 }}
                       className={cn(
-                        'absolute rounded-md px-2 py-1 text-left text-[11px] leading-tight overflow-hidden',
+                        'absolute rounded-md px-2 py-1 text-left text-[11px] leading-tight overflow-hidden cursor-grab active:cursor-grabbing',
                         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
                         styles.pill,
+                        (isBeingMoved || isBeingResized) && 'opacity-60 ring-2 ring-border-focus',
                       )}
                     >
                       <div className="font-semibold truncate">{e.title}</div>
                       <div className="opacity-80 text-[10px] tabular-nums">
-                        {fmtTime(e.start)} – {fmtTime(e.end)}
+                        {fmtTime(liveStart)} – {fmtTime(liveEnd)}
                       </div>
+                      {/* Resize handle — only when there's room. */}
+                      {height >= 24 && (
+                        <span
+                          data-resize-handle
+                          role="separator"
+                          aria-label="Resize"
+                          onPointerDown={resizeDownFor(e)}
+                          className={cn(
+                            'absolute left-1 right-1 bottom-0 h-1.5 rounded-b cursor-ns-resize',
+                            'bg-transparent hover:bg-black/10',
+                          )}
+                        />
+                      )}
                     </button>
                   );
                 })}
+
+                {/* Drag ghost (create + cross-day move) */}
+                {ghost && (
+                  <div
+                    aria-hidden="true"
+                    style={{ top: ghost.top, height: ghost.height, left: 4, right: 4 }}
+                    className={cn(
+                      'absolute rounded-md border-2 border-dashed border-primary bg-primary/15',
+                      'pointer-events-none px-2 py-1 text-[11px] text-primary font-medium tabular-nums',
+                    )}
+                  >
+                    {ghost.label}
+                  </div>
+                )}
               </div>
             </div>
           );

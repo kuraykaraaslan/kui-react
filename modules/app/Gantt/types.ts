@@ -64,7 +64,37 @@ export type GanttMessages = {
 /** Telemetry events (TODO M6). */
 export type GanttTelemetry =
   | { kind: 'scale-change'; scale: TimeUnit }
-  | { kind: 'task-toggle'; taskId: TaskId; collapsed: boolean };
+  | { kind: 'task-toggle'; taskId: TaskId; collapsed: boolean }
+  | { kind: 'task-drag-commit'; taskId: TaskId; mode: DragMode }
+  | { kind: 'dependency-create'; dependencyId: string }
+  | { kind: 'dependency-delete'; dependencyId: string };
+
+/** Drag modes for a task bar. */
+export type DragMode = 'move' | 'resize-start' | 'resize-end' | 'progress';
+
+/** Active drag-in-progress snapshot. */
+export type DragState = {
+  taskId: TaskId;
+  mode: DragMode;
+  pointerStartX: number;
+  originStart: Date;
+  originEnd: Date;
+  originProgress: number;
+  /** Days moved since pointerdown — used by render to translate the bar. */
+  deltaDays: number;
+  /** Progress delta for `progress` mode (0..100 absolute). */
+  progressOverride: number | null;
+};
+
+/** Active dependency-draw rubber-band snapshot. */
+export type DepDrawState = {
+  sourceId: TaskId;
+  /** Pointer position in timeline-content coordinates (px from left/top of body). */
+  x: number;
+  y: number;
+  /** Task currently under the pointer, if any. */
+  hoverTargetId: TaskId | null;
+};
 
 export type GanttProps = {
   tasks: Task[];

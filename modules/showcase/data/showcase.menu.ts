@@ -270,6 +270,11 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'calendar',        title: 'Calendar',      category: 'App', abbr: 'Cl', since: '2026-05', status: 'beta' },
       { id: 'gantt',           title: 'Gantt',         category: 'App', abbr: 'Gt', since: '2026-05', status: 'beta' },
       { id: 'form-builder',    title: 'FormBuilder',   category: 'App', abbr: 'FB', since: '2026-05', status: 'beta' },
+      { id: 'maintenance-page', title: 'MaintenancePage',  category: 'App', abbr: 'Mp', since: '2026-05' },
+      { id: 'share-dialog',     title: 'ShareDialog',      category: 'App', abbr: 'SD', since: '2026-05' },
+      { id: 'comment-thread',   title: 'CommentThread',    category: 'App', abbr: 'CT', since: '2026-05' },
+      { id: 'mention-picker',   title: 'MentionPicker',    category: 'App', abbr: 'MP', since: '2026-05' },
+      { id: 'onboarding-wizard',title: 'OnboardingWizard', category: 'App', abbr: 'OW', since: '2026-05' },
     ],
   },
   {

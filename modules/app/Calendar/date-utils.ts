@@ -8,6 +8,11 @@
 
 export const MS_DAY = 24 * 60 * 60 * 1000;
 
+/** Pixels per hour in the timed week/day view. Shared between layout + drag math. */
+export const HOUR_HEIGHT = 48;
+/** Minimum height (px) for a rendered timed event card / ghost. */
+export const MIN_EVENT_HEIGHT = 18;
+
 export function startOfDay(d: Date): Date {
   const x = new Date(d);
   x.setHours(0, 0, 0, 0);
@@ -97,4 +102,20 @@ export function fmtTimeRange(start: Date, end: Date): string {
 /** Whole minutes since midnight. Used by the timed view layout. */
 export function minutesIntoDay(d: Date): number {
   return d.getHours() * 60 + d.getMinutes();
+}
+
+/** Return a new Date snapped to the nearest `step` minutes (down). */
+export function snapMinutes(d: Date, step: number): Date {
+  const x = new Date(d);
+  const m = x.getHours() * 60 + x.getMinutes();
+  const snapped = Math.floor(m / step) * step;
+  x.setHours(Math.floor(snapped / 60), snapped % 60, 0, 0);
+  return x;
+}
+
+/** Build a Date on `day` at the given offset in minutes from midnight. */
+export function dateAtMinute(day: Date, minute: number): Date {
+  const x = startOfDay(day);
+  x.setMinutes(Math.max(0, Math.min(24 * 60 - 1, Math.round(minute))));
+  return x;
 }

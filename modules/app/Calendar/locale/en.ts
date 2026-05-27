@@ -13,6 +13,10 @@ export const EN_MESSAGES: CalendarMessages = {
   allDay: 'All-day',
   noEvents: 'No events',
   more: (n) => `+${n} more`,
+  edit: 'Edit',
+  delete: 'Delete',
+  confirmDelete: 'Confirm delete?',
+  close: 'Close',
 };
 
 /** Sunday-start (US default). */

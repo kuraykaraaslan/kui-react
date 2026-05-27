@@ -13,6 +13,10 @@ export const TR_MESSAGES: CalendarMessages = {
   allDay: 'Tüm gün',
   noEvents: 'Etkinlik yok',
   more: (n) => `+${n} daha`,
+  edit: 'Düzenle',
+  delete: 'Sil',
+  confirmDelete: 'Silinsin mi?',
+  close: 'Kapat',
 };
 
 /** Monday-start (TR default). */

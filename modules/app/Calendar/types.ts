@@ -1,9 +1,14 @@
 /**
  * Calendar module — public types.
  *
- * M1 (this milestone): month / week / day views.
- * M2 — drag & drop, M3 — RRULE recurrence, M4 — resource/multi-calendar,
- * M5 — agenda + mini + search, M6 — full a11y/i18n/perf are TODO.
+ * M1: month / week / day views.       — done
+ * M2: interactions (popover + drag).  — in progress
+ * M3: RRULE recurrence.               — stub
+ * M4: resource / multi-calendar.      — stub
+ * M5: agenda + mini + search.         — stub
+ * M6: full a11y / i18n / perf.        — stub
+ *
+ * See modules/app/Calendar/PLAN.md for the roadmap.
  */
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
@@ -33,7 +38,7 @@ export type Event = {
   color?: EventColor;
   /** Optional FontAwesome icon shown next to the title. */
   icon?: IconDefinition;
-  /** Optional plain-text description (used by popover in M2). */
+  /** Optional plain-text description (used by popover). */
   description?: string;
   /** Optional calendar identifier — wired up properly in M4. */
   calendarId?: string;
@@ -62,6 +67,11 @@ export type CalendarMessages = {
   allDay: string;
   noEvents: string;
   more: (n: number) => string;
+  /** Popover action labels (M2). */
+  edit: string;
+  delete: string;
+  confirmDelete: string;
+  close: string;
 };
 
 /** Working-hours config (visual shading hint only in M1). */
@@ -74,11 +84,27 @@ export type WorkingHours = {
   days: number[];
 };
 
+/** Popover state held in the store. */
+export type CalendarPopoverState = {
+  event: Event | null;
+  anchorRect: DOMRect | null;
+};
+
+/** Drag preview state — single source of truth for ghost rendering. */
+export type CalendarDragState =
+  | { kind: 'idle' }
+  | { kind: 'move'; eventId: string; ghostStart: Date; ghostEnd: Date; dayIndex: number }
+  | { kind: 'resize'; eventId: string; ghostEnd: Date }
+  | { kind: 'create'; ghostStart: Date; ghostEnd: Date; dayIndex: number };
+
 /** Telemetry payload — reserved for future analytics integrations. */
 export type CalendarTelemetry =
   | { type: 'view-change'; view: View }
   | { type: 'nav'; date: Date; direction: 'prev' | 'next' | 'today' }
-  | { type: 'event-click'; eventId: string };
+  | { type: 'event-click'; eventId: string }
+  | { type: 'event-create'; start: Date; end: Date }
+  | { type: 'event-update'; eventId: string }
+  | { type: 'event-delete'; eventId: string };
 
 export type CalendarProps = {
   /** Events to render. Caller is responsible for fetching & memoising. */
@@ -93,9 +119,12 @@ export type CalendarProps = {
   onDateChange?: (d: Date) => void;
   /** Click handler — fires once per event press. */
   onEventClick?: (e: Event) => void;
-  // TODO M2: onEventCreate?: (start: Date, end: Date) => Promise<Event>;
-  // TODO M2: onEventUpdate?: (e: Event) => Promise<void>;
-  // TODO M2: onEventDelete?: (id: string) => Promise<void>;
+  /** Fired after a drag-create gesture commits. */
+  onEventCreate?: (range: { start: Date; end: Date }) => void | Promise<void>;
+  /** Fired after a drag-move or resize gesture commits. */
+  onEventUpdate?: (event: Event) => void | Promise<void>;
+  /** Fired from the popover's delete-confirm. */
+  onEventDelete?: (id: string) => void | Promise<void>;
 
   /** Resources column list — used by ResourceView in M4. */
   resources?: Resource[];

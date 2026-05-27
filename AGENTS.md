@@ -157,6 +157,11 @@ Full page-section components that combine multiple UI molecules into usable work
 | EmptyErrorState | `EmptyErrorState.tsx` | Exports `ErrorState`, `NotFoundState`, `NoAccessState` |
 | LoadingState | `LoadingState.tsx` | Full-page loading overlay |
 | AccessibilityKit | `AccessibilityKit.tsx` | ARIA helpers, focus trap, announce utilities |
+| MaintenancePage | `MaintenancePage.tsx` | Full-page maintenance screen with optional ETA countdown and status link |
+| ShareDialog | `ShareDialog.tsx` | Share modal: copy link + email invite + permission picker + invitee list |
+| CommentThread | `CommentThread.tsx` | Generic, domain-agnostic threaded comment list with reply form, like, and delete |
+| MentionPicker | `MentionPicker.tsx` | `@`-trigger autocomplete picker (headless; keyboard navigation, anchor position) |
+| OnboardingWizard | `OnboardingWizard.tsx` | Multi-step onboarding flow (dots/bar progress, page/modal mode, skip) |
 
 ---
 

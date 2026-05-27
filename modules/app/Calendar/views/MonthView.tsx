@@ -10,7 +10,7 @@ type MonthViewProps = {
   events: Event[];
   locale: LocaleBundle;
   today: Date;
-  onEventClick?: (e: Event) => void;
+  onEventClick?: (e: Event, anchorRect: DOMRect) => void;
   /** Maximum event rows per cell before showing "+N more". */
   maxPerDay?: number;
 };
