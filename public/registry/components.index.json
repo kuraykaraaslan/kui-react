@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-27T19:28:29.749Z",
+  "generatedAt": "2026-05-27T21:22:40.178Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -4997,7 +4997,7 @@
       "external": {
         "packageName": "kui-viewer",
         "version": "0.0.1",
-        "homepage": "https://github.com/kuraykaraaslan/kui-viewer#readme",
+        "homepage": "https://kui-viewer.kuray.dev",
         "npm": "https://www.npmjs.com/package/kui-viewer",
         "github": "https://github.com/kuraykaraaslan/kui-viewer"
       },
