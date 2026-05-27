@@ -3,8 +3,13 @@ export type ComponentStatus = 'stable' | 'beta' | 'deprecated';
 export type ShowcaseVariant = {
   title: string;
   preview: React.ReactNode;
-  code: string;
+  /** Source snippet for the right-hand "Code" pane. When null/undefined/empty the code pane is omitted and the preview takes the full width. */
+  code?: string | null;
   layout?: 'side' | 'stack';
+  /** Extra Tailwind classes appended to the outer preview area (height, padding, alignment). Conflicts are resolved by tailwind-merge. */
+  previewClassName?: string;
+  /** Extra Tailwind classes appended to the inner wrapper around `preview` (e.g. `h-full` for fill-the-pane content). */
+  previewInnerClassName?: string;
 };
 
 export type ControlDef =

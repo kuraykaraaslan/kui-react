@@ -8,7 +8,7 @@ import { useVariantLayout } from './VariantLayoutContext';
 import { cn } from '@/libs/utils/cn';
 import { buildShowcaseData, type ShowcaseVariant } from '@/modules/showcase/data/showcase.data';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHouse } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faExpand, faCompress } from '@fortawesome/free-solid-svg-icons';
 
 const categoryStyles: Record<string, string> = {
   Atom:     'bg-info-subtle text-info-fg',
@@ -66,11 +66,13 @@ const MAX_PREVIEW_PCT = 80;
 const DEFAULT_PREVIEW_PCT = 40;
 
 function VariantBlock({ variant }: { variant: ShowcaseVariant }) {
+  const hasCode = !!variant.code;
   const stack = variant.layout === 'stack';
   const containerRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const [previewPct, setPreviewPct] = useState(DEFAULT_PREVIEW_PCT);
   const [isWide, setIsWide] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -81,7 +83,22 @@ function VariantBlock({ variant }: { variant: ShowcaseVariant }) {
     return () => mq.removeEventListener('change', update);
   }, []);
 
-  const canResize = !stack && isWide;
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsFullscreen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isFullscreen]);
+
+  const canResize = hasCode && !stack && isWide && !isFullscreen;
+  const showCodePane = hasCode && !isFullscreen;
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!canResize) return;
@@ -120,23 +137,54 @@ function VariantBlock({ variant }: { variant: ShowcaseVariant }) {
     }
   };
 
+  const fullscreenBtn = (
+    <button
+      type="button"
+      onClick={() => setIsFullscreen((v) => !v)}
+      aria-pressed={isFullscreen}
+      aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+      title={isFullscreen ? 'Exit fullscreen (Esc)' : 'Enter fullscreen'}
+      className={cn(
+        'px-2.5 py-1 text-xs rounded-md font-medium transition-colors inline-flex items-center justify-center',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+        'bg-surface-overlay text-text-secondary hover:text-text-primary hover:bg-surface-sunken'
+      )}
+    >
+      <FontAwesomeIcon icon={isFullscreen ? faCompress : faExpand} aria-hidden="true" />
+    </button>
+  );
+
   return (
-    <div className="bg-surface-raised border border-border rounded-xl overflow-hidden">
+    <div
+      className={cn(
+        'bg-surface-raised border border-border rounded-xl overflow-hidden',
+        isFullscreen && 'fixed inset-0 z-50 rounded-none border-0 flex flex-col'
+      )}
+    >
       <Widget
         title={variant.title}
-        headerRight={<CopyButton code={variant.code} />}
+        className={isFullscreen ? 'h-full' : undefined}
+        headerRight={
+          <>
+            {hasCode && <CopyButton code={variant.code!} />}
+            {fullscreenBtn}
+          </>
+        }
       >
         <div
           ref={containerRef}
           className={cn(
             'flex',
-            stack ? 'flex-col' : 'flex-col sm:flex-row'
+            stack ? 'flex-col' : 'flex-col sm:flex-row',
+            isFullscreen && 'h-full min-h-0'
           )}
         >
           <div
             className={cn(
               'flex flex-col',
-              !stack && 'border-b border-border sm:border-b-0'
+              showCodePane && !stack && 'border-b border-border sm:border-b-0',
+              !showCodePane && 'w-full',
+              isFullscreen && 'flex-1 min-h-0'
             )}
             style={canResize ? { width: `${previewPct}%` } : undefined}
           >
@@ -146,20 +194,28 @@ function VariantBlock({ variant }: { variant: ShowcaseVariant }) {
             <div
               className={cn(
                 'flex items-start justify-center px-6 py-8',
-                stack ? 'min-h-40' : 'flex-1 min-h-28'
+                stack ? 'min-h-40' : 'flex-1 min-h-28',
+                isFullscreen && 'flex-1 min-h-0',
+                variant.previewClassName
               )}
               style={{
                 backgroundImage: 'radial-gradient(circle, var(--border) 1px, transparent 1px)',
                 backgroundSize: '16px 16px',
               }}
             >
-              <div className={cn('w-full', !stack && 'flex flex-wrap gap-2 items-center justify-center')}>
+              <div
+                className={cn(
+                  'w-full',
+                  !stack && 'flex flex-wrap gap-2 items-center justify-center',
+                  variant.previewInnerClassName
+                )}
+              >
                 {variant.preview}
               </div>
             </div>
           </div>
 
-          {!stack && (
+          {showCodePane && !stack && (
             <div
               role="separator"
               aria-orientation="vertical"
@@ -192,19 +248,21 @@ function VariantBlock({ variant }: { variant: ShowcaseVariant }) {
             </div>
           )}
 
-          <div
-            className={cn(
-              'flex flex-col bg-surface-sunken overflow-x-auto',
-              !stack && 'flex-1 min-w-0'
-            )}
-          >
-            <div className="px-3 py-1.5 border-b border-border bg-surface-overlay">
-              <span className="text-xs font-medium text-text-secondary uppercase tracking-wider">Code</span>
+          {showCodePane && (
+            <div
+              className={cn(
+                'flex flex-col bg-surface-sunken overflow-x-auto',
+                !stack && 'flex-1 min-w-0'
+              )}
+            >
+              <div className="px-3 py-1.5 border-b border-border bg-surface-overlay">
+                <span className="text-xs font-medium text-text-secondary uppercase tracking-wider">Code</span>
+              </div>
+              <pre className="flex-1 px-4 py-5 text-sm font-mono text-text-primary leading-relaxed whitespace-pre-wrap">
+                <code>{variant.code}</code>
+              </pre>
             </div>
-            <pre className="flex-1 px-4 py-5 text-sm font-mono text-text-primary leading-relaxed whitespace-pre-wrap">
-              <code>{variant.code}</code>
-            </pre>
-          </div>
+          )}
         </div>
       </Widget>
     </div>
