@@ -207,6 +207,18 @@ async function tryExistingServer() {
 }
 
 async function main() {
+  // On Vercel (and other CI) Puppeteer's Chrome isn't installed and the
+  // committed snapshot under public/registry + public/components is already
+  // the source of truth for the build. Skip regeneration there.
+  if (process.env.SKIP_REGISTRY_SNAPSHOT === '1' || process.env.VERCEL || process.env.CI) {
+    const haveSnapshot = existsSync(REGISTRY_FILE) && existsSync(INDEX_FILE);
+    if (haveSnapshot) {
+      console.log('[snapshot] CI/Vercel detected — using committed snapshot, skipping regeneration');
+      return;
+    }
+    console.warn('[snapshot] CI/Vercel detected but no committed snapshot found — attempting regeneration anyway');
+  }
+
   if (!existsSync(path.join(REPO_ROOT, 'node_modules/next'))) {
     console.error('next is not installed. Run `npm install` first.');
     process.exit(1);
