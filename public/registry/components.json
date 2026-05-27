@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-27T13:42:56.221Z",
+  "generatedAt": "2026-05-27T19:28:29.749Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -8438,21 +8438,8 @@
       "filePath": "modules/showcase/data/sections/lib-kui-viewer.showcase.tsx",
       "abbr": "KV",
       "description": "Browser-based IFC/BIM 3D viewer built on Three.js, web-ifc and @thatopen/fragments. Ships a vanilla TypeScript core plus an optional React subpath (`kui-viewer/react`) exposing the `<KUIViewer />` component, a `ViewerProvider`, and a Zustand-backed `useViewerStore` hook for selection, federation and spatial-tree state.",
-      "source": "'use client';\n// Install:  npm install kui-viewer\n// Styles:   import 'kui-viewer/styles.css';   // once, e.g. in app/layout.tsx\n// React subpath: kui-viewer/react\n\nimport { KUIViewer } from 'kui-viewer/react';\nimport 'kui-viewer/styles.css';\n\nexport function BimViewer() {\n  return (\n    <div className=\"w-full h-[600px] rounded-md overflow-hidden border\">\n      <KUIViewer\n        className=\"w-full h-full\"\n        modelUrl=\"/models/site.ifc\"\n        pixelRatioCap={2}\n        onReady={(viewer) => {\n          // viewer is the vanilla TS core — fit camera, register listeners, etc.\n          console.log('viewer ready', viewer);\n        }}\n      />\n    </div>\n  );\n}\n",
-      "variants": [
-        {
-          "title": "Empty scene",
-          "code": "import { KUIViewer } from 'kui-viewer/react';\nimport 'kui-viewer/styles.css';\n\n// Mounts an empty Three.js scene — no model, no WASM download yet.\n// Useful as a placeholder while the user picks a model.\n<div className=\"w-full h-80 rounded-md overflow-hidden border\">\n  <KUIViewer className=\"w-full h-full\" />\n</div>"
-        },
-        {
-          "title": "With IFC model URL",
-          "code": "import { KUIViewer } from 'kui-viewer/react';\nimport 'kui-viewer/styles.css';\n\n// Provide a model URL — the viewer downloads + parses the IFC via web-ifc\n// and converts it to @thatopen/fragments under the hood.\n<div className=\"w-full h-80 rounded-md overflow-hidden border\">\n  <KUIViewer\n    className=\"w-full h-full\"\n    modelUrl=\"http://www.ifcwiki.org/images/e/e3/AC20-FZK-Haus.ifc\"\n    pixelRatioCap={2}\n  />\n</div>"
-        },
-        {
-          "title": "Provider + headless hooks",
-          "code": "import {\n  ViewerProvider,\n  KUIViewer,\n  useSelection,\n  useSpatialTree,\n  useLoadIfc,\n} from 'kui-viewer/react';\nimport 'kui-viewer/styles.css';\n\nfunction SelectionPanel() {\n  const { selected } = useSelection();\n  return (\n    <aside className=\"p-3 text-sm\">\n      Selected: {selected?.expressID ?? '—'}\n    </aside>\n  );\n}\n\nexport function BimWorkspace() {\n  return (\n    <ViewerProvider>\n      <div className=\"grid grid-cols-[1fr_320px] h-[600px]\">\n        <KUIViewer modelUrl=\"/models/site.ifc\" className=\"w-full h-full\" />\n        <SelectionPanel />\n      </div>\n    </ViewerProvider>\n  );\n}"
-        }
-      ],
+      "source": "'use client';\n// Install:  npm install kui-viewer\n// React subpath: kui-viewer/react\n//\n// Since 0.0.3 the published `kui-viewer/styles.css` no longer ships the\n// Tailwind preflight or default theme tokens, so importing it next to your\n// project-level Tailwind setup is safe — design tokens stay isolated under\n// the `--color-kui-viewer-*` namespace.\nimport 'kui-viewer/styles.css';\n\nimport { KUIViewer } from 'kui-viewer/react';\n\nexport function BimViewer() {\n  return (\n    <div className=\"w-full h-[600px] rounded-md overflow-hidden border\">\n      <KUIViewer\n        className=\"w-full h-full\"\n        modelUrl=\"/models/site.ifc\"\n        pixelRatioCap={2}\n        onReady={(viewer) => {\n          // viewer is the vanilla TS core — fit camera, register listeners, etc.\n          console.log('viewer ready', viewer);\n        }}\n      />\n    </div>\n  );\n}\n",
+      "variants": [],
       "status": "beta",
       "since": "2026-05",
       "whenToUse": "When you need to render IFC/BIM models in the browser — viewing, navigating and inspecting AEC scenes — and want a framework-agnostic core with an optional React wrapper.",
