@@ -10,10 +10,11 @@
 import dynamic from 'next/dynamic';
 import type { ComponentType } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
-// kui-viewer ≥ 0.0.2 publishes every design token under the `--color-kui-viewer-*`
-// namespace, so importing its stylesheet here no longer collides with the
-// host's Tailwind v4 `@theme` (the v0.0.1 build was clobbering --color-border
-// and turning every border in the showcase white). Safe to load globally.
+// kui-viewer ≥ 0.0.3 strips its Tailwind preflight and base theme tokens
+// (--font-sans, --spacing, --text-*, etc.) from the published bundle, so it
+// no longer fights the host Tailwind v4 build for the global cascade. Only
+// the namespaced `--color-kui-viewer-*` design tokens and the viewer's own
+// utility classes are emitted — safe to import globally.
 import 'kui-viewer/styles.css';
 
 type KUIViewerProps = {
@@ -34,14 +35,6 @@ const KUIViewer: ComponentType<KUIViewerProps> = dynamic(
     ),
   },
 );
-
-function EmptySceneDemo() {
-  return (
-    <div className="w-full h-80 rounded-md overflow-hidden border border-border bg-surface-sunken">
-      <KUIViewer className="w-full h-full" />
-    </div>
-  );
-}
 
 function WithModelDemo() {
   // Public sample IFC hosted by the upstream project. Swap with your own
@@ -69,8 +62,8 @@ export function buildLibKuiViewerData(): ShowcaseComponent[] {
       since: '2026-05',
       external: {
         packageName: 'kui-viewer',
-        version: '0.0.2',
-        homepage: 'https://github.com/kuraykaraaslan/kui-viewer#readme',
+        version: '0.0.1',
+        homepage: 'https://kui-viewer.kuray.dev',
         npm: 'https://www.npmjs.com/package/kui-viewer',
         github: 'https://github.com/kuraykaraaslan/kui-viewer',
       },
@@ -80,14 +73,16 @@ export function buildLibKuiViewerData(): ShowcaseComponent[] {
         'For lightweight, non-BIM 3D scenes — prefer a thinner Three.js wrapper or react-three-fiber. KUIViewer pulls in web-ifc WASM and @thatopen/fragments and is sized for AEC workloads.',
       dependencies: ['kui-viewer', 'three', 'web-ifc', '@thatopen/fragments', 'zustand'],
       sourceCode: `'use client';
-// Install:    npm install kui-viewer
-// Subpaths:   kui-viewer/react   /   kui-viewer/styles.css
+// Install:  npm install kui-viewer
+// React subpath: kui-viewer/react
 //
-// Since v0.0.2 every design token is namespaced (\`--color-kui-viewer-*\`),
-// so importing the stylesheet is safe alongside a host Tailwind v4 theme.
+// Since 0.0.3 the published \`kui-viewer/styles.css\` no longer ships the
+// Tailwind preflight or default theme tokens, so importing it next to your
+// project-level Tailwind setup is safe — design tokens stay isolated under
+// the \`--color-kui-viewer-*\` namespace.
+import 'kui-viewer/styles.css';
 
 import { KUIViewer } from 'kui-viewer/react';
-import 'kui-viewer/styles.css';
 
 export function BimViewer() {
   return (
@@ -107,75 +102,9 @@ export function BimViewer() {
 `,
       variants: [
         {
-          title: 'Empty scene',
-          layout: 'stack',
-          preview: <EmptySceneDemo />,
-          code: `import { KUIViewer } from 'kui-viewer/react';
-
-// Mounts an empty Three.js scene — no model, no WASM download yet.
-// Useful as a placeholder while the user picks a model.
-<div className="w-full h-80 rounded-md overflow-hidden border">
-  <KUIViewer className="w-full h-full" />
-</div>`,
-        },
-        {
           title: 'With IFC model URL',
           layout: 'stack',
           preview: <WithModelDemo />,
-          code: `import { KUIViewer } from 'kui-viewer/react';
-
-// Provide a model URL — the viewer downloads + parses the IFC via web-ifc
-// and converts it to @thatopen/fragments under the hood.
-<div className="w-full h-80 rounded-md overflow-hidden border">
-  <KUIViewer
-    className="w-full h-full"
-    modelUrl="http://www.ifcwiki.org/images/e/e3/AC20-FZK-Haus.ifc"
-    pixelRatioCap={2}
-  />
-</div>`,
-        },
-        {
-          title: 'Provider + headless hooks',
-          layout: 'stack',
-          preview: (
-            <div className="w-full p-4 rounded-md border border-border bg-surface-overlay text-sm text-text-secondary">
-              <p className="mb-2 font-medium text-text-primary">Provider pattern</p>
-              <p>
-                Wrap your tree in <code className="font-mono text-xs">ViewerProvider</code> and read
-                viewer state with <code className="font-mono text-xs">useViewerStore</code> /{' '}
-                <code className="font-mono text-xs">useSelection</code> /{' '}
-                <code className="font-mono text-xs">useSpatialTree</code>. See the Code panel for a
-                full example.
-              </p>
-            </div>
-          ),
-          code: `import {
-  ViewerProvider,
-  KUIViewer,
-  useSelection,
-  useSpatialTree,
-  useLoadIfc,
-} from 'kui-viewer/react';
-
-function SelectionPanel() {
-  const { selected } = useSelection();
-  return (
-    <aside className="p-3 text-sm">
-      Selected: {selected?.expressID ?? '—'}
-    </aside>
-  );
-}
-
-export function BimWorkspace() {
-  return (
-    <ViewerProvider>
-      <div className="grid grid-cols-[1fr_320px] h-[600px]">
-        <KUIViewer modelUrl="/models/site.ifc" className="w-full h-full" />
-        <SelectionPanel />
-      </div>
-    </ViewerProvider>
-  );
-}`,
         },
       ],
     },
