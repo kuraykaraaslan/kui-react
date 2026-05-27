@@ -125,6 +125,53 @@ function CalendarDayDemo() {
   );
 }
 
+function CalendarRecurringDemo() {
+  const [view, setView] = useState<View>('week');
+  // One-off events + one recurring weekly standup expanded by the RRULE engine.
+  const events: Event[] = [
+    {
+      id: 'rec-standup',
+      title: 'Daily standup',
+      start: new Date(2026, 4, 11, 9, 30),
+      end: new Date(2026, 4, 11, 9, 45),
+      color: 'primary',
+      rrule: 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;COUNT=20',
+      // Skip the Wednesday — team off-site.
+      exceptions: [new Date(2026, 4, 13)],
+    },
+    {
+      id: 'one-off',
+      title: 'Roadmap review',
+      start: new Date(2026, 4, 13, 14, 0),
+      end: new Date(2026, 4, 13, 15, 0),
+      color: 'info',
+      icon: faVideo,
+    },
+    {
+      id: 'rec-coffee',
+      title: 'Coffee with Ada',
+      start: new Date(2026, 4, 12, 8, 30),
+      end: new Date(2026, 4, 12, 9, 0),
+      color: 'success',
+      icon: faMugHot,
+      rrule: 'FREQ=WEEKLY;INTERVAL=2;BYDAY=TU;COUNT=5',
+    },
+  ];
+  return (
+    <div className="w-full">
+      <Calendar
+        events={events}
+        view={view}
+        defaultDate={DEMO_ANCHOR}
+        onViewChange={setView}
+        locale="en"
+        slotMinutes={15}
+        workingHours={{ start: 9, end: 18, days: [1, 2, 3, 4, 5] }}
+      />
+    </div>
+  );
+}
+
 function CalendarInteractiveDemo() {
   const [view, setView] = useState<View>('week');
   const [events, setEvents] = useState<Event[]>(() => makeEvents());
@@ -191,7 +238,7 @@ export function buildAppCalendarData(): ShowcaseComponent[] {
       category: 'App',
       abbr: 'Cl',
       description:
-        'Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, and full interactions — click event for an anchored popover (Edit/Delete), drag a timed event to move, drag the bottom edge to resize, drag an empty range to create. RRULE recurrence, resource/multi-calendar overlay, agenda + mini, and full a11y/i18n/perf polish land in M3-M6.',
+        'Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create) and in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions). Resource/multi-calendar overlay, agenda + mini, and full a11y/i18n/perf polish land in M4-M6.',
       filePath: 'modules/app/Calendar/index.tsx',
       since: '2026-05',
       status: 'beta',
@@ -290,6 +337,37 @@ const events: Event[] = [
   onViewChange={setView}
   locale="en"
   workingHours={{ start: 9, end: 18, days: [1,2,3,4,5] }}
+/>`,
+        },
+        {
+          title: 'Recurring — RRULE expansion',
+          layout: 'stack',
+          preview: <CalendarRecurringDemo />,
+          code: `// Lazy in-house RRULE expander — FREQ + INTERVAL + COUNT + UNTIL + BYDAY.
+const events: Event[] = [
+  {
+    id: 'standup',
+    title: 'Daily standup',
+    start: new Date(2026, 4, 11, 9, 30),
+    end:   new Date(2026, 4, 11, 9, 45),
+    rrule: 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;COUNT=20',
+    exceptions: [new Date(2026, 4, 13)], // skip team off-site
+  },
+  {
+    id: 'coffee',
+    title: 'Coffee with Ada',
+    start: new Date(2026, 4, 12, 8, 30),
+    end:   new Date(2026, 4, 12, 9, 0),
+    rrule: 'FREQ=WEEKLY;INTERVAL=2;BYDAY=TU;COUNT=5',
+  },
+];
+
+<Calendar
+  events={events}
+  view="week"
+  defaultDate={new Date(2026, 4, 13)}
+  slotMinutes={15}
+  workingHours={{ start: 9, end: 18, days: [1, 2, 3, 4, 5] }}
 />`,
         },
         {

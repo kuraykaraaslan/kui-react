@@ -104,6 +104,26 @@ export function minutesIntoDay(d: Date): number {
   return d.getHours() * 60 + d.getMinutes();
 }
 
+/**
+ * Visible date window for the current view + anchor date. Drives
+ * recurrence expansion in `useRecurrence`.
+ */
+export function visibleWindow(
+  view: 'month' | 'week' | 'day' | 'agenda' | 'resource',
+  date: Date,
+  weekStart: 0 | 1,
+): [Date, Date] {
+  if (view === 'month' || view === 'agenda' || view === 'resource') {
+    const cells = monthGrid(date, weekStart);
+    return [startOfDay(cells[0]), endOfDay(cells[cells.length - 1])];
+  }
+  if (view === 'week') {
+    const s = startOfWeek(date, weekStart);
+    return [startOfDay(s), endOfDay(rangeDays(s, 7)[6])];
+  }
+  return [startOfDay(date), endOfDay(date)];
+}
+
 /** Return a new Date snapped to the nearest `step` minutes (down). */
 export function snapMinutes(d: Date, step: number): Date {
   const x = new Date(d);

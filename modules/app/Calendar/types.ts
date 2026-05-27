@@ -42,9 +42,28 @@ export type Event = {
   description?: string;
   /** Optional calendar identifier — wired up properly in M4. */
   calendarId?: string;
-  // TODO M3: rrule?: string;            (RRULE string, lazy-expanded)
+  /**
+   * RFC 5545 RRULE string (without `DTSTART:` prefix), e.g.
+   * `FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=10`.
+   * Occurrences are expanded for the visible date range only.
+   * Supported tokens (M3 subset): FREQ, INTERVAL, COUNT, UNTIL, BYDAY.
+   */
+  rrule?: string;
+  /** Dates to skip when expanding `rrule` (matched on day boundary). */
+  exceptions?: Date[];
   // TODO M4: resourceId?: string;       (resource column the event belongs to)
-  // TODO M3: exceptions?: Date[];       (recurring-event exceptions)
+};
+
+/**
+ * Materialised occurrence of a recurring event. The `id` becomes
+ * `${parent.id}::${ISO start}` so consumers can distinguish a single
+ * instance from the series. `parentId` + `originalStart` are added
+ * so handlers can scope edits ("this", "this and following", "series").
+ */
+export type EventOccurrence = Event & {
+  parentId?: string;
+  originalStart?: Date;
+  isRecurrence?: boolean;
 };
 
 /** Resource (room / person / lane). Real handling in M4. */

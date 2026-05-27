@@ -14,9 +14,11 @@ import {
   addMonths,
   endOfWeek,
   startOfWeek,
+  visibleWindow,
 } from './date-utils';
 import { mergeMessages, resolveLocale } from './locale';
 import { useKeyboardNav } from './hooks/useKeyboardNav';
+import { useRecurrence } from './hooks/useRecurrence';
 import {
   CalendarStoreProvider,
   createCalendarStore,
@@ -27,6 +29,7 @@ import {
 export type {
   CalendarProps,
   Event,
+  EventOccurrence,
   View,
   Resource,
   EventColor,
@@ -87,6 +90,12 @@ function CalendarInner({
 
   const today = useMemo(() => new Date(), []);
   const rootRef = useRef<HTMLDivElement>(null);
+
+  const [windowStart, windowEnd] = useMemo(
+    () => visibleWindow(view, date, localeBundle.weekStart),
+    [view, date, localeBundle.weekStart],
+  );
+  const visibleEvents = useRecurrence(events, windowStart, windowEnd);
 
   // Period label, e.g. "May 2026" / "Mayıs 2026" / "5 — 11 Mayıs 2026" / "5 Mayıs 2026"
   const periodLabel = useMemo(() => {
@@ -183,7 +192,7 @@ function CalendarInner({
       {view === 'month' && (
         <MonthView
           date={date}
-          events={events}
+          events={visibleEvents}
           locale={{ ...localeBundle, messages }}
           today={today}
           onEventClick={handleEventClick}
@@ -192,7 +201,7 @@ function CalendarInner({
       {view === 'week' && (
         <WeekView
           date={date}
-          events={events}
+          events={visibleEvents}
           locale={{ ...localeBundle, messages }}
           today={today}
           workingHours={workingHours}
@@ -206,7 +215,7 @@ function CalendarInner({
       {view === 'day' && (
         <DayView
           date={date}
-          events={events}
+          events={visibleEvents}
           locale={{ ...localeBundle, messages }}
           today={today}
           workingHours={workingHours}

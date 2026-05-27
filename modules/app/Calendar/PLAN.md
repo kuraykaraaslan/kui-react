@@ -5,8 +5,8 @@ Single source of truth for the milestone plan of `modules/app/Calendar`. Every m
 | ID | Theme | Status |
 |----|-------|--------|
 | M1 | Month / Week / Day views, view switcher, nav, locales, working-hours, all-day bars | **Done** |
-| M2 | Interactions — popover, drag-move, resize, drag-create, CRUD callbacks | **In progress** |
-| M3 | RRULE recurrence (lazy `rrule` import in `useRecurrence`) | Stub |
+| M2 | Interactions — popover, drag-move, resize, drag-create, CRUD callbacks | **Done** |
+| M3 | RRULE recurrence — in-house FREQ/INTERVAL/COUNT/UNTIL/BYDAY expander | **Done** |
 | M4 | `ResourceView` + multi-calendar overlay | Stub |
 | M5 | `AgendaView` (search + filters) + `MiniCalendar` sidebar | Stub |
 | M6 | Full a11y / i18n / perf polish + IANA timezone | Stub |
@@ -103,11 +103,44 @@ Telemetry adds `event-create`, `event-update`, `event-delete` variants.
 
 ---
 
-## M3 — RRULE recurrence (deferred)
+## M3 — RRULE recurrence
 
-- Lazy-import `rrule` inside `useRecurrence` (per-visible-range expansion).
-- Extend `Event` with `rrule?: string` + `exceptions?: Date[]`.
-- Materialise occurrences for the current visible date range only.
+### Outcome
+
+`Event.rrule?: string` accepts an RFC 5545 RRULE string (e.g. `FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=10`). The Calendar expands those recurrences for the **visible date window only** and renders each occurrence as a normal event. `Event.exceptions?: Date[]` skips listed days.
+
+### Why in-house, not the `rrule` npm package
+
+The `rrule` package is ~13kB gzipped and pulls in `luxon` semantics. The realistic calendar UI subset is much smaller. We ship a ~140-LoC pure-TS expander at [rrule.ts](rrule.ts) covering the tokens that matter for product UIs:
+
+- `FREQ` — `DAILY` / `WEEKLY` / `MONTHLY` / `YEARLY`
+- `INTERVAL` — every N units (default 1)
+- `COUNT` — total occurrence cap
+- `UNTIL` — terminal date (`YYYYMMDD` or `YYYYMMDDTHHMMSSZ`)
+- `BYDAY` — `SU,MO,TU,WE,TH,FR,SA` (WEEKLY only)
+
+Everything else (`BYMONTHDAY`, `BYSETPOS`, `RDATE`, `EXDATE`) is silently ignored. Consumers who need full RFC 5545 swap [rrule.ts](rrule.ts) for the npm package — the `parseRRule` / `expandRRule` signatures match.
+
+### Files
+
+| File | Change |
+|---|---|
+| `rrule.ts` | **NEW** — `parseRRule`, `expandRRule`, `isException` |
+| `types.ts` | Add `Event.rrule?: string`, `Event.exceptions?: Date[]`, export `EventOccurrence` |
+| `hooks/useRecurrence.ts` | Replace identity stub: takes `(events, windowStart, windowEnd)`, returns `EventOccurrence[]` |
+| `index.tsx` | Compute visible window from view+date; `useRecurrence` → `visibleEvents`; pass to views |
+| `modules/showcase/data/sections/app-calendar.showcase.tsx` | Add `Recurring — RRULE expansion` variant |
+| `public/components/calendar.md` + `public/registry/components.json` | Regenerated |
+
+### Occurrence identity
+
+Each materialised occurrence has `id = "${parent.id}::${occurrence.toISOString()}"` plus three diagnostic fields: `parentId`, `originalStart`, `isRecurrence: true`. Consumers can detect a recurring instance with `'isRecurrence' in event`. CRUD callbacks (`onEventUpdate`, `onEventDelete`) fire with the occurrence — consumers decide whether the edit applies to "this", "this and following", or "the series". M3 deliberately does **not** ship a scope picker; that's M4 polish.
+
+### Performance
+
+- `useRecurrence` is memoised on `(events, windowStart.getTime(), windowEnd.getTime())` — zero work when nothing recurs.
+- `expandRRule` is bounded by `COUNT`, `UNTIL`, the visible window, and a hard cap (1000 occurrences). A "forever" `FREQ=DAILY` over one month emits ≤ 31 dates.
+- No async, no dynamic import, no Suspense fence — recurrence renders synchronously on first paint.
 
 ## M4 — Resources + multi-calendar overlay (deferred)
 
