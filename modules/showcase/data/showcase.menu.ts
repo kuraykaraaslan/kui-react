@@ -494,6 +494,14 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'iot',          title: 'IoT Theme',          category: 'Theme', abbr: 'IT', href: '/theme/iot',            since: '2026-05' },
       { id: 'nft',          title: 'NFT Theme',          category: 'Theme', abbr: 'NT', href: '/theme/nft',            since: '2026-05' },
     ],
+  },
+  {
+    label: 'Libraries',
+    collapsible: true,
+    sectionStart: 'Libraries',
+    items: [
+      { id: 'lib-kui-viewer', title: 'KUIViewer', category: 'Library', abbr: 'KV', since: '2026-05', status: 'beta' },
+    ],
   }
 ];
 

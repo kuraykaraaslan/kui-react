@@ -30,6 +30,7 @@ const categoryStyles: Record<string, string> = {
   App:      'bg-warning-subtle text-warning-fg',
   Domain:   'bg-error-subtle text-error-fg',
   Theme:    'bg-secondary text-primary-fg',
+  Library:  'bg-surface-sunken text-text-primary',
 };
 
 type NavContentProps = {

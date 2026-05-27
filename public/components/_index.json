@@ -1822,5 +1822,11 @@
     "layer": "domain",
     "category": "Domain",
     "file": "reviews-review-submit-form.md"
+  },
+  "lib-kui-viewer": {
+    "name": "KUIViewer",
+    "layer": "library",
+    "category": "Library",
+    "file": "lib-kui-viewer.md"
   }
 }

@@ -3,13 +3,14 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-27T13:05:56.863Z",
+  "generatedAt": "2026-05-27T13:42:56.221Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
     "app": "modules/app/ — Application-level patterns (organisms, page shells, forms, providers). May own local state and orchestrate ui-layer atoms.",
     "domain": "modules/domains/<vertical>/ — Industry-vertical components that compose ui/ + app/. Each vertical exports a barrel index.ts and a types.ts with Zod schemas.",
-    "theme": "app/theme/<vertical>/ — Full multi-page demos wiring domain components into a realistic product experience. layout.tsx is client, page.tsx is server unless it owns state."
+    "theme": "app/theme/<vertical>/ — Full multi-page demos wiring domain components into a realistic product experience. layout.tsx is client, page.tsx is server unless it owns state.",
+    "library": "External npm packages featured in the showcase (e.g. kui-viewer). filePath points to the showcase example, not first-party source; the `external` field carries homepage/npm/github links."
   },
   "conventions": {
     "icons": "All icons MUST come from Font Awesome. Named imports only — never the whole set. Apply Tailwind classes via className (e.g. text-primary, w-4 h-4); never use the size prop with raw strings. aria-hidden=\"true\" on decorative icons.",
@@ -1933,7 +1934,7 @@
       "category": "App",
       "filePath": "modules/app/Calendar/index.tsx",
       "abbr": "Cl",
-      "description": "Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, and full interactions — click event for an anchored popover (Edit/Delete), drag a timed event to move, drag the bottom edge to resize, drag an empty range to create. RRULE recurrence, resource/multi-calendar overlay, agenda + mini, and full a11y/i18n/perf polish land in M3-M6.",
+      "description": "Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create) and in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions). Resource/multi-calendar overlay, agenda + mini, and full a11y/i18n/perf polish land in M4-M6.",
       "status": "beta",
       "since": "2026-05",
       "composes": [],
@@ -1982,7 +1983,7 @@
         "--text-secondary",
         "--text-disabled"
       ],
-      "variantCount": 4
+      "variantCount": 5
     },
     {
       "id": "gantt",
@@ -1991,7 +1992,7 @@
       "category": "App",
       "filePath": "modules/app/Gantt/index.tsx",
       "abbr": "Gt",
-      "description": "MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale switcher (day / week / month / quarter / year), a vertical Today line, WBS tree with expand/collapse on the left panel, sticky timeline header with synchronised horizontal + vertical scroll, and absolutely-positioned task bars with a %-progress fill. M2 adds full interactivity: drag a bar to reschedule (snap to day), drag the left/right edges to resize, drag the white progress thumb to change %, and drag from the right-edge blue dot to another bar to draw an FS dependency. Dependencies render as orthogonal SVG arrows with a marker-end arrowhead; click an arrow then press Delete to remove it. All mutations are optimistic and roll back automatically if `onTaskUpdate` / `onDependencyCreate` rejects. Internal state is owned by a per-instance Zustand store (`store.ts`). Public props for `baselines`, `criticalPath`, `workingDays`, `holidays`, `exportFormats`, and `reducedMotion` are accepted but not yet wired — they become live in M3 (CPM highlight + hover tooltip), M4 (milestones + baselines + weekends), M5 (export + working-day calendar), and M6 (full keyboard nav + locale + virtualisation).",
+      "description": "MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale switcher (day / week / month / quarter / year), a vertical Today line, WBS tree with expand/collapse on the left panel, sticky timeline header with synchronised horizontal + vertical scroll, and absolutely-positioned task bars with a %-progress fill. M2 adds full interactivity: drag a bar to reschedule (snap to day), drag the left/right edges to resize, drag the white progress thumb to change %, and drag from the right-edge blue dot to another bar to draw an FS dependency. Dependencies render as orthogonal SVG arrows with a marker-end arrowhead; click an arrow then press Delete to remove it. M3 adds a Critical Path toggle in the toolbar — tasks on the longest dependency chain switch to var(--error) styling and their connecting arrows turn red, computed by a forward + backward longest-path pass on the dependency DAG (cycles render nothing instead of crashing). Hovering a bar after a short delay shows a tooltip with name, start/end, duration, owner, % complete, predecessors, and a Critical badge when applicable. All mutations are optimistic and roll back automatically if `onTaskUpdate` / `onDependencyCreate` rejects. Internal state is owned by a per-instance Zustand store (`store.ts`). Public props for `baselines`, `workingDays`, `holidays`, `exportFormats`, and `reducedMotion` are accepted but not yet wired — they become live in M4 (milestones + baselines + weekends), M5 (export + working-day calendar), and M6 (full keyboard nav + locale + virtualisation).",
       "status": "beta",
       "since": "2026-05",
       "composes": [
@@ -2038,9 +2039,11 @@
         "--primary",
         "--primary-subtle",
         "--primary-fg",
-        "--warning"
+        "--warning",
+        "--error",
+        "--error-subtle"
       ],
-      "variantCount": 5
+      "variantCount": 6
     },
     {
       "id": "form-builder",
@@ -4970,6 +4973,35 @@
       ],
       "designTokens": [],
       "variantCount": 2
+    },
+    {
+      "id": "lib-kui-viewer",
+      "name": "KUIViewer",
+      "layer": "library",
+      "category": "Library",
+      "filePath": "modules/showcase/data/sections/lib-kui-viewer.showcase.tsx",
+      "abbr": "KV",
+      "description": "Browser-based IFC/BIM 3D viewer built on Three.js, web-ifc and @thatopen/fragments. Ships a vanilla TypeScript core plus an optional React subpath (`kui-viewer/react`) exposing the `<KUIViewer />` component, a `ViewerProvider`, and a Zustand-backed `useViewerStore` hook for selection, federation and spatial-tree state.",
+      "status": "beta",
+      "since": "2026-05",
+      "whenToUse": "When you need to render IFC/BIM models in the browser — viewing, navigating and inspecting AEC scenes — and want a framework-agnostic core with an optional React wrapper.",
+      "whenNotToUse": "For lightweight, non-BIM 3D scenes — prefer a thinner Three.js wrapper or react-three-fiber. KUIViewer pulls in web-ifc WASM and @thatopen/fragments and is sized for AEC workloads.",
+      "designTokens": [],
+      "dependencies": [
+        "kui-viewer",
+        "three",
+        "web-ifc",
+        "@thatopen/fragments",
+        "zustand"
+      ],
+      "external": {
+        "packageName": "kui-viewer",
+        "version": "0.0.1",
+        "homepage": "https://github.com/kuraykaraaslan/kui-viewer#readme",
+        "npm": "https://www.npmjs.com/package/kui-viewer",
+        "github": "https://github.com/kuraykaraaslan/kui-viewer"
+      },
+      "variantCount": 3
     }
   ],
   "themes": [

@@ -28,6 +28,8 @@ const LAYER_DESCRIPTIONS: Record<RegistryLayer, string> = {
     'modules/domains/<vertical>/ — Industry-vertical components that compose ui/ + app/. Each vertical exports a barrel index.ts and a types.ts with Zod schemas.',
   theme:
     'app/theme/<vertical>/ — Full multi-page demos wiring domain components into a realistic product experience. layout.tsx is client, page.tsx is server unless it owns state.',
+  library:
+    'External npm packages featured in the showcase (e.g. kui-viewer). filePath points to the showcase example, not first-party source; the `external` field carries homepage/npm/github links.',
 };
 
 const CONVENTIONS = {
@@ -74,7 +76,8 @@ const DESIGN_TOKENS: RegistryToken[] = [
   { name: '--info-subtle',     light: '#ecfeff', purpose: 'Info background' },
 ];
 
-function inferLayer(filePath: string): RegistryLayer {
+function inferLayer(filePath: string, isExternal: boolean): RegistryLayer {
+  if (isExternal) return 'library';
   if (filePath.startsWith('modules/ui/')) return 'ui';
   if (filePath.startsWith('modules/app/')) return 'app';
   if (filePath.startsWith('modules/domains/')) return 'domain';
@@ -113,7 +116,7 @@ export function buildRegistry(): Registry {
 
   const components: RegistryComponent[] = showcase.map((c) => {
     const menu = findMenuEntry(c.id);
-    const layer = inferLayer(c.filePath);
+    const layer = inferLayer(c.filePath, Boolean(c.external));
     return {
       id: c.id,
       name: c.title,
@@ -133,6 +136,7 @@ export function buildRegistry(): Registry {
       a11y: c.a11y,
       designTokens: c.designTokens ?? inferDesignTokens(c.sourceCode),
       dependencies: c.dependencies,
+      external: c.external,
     };
   });
 

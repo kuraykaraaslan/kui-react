@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Widget } from './Widget';
 import { CopyButton } from './CopyButton';
 import { PropsEditor } from './PropsEditor';
+import { ExternalLinksPopover } from './ExternalLinksPopover';
 import { useVariantLayout } from './VariantLayoutContext';
 import { cn } from '@/libs/utils/cn';
 import { buildShowcaseData, type ShowcaseVariant } from '@/modules/showcase/data/showcase.data';
@@ -16,6 +17,7 @@ const categoryStyles: Record<string, string> = {
   App:      'bg-warning-subtle text-warning-fg',
   Domain:   'bg-error-subtle text-error-fg',
   Theme:    'bg-secondary text-primary-fg',
+  Library:  'bg-surface-sunken text-text-primary',
 };
 
 function SourceBlock({ filePath, sourceCode }: { filePath: string; sourceCode: string }) {
@@ -228,7 +230,7 @@ export function ShowcaseDetail({ slug }: { slug: string }) {
   return (
     <>
       <div className="mb-2">
-        <div className="flex items-center gap-3 mb-1">
+        <div className="flex flex-wrap items-center gap-3 mb-1">
           <h2 className="text-2xl font-bold text-text-primary leading-tight">
             {selected.title}
           </h2>
@@ -240,6 +242,9 @@ export function ShowcaseDetail({ slug }: { slug: string }) {
           >
             {selected.category}
           </span>
+          {selected.external && (
+            <ExternalLinksPopover external={selected.external} title={selected.title} />
+          )}
         </div>
         <p className="text-sm text-text-secondary max-w-2xl">{selected.description}</p>
       </div>

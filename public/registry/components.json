@@ -3,13 +3,14 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-27T13:05:56.863Z",
+  "generatedAt": "2026-05-27T13:42:56.221Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
     "app": "modules/app/ — Application-level patterns (organisms, page shells, forms, providers). May own local state and orchestrate ui-layer atoms.",
     "domain": "modules/domains/<vertical>/ — Industry-vertical components that compose ui/ + app/. Each vertical exports a barrel index.ts and a types.ts with Zod schemas.",
-    "theme": "app/theme/<vertical>/ — Full multi-page demos wiring domain components into a realistic product experience. layout.tsx is client, page.tsx is server unless it owns state."
+    "theme": "app/theme/<vertical>/ — Full multi-page demos wiring domain components into a realistic product experience. layout.tsx is client, page.tsx is server unless it owns state.",
+    "library": "External npm packages featured in the showcase (e.g. kui-viewer). filePath points to the showcase example, not first-party source; the `external` field carries homepage/npm/github links."
   },
   "conventions": {
     "icons": "All icons MUST come from Font Awesome. Named imports only — never the whole set. Apply Tailwind classes via className (e.g. text-primary, w-4 h-4); never use the size prop with raw strings. aria-hidden=\"true\" on decorative icons.",
@@ -3189,7 +3190,7 @@
       "category": "App",
       "filePath": "modules/app/Calendar/index.tsx",
       "abbr": "Cl",
-      "description": "Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, and full interactions — click event for an anchored popover (Edit/Delete), drag a timed event to move, drag the bottom edge to resize, drag an empty range to create. RRULE recurrence, resource/multi-calendar overlay, agenda + mini, and full a11y/i18n/perf polish land in M3-M6.",
+      "description": "Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create) and in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions). Resource/multi-calendar overlay, agenda + mini, and full a11y/i18n/perf polish land in M4-M6.",
       "source": "'use client';\nimport { Calendar } from '@/modules/app/Calendar';\nimport type { Event, View } from '@/modules/app/Calendar';\nimport { faVideo } from '@fortawesome/free-solid-svg-icons';\n\nconst events: Event[] = [\n  {\n    id: '1',\n    title: 'Design sync',\n    start: new Date(2026, 4, 13, 10, 0),\n    end:   new Date(2026, 4, 13, 11, 0),\n    color: 'primary',\n    icon: faVideo,\n  },\n  {\n    id: '2',\n    title: 'Birthday — Grace',\n    start: new Date(2026, 4, 14, 0, 0),\n    end:   new Date(2026, 4, 14, 23, 59),\n    allDay: true,\n    color: 'warning',\n  },\n];\n\n<Calendar\n  events={events}\n  view={view}                    // 'month' | 'week' | 'day' | 'agenda' | 'resource'\n  defaultDate={new Date(2026, 4, 13)}\n  onViewChange={setView}\n  onEventClick={(e) => console.log(e)}\n  onEventCreate={({ start, end }) => api.create({ start, end })}\n  onEventUpdate={(event) => api.update(event)}\n  onEventDelete={(id) => api.remove(id)}\n  locale=\"tr\"                    // 'tr' (default) | 'en'\n  workingHours={{ start: 9, end: 18, days: [1,2,3,4,5] }}\n  slotMinutes={30}\n/>",
       "variants": [
         {
@@ -3203,6 +3204,10 @@
         {
           "title": "Day view — English",
           "code": "<Calendar\n  events={events}\n  view=\"day\"\n  defaultDate={new Date(2026, 4, 13)}\n  onViewChange={setView}\n  locale=\"en\"\n  workingHours={{ start: 9, end: 18, days: [1,2,3,4,5] }}\n/>"
+        },
+        {
+          "title": "Recurring — RRULE expansion",
+          "code": "// Lazy in-house RRULE expander — FREQ + INTERVAL + COUNT + UNTIL + BYDAY.\nconst events: Event[] = [\n  {\n    id: 'standup',\n    title: 'Daily standup',\n    start: new Date(2026, 4, 11, 9, 30),\n    end:   new Date(2026, 4, 11, 9, 45),\n    rrule: 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;COUNT=20',\n    exceptions: [new Date(2026, 4, 13)], // skip team off-site\n  },\n  {\n    id: 'coffee',\n    title: 'Coffee with Ada',\n    start: new Date(2026, 4, 12, 8, 30),\n    end:   new Date(2026, 4, 12, 9, 0),\n    rrule: 'FREQ=WEEKLY;INTERVAL=2;BYDAY=TU;COUNT=5',\n  },\n];\n\n<Calendar\n  events={events}\n  view=\"week\"\n  defaultDate={new Date(2026, 4, 13)}\n  slotMinutes={15}\n  workingHours={{ start: 9, end: 18, days: [1, 2, 3, 4, 5] }}\n/>"
         },
         {
           "title": "Interactive — drag, resize, popover",
@@ -3265,7 +3270,7 @@
       "category": "App",
       "filePath": "modules/app/Gantt/index.tsx",
       "abbr": "Gt",
-      "description": "MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale switcher (day / week / month / quarter / year), a vertical Today line, WBS tree with expand/collapse on the left panel, sticky timeline header with synchronised horizontal + vertical scroll, and absolutely-positioned task bars with a %-progress fill. M2 adds full interactivity: drag a bar to reschedule (snap to day), drag the left/right edges to resize, drag the white progress thumb to change %, and drag from the right-edge blue dot to another bar to draw an FS dependency. Dependencies render as orthogonal SVG arrows with a marker-end arrowhead; click an arrow then press Delete to remove it. All mutations are optimistic and roll back automatically if `onTaskUpdate` / `onDependencyCreate` rejects. Internal state is owned by a per-instance Zustand store (`store.ts`). Public props for `baselines`, `criticalPath`, `workingDays`, `holidays`, `exportFormats`, and `reducedMotion` are accepted but not yet wired — they become live in M3 (CPM highlight + hover tooltip), M4 (milestones + baselines + weekends), M5 (export + working-day calendar), and M6 (full keyboard nav + locale + virtualisation).",
+      "description": "MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale switcher (day / week / month / quarter / year), a vertical Today line, WBS tree with expand/collapse on the left panel, sticky timeline header with synchronised horizontal + vertical scroll, and absolutely-positioned task bars with a %-progress fill. M2 adds full interactivity: drag a bar to reschedule (snap to day), drag the left/right edges to resize, drag the white progress thumb to change %, and drag from the right-edge blue dot to another bar to draw an FS dependency. Dependencies render as orthogonal SVG arrows with a marker-end arrowhead; click an arrow then press Delete to remove it. M3 adds a Critical Path toggle in the toolbar — tasks on the longest dependency chain switch to var(--error) styling and their connecting arrows turn red, computed by a forward + backward longest-path pass on the dependency DAG (cycles render nothing instead of crashing). Hovering a bar after a short delay shows a tooltip with name, start/end, duration, owner, % complete, predecessors, and a Critical badge when applicable. All mutations are optimistic and roll back automatically if `onTaskUpdate` / `onDependencyCreate` rejects. Internal state is owned by a per-instance Zustand store (`store.ts`). Public props for `baselines`, `workingDays`, `holidays`, `exportFormats`, and `reducedMotion` are accepted but not yet wired — they become live in M4 (milestones + baselines + weekends), M5 (export + working-day calendar), and M6 (full keyboard nav + locale + virtualisation).",
       "source": "import { Gantt, type Dependency, type Task } from '@/modules/app/Gantt';\nimport { useState } from 'react';\n\nexport function MyPlan() {\n  const [tasks, setTasks] = useState<Task[]>([\n    { id: 't1', name: 'Wireframes',   start: new Date('2026-05-01'), end: new Date('2026-05-08'), progress: 100 },\n    { id: 't2', name: 'Visual design', start: new Date('2026-05-08'), end: new Date('2026-05-15'), progress: 60 },\n    { id: 't3', name: 'Launch',       start: new Date('2026-06-01'), end: new Date('2026-06-01'), isMilestone: true },\n  ]);\n  const [deps, setDeps] = useState<Dependency[]>([\n    { id: 'd1', from: 't1', to: 't2', type: 'FS' },\n  ]);\n\n  return (\n    <Gantt\n      tasks={tasks}\n      dependencies={deps}\n      scale=\"week\"\n      ariaLabel=\"Q2 release plan\"\n      onTaskUpdate={(t) => setTasks((prev) => prev.map((p) => (p.id === t.id ? t : p)))}\n      onDependencyCreate={(d) => setDeps((prev) => [...prev, d])}\n      onDependencyDelete={(id) => setDeps((prev) => prev.filter((d) => d.id !== id))}\n    />\n  );\n}",
       "variants": [
         {
@@ -3283,6 +3288,10 @@
         {
           "title": "Dependencies (FS + SS)",
           "code": "const dependencies = [\n  { id: 'd-t1-t2', from: 't1', to: 't2', type: 'FS' }, // Finish-to-Start\n  { id: 'd-t4-t5', from: 't4', to: 't5', type: 'SS' }, // Start-to-Start\n];\n\n<Gantt tasks={tasks} dependencies={dependencies} scale=\"week\" />"
+        },
+        {
+          "title": "Critical path (CPM)",
+          "code": "// Critical-path highlight uses a forward + backward longest-path pass\n// over the dependency DAG. Tasks with zero float switch to error styling\n// and their connecting arrows turn red. The toolbar toggle lets users\n// switch it on / off; passing the prop sets the initial value.\n<Gantt\n  tasks={tasks}\n  dependencies={dependencies}\n  scale=\"week\"\n  criticalPath\n/>"
         },
         {
           "title": "Interactive (drag + dependencies)",
@@ -3335,7 +3344,9 @@
         "--primary",
         "--primary-subtle",
         "--primary-fg",
-        "--warning"
+        "--warning",
+        "--error",
+        "--error-subtle"
       ]
     },
     {
@@ -8418,6 +8429,49 @@
         "button"
       ],
       "designTokens": []
+    },
+    {
+      "id": "lib-kui-viewer",
+      "name": "KUIViewer",
+      "layer": "library",
+      "category": "Library",
+      "filePath": "modules/showcase/data/sections/lib-kui-viewer.showcase.tsx",
+      "abbr": "KV",
+      "description": "Browser-based IFC/BIM 3D viewer built on Three.js, web-ifc and @thatopen/fragments. Ships a vanilla TypeScript core plus an optional React subpath (`kui-viewer/react`) exposing the `<KUIViewer />` component, a `ViewerProvider`, and a Zustand-backed `useViewerStore` hook for selection, federation and spatial-tree state.",
+      "source": "'use client';\n// Install:  npm install kui-viewer\n// Styles:   import 'kui-viewer/styles.css';   // once, e.g. in app/layout.tsx\n// React subpath: kui-viewer/react\n\nimport { KUIViewer } from 'kui-viewer/react';\nimport 'kui-viewer/styles.css';\n\nexport function BimViewer() {\n  return (\n    <div className=\"w-full h-[600px] rounded-md overflow-hidden border\">\n      <KUIViewer\n        className=\"w-full h-full\"\n        modelUrl=\"/models/site.ifc\"\n        pixelRatioCap={2}\n        onReady={(viewer) => {\n          // viewer is the vanilla TS core — fit camera, register listeners, etc.\n          console.log('viewer ready', viewer);\n        }}\n      />\n    </div>\n  );\n}\n",
+      "variants": [
+        {
+          "title": "Empty scene",
+          "code": "import { KUIViewer } from 'kui-viewer/react';\nimport 'kui-viewer/styles.css';\n\n// Mounts an empty Three.js scene — no model, no WASM download yet.\n// Useful as a placeholder while the user picks a model.\n<div className=\"w-full h-80 rounded-md overflow-hidden border\">\n  <KUIViewer className=\"w-full h-full\" />\n</div>"
+        },
+        {
+          "title": "With IFC model URL",
+          "code": "import { KUIViewer } from 'kui-viewer/react';\nimport 'kui-viewer/styles.css';\n\n// Provide a model URL — the viewer downloads + parses the IFC via web-ifc\n// and converts it to @thatopen/fragments under the hood.\n<div className=\"w-full h-80 rounded-md overflow-hidden border\">\n  <KUIViewer\n    className=\"w-full h-full\"\n    modelUrl=\"http://www.ifcwiki.org/images/e/e3/AC20-FZK-Haus.ifc\"\n    pixelRatioCap={2}\n  />\n</div>"
+        },
+        {
+          "title": "Provider + headless hooks",
+          "code": "import {\n  ViewerProvider,\n  KUIViewer,\n  useSelection,\n  useSpatialTree,\n  useLoadIfc,\n} from 'kui-viewer/react';\nimport 'kui-viewer/styles.css';\n\nfunction SelectionPanel() {\n  const { selected } = useSelection();\n  return (\n    <aside className=\"p-3 text-sm\">\n      Selected: {selected?.expressID ?? '—'}\n    </aside>\n  );\n}\n\nexport function BimWorkspace() {\n  return (\n    <ViewerProvider>\n      <div className=\"grid grid-cols-[1fr_320px] h-[600px]\">\n        <KUIViewer modelUrl=\"/models/site.ifc\" className=\"w-full h-full\" />\n        <SelectionPanel />\n      </div>\n    </ViewerProvider>\n  );\n}"
+        }
+      ],
+      "status": "beta",
+      "since": "2026-05",
+      "whenToUse": "When you need to render IFC/BIM models in the browser — viewing, navigating and inspecting AEC scenes — and want a framework-agnostic core with an optional React wrapper.",
+      "whenNotToUse": "For lightweight, non-BIM 3D scenes — prefer a thinner Three.js wrapper or react-three-fiber. KUIViewer pulls in web-ifc WASM and @thatopen/fragments and is sized for AEC workloads.",
+      "designTokens": [],
+      "dependencies": [
+        "kui-viewer",
+        "three",
+        "web-ifc",
+        "@thatopen/fragments",
+        "zustand"
+      ],
+      "external": {
+        "packageName": "kui-viewer",
+        "version": "0.0.1",
+        "homepage": "https://github.com/kuraykaraaslan/kui-viewer#readme",
+        "npm": "https://www.npmjs.com/package/kui-viewer",
+        "github": "https://github.com/kuraykaraaslan/kui-viewer"
+      }
     }
   ],
   "themes": [

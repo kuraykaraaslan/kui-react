@@ -29,6 +29,7 @@ import { buildAppCalendarData } from './sections/app-calendar.showcase';
 import { buildAppGanttData } from './sections/app-gantt.showcase';
 import { buildAppFormBuilderData } from './sections/app-form-builder.showcase';
 import { buildMoleculeDiffViewerData } from './sections/ui-molecule-diff-viewer.showcase';
+import { buildLibKuiViewerData } from './sections/lib-kui-viewer.showcase';
 
 export function buildShowcaseData() {
   return [
@@ -61,5 +62,6 @@ export function buildShowcaseData() {
     ...buildIoTDomainData(),
     ...buildNftDomainData(),
     ...buildReviewsDomainData(),
+    ...buildLibKuiViewerData(),
   ];
 }
