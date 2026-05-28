@@ -7,7 +7,7 @@
 - **status:** beta
 - **since:** 2026-05
 
-Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create) and in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions). Resource/multi-calendar overlay, agenda + mini, and full a11y/i18n/perf polish land in M4-M6.
+Month / week / day / resource calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create), in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions), and multi-calendar overlay with per-calendar visibility legend. ResourceView shows one column per resource with O(n²) conflict highlighting. Agenda + mini and full a11y/i18n/perf polish land in M5-M6.
 
 ## Accessibility
 
@@ -129,6 +129,56 @@ const events: Event[] = [
   onEventDelete={(id) =>
     setEvents((prev) => prev.filter((e) => e.id !== id))
   }
+/>
+```
+
+### Resource view — rooms with conflict highlight
+
+```tsx
+const resources = [
+  { id: 'room-a', name: 'Studio A',  color: 'primary' },
+  { id: 'room-b', name: 'Studio B',  color: 'success' },
+  { id: 'room-c', name: 'Boardroom', color: 'warning' },
+];
+const events = [
+  { id: 'r1', title: 'Sprint planning',
+    start: new Date(2026, 4, 13,  9, 0), end: new Date(2026, 4, 13, 11, 0),
+    resourceId: 'room-a' },
+  { id: 'r2', title: 'Design crit',  // overlaps r1 → ring-error
+    start: new Date(2026, 4, 13, 10, 30), end: new Date(2026, 4, 13, 12, 0),
+    resourceId: 'room-a' },
+  // …
+];
+
+<Calendar
+  events={events}
+  view="resource"
+  defaultDate={new Date(2026, 4, 13)}
+  resources={resources}
+  slotMinutes={15}
+  workingHours={{ start: 9, end: 18, days: [1, 2, 3, 4, 5] }}
+/>
+```
+
+### Multi-calendar overlay — toggle visibility
+
+```tsx
+const calendars = [
+  { id: 'work',     name: 'Work',     color: 'primary' },
+  { id: 'personal', name: 'Personal', color: 'success' },
+  { id: 'family',   name: 'Family',   color: 'warning' },
+];
+const events = [
+  { id: 'm1', title: 'Design sync',     start: ..., end: ..., calendarId: 'work' },
+  { id: 'm2', title: 'Yoga',            start: ..., end: ..., calendarId: 'personal' },
+  { id: 'm3', title: 'Dinner — parents', start: ..., end: ..., calendarId: 'family' },
+];
+
+<Calendar
+  events={events}
+  view="week"
+  calendars={calendars}
+  onCalendarToggle={(id, visible) => console.log(id, visible)}
 />
 ```
 

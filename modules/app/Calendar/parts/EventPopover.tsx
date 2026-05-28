@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { cn } from '@/libs/utils/cn';
 import type { CalendarMessages, CalendarTelemetry, Event } from '../types';
-import { EVENT_COLOR_CLASSES, resolveColor } from '../colors';
+import { effectiveColor, EVENT_COLOR_CLASSES } from '../colors';
 import { fmtTimeRange } from '../date-utils';
 import { useCalStore } from '../store';
 
@@ -48,8 +48,13 @@ export function EventPopover({
 }: EventPopoverProps) {
   const popover = useCalStore((s) => s.popover);
   const closePopover = useCalStore((s) => s.closePopover);
+  const calendars = useCalStore((s) => s.calendars);
   const event = popover.event;
   const anchorRect = popover.anchorRect;
+  const calendarName =
+    event && event.calendarId
+      ? (calendars.find((c) => c.id === event.calendarId)?.name ?? null)
+      : null;
 
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<Placement | null>(null);
@@ -92,7 +97,7 @@ export function EventPopover({
 
   if (!event || typeof document === 'undefined') return null;
 
-  const color = resolveColor(event.color);
+  const color = effectiveColor(event, calendars);
   const dot = EVENT_COLOR_CLASSES[color].dot;
   const timeLabel = event.allDay ? messages.allDay : fmtTimeRange(event.start, event.end);
 
@@ -141,6 +146,9 @@ export function EventPopover({
             {event.title}
           </h3>
           <p className="text-xs text-text-secondary tabular-nums">{timeLabel}</p>
+          {calendarName && (
+            <p className="text-[11px] text-text-disabled truncate mt-0.5">{calendarName}</p>
+          )}
         </div>
         <button
           type="button"

@@ -4,6 +4,7 @@ import { cn } from '@/libs/utils/cn';
 import type { CalendarProps, View } from './types';
 import { HeaderBar } from './parts/HeaderBar';
 import { EventPopover } from './parts/EventPopover';
+import { CalendarLegend } from './parts/CalendarLegend';
 import { MonthView } from './views/MonthView';
 import { WeekView } from './views/WeekView';
 import { DayView } from './views/DayView';
@@ -12,8 +13,7 @@ import { ResourceView } from './views/ResourceView';
 import {
   addDays,
   addMonths,
-  endOfWeek,
-  startOfWeek,
+  periodLabel,
   visibleWindow,
 } from './date-utils';
 import { mergeMessages, resolveLocale } from './locale';
@@ -32,6 +32,7 @@ export type {
   EventOccurrence,
   View,
   Resource,
+  CalendarSource,
   EventColor,
   CalendarMessages,
   WorkingHours,
@@ -74,13 +75,23 @@ function CalendarInner({
   messages: messageOverrides,
   workingHours,
   slotMinutes = 30,
+  resources,
+  calendars,
+  onCalendarToggle,
+  hideCalendarLegend,
   onTelemetry,
   className,
-  // resources, calendars, recurrence, timezone, reducedMotion → M3–M6
 }: CalendarProps) {
   const date = useCalStore((s) => s.date);
   const setStoreDate = useCalStore((s) => s.setDate);
   const openPopover = useCalStore((s) => s.openPopover);
+  const setCalendars = useCalStore((s) => s.setCalendars);
+  const hiddenCalendarIds = useCalStore((s) => s.hiddenCalendarIds);
+
+  // Push `calendars` prop into the store so descendants resolve effective colour.
+  useEffect(() => {
+    setCalendars(calendars ?? []);
+  }, [calendars, setCalendars]);
 
   const localeBundle = useMemo(() => resolveLocale(locale), [locale]);
   const messages = useMemo(
@@ -95,26 +106,25 @@ function CalendarInner({
     () => visibleWindow(view, date, localeBundle.weekStart),
     [view, date, localeBundle.weekStart],
   );
-  const visibleEvents = useRecurrence(events, windowStart, windowEnd);
+  const expanded = useRecurrence(events, windowStart, windowEnd);
+  // Filter out events from hidden calendars.
+  const visibleEvents = useMemo(() => {
+    if (!hiddenCalendarIds.size) return expanded;
+    return expanded.filter((e) => !e.calendarId || !hiddenCalendarIds.has(e.calendarId));
+  }, [expanded, hiddenCalendarIds]);
 
-  // Period label, e.g. "May 2026" / "Mayıs 2026" / "5 — 11 Mayıs 2026" / "5 Mayıs 2026"
-  const periodLabel = useMemo(() => {
-    const d = date;
-    const monthName = localeBundle.monthNames[d.getMonth()];
-    if (view === 'month' || view === 'agenda' || view === 'resource') {
-      return `${monthName} ${d.getFullYear()}`;
-    }
-    if (view === 'week') {
-      const s = startOfWeek(d, localeBundle.weekStart);
-      const e = endOfWeek(d, localeBundle.weekStart);
-      const sameMonth = s.getMonth() === e.getMonth();
-      if (sameMonth) {
-        return `${s.getDate()} – ${e.getDate()} ${localeBundle.monthNames[s.getMonth()]} ${s.getFullYear()}`;
-      }
-      return `${s.getDate()} ${localeBundle.monthNames[s.getMonth()]} – ${e.getDate()} ${localeBundle.monthNames[e.getMonth()]} ${e.getFullYear()}`;
-    }
-    return `${d.getDate()} ${monthName} ${d.getFullYear()}`;
-  }, [view, date, localeBundle]);
+  const handleCalendarToggle = useCallback(
+    (calendarId: string, visible: boolean) => {
+      onCalendarToggle?.(calendarId, visible);
+      onTelemetry?.({ type: 'calendar-toggle', calendarId, visible });
+    },
+    [onCalendarToggle, onTelemetry],
+  );
+
+  const label = useMemo(
+    () => periodLabel(view, date, localeBundle.monthNames, localeBundle.weekStart),
+    [view, date, localeBundle.monthNames, localeBundle.weekStart],
+  );
 
   const setDate = useCallback(
     (next: Date, direction: 'prev' | 'next' | 'today') => {
@@ -180,7 +190,7 @@ function CalendarInner({
       aria-label="Calendar"
     >
       <HeaderBar
-        label={periodLabel}
+        label={label}
         view={view}
         onViewChange={handleViewChange}
         onPrev={goPrev}
@@ -188,6 +198,10 @@ function CalendarInner({
         onToday={goToday}
         messages={messages}
       />
+
+      {!hideCalendarLegend && calendars && calendars.length > 0 && (
+        <CalendarLegend messages={messages} onToggle={handleCalendarToggle} />
+      )}
 
       {view === 'month' && (
         <MonthView
@@ -227,7 +241,19 @@ function CalendarInner({
         />
       )}
       {view === 'agenda' && <AgendaView />}
-      {view === 'resource' && <ResourceView />}
+      {view === 'resource' && (
+        <ResourceView
+          date={date}
+          events={visibleEvents}
+          resources={resources ?? []}
+          locale={{ ...localeBundle, messages }}
+          today={today}
+          workingHours={workingHours}
+          slotMinutes={slotMinutes}
+          onEventClick={handleEventClick}
+          onTelemetry={onTelemetry}
+        />
+      )}
 
       <EventPopover
         messages={messages}

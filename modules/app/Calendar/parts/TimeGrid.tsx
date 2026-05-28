@@ -1,7 +1,7 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
 import type { CalendarTelemetry, Event, WorkingHours } from '../types';
-import { EVENT_COLOR_CLASSES, resolveColor } from '../colors';
+import { effectiveColor, EVENT_COLOR_CLASSES } from '../colors';
 import {
   fmtTime,
   HOUR_HEIGHT,
@@ -52,6 +52,7 @@ export function TimeGrid({
   const totalHeight = 24 * HOUR_HEIGHT;
 
   const drag = useCalStore((s) => s.drag);
+  const calendars = useCalStore((s) => s.calendars);
   const moveDownFor = useDragMove({ days, slotMinutes, onEventUpdate, onTelemetry });
   const resizeDownFor = useResize({ slotMinutes, onEventUpdate, onTelemetry });
   const createDownFor = useDragCreate({ days, slotMinutes, onEventCreate, onTelemetry });
@@ -140,7 +141,7 @@ export function TimeGrid({
 
                   const top = eventTop(liveStart);
                   const height = eventHeight(liveStart, liveEnd);
-                  const color = resolveColor(e.color);
+                  const color = effectiveColor(e, calendars);
                   const styles = EVENT_COLOR_CLASSES[color];
                   return (
                     <button

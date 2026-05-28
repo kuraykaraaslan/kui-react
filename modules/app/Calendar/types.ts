@@ -51,7 +51,8 @@ export type Event = {
   rrule?: string;
   /** Dates to skip when expanding `rrule` (matched on day boundary). */
   exceptions?: Date[];
-  // TODO M4: resourceId?: string;       (resource column the event belongs to)
+  /** Resource (room / person / lane) the event belongs to. Used by ResourceView. */
+  resourceId?: string;
 };
 
 /**
@@ -91,6 +92,10 @@ export type CalendarMessages = {
   delete: string;
   confirmDelete: string;
   close: string;
+  /** Legend section title (M4). */
+  calendars: string;
+  /** Empty-state for ResourceView when `resources` is empty (M4). */
+  noResources: string;
 };
 
 /** Working-hours config (visual shading hint only in M1). */
@@ -123,7 +128,15 @@ export type CalendarTelemetry =
   | { type: 'event-click'; eventId: string }
   | { type: 'event-create'; start: Date; end: Date }
   | { type: 'event-update'; eventId: string }
-  | { type: 'event-delete'; eventId: string };
+  | { type: 'event-delete'; eventId: string }
+  | { type: 'calendar-toggle'; calendarId: string; visible: boolean };
+
+/** A named calendar — a logical grouping of events with a shared color. */
+export type CalendarSource = {
+  id: string;
+  name: string;
+  color: EventColor;
+};
 
 export type CalendarProps = {
   /** Events to render. Caller is responsible for fetching & memoising. */
@@ -145,10 +158,18 @@ export type CalendarProps = {
   /** Fired from the popover's delete-confirm. */
   onEventDelete?: (id: string) => void | Promise<void>;
 
-  /** Resources column list — used by ResourceView in M4. */
+  /** Resources column list — used by ResourceView. */
   resources?: Resource[];
-  /** Multi-calendar overlay — wired up in M4. */
-  calendars?: { id: string; name: string; color: EventColor }[];
+  /**
+   * Multi-calendar overlay. Each calendar contributes a color + visibility
+   * toggle (via the legend); events with a matching `calendarId` inherit the
+   * calendar's color when they don't carry their own.
+   */
+  calendars?: CalendarSource[];
+  /** Fired when the user toggles a calendar's visibility in the legend. */
+  onCalendarToggle?: (calendarId: string, visible: boolean) => void;
+  /** Hide the legend even when `calendars` is provided. */
+  hideCalendarLegend?: boolean;
   /** Lazy RRULE expansion toggle. Defaults to false until M3 lands. */
   recurrence?: boolean;
   /** Locale code — currently "tr" or "en". Default "tr". */

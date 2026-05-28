@@ -105,6 +105,31 @@ export function minutesIntoDay(d: Date): number {
 }
 
 /**
+ * Human-readable label for the header bar — "May 2026" / "5 – 11 May 2026" /
+ * "13 May 2026" depending on view.
+ */
+export function periodLabel(
+  view: 'month' | 'week' | 'day' | 'agenda' | 'resource',
+  date: Date,
+  monthNames: string[],
+  weekStart: 0 | 1,
+): string {
+  const monthName = monthNames[date.getMonth()];
+  if (view === 'month' || view === 'agenda' || view === 'resource') {
+    return `${monthName} ${date.getFullYear()}`;
+  }
+  if (view === 'week') {
+    const s = startOfWeek(date, weekStart);
+    const e = endOfWeek(date, weekStart);
+    if (s.getMonth() === e.getMonth()) {
+      return `${s.getDate()} – ${e.getDate()} ${monthNames[s.getMonth()]} ${s.getFullYear()}`;
+    }
+    return `${s.getDate()} ${monthNames[s.getMonth()]} – ${e.getDate()} ${monthNames[e.getMonth()]} ${e.getFullYear()}`;
+  }
+  return `${date.getDate()} ${monthName} ${date.getFullYear()}`;
+}
+
+/**
  * Visible date window for the current view + anchor date. Drives
  * recurrence expansion in `useRecurrence`.
  */

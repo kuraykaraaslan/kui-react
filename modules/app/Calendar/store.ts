@@ -10,7 +10,13 @@
 
 import { createContext, createElement, useContext } from 'react';
 import { create, type StoreApi, type UseBoundStore } from 'zustand';
-import type { CalendarDragState, CalendarPopoverState, Event, View } from './types';
+import type {
+  CalendarDragState,
+  CalendarPopoverState,
+  CalendarSource,
+  Event,
+  View,
+} from './types';
 
 export type CalendarState = {
   // Navigation
@@ -22,6 +28,11 @@ export type CalendarState = {
 
   // Drag / resize / create preview (single source of truth for the ghost)
   drag: CalendarDragState;
+
+  // Multi-calendar overlay — sources are pushed by index.tsx on prop change so
+  // sub-components can resolve event colours via the store (M4).
+  calendars: CalendarSource[];
+  hiddenCalendarIds: Set<string>;
 };
 
 export type CalendarActions = {
@@ -32,6 +43,9 @@ export type CalendarActions = {
   closePopover: () => void;
 
   setDrag: (d: CalendarDragState) => void;
+
+  setCalendars: (cals: CalendarSource[]) => void;
+  toggleCalendar: (id: string) => void;
 };
 
 export type CalendarStore = CalendarState & CalendarActions;
@@ -45,6 +59,8 @@ export function createCalendarStore(initial: { date: Date; view: View }) {
     view: initial.view,
     popover: EMPTY_POPOVER,
     drag: IDLE_DRAG,
+    calendars: [],
+    hiddenCalendarIds: new Set<string>(),
 
     setDate: (d) => set({ date: d }),
     setView: (v) => set({ view: v }),
@@ -53,6 +69,15 @@ export function createCalendarStore(initial: { date: Date; view: View }) {
     closePopover: () => set({ popover: EMPTY_POPOVER }),
 
     setDrag: (d) => set({ drag: d }),
+
+    setCalendars: (cals) => set({ calendars: cals }),
+    toggleCalendar: (id) =>
+      set((s) => {
+        const next = new Set(s.hiddenCalendarIds);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return { hiddenCalendarIds: next };
+      }),
   }));
 }
 

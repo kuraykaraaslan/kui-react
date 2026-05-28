@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Calendar } from '@/modules/app/Calendar';
-import type { Event, View } from '@/modules/app/Calendar';
+import type { CalendarSource, Event, Resource, View } from '@/modules/app/Calendar';
 import {
   faVideo,
   faMugHot,
@@ -230,6 +230,87 @@ function CalendarInteractiveDemo() {
   );
 }
 
+const RESOURCE_ANCHOR = new Date(2026, 4, 13);
+const RESOURCES: Resource[] = [
+  { id: 'room-a', name: 'Studio A', color: 'primary' },
+  { id: 'room-b', name: 'Studio B', color: 'success' },
+  { id: 'room-c', name: 'Boardroom', color: 'warning' },
+];
+
+function CalendarResourceDemo() {
+  const events: Event[] = [
+    { id: 'r1', title: 'Sprint planning',
+      start: new Date(2026, 4, 13, 9, 0), end: new Date(2026, 4, 13, 11, 0),
+      resourceId: 'room-a', color: 'primary' },
+    { id: 'r2', title: 'Design crit',
+      start: new Date(2026, 4, 13, 10, 30), end: new Date(2026, 4, 13, 12, 0),
+      resourceId: 'room-a', color: 'primary' }, // conflicts with r1 → ring-error
+    { id: 'r3', title: 'Client demo',
+      start: new Date(2026, 4, 13, 13, 0), end: new Date(2026, 4, 13, 14, 0),
+      resourceId: 'room-b', color: 'success', icon: faVideo },
+    { id: 'r4', title: 'Budget review',
+      start: new Date(2026, 4, 13, 15, 0), end: new Date(2026, 4, 13, 16, 30),
+      resourceId: 'room-c', color: 'warning' },
+    { id: 'r5', title: 'Coffee chat',
+      start: new Date(2026, 4, 13, 9, 30), end: new Date(2026, 4, 13, 10, 0),
+      resourceId: 'room-b', icon: faMugHot, color: 'success' },
+  ];
+  return (
+    <div className="w-full">
+      <Calendar
+        events={events}
+        view="resource"
+        defaultDate={RESOURCE_ANCHOR}
+        resources={RESOURCES}
+        locale="en"
+        slotMinutes={15}
+        workingHours={{ start: 9, end: 18, days: [1, 2, 3, 4, 5] }}
+      />
+    </div>
+  );
+}
+
+const CALENDARS: CalendarSource[] = [
+  { id: 'work',     name: 'Work',     color: 'primary' },
+  { id: 'personal', name: 'Personal', color: 'success' },
+  { id: 'family',   name: 'Family',   color: 'warning' },
+];
+
+function CalendarMultiSourceDemo() {
+  const [view, setView] = useState<View>('week');
+  const events: Event[] = [
+    { id: 'm1', title: 'Design sync',
+      start: new Date(2026, 4, 11, 10, 0), end: new Date(2026, 4, 11, 11, 0),
+      calendarId: 'work', icon: faVideo },
+    { id: 'm2', title: 'Standup',
+      start: new Date(2026, 4, 12, 9, 30), end: new Date(2026, 4, 12, 10, 0),
+      calendarId: 'work' },
+    { id: 'm3', title: 'Yoga',
+      start: new Date(2026, 4, 12, 18, 30), end: new Date(2026, 4, 12, 19, 30),
+      calendarId: 'personal' },
+    { id: 'm4', title: 'Dinner — parents',
+      start: new Date(2026, 4, 14, 19, 0), end: new Date(2026, 4, 14, 21, 0),
+      calendarId: 'family', icon: faMugHot },
+    { id: 'm5', title: 'Doctor',
+      start: new Date(2026, 4, 13, 14, 0), end: new Date(2026, 4, 13, 15, 0),
+      calendarId: 'personal' },
+  ];
+  return (
+    <div className="w-full">
+      <Calendar
+        events={events}
+        view={view}
+        defaultDate={DEMO_ANCHOR}
+        onViewChange={setView}
+        calendars={CALENDARS}
+        locale="en"
+        slotMinutes={30}
+        workingHours={{ start: 9, end: 18, days: [1, 2, 3, 4, 5] }}
+      />
+    </div>
+  );
+}
+
 export function buildAppCalendarData(): ShowcaseComponent[] {
   return [
     {
@@ -238,7 +319,7 @@ export function buildAppCalendarData(): ShowcaseComponent[] {
       category: 'App',
       abbr: 'Cl',
       description:
-        'Month / week / day calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create) and in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions). Resource/multi-calendar overlay, agenda + mini, and full a11y/i18n/perf polish land in M4-M6.',
+        'Month / week / day / resource calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create), in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions), and multi-calendar overlay with per-calendar visibility legend. ResourceView shows one column per resource with O(n²) conflict highlighting. Agenda + mini and full a11y/i18n/perf polish land in M5-M6.',
       filePath: 'modules/app/Calendar/index.tsx',
       since: '2026-05',
       status: 'beta',
@@ -389,6 +470,56 @@ const events: Event[] = [
   onEventDelete={(id) =>
     setEvents((prev) => prev.filter((e) => e.id !== id))
   }
+/>`,
+        },
+        {
+          title: 'Resource view — rooms with conflict highlight',
+          layout: 'stack',
+          preview: <CalendarResourceDemo />,
+          code: `const resources = [
+  { id: 'room-a', name: 'Studio A',  color: 'primary' },
+  { id: 'room-b', name: 'Studio B',  color: 'success' },
+  { id: 'room-c', name: 'Boardroom', color: 'warning' },
+];
+const events = [
+  { id: 'r1', title: 'Sprint planning',
+    start: new Date(2026, 4, 13,  9, 0), end: new Date(2026, 4, 13, 11, 0),
+    resourceId: 'room-a' },
+  { id: 'r2', title: 'Design crit',  // overlaps r1 → ring-error
+    start: new Date(2026, 4, 13, 10, 30), end: new Date(2026, 4, 13, 12, 0),
+    resourceId: 'room-a' },
+  // …
+];
+
+<Calendar
+  events={events}
+  view="resource"
+  defaultDate={new Date(2026, 4, 13)}
+  resources={resources}
+  slotMinutes={15}
+  workingHours={{ start: 9, end: 18, days: [1, 2, 3, 4, 5] }}
+/>`,
+        },
+        {
+          title: 'Multi-calendar overlay — toggle visibility',
+          layout: 'stack',
+          preview: <CalendarMultiSourceDemo />,
+          code: `const calendars = [
+  { id: 'work',     name: 'Work',     color: 'primary' },
+  { id: 'personal', name: 'Personal', color: 'success' },
+  { id: 'family',   name: 'Family',   color: 'warning' },
+];
+const events = [
+  { id: 'm1', title: 'Design sync',     start: ..., end: ..., calendarId: 'work' },
+  { id: 'm2', title: 'Yoga',            start: ..., end: ..., calendarId: 'personal' },
+  { id: 'm3', title: 'Dinner — parents', start: ..., end: ..., calendarId: 'family' },
+];
+
+<Calendar
+  events={events}
+  view="week"
+  calendars={calendars}
+  onCalendarToggle={(id, visible) => console.log(id, visible)}
 />`,
         },
       ],

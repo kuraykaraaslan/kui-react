@@ -17,6 +17,8 @@ export const TR_MESSAGES: CalendarMessages = {
   delete: 'Sil',
   confirmDelete: 'Silinsin mi?',
   close: 'Kapat',
+  calendars: 'Takvimler',
+  noResources: 'Kaynak tanımlı değil',
 };
 
 /** Monday-start (TR default). */

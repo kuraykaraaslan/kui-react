@@ -7,7 +7,7 @@ Single source of truth for the milestone plan of `modules/app/Calendar`. Every m
 | M1 | Month / Week / Day views, view switcher, nav, locales, working-hours, all-day bars | **Done** |
 | M2 | Interactions — popover, drag-move, resize, drag-create, CRUD callbacks | **Done** |
 | M3 | RRULE recurrence — in-house FREQ/INTERVAL/COUNT/UNTIL/BYDAY expander | **Done** |
-| M4 | `ResourceView` + multi-calendar overlay | Stub |
+| M4 | `ResourceView` + multi-calendar overlay + visibility legend | **Done** |
 | M5 | `AgendaView` (search + filters) + `MiniCalendar` sidebar | Stub |
 | M6 | Full a11y / i18n / perf polish + IANA timezone | Stub |
 
@@ -142,10 +142,55 @@ Each materialised occurrence has `id = "${parent.id}::${occurrence.toISOString()
 - `expandRRule` is bounded by `COUNT`, `UNTIL`, the visible window, and a hard cap (1000 occurrences). A "forever" `FREQ=DAILY` over one month emits ≤ 31 dates.
 - No async, no dynamic import, no Suspense fence — recurrence renders synchronously on first paint.
 
-## M4 — Resources + multi-calendar overlay (deferred)
+## M4 — Resources + multi-calendar overlay
 
-- `ResourceView` — one column per `Resource` in the time grid; conflict detection.
-- `calendars[]` prop — overlay with per-calendar color + visibility toggles.
+### Outcome
+
+`view="resource"` now renders a single-day grid with one column per `Resource`. Events with a matching `resourceId` land in the right column; unassigned events fall into a leading "—" lane (only shown when there are any). Overlapping events on the same resource get a `ring-error` outline — pure O(n²) per-lane, plenty fast at typical resource counts.
+
+The `calendars[]` prop is now functional. Each calendar contributes a color + a chip in the **Calendar Legend** strip below the header. Clicking a chip toggles `hiddenCalendarIds` in the store, filtering events out of every view. Events without a `color` of their own inherit the calendar color via `effectiveColor()`.
+
+### Files
+
+| File | Change |
+|---|---|
+| `types.ts` | `Event.resourceId?` + `CalendarSource` exported; new `calendars`, `onCalendarToggle`, `hideCalendarLegend` props; `CalendarMessages` gains `calendars` + `noResources`; new telemetry variant `calendar-toggle` |
+| `store.ts` | Track `calendars: CalendarSource[]` + `hiddenCalendarIds: Set<string>`; actions `setCalendars`, `toggleCalendar` |
+| `colors.ts` | `effectiveColor(event, calendars)` — `event.color → calendar.color → 'primary'` |
+| `parts/EventCard.tsx`, `parts/TimeGrid.tsx`, `parts/EventPopover.tsx` | Use `effectiveColor` from the store |
+| `parts/EventPopover.tsx` | Show the calendar name as a third metadata line |
+| `parts/CalendarLegend.tsx` | **NEW** — chip-style visibility switches (role="switch") |
+| `views/ResourceView.tsx` | Full impl — resource lanes, conflict highlighting |
+| `index.tsx` | Push `calendars` into the store on prop change; filter expanded events by hidden ids; mount `CalendarLegend` when `calendars.length > 0 && !hideCalendarLegend` |
+| `locale/tr.ts` + `locale/en.ts` | New `calendars` + `noResources` strings |
+| `modules/showcase/data/sections/app-calendar.showcase.tsx` | Add `Resource view — rooms with conflict highlight` + `Multi-calendar overlay — toggle visibility` variants |
+| `public/components/calendar.md` + `public/registry/components.json` | Regenerated |
+
+### API additions
+
+```ts
+type CalendarSource = { id: string; name: string; color: EventColor };
+
+type CalendarProps = {
+  // ...existing...
+  resources?: Resource[];              // → ResourceView lanes
+  calendars?: CalendarSource[];        // → legend + colour inheritance
+  onCalendarToggle?: (id: string, visible: boolean) => void;
+  hideCalendarLegend?: boolean;
+};
+
+type Event = {
+  // ...existing...
+  resourceId?: string;
+  calendarId?: string; // already existed; now wired up
+};
+```
+
+### Tradeoffs
+
+- ResourceView is single-day on purpose. Multi-day-resource grids are a real product need but quadruple the layout complexity; deferred to M5+.
+- Conflict detection is O(n²) per resource per day. At >100 events / resource / day the cost would matter — the typical scheduling UI is well under that.
+- Hidden-calendar filtering happens at the orchestrator level, so every downstream view (Month / Week / Day / Resource) gets it for free.
 
 ## M5 — Agenda + Mini calendar (deferred)
 

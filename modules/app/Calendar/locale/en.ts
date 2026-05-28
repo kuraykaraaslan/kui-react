@@ -17,6 +17,8 @@ export const EN_MESSAGES: CalendarMessages = {
   delete: 'Delete',
   confirmDelete: 'Confirm delete?',
   close: 'Close',
+  calendars: 'Calendars',
+  noResources: 'No resources defined',
 };
 
 /** Sunday-start (US default). */

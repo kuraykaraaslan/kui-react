@@ -62,3 +62,19 @@ export const EVENT_COLOR_CLASSES: Record<EventColor, {
 export function resolveColor(c?: EventColor): EventColor {
   return c ?? 'primary';
 }
+
+/**
+ * The colour to render an event in, after multi-calendar resolution:
+ *   event.color  →  matching calendar.color  →  'primary'
+ */
+export function effectiveColor(
+  event: { color?: EventColor; calendarId?: string },
+  calendars?: { id: string; color: EventColor }[],
+): EventColor {
+  if (event.color) return event.color;
+  if (event.calendarId && calendars) {
+    const cal = calendars.find((c) => c.id === event.calendarId);
+    if (cal) return cal.color;
+  }
+  return 'primary';
+}

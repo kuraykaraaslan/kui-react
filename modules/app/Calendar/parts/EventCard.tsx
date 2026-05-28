@@ -2,7 +2,8 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { cn } from '@/libs/utils/cn';
 import type { Event } from '../types';
-import { EVENT_COLOR_CLASSES, resolveColor } from '../colors';
+import { effectiveColor, EVENT_COLOR_CLASSES } from '../colors';
+import { useCalStore } from '../store';
 import { fmtTime } from '../date-utils';
 
 type Variant = 'pill' | 'bar' | 'stack';
@@ -16,7 +17,8 @@ type EventCardProps = {
 };
 
 export function EventCard({ event, variant = 'pill', onClick, className }: EventCardProps) {
-  const color = resolveColor(event.color);
+  const calendars = useCalStore((s) => s.calendars);
+  const color = effectiveColor(event, calendars);
   const styles = EVENT_COLOR_CLASSES[color];
   const time = !event.allDay ? fmtTime(event.start) : null;
 
