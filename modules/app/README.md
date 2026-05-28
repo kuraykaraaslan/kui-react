@@ -4,39 +4,18 @@ App-level patterns (organisms + page shells). Composes `modules/ui/` primitives 
 
 ## Files
 
-```
-AccessibilityKit.tsx
-AppBreadcrumbs.tsx
-AppCommandBar.tsx
-AppDrawer.tsx
-AppFooter.tsx
-AppNav.tsx
-AppShell.tsx
-AppSidebar.tsx
-AppTopBar.tsx
-CommentThread.tsx
-DetailHeader.tsx
-EmptyErrorState.tsx
-FilterBar.tsx
-Form.tsx
-FormField.tsx
-GlobalSearch.tsx
-InlineAlert.tsx
-LoadingState.tsx
-MaintenancePage.tsx
-MentionPicker.tsx
-NavDrawer.tsx
-NotFoundPage.tsx
-NotificationSystem.tsx
-OnboardingWizard.tsx
-SectionCard.tsx
-ShareDialog.tsx
-SplashScreen.tsx
-StepFlow.tsx
-StepShell.tsx
-ThemeSwitcher.tsx
-index.ts
-```
+Canonical list is [index.ts](index.ts). See [/AGENTS.md](../../AGENTS.md#layer-2--modulesapp-app-patterns--organisms) for the grouped reference with descriptions.
+
+Top-level `.tsx` files cover shell, navigation, forms, content, states, notifications, theming, a11y, and collaboration organisms. Larger features that needed splitting per the 250-LoC rule live in their own folders:
+
+- [Calendar/](Calendar/) — multi-view scheduler (see [PLAN.md](Calendar/PLAN.md))
+- [CommandPalette/](CommandPalette/) — ⌘K palette (exposed as `AppCommandBar`)
+- [FileUploadSection/](FileUploadSection/) — drag-drop uploader + parts
+- [FormBuilder/](FormBuilder/) — schema-driven form editor + renderer
+- [Gantt/](Gantt/) — WBS + timeline + dependencies (see [PLAN.MD](Gantt/PLAN.MD))
+- [ImageGallery/](ImageGallery/) — grid + lightbox
+- [KanbanBoard/](KanbanBoard/) — drag-and-drop column board
+- [RichTextEditor/](RichTextEditor/) — Quill-based editor + toolbar + popups
 
 ## Parity
 

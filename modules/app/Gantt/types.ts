@@ -1,5 +1,4 @@
-// Type definitions for the Gantt module (M1 — Timeline + bars).
-// Future milestones (M2–M6) extend these without breaking the M1 surface.
+// Type definitions for the Gantt module. See PLAN.MD for milestone history.
 
 export type TaskId = string;
 
@@ -18,19 +17,19 @@ export type Task = {
   owner?: string;
   /** Parent task id — used to build the WBS tree. */
   parentId?: TaskId;
-  /** Render as a milestone diamond (TODO M4). */
+  /** Render as a milestone diamond instead of a bar. */
   isMilestone?: boolean;
-  /** Render as a summary / group rollup bar (TODO M4). */
+  /** Render as a summary / group rollup row (M4.5 future: bracketed bar shape). */
   isGroup?: boolean;
   /** Collapsed state for group rows (controlled or initial). */
   collapsed?: boolean;
-  /** Mark as critical (TODO M3 — CPM result). */
+  /** Mark as critical (overrides the computed CPM result for this task). */
   critical?: boolean;
   /** Caller-defined opaque payload. */
   data?: unknown;
 };
 
-/** Dependency between two tasks (TODO M2 — render arrows + CPM in M3). */
+/** Dependency between two tasks. */
 export type Dependency = {
   id: string;
   from: TaskId;
@@ -41,14 +40,14 @@ export type Dependency = {
   lag?: number;
 };
 
-/** Planned vs actual ghost (TODO M4). */
+/** Planned vs actual ghost strip rendered beneath the bar. */
 export type Baseline = {
   taskId: TaskId;
   start: Date;
   end: Date;
 };
 
-/** Localised strings (TODO M6). */
+/** Localised strings. */
 export type GanttMessages = {
   today: string;
   scaleDay: string;
@@ -61,7 +60,7 @@ export type GanttMessages = {
   progressColumn: string;
 };
 
-/** Telemetry events (TODO M6). */
+/** Telemetry events emitted via `onTelemetry`. */
 export type GanttTelemetry =
   | { kind: 'scale-change'; scale: TimeUnit }
   | { kind: 'task-toggle'; taskId: TaskId; collapsed: boolean }
@@ -98,31 +97,33 @@ export type DepDrawState = {
 
 export type GanttProps = {
   tasks: Task[];
-  /** TODO M2 stub — accepted but not rendered until dependency milestone. */
+  /** Drawn as arrows on the overlay; consumers can edit via `onDependencyCreate / onDependencyDelete`. */
   dependencies?: Dependency[];
-  /** TODO M4 stub — planned-vs-actual ghosts. */
+  /** Planned-vs-actual ghost strips beneath the affected bars. */
   baselines?: Baseline[];
   /** Current scale level. Defaults to 'week'. */
   scale?: TimeUnit;
-  /** TODO M5 — non-working day indices, 0=Sun … 6=Sat. */
+  /** Working-day indices, 0=Sun … 6=Sat. Drives weekend shading + drag snap. */
   workingDays?: number[];
-  /** TODO M5 — holiday dates excluded from the working calendar. */
+  /** Holiday dates excluded from the working calendar (shading + drag snap). */
   holidays?: Date[];
-  /** TODO M3 — toggle critical-path highlighting. */
+  /** Initial state for the critical-path toggle in the toolbar. */
   criticalPath?: boolean;
-  /** TODO M2 — async task update callback (drag/resize). */
+  /** Async task update callback (drag/resize). */
   onTaskUpdate?: (task: Task) => Promise<void> | void;
-  /** TODO M2 — async dependency creation callback. */
+  /** Async dependency creation callback. */
   onDependencyCreate?: (dep: Dependency) => Promise<void> | void;
-  /** TODO M2 — async dependency deletion callback. */
+  /** Async dependency deletion callback. */
   onDependencyDelete?: (id: string) => Promise<void> | void;
-  /** TODO M5 — export formats. */
+  /** Enabled export formats — populates the toolbar Export menu. */
   exportFormats?: ('png' | 'pdf' | 'csv')[];
-  /** TODO M6 — i18n overrides. */
+  /** i18n string overrides. */
   messages?: Partial<GanttMessages>;
-  /** TODO M6 — respect prefers-reduced-motion. */
+  /** BCP-47 locale for date headers + tooltip (default = browser locale). */
+  locale?: string;
+  /** Force-on reduced motion regardless of `prefers-reduced-motion`. */
   reducedMotion?: boolean;
-  /** TODO M6 — telemetry hook. */
+  /** Telemetry hook — receives drag/toggle/scale-change events. */
   onTelemetry?: (event: GanttTelemetry) => void;
   /** Optional ARIA label for the root grid. */
   ariaLabel?: string;

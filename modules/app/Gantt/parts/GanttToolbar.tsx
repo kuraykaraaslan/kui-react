@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faBolt } from '@fortawesome/free-solid-svg-icons';
 import type { GanttMessages, TimeUnit } from '../types';
 import { useGanttStore } from '../store';
+import { ExportMenu } from './ExportMenu';
+import type { ExportFormat } from '../hooks/useExport';
 
 const SCALES: TimeUnit[] = ['day', 'week', 'month', 'quarter', 'year'];
 
@@ -11,9 +13,17 @@ type GanttToolbarProps = {
   messages: GanttMessages;
   controlledScale?: TimeUnit;
   showCriticalPathToggle?: boolean;
+  exportFormats?: ExportFormat[];
+  onExport?: (format: ExportFormat) => void;
 };
 
-export function GanttToolbar({ messages, controlledScale, showCriticalPathToggle }: GanttToolbarProps) {
+export function GanttToolbar({
+  messages,
+  controlledScale,
+  showCriticalPathToggle,
+  exportFormats,
+  onExport,
+}: GanttToolbarProps) {
   const storeScale = useGanttStore((s) => s.scale);
   const setScale = useGanttStore((s) => s.setScale);
   const criticalPath = useGanttStore((s) => s.criticalPath);
@@ -32,6 +42,9 @@ export function GanttToolbar({ messages, controlledScale, showCriticalPathToggle
         </h2>
       </div>
       <div className="flex items-center gap-2">
+        {exportFormats && exportFormats.length > 0 && onExport && (
+          <ExportMenu formats={exportFormats} onExport={onExport} />
+        )}
         {showCriticalPathToggle && (
           <button
             type="button"
@@ -84,10 +97,6 @@ export function GanttToolbar({ messages, controlledScale, showCriticalPathToggle
         })}
         </div>
       </div>
-      {/*
-        TODO M5: export menu (PNG / PDF / CSV).
-        TODO M6: zoom + / − keyboard hints.
-      */}
     </div>
   );
 }

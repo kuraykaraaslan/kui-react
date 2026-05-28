@@ -66,9 +66,12 @@ export { SplashScreen } from './SplashScreen';
 export { NotificationProvider, notify, toast } from './NotificationSystem';
 export {
   Announcer,
+  AnnouncerOutlet,
+  FocusTrap,
   LiveRegion,
   SkipLink,
   Tooltip,
+  useAnnounce,
 } from './AccessibilityKit';
 
 // Status / chrome

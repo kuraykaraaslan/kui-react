@@ -137,30 +137,100 @@ Stateless or locally-stateful primitive components. No business logic, no extern
 
 ## Layer 2 — `modules/app/` (App Patterns / Organisms)
 
-Full page-section components that combine multiple UI molecules into usable workflows. May manage local state.
+Full page-section components that combine multiple UI molecules into usable workflows. May manage local state. The canonical export list is [modules/app/index.ts](modules/app/index.ts); this table mirrors it.
+
+### Shell + layout
 
 | Component | File | What it does |
 |-----------|------|-------------|
-| AppShell | `AppShell.tsx` | Root layout: sidebar + main content area |
-| GlobalNav | `GlobalNav.tsx` | Collapsible sidebar nav with nested items and badges |
+| AppShell | `AppShell.tsx` | Root layout: sidebar aside + sticky top bar + main content with mobile drawer |
+| AppSidebar | `AppSidebar.tsx` | Collapsible sidebar nav with grouped items, badges, footer slot |
+| AppTopBar | `AppTopBar.tsx` | Flex wrapper for header content (logo + custom children) |
+| AppDrawer | `AppDrawer.tsx` | Slide-in drawer shell used inside `AppShell` mobile mode |
+| AppFooter | `AppFooter.tsx` | Site footer: logo, version badge, status pill, nav, social, copyright |
+| AppBreadcrumbs | `AppBreadcrumbs.tsx` | Breadcrumb trail with overflow collapse |
+| SectionCard | `SectionCard.tsx` | Titled card section wrapper for grouping form/content blocks |
+| ConditionalShell | `ConditionalShell.tsx` | Wraps children with `ShowcaseShell` except for paths under `/internal/` |
+
+### Navigation + search
+
+| Component | File | What it does |
+|-----------|------|-------------|
+| AppNav | `AppNav.tsx` | Horizontal nav bar with active-route highlighting |
+| NavDrawer | `NavDrawer.tsx` | Trigger + slide-in drawer composite for off-canvas menus |
 | GlobalSearch | `GlobalSearch.tsx` | Command-palette-style global search with result previews |
-| UserMenu | `UserMenu.tsx` | Avatar + dropdown: user info, settings, sign-out |
-| PageHeader | `PageHeader.tsx` | Page title + subtitle + action buttons (extends ui/PageHeader) |
-| DataListingPage | `DataListingPage.tsx` | Generic `<T>` listing: search + filter + table + empty/loading/error states |
-| DetailHeader | `DetailHeader.tsx` | Breadcrumbs + title + status badge + action buttons for detail views |
-| CreateEditForm | `CreateEditForm.tsx` | Form shell with field layout, validation states, save/cancel |
-| ConfirmDialog | `ConfirmDialog.tsx` | Destructive action confirmation modal |
+| AppCommandBar / CommandPalette | `CommandPalette/` | ⌘K palette: fuzzy command search, grouped results, keyboard-first |
+
+### Overlays + menus
+
+| Component | File | What it does |
+|-----------|------|-------------|
+| ContextMenu | `ContextMenu.tsx` | Right-click / long-press menu with submenus, separators, disabled items |
+
+### Forms + flows
+
+| Component | File | What it does |
+|-----------|------|-------------|
+| Form | `Form.tsx` | Form layout shell: title, description, error banner, 1/2-col grid, actions |
+| FormField | `FormField.tsx` | Render-prop wrapper that wires react-hook-form to accessible label/hint/error markup |
+| FormBuilder | `FormBuilder/` | Schema-driven form editor + renderer with field palette |
 | FilterBar | `FilterBar.tsx` | Multi-field filter UI (text, select, date, checkbox) |
-| FileUploadSection | `FileUploadSection.tsx` | Drag-and-drop zone with file list + progress |
-| NotificationSystem | `NotificationSystem.tsx` | Toast provider + `useNotifications()` hook |
 | StepFlow | `StepFlow.tsx` | Multi-step wizard with visual step indicator |
-| EmptyErrorState | `EmptyErrorState.tsx` | Exports `ErrorState`, `NotFoundState`, `NoAccessState` |
+| StepShell | `StepShell.tsx` | Per-step layout wrapper used inside `StepFlow` |
+| FileUploadSection | `FileUploadSection/` | Drag-and-drop zone with file list + per-file progress + preview parts |
+| RichTextEditor | `RichTextEditor/` | Quill-based editor with toolbar, slash menu, mentions, image insert |
+
+### Content + detail
+
+| Component | File | What it does |
+|-----------|------|-------------|
+| DetailHeader | `DetailHeader.tsx` | Breadcrumbs + title + status badge + action buttons for detail views |
+| ImageGallery | `ImageGallery/` | Thumbnail grid + lightbox with keyboard navigation |
+| InlineAlert | `InlineAlert.tsx` | Inline banner alert (success / error / warning / info) |
+
+### Data viz / planning
+
+| Component | File | What it does |
+|-----------|------|-------------|
+| Calendar | `Calendar/` | Month / week / day / resource / agenda views with drag-create + RRULE recurrence — see `Calendar/PLAN.md` |
+| Gantt | `Gantt/` | WBS tree + timeline bars + dependencies + critical path + export — see `Gantt/PLAN.MD` |
+| KanbanBoard | `KanbanBoard/` | Column-based card board with drag-to-reorder + cross-column moves |
+
+### Theming + a11y
+
+| Component | File | What it does |
+|-----------|------|-------------|
+| ThemeSwitcher | `ThemeSwitcher.tsx` | Light / dark / system theme toggle |
+| AccessibilityKit | `AccessibilityKit.tsx` | Re-exports `SkipLink` / `LiveRegion` / `Announcer` / `Tooltip` and adds `<FocusTrap>` + `useAnnounce()` + `<AnnouncerOutlet />` |
+
+### States (loading / empty / error / 404 / splash)
+
+| Component | File | What it does |
+|-----------|------|-------------|
 | LoadingState | `LoadingState.tsx` | Full-page loading overlay |
-| AccessibilityKit | `AccessibilityKit.tsx` | ARIA helpers, focus trap, announce utilities |
+| EmptyErrorState | `EmptyErrorState.tsx` | Exports `ErrorState`, `NotFoundState`, `NoAccessState` |
+| NotFoundPage | `NotFoundPage.tsx` | Full-page 404 with home / back actions |
+| SplashScreen | `SplashScreen.tsx` | Branded boot splash with optional progress bar |
 | MaintenancePage | `MaintenancePage.tsx` | Full-page maintenance screen with optional ETA countdown and status link |
+
+### Notifications
+
+| Component | File | What it does |
+|-----------|------|-------------|
+| NotificationSystem | `NotificationSystem.tsx` | Toast provider (`NotificationProvider`) + imperative `notify.*` / `toast` helpers |
+
+### Collaboration
+
+| Component | File | What it does |
+|-----------|------|-------------|
 | ShareDialog | `ShareDialog.tsx` | Share modal: copy link + email invite + permission picker + invitee list |
 | CommentThread | `CommentThread.tsx` | Generic, domain-agnostic threaded comment list with reply form, like, and delete |
 | MentionPicker | `MentionPicker.tsx` | `@`-trigger autocomplete picker (headless; keyboard navigation, anchor position) |
+
+### Onboarding
+
+| Component | File | What it does |
+|-----------|------|-------------|
 | OnboardingWizard | `OnboardingWizard.tsx` | Multi-step onboarding flow (dots/bar progress, page/modal mode, skip) |
 
 ---
