@@ -10,6 +10,7 @@ type HoverTooltipProps = {
   anchorRect: DOMRect | null;
   predecessorNames: string[];
   isCritical?: boolean;
+  locale?: string;
 };
 
 /**
@@ -18,7 +19,7 @@ type HoverTooltipProps = {
  * clipping. Position flips below the bar if the bar is near the top of
  * the viewport.
  */
-export function HoverTooltip({ task, anchorRect, predecessorNames, isCritical }: HoverTooltipProps) {
+export function HoverTooltip({ task, anchorRect, predecessorNames, isCritical, locale }: HoverTooltipProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [mounted, setMounted] = useState(false);
   const [pos, setPos] = useState<{ top: number; left: number; placement: 'above' | 'below' }>({
@@ -53,7 +54,7 @@ export function HoverTooltip({ task, anchorRect, predecessorNames, isCritical }:
     Math.round((task.end.getTime() - task.start.getTime()) / MS_PER_DAY),
   );
   const progress = Math.max(0, Math.min(100, task.progress ?? 0));
-  const fmt = (d: Date) => d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  const fmt = (d: Date) => d.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
 
   return createPortal(
     <div

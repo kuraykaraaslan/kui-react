@@ -24,6 +24,34 @@ export function addDays(d: Date, n: number): Date {
   return c;
 }
 
+/**
+ * Move a date forward (or back, if `direction = -1`) to the next working day,
+ * skipping weekends and holidays. Returns the date unchanged when the
+ * working-day set already contains it. Bails after 14 hops to keep callers
+ * safe against caller errors (e.g. empty workingDays).
+ */
+export function snapToWorkingDay(
+  d: Date,
+  workingDays: number[] | undefined,
+  holidays: Date[] | undefined,
+  direction: 1 | -1 = 1,
+): Date {
+  if (!workingDays || workingDays.length === 0) return d;
+  const work = new Set(workingDays);
+  const holidaySet = new Set<number>();
+  for (const h of holidays ?? []) {
+    const h0 = new Date(h);
+    h0.setHours(0, 0, 0, 0);
+    holidaySet.add(h0.getTime());
+  }
+  let cur = startOfDay(d);
+  for (let i = 0; i < 14; i++) {
+    if (work.has(cur.getDay()) && !holidaySet.has(cur.getTime())) return cur;
+    cur = addDays(cur, direction);
+  }
+  return d;
+}
+
 export type TimelineColumn = {
   /** Day-aligned start of this header cell. */
   start: Date;
@@ -31,7 +59,7 @@ export type TimelineColumn = {
   end: Date;
   /** Display label, e.g. "5", "Mar", "2026", "W12". */
   label: string;
-  /** Secondary label (for two-row headers, TODO M3). */
+  /** Secondary label (for two-row headers — M3.5 future). */
   subLabel?: string;
   /** Width in pixels. */
   width: number;
@@ -76,6 +104,17 @@ const MONTH_NAMES_SHORT = [
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
 ];
 
+/** Resolve short month names for the supplied locale (memoised by caller). */
+function monthNamesFor(locale?: string): string[] {
+  if (!locale) return MONTH_NAMES_SHORT;
+  try {
+    const fmt = new Intl.DateTimeFormat(locale, { month: 'short' });
+    return Array.from({ length: 12 }, (_, i) => fmt.format(new Date(2024, i, 1)));
+  } catch {
+    return MONTH_NAMES_SHORT;
+  }
+}
+
 /** ISO week number (Monday-based) — enough for M1 label parity. */
 function isoWeek(d: Date): number {
   const target = new Date(d.valueOf());
@@ -89,18 +128,18 @@ function isoWeek(d: Date): number {
   return 1 + Math.ceil((firstThursday - target.valueOf()) / 604800000);
 }
 
-function buildDayColumns(start: Date, end: Date, ppd: number): TimelineColumn[] {
+function buildDayColumns(start: Date, end: Date, ppd: number, months: string[]): TimelineColumn[] {
   const cols: TimelineColumn[] = [];
   let cur = new Date(start);
   while (cur < end) {
     const next = addDays(cur, 1);
-    cols.push({ start: new Date(cur), end: next, label: String(cur.getDate()), subLabel: MONTH_NAMES_SHORT[cur.getMonth()], width: ppd });
+    cols.push({ start: new Date(cur), end: next, label: String(cur.getDate()), subLabel: months[cur.getMonth()], width: ppd });
     cur = next;
   }
   return cols;
 }
 
-function buildWeekColumns(start: Date, end: Date, ppd: number): TimelineColumn[] {
+function buildWeekColumns(start: Date, end: Date, ppd: number, months: string[]): TimelineColumn[] {
   const cols: TimelineColumn[] = [];
   // Snap to Monday
   let cur = new Date(start);
@@ -113,7 +152,7 @@ function buildWeekColumns(start: Date, end: Date, ppd: number): TimelineColumn[]
       start: new Date(cur),
       end: next,
       label: `W${isoWeek(cur)}`,
-      subLabel: `${MONTH_NAMES_SHORT[cur.getMonth()]} ${cur.getDate()}`,
+      subLabel: `${months[cur.getMonth()]} ${cur.getDate()}`,
       width: days * ppd,
     });
     cur = next;
@@ -121,7 +160,7 @@ function buildWeekColumns(start: Date, end: Date, ppd: number): TimelineColumn[]
   return cols;
 }
 
-function buildMonthColumns(start: Date, end: Date, ppd: number): TimelineColumn[] {
+function buildMonthColumns(start: Date, end: Date, ppd: number, months: string[]): TimelineColumn[] {
   const cols: TimelineColumn[] = [];
   let cur = new Date(start.getFullYear(), start.getMonth(), 1);
   while (cur < end) {
@@ -130,7 +169,7 @@ function buildMonthColumns(start: Date, end: Date, ppd: number): TimelineColumn[
     cols.push({
       start: new Date(cur),
       end: next,
-      label: MONTH_NAMES_SHORT[cur.getMonth()],
+      label: months[cur.getMonth()],
       subLabel: String(cur.getFullYear()),
       width: days * ppd,
     });
@@ -175,16 +214,17 @@ function buildYearColumns(start: Date, end: Date, ppd: number): TimelineColumn[]
   return cols;
 }
 
-export function useTimelineScale(tasks: Task[], scale: TimeUnit): TimelineScale {
+export function useTimelineScale(tasks: Task[], scale: TimeUnit, locale?: string): TimelineScale {
   return useMemo<TimelineScale>(() => {
     const { rangeStart, rangeEnd } = computeRange(tasks);
     const ppd = PIXELS_PER_DAY[scale];
+    const months = monthNamesFor(locale);
 
     let columns: TimelineColumn[];
     switch (scale) {
-      case 'day':     columns = buildDayColumns(rangeStart, rangeEnd, ppd); break;
-      case 'week':    columns = buildWeekColumns(rangeStart, rangeEnd, ppd); break;
-      case 'month':   columns = buildMonthColumns(rangeStart, rangeEnd, ppd); break;
+      case 'day':     columns = buildDayColumns(rangeStart, rangeEnd, ppd, months); break;
+      case 'week':    columns = buildWeekColumns(rangeStart, rangeEnd, ppd, months); break;
+      case 'month':   columns = buildMonthColumns(rangeStart, rangeEnd, ppd, months); break;
       case 'quarter': columns = buildQuarterColumns(rangeStart, rangeEnd, ppd); break;
       case 'year':    columns = buildYearColumns(rangeStart, rangeEnd, ppd); break;
     }
@@ -196,5 +236,5 @@ export function useTimelineScale(tasks: Task[], scale: TimeUnit): TimelineScale 
     const xForDate = (d: Date) => diffDays(baselineStart, d) * ppd;
 
     return { scale, pixelsPerDay: ppd, totalWidth, rangeStart: baselineStart, rangeEnd, columns, xForDate };
-  }, [tasks, scale]);
+  }, [tasks, scale, locale]);
 }

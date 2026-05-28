@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import type { DragMode, Task } from '../types';
 import { useGanttStoreApi } from '../store';
+import { addDays, diffDays, snapToWorkingDay } from './useTimelineScale';
 
 export type UseTaskDragApi = {
   /** Begin a drag on a task bar. Pass the React pointer event from a handle/region. */
@@ -16,6 +17,8 @@ export type UseTaskDragApi = {
 
 export function useTaskDrag(opts: {
   pixelsPerDay: number;
+  workingDays?: number[];
+  holidays?: Date[];
   onTaskUpdate?: (task: Task) => Promise<void> | void;
 }): UseTaskDragApi {
   const storeApi = useGanttStoreApi();
@@ -38,7 +41,17 @@ export function useTaskDrag(opts: {
         const next = Math.max(0, Math.min(100, drag.originProgress + deltaPct));
         storeApi.getState().updateDrag(0, next);
       } else {
-        const deltaDays = Math.round(dx / ppd);
+        const rawDelta = Math.round(dx / ppd);
+        // Working-day snap: nudge the resulting anchor date forward to the next
+        // working day so a drop on a weekend lands on Monday instead.
+        const { workingDays, holidays } = optsRef.current;
+        let deltaDays = rawDelta;
+        if (workingDays && workingDays.length > 0) {
+          const anchor = drag.mode === 'resize-end' ? drag.originEnd : drag.originStart;
+          const tentative = addDays(anchor, rawDelta);
+          const snapped = snapToWorkingDay(tentative, workingDays, holidays, rawDelta >= 0 ? 1 : -1);
+          deltaDays = diffDays(anchor, snapped);
+        }
         storeApi.getState().updateDrag(deltaDays, null);
       }
     }

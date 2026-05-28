@@ -1,6 +1,6 @@
 'use client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faChevronDown, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faChevronDown, faDiamond, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { cn } from '@/libs/utils/cn';
 import type { Task, TaskId, GanttMessages } from '../types';
 import { ROW_HEIGHT, SIDE_PANEL_WIDTH } from '../types';
@@ -17,6 +17,7 @@ type TaskListSideProps = {
   onToggleCollapse: (id: TaskId) => void;
   messages: GanttMessages;
   totalHeight: number;
+  conflictSet?: Set<TaskId>;
 };
 
 /**
@@ -30,6 +31,7 @@ export function TaskListSide({
   onToggleCollapse,
   messages,
   totalHeight,
+  conflictSet,
 }: TaskListSideProps) {
   return (
     <div
@@ -86,11 +88,10 @@ export function TaskListSide({
                 ) : (
                   <span className="inline-block w-5 mr-1" aria-hidden="true" />
                 )}
-                {/* Milestone glyph stub (TODO M4 — diamond marker). */}
                 {task.isMilestone && (
                   <FontAwesomeIcon
-                    icon={faCalendar}
-                    className="w-3 h-3 mr-1.5 text-text-secondary"
+                    icon={faDiamond}
+                    className="w-2.5 h-2.5 mr-1.5 rotate-45 text-primary"
                     aria-hidden="true"
                   />
                 )}
@@ -104,8 +105,25 @@ export function TaskListSide({
                   {task.name}
                 </span>
               </div>
-              <span className="w-24 truncate text-xs text-text-secondary" title={task.owner ?? ''}>
-                {task.owner ?? '—'}
+              <span
+                className={cn(
+                  'w-24 truncate text-xs flex items-center gap-1',
+                  conflictSet?.has(task.id) ? 'text-error' : 'text-text-secondary',
+                )}
+                title={
+                  conflictSet?.has(task.id)
+                    ? `${task.owner ?? ''} — over-allocated (overlapping work)`
+                    : task.owner ?? ''
+                }
+              >
+                {conflictSet?.has(task.id) && (
+                  <FontAwesomeIcon
+                    icon={faTriangleExclamation}
+                    className="w-3 h-3 shrink-0"
+                    aria-hidden="true"
+                  />
+                )}
+                <span className="truncate">{task.owner ?? '—'}</span>
               </span>
               <span className="w-10 text-right text-xs tabular-nums text-text-secondary">
                 {progress}%

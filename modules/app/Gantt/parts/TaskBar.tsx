@@ -11,6 +11,8 @@ type TaskBarProps = {
   rowIndex: number;
   isDepHoverTarget?: boolean;
   isCritical?: boolean;
+  isFocused?: boolean;
+  reducedMotion?: boolean;
   onMoveDown: (e: React.PointerEvent<HTMLElement>, taskId: string, barWidth: number) => void;
   onResizeStartDown: (e: React.PointerEvent<HTMLElement>, taskId: string) => void;
   onResizeEndDown: (e: React.PointerEvent<HTMLElement>, taskId: string) => void;
@@ -27,6 +29,8 @@ export function TaskBar({
   rowIndex,
   isDepHoverTarget,
   isCritical,
+  isFocused,
+  reducedMotion,
   onMoveDown,
   onResizeStartDown,
   onResizeEndDown,
@@ -47,6 +51,7 @@ export function TaskBar({
     <div
       role="gridcell"
       aria-label={`${task.name}: ${task.start.toDateString()} to ${task.end.toDateString()}, ${progress}% complete`}
+      id={`gantt-bar-${task.id}`}
       data-task-id={task.id}
       className={cn(
         'gantt-task-bar group absolute rounded-md overflow-visible',
@@ -55,6 +60,8 @@ export function TaskBar({
           ? 'bg-error-subtle border border-error/60'
           : 'bg-primary-subtle border border-primary/40',
         isDepHoverTarget && 'ring-2 ring-primary',
+        isFocused && 'ring-2 ring-border-focus z-10',
+        !reducedMotion && 'transition-colors',
       )}
       style={{ left, width, top, height: BAR_HEIGHT }}
       onPointerEnter={onHoverEnter ? (e) => onHoverEnter(e, task.id) : undefined}

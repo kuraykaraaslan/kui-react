@@ -31,6 +31,8 @@ export type GanttState = {
   selectedDepId: string | null;
   /** M3 — critical-path highlight toggle. */
   criticalPath: boolean;
+  /** M6 — currently focused row for keyboard navigation. */
+  focusedTaskId: TaskId | null;
 };
 
 export type GanttActions = {
@@ -61,6 +63,7 @@ export type GanttActions = {
   removeDependency: (id: string) => string | null;
   /** Toggle (or set) the critical-path highlight. */
   setCriticalPath: (v: boolean) => void;
+  setFocusedTaskId: (id: TaskId | null) => void;
 };
 
 export type GanttStore = GanttState & GanttActions;
@@ -120,6 +123,7 @@ export function createGanttStore(opts: {
     depDraw: null,
     selectedDepId: null,
     criticalPath: opts.criticalPath ?? false,
+    focusedTaskId: null,
 
     setScale: (s) => {
       set({ scale: s });
@@ -210,6 +214,7 @@ export function createGanttStore(opts: {
 
     selectDep: (id) => set({ selectedDepId: id }),
     setCriticalPath: (v) => set({ criticalPath: v }),
+    setFocusedTaskId: (id) => set({ focusedTaskId: id }),
     removeDependency: (id) => {
       const deps = get().dependencies;
       if (!deps.some((d) => d.id === id)) return null;

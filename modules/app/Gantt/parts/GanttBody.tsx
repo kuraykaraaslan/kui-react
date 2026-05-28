@@ -1,13 +1,15 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/libs/utils/cn';
-import type { Dependency, GanttMessages, Task, TaskId, TimeUnit } from '../types';
+import type { Baseline, Dependency, GanttMessages, Task, TaskId, TimeUnit } from '../types';
 import { ROW_HEIGHT } from '../types';
 import { useTimelineScale } from '../hooks/useTimelineScale';
 import { useScroll } from '../hooks/useScroll';
 import { useTaskDrag } from '../hooks/useTaskDrag';
 import { useDependencyDraw } from '../hooks/useDependencyDraw';
 import { useCriticalPath } from '../hooks/useCriticalPath';
+import { useResourceConflicts } from '../hooks/useResourceConflicts';
+import { useGanttKeyboard } from '../hooks/useGanttKeyboard';
 import { useGanttStore } from '../store';
 import { TaskListSide } from './TaskListSide';
 import { TimelineHeader } from './TimelineHeader';
@@ -15,6 +17,14 @@ import { TaskBar } from './TaskBar';
 import { TodayLine } from './TodayLine';
 import { DependencyLayer } from './DependencyLayer';
 import { HoverTooltip } from './HoverTooltip';
+import { Milestone } from './Milestone';
+import { GroupBar } from './GroupBar';
+import { BaselineGhost } from './BaselineGhost';
+import { NonWorkingDaysLayer } from './NonWorkingDaysLayer';
+
+const VIEWPORT_HEIGHT = 512; // matches max-h-[32rem] below
+const VIRTUALIZE_THRESHOLD = 60; // rows; below this we render everything
+const BUFFER_ROWS = 6;
 
 /** Depth-first flatten of the parent/child tree, skipping collapsed subtrees. */
 function flattenTree(
@@ -44,6 +54,11 @@ function flattenTree(
 type GanttBodyProps = {
   messages: GanttMessages;
   controlledScale?: TimeUnit;
+  baselines?: Baseline[];
+  workingDays?: number[];
+  holidays?: Date[];
+  locale?: string;
+  reducedMotion?: boolean;
   onTaskUpdate?: (task: Task) => Promise<void> | void;
   onDependencyCreate?: (dep: Dependency) => Promise<void> | void;
   onDependencyDelete?: (id: string) => Promise<void> | void;
@@ -52,6 +67,11 @@ type GanttBodyProps = {
 export function GanttBody({
   messages,
   controlledScale,
+  baselines,
+  workingDays,
+  holidays,
+  locale,
+  reducedMotion,
   onTaskUpdate,
   onDependencyCreate,
   onDependencyDelete,
@@ -63,11 +83,18 @@ export function GanttBody({
   const drag         = useGanttStore((s) => s.drag);
   const depDraw      = useGanttStore((s) => s.depDraw);
   const criticalPathOn = useGanttStore((s) => s.criticalPath);
+  const focusedTaskId  = useGanttStore((s) => s.focusedTaskId);
   const toggleCollapse = useGanttStore((s) => s.toggleCollapse);
 
   const effectiveScale = controlledScale ?? storeScale;
-  const timeline = useTimelineScale(workingTasks, effectiveScale);
-  const { sideRef, timelineRef, headerRef, onTimelineScroll, onSideScroll } = useScroll();
+  const timeline = useTimelineScale(workingTasks, effectiveScale, locale);
+  const { sideRef, timelineRef, headerRef, onTimelineScroll: rawOnTimelineScroll, onSideScroll } = useScroll();
+
+  const [scrollTop, setScrollTop] = useState(0);
+  const onTimelineScroll: React.UIEventHandler<HTMLDivElement> = (e) => {
+    rawOnTimelineScroll();
+    setScrollTop((e.currentTarget as HTMLDivElement).scrollTop);
+  };
 
   // Apply in-flight drag preview to the dragged task only.
   const tasksToRender: Task[] = useMemo(() => {
@@ -103,7 +130,31 @@ export function GanttBody({
     return m;
   }, [flatRows]);
 
-  const { onBarPointerDown } = useTaskDrag({ pixelsPerDay: timeline.pixelsPerDay, onTaskUpdate });
+  // Windowing: only render rows that are within the viewport ± buffer when
+  // the list is long enough to justify the bookkeeping.
+  const visible = useMemo(() => {
+    if (flatRows.length <= VIRTUALIZE_THRESHOLD) {
+      return { start: 0, end: flatRows.length };
+    }
+    const first = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - BUFFER_ROWS);
+    const last  = Math.min(
+      flatRows.length,
+      Math.ceil((scrollTop + VIEWPORT_HEIGHT) / ROW_HEIGHT) + BUFFER_ROWS,
+    );
+    return { start: first, end: last };
+  }, [flatRows.length, scrollTop]);
+
+  const visibleRows = useMemo(
+    () => flatRows.slice(visible.start, visible.end).map((row, j) => ({ row, idx: visible.start + j })),
+    [flatRows, visible.start, visible.end],
+  );
+
+  const { onBarPointerDown } = useTaskDrag({
+    pixelsPerDay: timeline.pixelsPerDay,
+    workingDays,
+    holidays,
+    onTaskUpdate,
+  });
   const { beginFromTask }    = useDependencyDraw({ bodyRef: timelineRef, onDependencyCreate, onDependencyDelete });
 
   const criticalSet = useCriticalPath({
@@ -111,6 +162,21 @@ export function GanttBody({
     dependencies,
     enabled: criticalPathOn,
   });
+  const conflictSet = useResourceConflicts(workingTasks);
+  const handleKeyDown = useGanttKeyboard({ flatRows, effectiveScale });
+
+  // Scroll the focused row into view (vertical) + bar start into view (horizontal).
+  useEffect(() => {
+    if (!focusedTaskId) return;
+    const rowIdx = flatRowIndex[focusedTaskId];
+    const tl = timelineRef.current;
+    if (rowIdx == null || !tl) return;
+    const top = rowIdx * ROW_HEIGHT;
+    if (top < tl.scrollTop) tl.scrollTop = top;
+    else if (top + ROW_HEIGHT > tl.scrollTop + tl.clientHeight) {
+      tl.scrollTop = top + ROW_HEIGHT - tl.clientHeight;
+    }
+  }, [focusedTaskId, flatRowIndex, timelineRef]);
 
   // Hover tooltip state. A short delay avoids flicker while panning.
   const [hover, setHover] = useState<{ taskId: TaskId; rect: DOMRect } | null>(null);
@@ -154,7 +220,12 @@ export function GanttBody({
   const totalHeight = flatRows.length * ROW_HEIGHT;
 
   return (
-    <div className="flex w-full max-h-[32rem]">
+    <div
+      className="flex w-full max-h-[32rem]"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      aria-activedescendant={focusedTaskId ? `gantt-bar-${focusedTaskId}` : undefined}
+    >
       {/* Left: WBS panel */}
       <div
         ref={sideRef}
@@ -167,6 +238,7 @@ export function GanttBody({
           onToggleCollapse={toggleCollapse}
           messages={messages}
           totalHeight={totalHeight}
+          conflictSet={conflictSet}
         />
       </div>
 
@@ -181,18 +253,28 @@ export function GanttBody({
           className="relative flex-1 overflow-auto"
         >
           <div className="relative" style={{ width: timeline.totalWidth, height: totalHeight }}>
-            {/* Row backgrounds */}
-            {flatRows.map((row, i) => (
+            {/* Row backgrounds — only the visible slice */}
+            {visibleRows.map(({ row, idx }) => (
               <div
                 key={row.task.id}
                 aria-hidden="true"
                 className={cn(
                   'absolute left-0 right-0 border-b border-border/60',
-                  i % 2 === 1 ? 'bg-surface-overlay/40' : 'bg-transparent',
+                  idx % 2 === 1 ? 'bg-surface-overlay/40' : 'bg-transparent',
                 )}
-                style={{ top: i * ROW_HEIGHT, height: ROW_HEIGHT, width: timeline.totalWidth }}
+                style={{ top: idx * ROW_HEIGHT, height: ROW_HEIGHT, width: timeline.totalWidth }}
               />
             ))}
+
+            {/* Weekend + holiday stripes */}
+            <NonWorkingDaysLayer
+              rangeStart={timeline.rangeStart}
+              rangeEnd={timeline.rangeEnd}
+              pixelsPerDay={timeline.pixelsPerDay}
+              totalHeight={totalHeight}
+              workingDays={workingDays}
+              holidays={holidays}
+            />
 
             <TodayLine
               rangeStart={timeline.rangeStart}
@@ -201,25 +283,75 @@ export function GanttBody({
               totalHeight={totalHeight}
             />
 
-            {/* Task bars */}
-            {flatRows.map((row, i) => (
-              <TaskBar
-                key={row.task.id}
-                task={row.task}
-                rangeStart={timeline.rangeStart}
-                pixelsPerDay={timeline.pixelsPerDay}
-                rowIndex={i}
-                isDepHoverTarget={depDraw?.hoverTargetId === row.task.id}
-                isCritical={criticalSet.has(row.task.id)}
-                onMoveDown={(e, id, w) => onBarPointerDown(e, id, 'move', w)}
-                onResizeStartDown={(e, id) => onBarPointerDown(e, id, 'resize-start', 0)}
-                onResizeEndDown={(e, id) => onBarPointerDown(e, id, 'resize-end', 0)}
-                onProgressDown={(e, id, w) => onBarPointerDown(e, id, 'progress', w)}
-                onDepSourceDown={(e, id) => beginFromTask(e, id)}
-                onHoverEnter={onBarHoverEnter}
-                onHoverLeave={onBarHoverLeave}
-              />
-            ))}
+            {/* Baseline ghosts — one per baseline entry whose task is visible */}
+            {baselines?.map((b) => {
+              const rowIndex = flatRowIndex[b.taskId];
+              if (rowIndex == null) return null;
+              if (rowIndex < visible.start || rowIndex >= visible.end) return null;
+              return (
+                <BaselineGhost
+                  key={`baseline-${b.taskId}`}
+                  baseline={b}
+                  rangeStart={timeline.rangeStart}
+                  pixelsPerDay={timeline.pixelsPerDay}
+                  rowIndex={rowIndex}
+                />
+              );
+            })}
+
+            {/* Task bars + milestones + group rollups */}
+            {visibleRows.map(({ row, idx }) => {
+              if (row.task.isMilestone) {
+                return (
+                  <Milestone
+                    key={row.task.id}
+                    task={row.task}
+                    rangeStart={timeline.rangeStart}
+                    pixelsPerDay={timeline.pixelsPerDay}
+                    rowIndex={idx}
+                    isCritical={criticalSet.has(row.task.id)}
+                    isFocused={focusedTaskId === row.task.id}
+                    onHoverEnter={onBarHoverEnter}
+                    onHoverLeave={onBarHoverLeave}
+                  />
+                );
+              }
+              if (row.task.isGroup) {
+                return (
+                  <GroupBar
+                    key={row.task.id}
+                    task={row.task}
+                    rangeStart={timeline.rangeStart}
+                    pixelsPerDay={timeline.pixelsPerDay}
+                    rowIndex={idx}
+                    isCritical={criticalSet.has(row.task.id)}
+                    isFocused={focusedTaskId === row.task.id}
+                    onHoverEnter={onBarHoverEnter}
+                    onHoverLeave={onBarHoverLeave}
+                  />
+                );
+              }
+              return (
+                <TaskBar
+                  key={row.task.id}
+                  task={row.task}
+                  rangeStart={timeline.rangeStart}
+                  pixelsPerDay={timeline.pixelsPerDay}
+                  rowIndex={idx}
+                  isDepHoverTarget={depDraw?.hoverTargetId === row.task.id}
+                  isCritical={criticalSet.has(row.task.id)}
+                  isFocused={focusedTaskId === row.task.id}
+                  reducedMotion={reducedMotion}
+                  onMoveDown={(e, id, w) => onBarPointerDown(e, id, 'move', w)}
+                  onResizeStartDown={(e, id) => onBarPointerDown(e, id, 'resize-start', 0)}
+                  onResizeEndDown={(e, id) => onBarPointerDown(e, id, 'resize-end', 0)}
+                  onProgressDown={(e, id, w) => onBarPointerDown(e, id, 'progress', w)}
+                  onDepSourceDown={(e, id) => beginFromTask(e, id)}
+                  onHoverEnter={onBarHoverEnter}
+                  onHoverLeave={onBarHoverLeave}
+                />
+              );
+            })}
 
             {/* Dependency overlay */}
             <DependencyLayer
@@ -231,7 +363,6 @@ export function GanttBody({
               totalHeight={totalHeight}
               criticalSet={criticalSet}
             />
-            {/* TODO M4: <BaselineGhost /> per task with a baseline entry. */}
           </div>
         </div>
       </div>
@@ -240,6 +371,7 @@ export function GanttBody({
         anchorRect={hover?.rect ?? null}
         predecessorNames={predecessorNames}
         isCritical={hoveredTask ? criticalSet.has(hoveredTask.id) : false}
+        locale={locale}
       />
     </div>
   );

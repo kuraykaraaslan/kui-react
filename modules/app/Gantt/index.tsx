@@ -6,6 +6,8 @@ import { DEFAULT_MESSAGES } from './types';
 import { createGanttStore, GanttStoreProvider } from './store';
 import { GanttToolbar } from './parts/GanttToolbar';
 import { GanttBody } from './parts/GanttBody';
+import { useExport } from './hooks/useExport';
+import { useReducedMotion } from './hooks/useReducedMotion';
 
 export type {
   GanttProps,
@@ -22,25 +24,23 @@ export type {
 export function Gantt({
   tasks,
   dependencies,
-  // baselines (TODO M4 stub).
-  baselines: _baselines,
+  baselines,
   scale,
-  // workingDays / holidays (TODO M5 stub).
-  workingDays: _workingDays,
-  holidays: _holidays,
+  workingDays,
+  holidays,
   criticalPath,
   onTaskUpdate,
   onDependencyCreate,
   onDependencyDelete,
-  // exportFormats (TODO M5 stub).
-  exportFormats: _exportFormats,
+  exportFormats,
   messages: messageOverrides,
-  // reducedMotion (TODO M6 stub).
-  reducedMotion: _reducedMotion,
+  locale,
+  reducedMotion,
   onTelemetry,
   ariaLabel = 'Gantt chart',
   className,
 }: GanttProps) {
+  const motionReduced = useReducedMotion(reducedMotion);
   const messages = useMemo(
     () => ({ ...DEFAULT_MESSAGES, ...(messageOverrides ?? {}) }),
     [messageOverrides],
@@ -59,6 +59,13 @@ export function Gantt({
     }),
   );
 
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const { run: handleExport } = useExport({
+    tasks,
+    dependencies: dependencies ?? [],
+    contentRef,
+  });
+
   // Seed back into the store whenever the controlled inputs change.
   useEffect(() => { store.getState().seedTasks(tasks); }, [tasks, store]);
   useEffect(() => { store.getState().seedDependencies(dependencies ?? []); }, [dependencies, store]);
@@ -74,21 +81,32 @@ export function Gantt({
   return (
     <GanttStoreProvider store={store}>
       <div
+        ref={contentRef}
         role="grid"
         aria-label={ariaLabel}
         className={cn(
           'gantt-root w-full flex flex-col rounded-lg border border-border bg-surface-base overflow-hidden',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+          motionReduced && '[&_*]:!transition-none [&_*]:!animation-none',
           className,
         )}
+        data-reduced-motion={motionReduced ? 'true' : undefined}
       >
         <GanttToolbar
           messages={messages}
           controlledScale={scale}
           showCriticalPathToggle
+          exportFormats={exportFormats}
+          onExport={handleExport}
         />
         <GanttBody
           messages={messages}
           controlledScale={scale}
+          baselines={baselines}
+          workingDays={workingDays}
+          holidays={holidays}
+          locale={locale}
+          reducedMotion={motionReduced}
           onTaskUpdate={onTaskUpdate}
           onDependencyCreate={onDependencyCreate}
           onDependencyDelete={onDependencyDelete}
