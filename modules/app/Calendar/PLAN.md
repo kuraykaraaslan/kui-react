@@ -8,7 +8,7 @@ Single source of truth for the milestone plan of `modules/app/Calendar`. Every m
 | M2 | Interactions — popover, drag-move, resize, drag-create, CRUD callbacks | **Done** |
 | M3 | RRULE recurrence — in-house FREQ/INTERVAL/COUNT/UNTIL/BYDAY expander | **Done** |
 | M4 | `ResourceView` + multi-calendar overlay + visibility legend | **Done** |
-| M5 | `AgendaView` (search + filters) + `MiniCalendar` sidebar | Stub |
+| M5 | `AgendaView` (search + date grouping) + standalone `MiniCalendar` | **Done** |
 | M6 | Full a11y / i18n / perf polish + IANA timezone | Stub |
 
 ---
@@ -192,10 +192,53 @@ type Event = {
 - Conflict detection is O(n²) per resource per day. At >100 events / resource / day the cost would matter — the typical scheduling UI is well under that.
 - Hidden-calendar filtering happens at the orchestrator level, so every downstream view (Month / Week / Day / Resource) gets it for free.
 
-## M5 — Agenda + Mini calendar (deferred)
+## M5 — Agenda + Mini calendar
 
-- `AgendaView` — grouped-by-day virtualised list with search + filters.
-- `MiniCalendar` — sidebar month grid that jumps the main view to the picked date.
+### Outcome
+
+- **`AgendaView`** ([views/AgendaView.tsx](views/AgendaView.tsx)) — a scrollable date-grouped list of every event in the visible window. A search input above the list filters by `title` + `description` (case-insensitive). Each day section gets a sticky-feeling header chip (today highlighted in `--primary`) and rows of events with colour dot + time-range + title. Click a row → standard popover. Empty state shows `noEvents`.
+- **`MiniCalendar`** ([parts/MiniCalendar.tsx](parts/MiniCalendar.tsx)) — **standalone** 6×7 month grid (240 px wide). Does **not** depend on the `<Calendar>` store, so callers compose it freely outside the calendar widget. Single-letter weekday headers, today ringed in primary, selected day filled. Chevrons page months.
+
+### API
+
+```tsx
+import { Calendar, MiniCalendar } from '@/modules/app/Calendar';
+
+const [date, setDate] = useState(new Date());
+const [view, setView] = useState<View>('week');
+
+<div className="grid grid-cols-[15rem_1fr] gap-3">
+  <MiniCalendar
+    value={date}
+    onChange={(d) => { setDate(d); setView('day'); }}
+    locale="en"
+  />
+  <Calendar
+    events={events}
+    view={view}
+    defaultDate={date}
+    onViewChange={setView}
+    onDateChange={setDate}
+  />
+</div>
+```
+
+The composition pattern is deliberate: MiniCalendar as a standalone primitive can also drive any other date input — date-range pickers, schedule pickers, etc.
+
+### Files
+
+| File | Change |
+|---|---|
+| `views/AgendaView.tsx` | Full impl (~170 LoC) — search + date grouping + popover hook |
+| `parts/MiniCalendar.tsx` | Full impl (~110 LoC) — standalone month grid + paging |
+| `index.tsx` | Wire AgendaView when `view='agenda'`; export `MiniCalendar` |
+| `types.ts` + `locale/tr.ts` + `locale/en.ts` | New `search` message string |
+| `modules/showcase/data/sections/app-calendar.showcase.tsx` | Add `Agenda view — date-grouped + search` + `MiniCalendar sidebar` variants |
+| `public/components/calendar.md` + registry JSONs | Regenerated |
+
+### Performance
+
+Both new components are pure render — no async, no portals, no observers. Bucketing in AgendaView is single-pass O(n) into a `Map` keyed by `startOfDay`. The full agenda is rendered in a single scroll container with a `max-h-[60vh]` cap; virtualisation is M6 territory once we have a real workload to measure against.
 
 ## M6 — A11y / i18n / perf polish (deferred)
 

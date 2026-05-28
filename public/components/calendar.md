@@ -7,7 +7,7 @@
 - **status:** beta
 - **since:** 2026-05
 
-Month / week / day / resource calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create), in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions), and multi-calendar overlay with per-calendar visibility legend. ResourceView shows one column per resource with O(n²) conflict highlighting. Agenda + mini and full a11y/i18n/perf polish land in M5-M6.
+Month / week / day / agenda / resource calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create), in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions), multi-calendar overlay with per-calendar visibility legend, ResourceView lanes with O(n²) conflict highlighting, agenda list (search + date grouping) and a composable MiniCalendar sidebar. Full a11y / i18n / perf polish + IANA timezone land in M6.
 
 ## Accessibility
 
@@ -180,6 +180,42 @@ const events = [
   calendars={calendars}
   onCalendarToggle={(id, visible) => console.log(id, visible)}
 />
+```
+
+### Agenda view — date-grouped + search
+
+```tsx
+<Calendar
+  events={events}
+  view="agenda"
+  defaultDate={new Date(2026, 4, 13)}
+  onViewChange={setView}
+  locale="en"
+/>
+```
+
+### MiniCalendar sidebar — jumps the main view to picked date
+
+```tsx
+import { Calendar, MiniCalendar } from '@/modules/app/Calendar';
+
+const [date, setDate] = useState(new Date(2026, 4, 13));
+const [view, setView] = useState<View>('week');
+
+<div className="grid grid-cols-[15rem_1fr] gap-3">
+  <MiniCalendar
+    value={date}
+    onChange={(d) => { setDate(d); setView('day'); }}
+    locale="en"
+  />
+  <Calendar
+    events={events}
+    view={view}
+    defaultDate={date}
+    onViewChange={setView}
+    onDateChange={setDate}
+  />
+</div>
 ```
 
 ## Full source

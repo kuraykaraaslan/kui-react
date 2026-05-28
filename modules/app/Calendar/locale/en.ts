@@ -19,6 +19,7 @@ export const EN_MESSAGES: CalendarMessages = {
   close: 'Close',
   calendars: 'Calendars',
   noResources: 'No resources defined',
+  search: 'Search events…',
 };
 
 /** Sunday-start (US default). */

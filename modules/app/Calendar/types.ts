@@ -96,6 +96,8 @@ export type CalendarMessages = {
   calendars: string;
   /** Empty-state for ResourceView when `resources` is empty (M4). */
   noResources: string;
+  /** Agenda search input placeholder (M5). */
+  search: string;
 };
 
 /** Working-hours config (visual shading hint only in M1). */

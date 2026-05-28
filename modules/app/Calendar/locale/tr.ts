@@ -19,6 +19,7 @@ export const TR_MESSAGES: CalendarMessages = {
   close: 'Kapat',
   calendars: 'Takvimler',
   noResources: 'Kaynak tanımlı değil',
+  search: 'Etkinliklerde ara…',
 };
 
 /** Monday-start (TR default). */

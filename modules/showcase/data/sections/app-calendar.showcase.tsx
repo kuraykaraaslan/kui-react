@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Calendar } from '@/modules/app/Calendar';
+import { Calendar, MiniCalendar } from '@/modules/app/Calendar';
 import type { CalendarSource, Event, Resource, View } from '@/modules/app/Calendar';
 import {
   faVideo,
@@ -311,6 +311,40 @@ function CalendarMultiSourceDemo() {
   );
 }
 
+function CalendarAgendaDemo() {
+  const [view, setView] = useState<View>('agenda');
+  return (
+    <div className="w-full">
+      <Calendar
+        events={makeEvents()}
+        view={view}
+        defaultDate={DEMO_ANCHOR}
+        onViewChange={setView}
+        locale="en"
+      />
+    </div>
+  );
+}
+
+function CalendarMiniSidebarDemo() {
+  const [date, setDate] = useState<Date>(DEMO_ANCHOR);
+  const [view, setView] = useState<View>('week');
+  return (
+    <div className="w-full grid grid-cols-1 md:grid-cols-[15rem_1fr] gap-3 items-start">
+      <MiniCalendar value={date} onChange={(d) => { setDate(d); setView('day'); }} locale="en" />
+      <Calendar
+        events={makeEvents()}
+        view={view}
+        defaultDate={date}
+        onViewChange={setView}
+        onDateChange={setDate}
+        locale="en"
+        workingHours={{ start: 9, end: 18, days: [1, 2, 3, 4, 5] }}
+      />
+    </div>
+  );
+}
+
 export function buildAppCalendarData(): ShowcaseComponent[] {
   return [
     {
@@ -319,7 +353,7 @@ export function buildAppCalendarData(): ShowcaseComponent[] {
       category: 'App',
       abbr: 'Cl',
       description:
-        'Month / week / day / resource calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create), in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions), and multi-calendar overlay with per-calendar visibility legend. ResourceView shows one column per resource with O(n²) conflict highlighting. Agenda + mini and full a11y/i18n/perf polish land in M5-M6.',
+        'Month / week / day / agenda / resource calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create), in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions), multi-calendar overlay with per-calendar visibility legend, ResourceView lanes with O(n²) conflict highlighting, agenda list (search + date grouping) and a composable MiniCalendar sidebar. Full a11y / i18n / perf polish + IANA timezone land in M6.',
       filePath: 'modules/app/Calendar/index.tsx',
       since: '2026-05',
       status: 'beta',
@@ -521,6 +555,42 @@ const events = [
   calendars={calendars}
   onCalendarToggle={(id, visible) => console.log(id, visible)}
 />`,
+        },
+        {
+          title: 'Agenda view — date-grouped + search',
+          layout: 'stack',
+          preview: <CalendarAgendaDemo />,
+          code: `<Calendar
+  events={events}
+  view="agenda"
+  defaultDate={new Date(2026, 4, 13)}
+  onViewChange={setView}
+  locale="en"
+/>`,
+        },
+        {
+          title: 'MiniCalendar sidebar — jumps the main view to picked date',
+          layout: 'stack',
+          preview: <CalendarMiniSidebarDemo />,
+          code: `import { Calendar, MiniCalendar } from '@/modules/app/Calendar';
+
+const [date, setDate] = useState(new Date(2026, 4, 13));
+const [view, setView] = useState<View>('week');
+
+<div className="grid grid-cols-[15rem_1fr] gap-3">
+  <MiniCalendar
+    value={date}
+    onChange={(d) => { setDate(d); setView('day'); }}
+    locale="en"
+  />
+  <Calendar
+    events={events}
+    view={view}
+    defaultDate={date}
+    onViewChange={setView}
+    onDateChange={setDate}
+  />
+</div>`,
         },
       ],
     },

@@ -39,6 +39,7 @@ export type {
   CalendarTelemetry,
   CalendarHandle,
 } from './types';
+export { MiniCalendar } from './parts/MiniCalendar';
 
 export function Calendar(props: CalendarProps) {
   // One store per <Calendar> instance — ref keeps it stable across re-renders.
@@ -240,7 +241,16 @@ function CalendarInner({
           onTelemetry={onTelemetry}
         />
       )}
-      {view === 'agenda' && <AgendaView />}
+      {view === 'agenda' && (
+        <AgendaView
+          events={visibleEvents}
+          locale={{ ...localeBundle, messages }}
+          today={today}
+          windowStart={windowStart}
+          windowEnd={windowEnd}
+          onEventClick={handleEventClick}
+        />
+      )}
       {view === 'resource' && (
         <ResourceView
           date={date}

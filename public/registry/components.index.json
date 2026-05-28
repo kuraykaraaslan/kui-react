@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-27T23:42:38.986Z",
+  "generatedAt": "2026-05-28T06:48:16.494Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -1934,7 +1934,7 @@
       "category": "App",
       "filePath": "modules/app/Calendar/index.tsx",
       "abbr": "Cl",
-      "description": "Month / week / day / resource calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create), in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions), and multi-calendar overlay with per-calendar visibility legend. ResourceView shows one column per resource with O(n²) conflict highlighting. Agenda + mini and full a11y/i18n/perf polish land in M5-M6.",
+      "description": "Month / week / day / agenda / resource calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create), in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions), multi-calendar overlay with per-calendar visibility legend, ResourceView lanes with O(n²) conflict highlighting, agenda list (search + date grouping) and a composable MiniCalendar sidebar. Full a11y / i18n / perf polish + IANA timezone land in M6.",
       "status": "beta",
       "since": "2026-05",
       "composes": [],
@@ -1983,7 +1983,7 @@
         "--text-secondary",
         "--text-disabled"
       ],
-      "variantCount": 7
+      "variantCount": 9
     },
     {
       "id": "gantt",
@@ -1992,7 +1992,7 @@
       "category": "App",
       "filePath": "modules/app/Gantt/index.tsx",
       "abbr": "Gt",
-      "description": "MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale switcher (day / week / month / quarter / year), a vertical Today line, WBS tree with expand/collapse on the left panel, sticky timeline header with synchronised horizontal + vertical scroll, and absolutely-positioned task bars with a %-progress fill. M2 adds full interactivity: drag a bar to reschedule (snap to day), drag the left/right edges to resize, drag the white progress thumb to change %, and drag from the right-edge blue dot to another bar to draw an FS dependency. Dependencies render as orthogonal SVG arrows with a marker-end arrowhead; click an arrow then press Delete to remove it. M3 adds a Critical Path toggle in the toolbar — tasks on the longest dependency chain switch to var(--error) styling and their connecting arrows turn red, computed by a forward + backward longest-path pass on the dependency DAG. Hovering a bar after a short delay shows a tooltip with name, start/end, duration, owner, % complete, predecessors, and a Critical badge. M4 adds zero-duration milestones rendered as 14×14 diamonds, planned-vs-actual baseline ghost bars beneath the live bars, and weekend + holiday shading on the day + week scales. M5 adds a toolbar Export menu (PNG via SVG `<foreignObject>` round-trip, PDF via the browser print dialog, CSV via a pure-JS Blob download), drag snap that nudges drops forward to the next working day, and a resource-conflict detector that flags over-allocated owners in the WBS panel with a red triangle. All mutations are optimistic and roll back automatically if `onTaskUpdate` / `onDependencyCreate` rejects. Internal state is owned by a per-instance Zustand store (`store.ts`). The remaining `reducedMotion` prop is stubbed and becomes live in M6 alongside full keyboard nav, locale, and virtualisation.",
+      "description": "MS Project / GanttPRO / dhtmlxGantt-style project timeline. M1 ships the scale switcher (day / week / month / quarter / year), a vertical Today line, WBS tree with expand/collapse on the left panel, sticky timeline header with synchronised horizontal + vertical scroll, and absolutely-positioned task bars with a %-progress fill. M2 adds full interactivity: drag a bar to reschedule (snap to day), drag the left/right edges to resize, drag the white progress thumb to change %, and drag from the right-edge blue dot to another bar to draw an FS dependency. Dependencies render as orthogonal SVG arrows with a marker-end arrowhead; click an arrow then press Delete to remove it. M3 adds a Critical Path toggle in the toolbar — tasks on the longest dependency chain switch to var(--error) styling and their connecting arrows turn red, computed by a forward + backward longest-path pass on the dependency DAG. Hovering a bar after a short delay shows a tooltip with name, start/end, duration, owner, % complete, predecessors, and a Critical badge. M4 adds zero-duration milestones rendered as 14×14 diamonds, planned-vs-actual baseline ghost bars beneath the live bars, and weekend + holiday shading on the day + week scales. M5 adds a toolbar Export menu (PNG via SVG `<foreignObject>` round-trip, PDF via the browser print dialog, CSV via a pure-JS Blob download), drag snap that nudges drops forward to the next working day, and a resource-conflict detector that flags over-allocated owners in the WBS panel with a red triangle. M6 closes the loop with grid keyboard navigation (↑↓/Home/End/PageUp/PageDown between rows, +/− zoom, focused bar exposes a focus ring + `aria-activedescendant`), a `locale` prop that drives Intl-based month names and tooltip dates, `prefers-reduced-motion` honouring (plus a `reducedMotion` prop force-on), and automatic row virtualization above ~60 tasks. All mutations are optimistic and roll back automatically if `onTaskUpdate` / `onDependencyCreate` rejects. Internal state is owned by a per-instance Zustand store (`store.ts`).",
       "status": "beta",
       "since": "2026-05",
       "composes": [
@@ -2043,7 +2043,7 @@
         "--error",
         "--error-subtle"
       ],
-      "variantCount": 8
+      "variantCount": 9
     },
     {
       "id": "form-builder",
