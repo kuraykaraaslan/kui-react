@@ -59,11 +59,13 @@ export function MonthView({
           const dayEvents = events.filter((e) => eventOnDay(e, cell));
           const visible = dayEvents.slice(0, maxPerDay);
           const overflow = dayEvents.length - visible.length;
+          const dateLabel = `${locale.dayLong[cell.getDay()]} ${cell.getDate()} ${locale.monthNames[cell.getMonth()]}`;
           return (
             <div
               key={i}
               role="gridcell"
               aria-selected={isToday}
+              aria-label={locale.messages.cellLabel(dateLabel, dayEvents.length)}
               className={cn(
                 'min-h-[88px] border-b border-r border-border p-1 flex flex-col gap-0.5',
                 'last-of-type:border-r-0',

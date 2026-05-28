@@ -94,7 +94,29 @@ export function fmtTime(d: Date): string {
   return `${h}:${m}`;
 }
 
-/** Returns "title — HH:MM" for screen reader / aria-label use. */
+/**
+ * Locale-aware time format via `Intl.DateTimeFormat`. Falls back to
+ * the simple HH:MM formatter when the runtime has no Intl support.
+ * `cache` keyed on locale to avoid re-instantiating the formatter on
+ * every event card.
+ */
+const _intlCache = new Map<string, Intl.DateTimeFormat>();
+export function fmtTimeIntl(d: Date, locale?: string): string {
+  if (typeof Intl === 'undefined' || !Intl.DateTimeFormat) return fmtTime(d);
+  const key = locale || 'default';
+  let fmt = _intlCache.get(key);
+  if (!fmt) {
+    try {
+      fmt = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', hour12: false });
+      _intlCache.set(key, fmt);
+    } catch {
+      return fmtTime(d);
+    }
+  }
+  return fmt.format(d);
+}
+
+/** Returns "HH:MM – HH:MM" for screen reader / aria-label use. */
 export function fmtTimeRange(start: Date, end: Date): string {
   return `${fmtTime(start)} – ${fmtTime(end)}`;
 }

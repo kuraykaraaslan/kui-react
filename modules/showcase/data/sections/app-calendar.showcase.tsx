@@ -353,7 +353,7 @@ export function buildAppCalendarData(): ShowcaseComponent[] {
       category: 'App',
       abbr: 'Cl',
       description:
-        'Month / week / day / agenda / resource calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create), in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions), multi-calendar overlay with per-calendar visibility legend, ResourceView lanes with O(n²) conflict highlighting, agenda list (search + date grouping) and a composable MiniCalendar sidebar. Full a11y / i18n / perf polish + IANA timezone land in M6.',
+        'Month / week / day / agenda / resource calendar with view switcher, full keyboard nav (PageUp/Down + T + arrow keys for day-step), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create), in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions), multi-calendar overlay with per-calendar visibility legend, ResourceView lanes with O(n²) conflict highlighting, agenda list (search + date grouping) and a composable MiniCalendar sidebar. WAI-ARIA grid pattern with live-region nav announcements ("Showing May 2026") and event-count cell labels ("Tuesday May 12, 3 events"). Optional Intl.DateTimeFormat-based time formatting for locale-aware clocks.',
       filePath: 'modules/app/Calendar/index.tsx',
       since: '2026-05',
       status: 'beta',
@@ -396,15 +396,20 @@ const events: Event[] = [
 />`,
       a11y: {
         wcagLevel: 'AA',
-        ariaPatterns: ['Grid (month)', 'Tablist (view switcher)', 'Region (week/day)'],
+        ariaPatterns: ['Grid (month)', 'Tablist (view switcher)', 'Region (week/day)', 'Live region (nav announcements)', 'Dialog (event popover)'],
         keyboardInteractions: [
-          { keys: 'Page Up', action: 'Previous period (month / week / day)' },
-          { keys: 'Page Down', action: 'Next period (month / week / day)' },
-          { keys: 'T', action: 'Jump to today' },
-          { keys: 'Tab', action: 'Focus the next interactive element (events, nav buttons)' },
+          { keys: 'Page Up',     action: 'Previous period (month / week / day)' },
+          { keys: 'Page Down',   action: 'Next period (month / week / day)' },
+          { keys: 'T',           action: 'Jump to today' },
+          { keys: 'Arrow Left',  action: 'Step back one day' },
+          { keys: 'Arrow Right', action: 'Step forward one day' },
+          { keys: 'Arrow Up',    action: 'Step back one week' },
+          { keys: 'Arrow Down',  action: 'Step forward one week' },
+          { keys: 'Escape',      action: 'Close popover / cancel drag in progress' },
+          { keys: 'Tab',         action: 'Focus the next interactive element (events, nav buttons, legend chips)' },
         ],
         notes:
-          'Month view uses role="grid" with role="gridcell" per day. View switcher uses role="tablist". Today cell is marked aria-selected="true". Full WAI-ARIA polish + screen-reader text ("Tuesday March 5, 2 events") arrives in M6.',
+          'Month view uses role="grid" with role="gridcell" per day. Cells announce "Tuesday May 12, 3 events" via aria-label. View switcher uses role="tablist". Legend chips use role="switch". Nav changes push a polite live-region message ("Showing May 2026"). Drag is direct manipulation (no animated motion), so prefers-reduced-motion is a no-op for the calendar.',
       },
       designTokens: [
         '--primary', '--primary-fg',

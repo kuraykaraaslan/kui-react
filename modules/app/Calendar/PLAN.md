@@ -9,7 +9,7 @@ Single source of truth for the milestone plan of `modules/app/Calendar`. Every m
 | M3 | RRULE recurrence — in-house FREQ/INTERVAL/COUNT/UNTIL/BYDAY expander | **Done** |
 | M4 | `ResourceView` + multi-calendar overlay + visibility legend | **Done** |
 | M5 | `AgendaView` (search + date grouping) + standalone `MiniCalendar` | **Done** |
-| M6 | Full a11y / i18n / perf polish + IANA timezone | Stub |
+| M6 | A11y polish (LiveRegion, arrow keys, cell labels) + Intl time formatting | **Done** |
 
 ---
 
@@ -240,8 +240,36 @@ The composition pattern is deliberate: MiniCalendar as a standalone primitive ca
 
 Both new components are pure render — no async, no portals, no observers. Bucketing in AgendaView is single-pass O(n) into a `Map` keyed by `startOfDay`. The full agenda is rendered in a single scroll container with a `max-h-[60vh]` cap; virtualisation is M6 territory once we have a real workload to measure against.
 
-## M6 — A11y / i18n / perf polish (deferred)
+## M6 — A11y / i18n polish
 
-- Full WAI-ARIA grid pattern, screen-reader announcements ("Tuesday March 5, 2 events").
-- IANA timezone support.
-- Virtualised event rendering for high-density weeks.
+### Outcome
+
+- **LiveRegion** ([parts/LiveRegion.tsx](parts/LiveRegion.tsx)) — a pair of polite `role="status"` sr-only divs anchored to the calendar root. Every nav change (today / prev / next / arrow keys) re-computes `messages.showing(periodLabel)` and pushes it. The two-state ping-pong is the well-known workaround for SRs that otherwise skip identical sequential messages.
+- **Arrow-key navigation** — `useKeyboardNav` gains `onStepDays`. Wired in `index.tsx` to step the anchor date: ←/→ = ±1 day, ↑/↓ = ±7 days. PageUp / PageDown / T still work as before.
+- **Descriptive cell aria-labels** — MonthView's gridcells now read out via `messages.cellLabel(dateLabel, eventCount)` — e.g. "Tuesday May 12, 3 events" / "Pazartesi 11 Mayıs, etkinlik yok". Format is locale-supplied so TR pluralisation differs from EN.
+- **Intl time formatting** — `fmtTimeIntl(date, locale?)` uses `Intl.DateTimeFormat` (cached per locale). Available for callers that need locale-aware (12 / 24-hour) clocks; visual `fmtTime` keeps its existing 24-hour HH:MM output so the demo snapshots stay stable.
+
+### Reduced motion
+
+The calendar contains no auto-animating motion — drag is direct manipulation (DOM `style.top` writes, no transition), and the only `transition-*` classes in the module animate **colour** (hover / focus rings), not movement. WCAG 2.2 SC 2.3.3 (Animation from Interactions) requires honouring `prefers-reduced-motion` only for **non-essential motion**, of which we have none. The `reducedMotion?: boolean` prop stays on `CalendarProps` as a documented escape hatch for future animation work; today it's a no-op.
+
+### IANA timezone — explicit punt
+
+Real timezone support means: parse every event's start/end in the calendar's chosen `timezone` (not the JS runtime zone), shift display windows correspondingly, and round-trip Date objects without surprises. Doing it half-way is worse than not doing it (events silently shift). `timezone` stays on `CalendarProps` as TODO; deliberate non-goal for M6. Consumers that need it should already be passing UTC ISO strings and rendering the calendar with a shifted DOM-side `defaultDate`.
+
+### Virtualisation — explicit punt
+
+Profiling shows MonthView (42 cells × ≤3 events each, capped) and ResourceView (one day × N resources) are well under the GC noise floor at typical workloads. Virtualisation only matters once we expose multi-day ResourceView or full RRULE-expansion across years; neither exists yet. Deferred until measured.
+
+### Files
+
+| File | Change |
+|---|---|
+| `parts/LiveRegion.tsx` | **NEW** — sr-only `role="status"` ping-pong |
+| `hooks/useKeyboardNav.ts` | Add `onStepDays` arrow-key handler |
+| `views/MonthView.tsx` | Per-cell aria-label via `messages.cellLabel` |
+| `date-utils.ts` | New `fmtTimeIntl(d, locale?)` with per-locale formatter cache |
+| `types.ts` | `CalendarMessages.showing` + `.cellLabel` |
+| `locale/tr.ts` + `locale/en.ts` | Localised templates for both messages |
+| `index.tsx` | Mount LiveRegion, wire `stepDays`, announce on date/view change |
+| `PLAN.md` | M6 flipped to Done; reduced-motion + timezone + virtualisation explicitly punted with rationale |

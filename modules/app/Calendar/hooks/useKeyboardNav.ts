@@ -6,20 +6,27 @@ type Options = {
   onPrev: () => void;
   onNext: () => void;
   onToday: () => void;
+  /** Step the anchor date by N days. Drives ArrowLeft/Right ±1 day and
+   * ArrowUp/Down ±7 days for week-row navigation in the month grid (M6). */
+  onStepDays?: (delta: number) => void;
   enabled?: boolean;
 };
 
 /**
  * Keyboard navigation for the calendar root.
  *
- * - Page Up   → previous period
- * - Page Down → next period
- * - T         → jump to today
+ * - Page Up    → previous period
+ * - Page Down  → next period
+ * - T          → jump to today
+ * - Arrow Left → −1 day
+ * - Arrow Right → +1 day
+ * - Arrow Up   → −7 days (previous week-row)
+ * - Arrow Down → +7 days (next week-row)
  *
  * Focus must be inside `rootRef` (or the calendar must be focused) for the
  * shortcuts to fire — keeps the calendar from hijacking global keys.
  */
-export function useKeyboardNav({ rootRef, onPrev, onNext, onToday, enabled = true }: Options) {
+export function useKeyboardNav({ rootRef, onPrev, onNext, onToday, onStepDays, enabled = true }: Options) {
   useEffect(() => {
     if (!enabled) return;
     const root = rootRef.current;
@@ -43,14 +50,18 @@ export function useKeyboardNav({ rootRef, onPrev, onNext, onToday, enabled = tru
         e.preventDefault();
         onNext();
       } else if (e.key === 't' || e.key === 'T') {
-        // Don't interfere if a modifier is held (e.g. Ctrl-T new tab).
         if (e.ctrlKey || e.metaKey || e.altKey) return;
         e.preventDefault();
         onToday();
+      } else if (onStepDays && (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        const delta = e.key === 'ArrowLeft' ? -1 : e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' ? -7 : 7;
+        e.preventDefault();
+        onStepDays(delta);
       }
     }
 
     root.addEventListener('keydown', onKey);
     return () => root.removeEventListener('keydown', onKey);
-  }, [rootRef, onPrev, onNext, onToday, enabled]);
+  }, [rootRef, onPrev, onNext, onToday, onStepDays, enabled]);
 }

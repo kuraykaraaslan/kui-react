@@ -98,6 +98,10 @@ export type CalendarMessages = {
   noResources: string;
   /** Agenda search input placeholder (M5). */
   search: string;
+  /** Live-region announcement for nav changes — receives the new period label (M6). */
+  showing: (periodLabel: string) => string;
+  /** Cell aria-label template — `${weekday} ${day} ${month}` + event count (M6). */
+  cellLabel: (dateLabel: string, eventCount: number) => string;
 };
 
 /** Working-hours config (visual shading hint only in M1). */

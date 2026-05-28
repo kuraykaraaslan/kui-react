@@ -5,6 +5,7 @@ import type { CalendarProps, View } from './types';
 import { HeaderBar } from './parts/HeaderBar';
 import { EventPopover } from './parts/EventPopover';
 import { CalendarLegend } from './parts/CalendarLegend';
+import { LiveRegion } from './parts/LiveRegion';
 import { MonthView } from './views/MonthView';
 import { WeekView } from './views/WeekView';
 import { DayView } from './views/DayView';
@@ -160,6 +161,13 @@ function CalendarInner({
     setDate(new Date(), 'today');
   }, [setDate]);
 
+  const stepDays = useCallback(
+    (delta: number) => {
+      setDate(addDays(date, delta), delta < 0 ? 'prev' : 'next');
+    },
+    [date, setDate],
+  );
+
   const handleViewChange = useCallback(
     (v: View) => {
       onViewChange?.(v);
@@ -177,7 +185,10 @@ function CalendarInner({
     [openPopover, onEventClick, onTelemetry],
   );
 
-  useKeyboardNav({ rootRef, onPrev: goPrev, onNext: goNext, onToday: goToday });
+  useKeyboardNav({ rootRef, onPrev: goPrev, onNext: goNext, onToday: goToday, onStepDays: stepDays });
+
+  // Announce nav changes via the live region (M6).
+  const announcement = useMemo(() => messages.showing(label), [messages, label]);
 
   return (
     <div
@@ -271,6 +282,8 @@ function CalendarInner({
         onEventDelete={onEventDelete}
         onTelemetry={onTelemetry}
       />
+
+      <LiveRegion message={announcement} />
     </div>
   );
 }

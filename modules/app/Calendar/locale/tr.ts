@@ -20,6 +20,10 @@ export const TR_MESSAGES: CalendarMessages = {
   calendars: 'Takvimler',
   noResources: 'Kaynak tanımlı değil',
   search: 'Etkinliklerde ara…',
+  showing: (label) => `${label} gösteriliyor`,
+  cellLabel: (date, count) => count > 0
+    ? `${date}, ${count} etkinlik`
+    : `${date}, etkinlik yok`,
 };
 
 /** Monday-start (TR default). */

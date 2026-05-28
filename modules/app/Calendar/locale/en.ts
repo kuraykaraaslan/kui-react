@@ -20,6 +20,12 @@ export const EN_MESSAGES: CalendarMessages = {
   calendars: 'Calendars',
   noResources: 'No resources defined',
   search: 'Search events…',
+  showing: (label) => `Showing ${label}`,
+  cellLabel: (date, count) => count === 0
+    ? `${date}, no events`
+    : count === 1
+      ? `${date}, 1 event`
+      : `${date}, ${count} events`,
 };
 
 /** Sunday-start (US default). */

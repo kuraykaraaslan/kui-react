@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-28T06:48:16.494Z",
+  "generatedAt": "2026-05-28T06:55:39.789Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -3190,7 +3190,7 @@
       "category": "App",
       "filePath": "modules/app/Calendar/index.tsx",
       "abbr": "Cl",
-      "description": "Month / week / day / agenda / resource calendar with view switcher, today/prev/next nav (Page Up/Down + T keyboard), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create), in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions), multi-calendar overlay with per-calendar visibility legend, ResourceView lanes with O(n²) conflict highlighting, agenda list (search + date grouping) and a composable MiniCalendar sidebar. Full a11y / i18n / perf polish + IANA timezone land in M6.",
+      "description": "Month / week / day / agenda / resource calendar with view switcher, full keyboard nav (PageUp/Down + T + arrow keys for day-step), per-event color and icon, all-day bars + timed pills, TR/EN locales, full interactions (anchored popover, drag-move, edge-resize, drag-create), in-house RRULE expansion (FREQ/INTERVAL/COUNT/UNTIL/BYDAY + exceptions), multi-calendar overlay with per-calendar visibility legend, ResourceView lanes with O(n²) conflict highlighting, agenda list (search + date grouping) and a composable MiniCalendar sidebar. WAI-ARIA grid pattern with live-region nav announcements (\"Showing May 2026\") and event-count cell labels (\"Tuesday May 12, 3 events\"). Optional Intl.DateTimeFormat-based time formatting for locale-aware clocks.",
       "source": "'use client';\nimport { Calendar } from '@/modules/app/Calendar';\nimport type { Event, View } from '@/modules/app/Calendar';\nimport { faVideo } from '@fortawesome/free-solid-svg-icons';\n\nconst events: Event[] = [\n  {\n    id: '1',\n    title: 'Design sync',\n    start: new Date(2026, 4, 13, 10, 0),\n    end:   new Date(2026, 4, 13, 11, 0),\n    color: 'primary',\n    icon: faVideo,\n  },\n  {\n    id: '2',\n    title: 'Birthday — Grace',\n    start: new Date(2026, 4, 14, 0, 0),\n    end:   new Date(2026, 4, 14, 23, 59),\n    allDay: true,\n    color: 'warning',\n  },\n];\n\n<Calendar\n  events={events}\n  view={view}                    // 'month' | 'week' | 'day' | 'agenda' | 'resource'\n  defaultDate={new Date(2026, 4, 13)}\n  onViewChange={setView}\n  onEventClick={(e) => console.log(e)}\n  onEventCreate={({ start, end }) => api.create({ start, end })}\n  onEventUpdate={(event) => api.update(event)}\n  onEventDelete={(id) => api.remove(id)}\n  locale=\"tr\"                    // 'tr' (default) | 'en'\n  workingHours={{ start: 9, end: 18, days: [1,2,3,4,5] }}\n  slotMinutes={30}\n/>",
       "variants": [
         {
@@ -3238,7 +3238,9 @@
         "ariaPatterns": [
           "Grid (month)",
           "Tablist (view switcher)",
-          "Region (week/day)"
+          "Region (week/day)",
+          "Live region (nav announcements)",
+          "Dialog (event popover)"
         ],
         "keyboardInteractions": [
           {
@@ -3254,11 +3256,31 @@
             "action": "Jump to today"
           },
           {
+            "keys": "Arrow Left",
+            "action": "Step back one day"
+          },
+          {
+            "keys": "Arrow Right",
+            "action": "Step forward one day"
+          },
+          {
+            "keys": "Arrow Up",
+            "action": "Step back one week"
+          },
+          {
+            "keys": "Arrow Down",
+            "action": "Step forward one week"
+          },
+          {
+            "keys": "Escape",
+            "action": "Close popover / cancel drag in progress"
+          },
+          {
             "keys": "Tab",
-            "action": "Focus the next interactive element (events, nav buttons)"
+            "action": "Focus the next interactive element (events, nav buttons, legend chips)"
           }
         ],
-        "notes": "Month view uses role=\"grid\" with role=\"gridcell\" per day. View switcher uses role=\"tablist\". Today cell is marked aria-selected=\"true\". Full WAI-ARIA polish + screen-reader text (\"Tuesday March 5, 2 events\") arrives in M6."
+        "notes": "Month view uses role=\"grid\" with role=\"gridcell\" per day. Cells announce \"Tuesday May 12, 3 events\" via aria-label. View switcher uses role=\"tablist\". Legend chips use role=\"switch\". Nav changes push a polite live-region message (\"Showing May 2026\"). Drag is direct manipulation (no animated motion), so prefers-reduced-motion is a no-op for the calendar."
       },
       "designTokens": [
         "--primary",
