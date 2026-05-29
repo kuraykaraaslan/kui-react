@@ -7,6 +7,7 @@ import {
   buildShowcaseColorCss,
 } from "@/libs/config/showcase.config";
 import { ConditionalShell } from "@/modules/app/ConditionalShell";
+import { GoogleAnalytics } from "@/modules/app/GoogleAnalytics";
 
 /* =========================================================
    FONTS
@@ -212,6 +213,9 @@ export default function RootLayout({
             __html: JSON.stringify(structuredData),
           }}
         />
+
+        {/* GOOGLE ANALYTICS */}
+        <GoogleAnalytics />
       </body>
     </html>
   );

@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-28T07:00:35.070Z",
+  "generatedAt": "2026-05-29T15:24:50.963Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -8487,8 +8487,8 @@
       "category": "Library",
       "filePath": "modules/showcase/data/sections/lib-kui-viewer.showcase.tsx",
       "abbr": "KV",
-      "description": "Browser-based IFC/BIM 3D viewer built on Three.js, web-ifc and @thatopen/fragments. Ships a vanilla TypeScript core plus an optional React subpath (`kui-viewer/react`) exposing the `<KUIViewer />` component, a `ViewerProvider`, and a Zustand-backed `useViewerStore` hook for selection, federation and spatial-tree state.",
-      "source": "'use client';\n// Install:  npm install kui-viewer\n// React subpath: kui-viewer/react\n//\n// Since 0.0.3 the published `kui-viewer/styles.css` no longer ships the\n// Tailwind preflight or default theme tokens, so importing it next to your\n// project-level Tailwind setup is safe — design tokens stay isolated under\n// the `--color-kui-viewer-*` namespace.\nimport 'kui-viewer/styles.css';\n\nimport { KUIViewer } from 'kui-viewer/react';\n\nexport function BimViewer() {\n  return (\n    <div className=\"w-full h-[600px] rounded-md overflow-hidden border\">\n      <KUIViewer\n        className=\"w-full h-full\"\n        modelUrl=\"/models/site.ifc\"\n        pixelRatioCap={2}\n        onReady={(viewer) => {\n          // viewer is the vanilla TS core — fit camera, register listeners, etc.\n          console.log('viewer ready', viewer);\n        }}\n      />\n    </div>\n  );\n}\n",
+      "description": "Browser-based IFC/BIM 3D viewer built on Three.js, web-ifc and @thatopen/fragments. Ships a vanilla TypeScript core plus an optional React subpath (`kui-viewer/react`) exposing the `<KUIViewer />` component, a `ViewerProvider`, and a Zustand-backed `useViewerStore` hook for selection, federation and spatial-tree state. In-viewport widgets — an interactive NavCube, a pill toolbar (`viewer.toolbar`) and a dolly ZoomSlider — mount as children of `<KUIViewer />` and wire themselves to the live camera via `useViewer`.",
+      "source": "'use client';\n// Install:  npm install kui-viewer\n// React subpath: kui-viewer/react\n//\n// Since 0.0.3 the published `kui-viewer/styles.css` no longer ships the\n// Tailwind preflight or default theme tokens, so importing it next to your\n// project-level Tailwind setup is safe — design tokens stay isolated under\n// the `--color-kui-viewer-*` namespace.\nimport { useEffect, useRef } from 'react';\nimport 'kui-viewer/styles.css';\nimport {\n  KUIViewer,\n  ModelLoader,\n  NavCube,\n  useViewer,\n  useFitToScene,\n} from 'kui-viewer/react';\nimport { ZoomSlider } from 'kui-viewer';\n\n// ZoomSlider ships no React wrapper — mount the vanilla element by hand and\n// dispose it on unmount (the same pattern <NavCube/> uses internally).\nfunction ZoomSliderOverlay() {\n  const viewer = useViewer();\n  const ref = useRef<HTMLDivElement>(null);\n  useEffect(() => {\n    const host = ref.current;\n    if (!host) return;\n    const { el, dispose } = ZoomSlider(viewer.camera, viewer.controls, {\n      minDistance: 1,\n      maxDistance: 300,\n    });\n    host.appendChild(el);\n    return () => {\n      dispose();\n      el.remove();\n    };\n  }, [viewer]);\n  return <div ref={ref} className=\"absolute right-3 top-[128px] h-7 w-24\" />;\n}\n\n// Add controls to the viewer's pre-created default toolbar pill.\nfunction ToolbarWidgets() {\n  const viewer = useViewer();\n  const fitToScene = useFitToScene();\n  useEffect(() => {\n    const fit = viewer.toolbar.addButton({\n      id: 'fit',\n      label: 'Fit',\n      tooltip: 'Fit model to view',\n      onClick: () => fitToScene(400),\n    });\n    return () => fit.remove();\n  }, [viewer, fitToScene]);\n  return null;\n}\n\nexport function BimViewer() {\n  return (\n    <div className=\"w-full h-[600px] rounded-md overflow-hidden border\">\n      <KUIViewer\n        // `relative` anchors the absolutely-positioned overlay children.\n        className=\"relative w-full h-full\"\n        pixelRatioCap={2}\n        onReady={(viewer) => {\n          // viewer is the vanilla TS core — fit camera, register listeners, etc.\n          console.log('viewer ready', viewer);\n        }}\n      >\n        {/* Since 0.0.7 the model loads via this headless child, not a prop. */}\n        <ModelLoader source=\"/models/site.ifc\" />\n        <ToolbarWidgets />\n        {/* NavCube fills its positioned wrapper. */}\n        <div className=\"absolute right-3 top-3 h-24 w-24\">\n          <NavCube />\n        </div>\n        <ZoomSliderOverlay />\n      </KUIViewer>\n    </div>\n  );\n}\n",
       "variants": [],
       "status": "beta",
       "since": "2026-05",
@@ -8504,7 +8504,7 @@
       ],
       "external": {
         "packageName": "kui-viewer",
-        "version": "0.0.1",
+        "version": "0.0.7",
         "homepage": "https://kui-viewer.kuray.dev",
         "npm": "https://www.npmjs.com/package/kui-viewer",
         "github": "https://github.com/kuraykaraaslan/kui-viewer"

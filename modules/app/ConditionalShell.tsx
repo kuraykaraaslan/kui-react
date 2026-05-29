@@ -2,7 +2,7 @@
 import { usePathname } from 'next/navigation';
 import { ShowcaseShell } from '@/modules/showcase/ui/ShowcaseShell';
 
-const BYPASS_PREFIXES = ['/internal/'];
+const BYPASS_PREFIXES = ['/internal/', '/theme/'];
 
 export function ConditionalShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? '/';

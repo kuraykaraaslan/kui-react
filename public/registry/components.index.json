@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-05-28T07:00:35.070Z",
+  "generatedAt": "2026-05-29T15:24:50.963Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -5003,7 +5003,7 @@
       "category": "Library",
       "filePath": "modules/showcase/data/sections/lib-kui-viewer.showcase.tsx",
       "abbr": "KV",
-      "description": "Browser-based IFC/BIM 3D viewer built on Three.js, web-ifc and @thatopen/fragments. Ships a vanilla TypeScript core plus an optional React subpath (`kui-viewer/react`) exposing the `<KUIViewer />` component, a `ViewerProvider`, and a Zustand-backed `useViewerStore` hook for selection, federation and spatial-tree state.",
+      "description": "Browser-based IFC/BIM 3D viewer built on Three.js, web-ifc and @thatopen/fragments. Ships a vanilla TypeScript core plus an optional React subpath (`kui-viewer/react`) exposing the `<KUIViewer />` component, a `ViewerProvider`, and a Zustand-backed `useViewerStore` hook for selection, federation and spatial-tree state. In-viewport widgets — an interactive NavCube, a pill toolbar (`viewer.toolbar`) and a dolly ZoomSlider — mount as children of `<KUIViewer />` and wire themselves to the live camera via `useViewer`.",
       "status": "beta",
       "since": "2026-05",
       "whenToUse": "When you need to render IFC/BIM models in the browser — viewing, navigating and inspecting AEC scenes — and want a framework-agnostic core with an optional React wrapper.",
@@ -5018,7 +5018,7 @@
       ],
       "external": {
         "packageName": "kui-viewer",
-        "version": "0.0.1",
+        "version": "0.0.7",
         "homepage": "https://kui-viewer.kuray.dev",
         "npm": "https://www.npmjs.com/package/kui-viewer",
         "github": "https://github.com/kuraykaraaslan/kui-viewer"

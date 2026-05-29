@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# kui-viewer static assets — synced from node_modules by scripts/sync-kui-viewer-assets.mjs (predev/prebuild)
+/public/wasm/
+/public/assets/ifc-parser.worker-*.js
+/public/assets/ifc-parser.worker-*.js.map
