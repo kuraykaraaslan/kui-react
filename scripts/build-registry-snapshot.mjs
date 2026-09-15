@@ -210,7 +210,14 @@ async function main() {
   // On Vercel (and other CI) Puppeteer's Chrome isn't installed and the
   // committed snapshot under public/registry + public/components is already
   // the source of truth for the build. Skip regeneration there.
-  if (process.env.SKIP_REGISTRY_SNAPSHOT === '1' || process.env.VERCEL || process.env.CI) {
+  //
+  // FORCE_REGISTRY_SNAPSHOT=1 overrides this — used by the CI "snapshot
+  // drift" job, which needs to actually regenerate the snapshot (with
+  // Puppeteer installed) and diff it against what's committed.
+  if (
+    process.env.FORCE_REGISTRY_SNAPSHOT !== '1' &&
+    (process.env.SKIP_REGISTRY_SNAPSHOT === '1' || process.env.VERCEL || process.env.CI)
+  ) {
     const haveSnapshot = existsSync(REGISTRY_FILE) && existsSync(INDEX_FILE);
     if (haveSnapshot) {
       console.log('[snapshot] CI/Vercel detected — using committed snapshot, skipping regeneration');

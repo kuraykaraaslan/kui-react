@@ -1,0 +1,74 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: typecheck, lint (report-only), build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Type check
+        run: npx tsc --noEmit
+      # `npm run lint` genuinely fails today — 307 pre-existing errors in
+      # modules/ + app/theme/**, mostly @next/next/no-html-link-for-pages
+      # (<a> instead of next/link across theme pages), no-unused-vars, and
+      # no-img-element. Making this blocking now would make CI permanently
+      # red. It stays report-only (non-blocking) until docs/dev/phase-1
+      # section 1.6's debt ratchet gives it a baseline and a downward-only
+      # budget; remove `continue-on-error` once that lands and the count
+      # is at (or driven to) zero.
+      - name: Lint (report-only — see comment above)
+        run: npm run lint
+        continue-on-error: true
+      - name: Build
+        run: npm run build
+
+  stale-strings:
+    name: no stale internal paths
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Grep for stale absolute-path references
+        run: |
+          ! grep -rn '02_EJS_Components\|01_NextJS_Components\|00_Config_and_AI_Rules\|next_js_components' \
+            --include='*.md' --include='*.ts' --include='*.tsx' --include='.env.example' . \
+            --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=dist
+
+  snapshot-drift:
+    name: registry snapshot is up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Force real regeneration (bypasses the CI skip that lets `next build`
+      # reuse the committed snapshot) so this job actually catches drift.
+      - name: Regenerate registry snapshot
+        run: FORCE_REGISTRY_SNAPSHOT=1 npm run registry:snapshot
+      - name: Fail if the committed snapshot is stale
+        # -I'"generatedAt"' ignores the one line that legitimately changes
+        # on every run (the regeneration timestamp) so this job only fails
+        # on a real content difference. See docs/dev/phase-1-ci-and-gates.md
+        # section 1.2 — the proper fix (move generatedAt to its own file)
+        # is tracked there; this is the interim, verified-working guard.
+        run: |
+          git diff --exit-code -I'"generatedAt"' -- public/registry public/components || {
+            echo "::error::public/registry/** or public/components/** is out of date. Run 'npm run registry:snapshot' and commit the result.";
+            exit 1;
+          }
