@@ -1,5 +1,7 @@
 # kui-react
 
+[![CI](https://github.com/kuraykaraaslan/kui-react/actions/workflows/ci.yml/badge.svg)](https://github.com/kuraykaraaslan/kui-react/actions/workflows/ci.yml)
+
 A modular Next.js 16 / React 19 component library organised by atomic design — atoms → molecules → organisms → app patterns → industry-vertical domains → full-page theme demos. Every component is **copy-paste-ready** from the live showcase; no npm install required.
 
 > **AI assistants:** start at `/llms.txt` or fetch `/api/registry` for a machine-readable catalog of every component. See the [AI agent quick reference](#ai-agent-quick-reference) below.

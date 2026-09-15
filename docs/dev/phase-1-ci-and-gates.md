@@ -13,7 +13,7 @@ Today neither repo has a workflow file. `kui-viewer/.github/workflows/ci.yml` an
 - [x] `[ejs]` `.github/workflows/ci.yml` with jobs `check` (build, token audit, spacing lint, raw-output audit, dead-partial scan), `stale-strings`, `snapshot-drift`.
 - [x] `[both]` Concurrency group per branch so superseded runs cancel.
 - [ ] `[both]` Enable branch protection on `main`: require the `check` and `snapshot-drift` jobs. (Needs repo admin access on github.com — not doable from a local checkout.)
-- [ ] `[both]` Add a CI status badge to `README.md`.
+- [x] `[both]` Add a CI status badge to `README.md`.
 
 **What actually happened wiring this up** (both workflows are verified working, not aspirational — `next build` with `CI=1`, the full `npm run ci` equivalent, and the forced snapshot regeneration were all run locally before committing):
 
