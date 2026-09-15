@@ -1,3 +1,4 @@
+'use client';
 import { Card } from '@/modules/ui/Card';
 import type { EventWithData } from '@/modules/domains/event/types';
 

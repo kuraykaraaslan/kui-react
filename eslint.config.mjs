@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import kuiPlugin from "./eslint-rules/index.mjs";
 
 // NOTE: eslint-plugin-tailwindcss is installed but intentionally NOT wired in.
 // It requires a tailwind.config.js which does not exist in Tailwind CSS v4 —
@@ -25,6 +26,19 @@ const eslintConfig = defineConfig([
     // scripts (ESM) are still linted normally.
     "scripts/**/*.js",
   ]),
+  // Local rules encoding AGENTS.md's Component Authoring Rules for the
+  // modules/ui, modules/app, modules/domains layers. See eslint-rules/index.mjs
+  // and docs/dev/phase-1-ci-and-gates.md section 1.4.
+  {
+    files: ["modules/ui/**/*.{ts,tsx}", "modules/app/**/*.{ts,tsx}", "modules/domains/**/*.{ts,tsx}"],
+    plugins: { kui: kuiPlugin },
+    rules: {
+      "kui/use-client-header": "error",
+      "kui/no-default-export": "error",
+      "kui/classname-uses-cn": "error",
+      "kui/no-bare-browser-globals-in-ui": "error",
+    },
+  },
 ]);
 
 export default eslintConfig;

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { cn } from '@/libs/utils/cn';
 import { Modal } from '@/modules/ui/Modal';
 import { Input } from '@/modules/ui/Input';
 import { Button } from '@/modules/ui/Button';
@@ -64,12 +65,10 @@ export function TableInsertModal({
                 aria-selected={active}
                 onMouseEnter={() => { setHoverRow(r); setHoverCol(c); }}
                 onClick={() => { setRows(r); setCols(c); }}
-                className={
-                  'w-5 h-5 rounded-[2px] border ' +
-                  (active
-                    ? 'bg-primary border-primary'
-                    : 'bg-surface-base border-border hover:border-primary')
-                }
+                className={cn(
+                  'w-5 h-5 rounded-[2px] border',
+                  active ? 'bg-primary border-primary' : 'bg-surface-base border-border hover:border-primary',
+                )}
               />
             );
           })}

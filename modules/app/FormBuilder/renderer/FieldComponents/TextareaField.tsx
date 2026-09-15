@@ -1,4 +1,5 @@
 'use client';
+import { cn } from '@/libs/utils/cn';
 import type { Field } from '../../types';
 import { FieldShell, baseInputClasses, describedBy } from './FieldShell';
 
@@ -23,7 +24,7 @@ export function TextareaField({ field, value, error, onChange }: Props) {
         aria-invalid={error ? 'true' : undefined}
         aria-describedby={describedBy(field.helperText, error, field.id)}
         onChange={(e) => onChange(e.target.value)}
-        className={baseInputClasses + ' resize-y min-h-[6rem]'}
+        className={cn(baseInputClasses, 'resize-y min-h-[6rem]')}
       />
     </FieldShell>
   );

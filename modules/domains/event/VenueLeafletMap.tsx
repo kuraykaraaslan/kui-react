@@ -30,6 +30,10 @@ type VenueLeafletMapProps = {
   interactive?: boolean;
 };
 
+// Consumed via next/dynamic in VenueMapBox.tsx
+// (dynamic(() => import('./VenueLeafletMap'))), which requires a default
+// export.
+// eslint-disable-next-line kui/no-default-export
 export default function VenueLeafletMap({
   lat,
   lng,

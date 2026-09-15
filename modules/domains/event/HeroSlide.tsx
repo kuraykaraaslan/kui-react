@@ -1,3 +1,4 @@
+'use client';
 import { Badge } from '@/modules/ui/Badge';
 import { EventCategoryBadge } from '@/modules/domains/event/EventCategoryBadge';
 import { EventStatusBadge } from '@/modules/domains/event/EventStatusBadge';

@@ -1,4 +1,5 @@
 'use client';
+import { cn } from '@/libs/utils/cn';
 import type { Field } from '../../types';
 import { FieldShell, baseInputClasses, describedBy } from './FieldShell';
 
@@ -23,7 +24,7 @@ export function FileField({ field, error, onChange }: Props) {
         aria-invalid={error ? 'true' : undefined}
         aria-describedby={describedBy(field.helperText, error, field.id)}
         onChange={(e) => onChange(e.target.files?.[0]?.name ?? '')}
-        className={baseInputClasses + ' file:mr-3 file:px-2 file:py-1 file:rounded file:border-0 file:bg-surface-overlay file:text-text-primary'}
+        className={cn(baseInputClasses, 'file:mr-3 file:px-2 file:py-1 file:rounded file:border-0 file:bg-surface-overlay file:text-text-primary')}
       />
     </FieldShell>
   );

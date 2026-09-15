@@ -1,4 +1,5 @@
 'use client';
+import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
@@ -25,22 +26,28 @@ export function StepIndicator({ current }: StepIndicatorProps) {
           <div key={step.id} className="flex items-center">
             <div className="flex flex-col items-center gap-1">
               <div
-                className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-colors ${
+                className={cn(
+                  'flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-colors',
                   done
                     ? 'bg-success text-white'
                     : active
                       ? 'bg-primary text-primary-fg'
-                      : 'bg-surface-overlay text-text-disabled border border-border'
-                }`}
+                      : 'bg-surface-overlay text-text-disabled border border-border',
+                )}
               >
                 {done ? <FontAwesomeIcon icon={faCheck} className="w-3 h-3" aria-hidden="true" /> : i + 1}
               </div>
-              <span className={`text-[10px] font-medium whitespace-nowrap ${active ? 'text-primary' : done ? 'text-text-secondary' : 'text-text-disabled'}`}>
+              <span
+                className={cn(
+                  'text-[10px] font-medium whitespace-nowrap',
+                  active ? 'text-primary' : done ? 'text-text-secondary' : 'text-text-disabled',
+                )}
+              >
                 {step.label}
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`h-px w-12 sm:w-16 mb-4 transition-colors ${done ? 'bg-success' : 'bg-border'}`} />
+              <div className={cn('h-px w-12 sm:w-16 mb-4 transition-colors', done ? 'bg-success' : 'bg-border')} />
             )}
           </div>
         );
