@@ -29,6 +29,10 @@ import { buildAppCalendarData } from './sections/app-calendar.showcase';
 import { buildAppGanttData } from './sections/app-gantt.showcase';
 import { buildAppFormBuilderData } from './sections/app-form-builder.showcase';
 import { buildMoleculeDiffViewerData } from './sections/ui-molecule-diff-viewer.showcase';
+import { buildAccordionData } from './sections/ui-molecule-accordion.showcase';
+import { buildRangeSliderData } from './sections/ui-molecule-range-slider.showcase';
+import { buildPopconfirmData } from './sections/ui-molecule-popconfirm.showcase';
+import { buildTimePickerData } from './sections/ui-molecule-time-picker.showcase';
 import { buildLibKuiViewerData } from './sections/lib-kui-viewer.showcase';
 
 export function buildShowcaseData() {
@@ -36,6 +40,10 @@ export function buildShowcaseData() {
     ...buildAtomsData(),
     ...buildMoleculesData(),
     ...buildMoleculeDiffViewerData(),
+    ...buildAccordionData(),
+    ...buildRangeSliderData(),
+    ...buildPopconfirmData(),
+    ...buildTimePickerData(),
     ...buildPrimitiveChartsData(),
     ...buildOrganismsData(),
     ...buildAppPatternsData(),

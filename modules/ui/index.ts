@@ -3,6 +3,8 @@
 // unused components out of downstream consumer bundles.
 
 // Atoms
+export { Accordion } from './Accordion';
+export type { AccordionItem } from './Accordion';
 export { Avatar, AvatarGroup } from './Avatar';
 export { Badge } from './Badge';
 export { BrandLogo } from './BrandLogo';
@@ -11,12 +13,18 @@ export { Checkbox } from './Checkbox';
 export { DatePicker } from './DatePicker';
 export { FileInput } from './FileInput';
 export { Input } from './Input';
+export { Label } from './Label';
+export { Progress } from './Progress';
+export { RangeSlider } from './RangeSlider';
+export { ScrollArea } from './ScrollArea';
 export { Select } from './Select';
 export type { SelectOption } from './Select';
+export { Separator } from './Separator';
 export { SkipLink, LiveRegion, Announcer } from './SkipLink';
 export { Spinner } from './Spinner';
 export { StarRating } from './StarRating';
 export { StatCard } from './StatCard';
+export { Statistic } from './Statistic';
 export { Textarea } from './Textarea';
 export { Toggle } from './Toggle';
 
@@ -49,6 +57,7 @@ export type { MultiSelectOption } from './MultiSelect';
 export { PageHeader } from './PageHeader';
 export type { PageHeaderAction } from './PageHeader';
 export { Pagination } from './Pagination';
+export { Popconfirm } from './Popconfirm';
 export { Popover } from './Popover';
 export { RadioGroup } from './RadioGroup';
 export type { RadioOption } from './RadioGroup';

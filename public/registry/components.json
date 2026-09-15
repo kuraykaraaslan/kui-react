@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-09-05T04:30:00.705Z",
+  "generatedAt": "2026-09-15T12:12:44.192Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -232,6 +232,7 @@
         "form-builder",
         "gantt",
         "onboarding-wizard",
+        "popconfirm",
         "reviews-review-submit-form",
         "rich-text-editor",
         "share-dialog"
@@ -551,6 +552,136 @@
         "reviews-review-submit-form",
         "reviews-review-summary-card"
       ]
+    },
+    {
+      "id": "label",
+      "name": "Label",
+      "layer": "ui",
+      "category": "Atom",
+      "filePath": "modules/ui/Label.tsx",
+      "abbr": "Lb",
+      "description": "Standalone form label with an optional required indicator and disabled state, for pairing with custom controls that do not manage their own label.",
+      "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\ntype LabelProps = {\n  required?: boolean;\n  disabled?: boolean;\n  className?: string;\n  children?: React.ReactNode;\n} & React.LabelHTMLAttributes<HTMLLabelElement>;\n\nexport function Label({ required, disabled, className, children, ...rest }: LabelProps) {\n  return (\n    <label\n      className={cn(\n        'block text-sm font-medium text-text-primary select-none',\n        disabled && 'text-text-disabled cursor-not-allowed',\n        className\n      )}\n      {...rest}\n    >\n      {children}\n      {required && (\n        <>\n          <span className=\"text-error ml-1\" aria-hidden=\"true\">*</span>\n          <span className=\"sr-only\">(required)</span>\n        </>\n      )}\n    </label>\n  );\n}",
+      "variants": [
+        {
+          "title": "Basic + required",
+          "code": "<Label htmlFor=\"name\">Full name</Label>\n<Label htmlFor=\"email\" required>Email address</Label>"
+        },
+        {
+          "title": "Paired with a custom control",
+          "code": "<Label htmlFor=\"bio\">Bio</Label>\n<textarea id=\"bio\" rows={2} />\n\n<Label disabled htmlFor=\"handle\">Handle (disabled)</Label>\n<input id=\"handle\" disabled placeholder=\"@handle\" />"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-09",
+      "designTokens": [
+        "--error",
+        "--primary",
+        "--text-disabled",
+        "--text-primary"
+      ]
+    },
+    {
+      "id": "separator",
+      "name": "Separator",
+      "layer": "ui",
+      "category": "Atom",
+      "filePath": "modules/ui/Separator.tsx",
+      "abbr": "Se",
+      "description": "Visual divider between sections of content. Supports horizontal and vertical orientation, and an optional centered label for horizontal dividers.",
+      "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\ntype SeparatorOrientation = 'horizontal' | 'vertical';\n\ntype SeparatorProps = {\n  orientation?: SeparatorOrientation;\n  decorative?: boolean;\n  label?: React.ReactNode;\n  className?: string;\n} & React.HTMLAttributes<HTMLDivElement>;\n\nexport function Separator({ orientation = 'horizontal', decorative = true, label, className, ...rest }: SeparatorProps) {\n  if (label && orientation === 'horizontal') {\n    return (\n      <div role={decorative ? 'none' : 'separator'} className={cn('flex items-center gap-3 text-xs font-medium text-text-secondary', className)} {...rest}>\n        <span className=\"h-px flex-1 bg-border\" />\n        {label}\n        <span className=\"h-px flex-1 bg-border\" />\n      </div>\n    );\n  }\n  return (\n    <div\n      role={decorative ? 'none' : 'separator'}\n      className={cn('shrink-0 bg-border', orientation === 'horizontal' ? 'h-px w-full' : 'h-full w-px', className)}\n      {...rest}\n    />\n  );\n}",
+      "variants": [
+        {
+          "title": "Horizontal",
+          "code": "<p>Section one content</p>\n<Separator />\n<p>Section two content</p>"
+        },
+        {
+          "title": "Vertical + labeled",
+          "code": "<span>Profile</span>\n<Separator orientation=\"vertical\" />\n<span>Settings</span>\n\n<Separator label=\"OR\" />"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-09",
+      "designTokens": [
+        "--border",
+        "--secondary",
+        "--text-secondary"
+      ]
+    },
+    {
+      "id": "scroll-area",
+      "name": "ScrollArea",
+      "layer": "ui",
+      "category": "Atom",
+      "filePath": "modules/ui/ScrollArea.tsx",
+      "abbr": "SA",
+      "description": "Scrollable container with a themed, thin scrollbar (Firefox scrollbar-color + WebKit pseudo-elements) instead of the bulky native default. Supports vertical, horizontal, or both-axis scrolling.",
+      "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\ntype ScrollAreaOrientation = 'vertical' | 'horizontal' | 'both';\n\ntype ScrollAreaProps = {\n  orientation?: ScrollAreaOrientation;\n  className?: string;\n  children?: React.ReactNode;\n} & React.HTMLAttributes<HTMLDivElement>;\n\nconst overflowClasses: Record<ScrollAreaOrientation, string> = {\n  vertical: 'overflow-y-auto overflow-x-hidden',\n  horizontal: 'overflow-x-auto overflow-y-hidden',\n  both: 'overflow-auto',\n};\n\nexport function ScrollArea({ orientation = 'vertical', className, children, ...rest }: ScrollAreaProps) {\n  return (\n    <div\n      className={cn(\n        'relative rounded-md',\n        overflowClasses[orientation],\n        '[scrollbar-width:thin] [scrollbar-color:var(--border-strong)_transparent]',\n        '[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2',\n        '[&::-webkit-scrollbar-track]:bg-transparent',\n        '[&::-webkit-scrollbar-thumb]:bg-border-strong [&::-webkit-scrollbar-thumb]:rounded-full',\n        className\n      )}\n      {...rest}\n    >\n      {children}\n    </div>\n  );\n}",
+      "variants": [
+        {
+          "title": "Vertical list",
+          "code": "<ScrollArea className=\"h-40 w-64 rounded-md border border-border p-3\">\n  <ul className=\"space-y-2\">\n    {items.map((item) => <li key={item.id}>{item.label}</li>)}\n  </ul>\n</ScrollArea>"
+        },
+        {
+          "title": "Horizontal",
+          "code": "<ScrollArea orientation=\"horizontal\" className=\"w-full rounded-md border border-border p-3\">\n  <div className=\"flex gap-3\">\n    {cards.map((c) => <Card key={c.id} {...c} />)}\n  </div>\n</ScrollArea>"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-09",
+      "designTokens": [
+        "--border",
+        "--border-strong"
+      ]
+    },
+    {
+      "id": "progress",
+      "name": "Progress",
+      "layer": "ui",
+      "category": "Atom",
+      "filePath": "modules/ui/Progress.tsx",
+      "abbr": "Pr",
+      "description": "Determinate progress indicator as a bar or a circle, with variant colors and an optional percentage label.",
+      "source": "'use client';\nimport { Progress } from '@/modules/ui/Progress';\n\n<Progress value={62} />\n<Progress value={90} variant=\"success\" showLabel />\n<Progress value={40} shape=\"circle\" showLabel />",
+      "variants": [
+        {
+          "title": "Bar",
+          "code": "<Progress value={30} />\n<Progress value={62} variant=\"warning\" showLabel />\n<Progress value={90} variant=\"success\" size=\"lg\" showLabel />"
+        },
+        {
+          "title": "Circle",
+          "code": "<Progress value={40} shape=\"circle\" showLabel />\n<Progress value={75} shape=\"circle\" variant=\"success\" size=\"lg\" showLabel />"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-09",
+      "designTokens": []
+    },
+    {
+      "id": "statistic",
+      "name": "Statistic",
+      "layer": "ui",
+      "category": "Atom",
+      "filePath": "modules/ui/Statistic.tsx",
+      "abbr": "St",
+      "description": "Bare numeric/text figure with a label, optional prefix/suffix, trend indicator, and loading skeleton — no card chrome (compose with Card for a bordered KPI tile).",
+      "source": "'use client';\nimport { Statistic } from '@/modules/ui/Statistic';\n\n<Statistic label=\"Active users\" value={1284} />\n<Statistic label=\"Conversion rate\" value={4.2} precision={1} suffix=\"%\" trend=\"up\" trendValue=\"+0.6%\" />\n<Statistic label=\"Revenue\" value={82400} prefix=\"$\" trend=\"down\" trendValue=\"-3.1%\" />",
+      "variants": [
+        {
+          "title": "Basic",
+          "code": "<Statistic label=\"Active users\" value={1284} />\n<Statistic label=\"Open tickets\" value={12} />"
+        },
+        {
+          "title": "Prefix / suffix / trend",
+          "code": "<Statistic label=\"Revenue\" value={82400} prefix=\"$\" trend=\"up\" trendValue=\"+12.4%\" />\n<Statistic label=\"Conversion rate\" value={4.2} precision={1} suffix=\"%\" trend=\"down\" trendValue=\"-0.6%\" />\n<Statistic label=\"Loading example\" value={0} loading />"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-09",
+      "relatedTo": [
+        "stat-card"
+      ],
+      "designTokens": []
     },
     {
       "id": "input",
@@ -1232,6 +1363,145 @@
         "--error",
         "--error-subtle"
       ]
+    },
+    {
+      "id": "accordion",
+      "name": "Accordion",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/Accordion.tsx",
+      "abbr": "Ac",
+      "description": "Vertically stacked, collapsible content panels. Single-open by default, or `allowMultiple` for independent panels. Fully keyboard accessible via native `<button>` disclosure headers.",
+      "source": "'use client';\nimport { Accordion } from '@/modules/ui/Accordion';\n\n<Accordion\n  items={[\n    { id: 'shipping', title: 'Shipping', content: '...' },\n    { id: 'returns', title: 'Returns', content: '...' },\n  ]}\n  defaultOpenIds={['shipping']}\n/>",
+      "variants": [
+        {
+          "title": "Single open (default)",
+          "code": "<Accordion\n  items={[\n    { id: 'shipping', title: 'Shipping', content: '...' },\n    { id: 'returns', title: 'Returns', content: '...' },\n    { id: 'warranty', title: 'Warranty', content: '...', disabled: true },\n  ]}\n  defaultOpenIds={['shipping']}\n/>"
+        },
+        {
+          "title": "Allow multiple open",
+          "code": "<Accordion\n  allowMultiple\n  items={[{ id: 'a', title: 'Section A', content: '...' }, { id: 'b', title: 'Section B', content: '...' }]}\n  defaultOpenIds={['a', 'b']}\n/>"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-09",
+      "composes": [],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "disclosure (accordion)"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Tab",
+            "action": "Move focus between panel headers"
+          },
+          {
+            "keys": "Enter / Space",
+            "action": "Toggle the focused panel"
+          }
+        ]
+      },
+      "designTokens": []
+    },
+    {
+      "id": "range-slider",
+      "name": "RangeSlider",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/RangeSlider.tsx",
+      "abbr": "Rs",
+      "description": "Numeric range input built on native `<input type=\"range\">`. Single-handle by default, or `range` for a dual-handle min/max selector. Distinct from the `Slider` carousel component.",
+      "source": "'use client';\nimport { RangeSlider } from '@/modules/ui/RangeSlider';\n\nconst [v, setV] = useState(40);\n<RangeSlider label=\"Volume\" value={v} onChange={setV} />\n\nconst [range, setRange] = useState<[number, number]>([20, 70]);\n<RangeSlider range label=\"Price range\" value={range} onChange={setRange} min={0} max={100} />",
+      "variants": [
+        {
+          "title": "Single value",
+          "code": "const [v, setV] = useState(40);\n<RangeSlider label=\"Volume\" value={v} onChange={setV} />"
+        },
+        {
+          "title": "Dual handle (range)",
+          "code": "const [range, setRange] = useState<[number, number]>([20, 70]);\n<RangeSlider range label=\"Price range\" value={range} onChange={setRange} min={0} max={100} />"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-09",
+      "relatedTo": [
+        "slider"
+      ],
+      "designTokens": []
+    },
+    {
+      "id": "popconfirm",
+      "name": "Popconfirm",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/Popconfirm.tsx",
+      "abbr": "Pc",
+      "description": "Inline \"are you sure?\" confirmation popover for destructive or consequential actions — lighter-weight than a full Modal. Built on the same dismiss/focus-trap primitives as Popover.",
+      "source": "'use client';\nimport { Popconfirm } from '@/modules/ui/Popconfirm';\nimport { Button } from '@/modules/ui/Button';\n\n<Popconfirm\n  trigger={<Button variant=\"danger\">Delete</Button>}\n  title=\"Delete this item?\"\n  description=\"This action cannot be undone.\"\n  danger\n  confirmLabel=\"Delete\"\n  onConfirm={() => remove(id)}\n/>",
+      "variants": [
+        {
+          "title": "Default",
+          "code": "<Popconfirm trigger={<Button variant=\"outline\">Log out</Button>} title=\"Log out of your account?\" onConfirm={handleLogout} />"
+        },
+        {
+          "title": "Danger + description",
+          "code": "<Popconfirm\n  trigger={<Button variant=\"danger\">Delete project</Button>}\n  title=\"Delete this project?\"\n  description=\"This action cannot be undone.\"\n  danger\n  confirmLabel=\"Delete\"\n  onConfirm={handleDelete}\n/>"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-09",
+      "composes": [
+        "button"
+      ],
+      "relatedTo": [
+        "modal"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "alertdialog"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Enter / Space",
+            "action": "Open the trigger"
+          },
+          {
+            "keys": "Tab",
+            "action": "Move between Cancel / Confirm"
+          },
+          {
+            "keys": "Escape",
+            "action": "Dismiss without confirming"
+          }
+        ]
+      },
+      "designTokens": []
+    },
+    {
+      "id": "time-picker",
+      "name": "TimePicker",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/DateRangePicker.tsx",
+      "abbr": "Tp",
+      "description": "Native `<input type=\"time\">`-based time field with label/hint/error slots, matching the Input/DatePicker pattern. M1 baseline — hour/minute only, no timezone or 12h/24h toggle yet (tracked for the DateTimePicker milestone).",
+      "source": "'use client';\nimport { TimePicker } from '@/modules/ui/DateRangePicker';\n\nconst [time, setTime] = useState('09:00');\n<TimePicker id=\"meeting\" label=\"Meeting time\" value={time} onChange={setTime} hint=\"24-hour format\" />",
+      "variants": [
+        {
+          "title": "Default",
+          "code": "const [time, setTime] = useState('09:00');\n<TimePicker id=\"meeting\" label=\"Meeting time\" value={time} onChange={setTime} hint=\"24-hour format\" />"
+        },
+        {
+          "title": "Required / error",
+          "code": "<TimePicker id=\"pickup\" label=\"Pickup time\" required error=\"Pickup time is required.\" value={time} onChange={setTime} />"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-09",
+      "whenNotToUse": "For combined date + time selection, wait for the upcoming DateTimePicker (composes DatePicker + TimePicker) rather than pairing these two manually.",
+      "designTokens": []
     },
     {
       "id": "chart",

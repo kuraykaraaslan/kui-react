@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-09-05T04:30:00.705Z",
+  "generatedAt": "2026-09-15T12:12:44.192Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -181,6 +181,7 @@
         "form-builder",
         "gantt",
         "onboarding-wizard",
+        "popconfirm",
         "reviews-review-submit-form",
         "rich-text-editor",
         "share-dialog"
@@ -352,6 +353,86 @@
         "reviews-review-submit-form",
         "reviews-review-summary-card"
       ],
+      "variantCount": 2
+    },
+    {
+      "id": "label",
+      "name": "Label",
+      "layer": "ui",
+      "category": "Atom",
+      "filePath": "modules/ui/Label.tsx",
+      "abbr": "Lb",
+      "description": "Standalone form label with an optional required indicator and disabled state, for pairing with custom controls that do not manage their own label.",
+      "status": "stable",
+      "since": "2026-09",
+      "designTokens": [
+        "--error",
+        "--primary",
+        "--text-disabled",
+        "--text-primary"
+      ],
+      "variantCount": 2
+    },
+    {
+      "id": "separator",
+      "name": "Separator",
+      "layer": "ui",
+      "category": "Atom",
+      "filePath": "modules/ui/Separator.tsx",
+      "abbr": "Se",
+      "description": "Visual divider between sections of content. Supports horizontal and vertical orientation, and an optional centered label for horizontal dividers.",
+      "status": "stable",
+      "since": "2026-09",
+      "designTokens": [
+        "--border",
+        "--secondary",
+        "--text-secondary"
+      ],
+      "variantCount": 2
+    },
+    {
+      "id": "scroll-area",
+      "name": "ScrollArea",
+      "layer": "ui",
+      "category": "Atom",
+      "filePath": "modules/ui/ScrollArea.tsx",
+      "abbr": "SA",
+      "description": "Scrollable container with a themed, thin scrollbar (Firefox scrollbar-color + WebKit pseudo-elements) instead of the bulky native default. Supports vertical, horizontal, or both-axis scrolling.",
+      "status": "stable",
+      "since": "2026-09",
+      "designTokens": [
+        "--border",
+        "--border-strong"
+      ],
+      "variantCount": 2
+    },
+    {
+      "id": "progress",
+      "name": "Progress",
+      "layer": "ui",
+      "category": "Atom",
+      "filePath": "modules/ui/Progress.tsx",
+      "abbr": "Pr",
+      "description": "Determinate progress indicator as a bar or a circle, with variant colors and an optional percentage label.",
+      "status": "stable",
+      "since": "2026-09",
+      "designTokens": [],
+      "variantCount": 2
+    },
+    {
+      "id": "statistic",
+      "name": "Statistic",
+      "layer": "ui",
+      "category": "Atom",
+      "filePath": "modules/ui/Statistic.tsx",
+      "abbr": "St",
+      "description": "Bare numeric/text figure with a label, optional prefix/suffix, trend indicator, and loading skeleton — no card chrome (compose with Card for a bordered KPI tile).",
+      "status": "stable",
+      "since": "2026-09",
+      "relatedTo": [
+        "stat-card"
+      ],
+      "designTokens": [],
       "variantCount": 2
     },
     {
@@ -730,6 +811,105 @@
         "--error-subtle"
       ],
       "variantCount": 4
+    },
+    {
+      "id": "accordion",
+      "name": "Accordion",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/Accordion.tsx",
+      "abbr": "Ac",
+      "description": "Vertically stacked, collapsible content panels. Single-open by default, or `allowMultiple` for independent panels. Fully keyboard accessible via native `<button>` disclosure headers.",
+      "status": "stable",
+      "since": "2026-09",
+      "composes": [],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "disclosure (accordion)"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Tab",
+            "action": "Move focus between panel headers"
+          },
+          {
+            "keys": "Enter / Space",
+            "action": "Toggle the focused panel"
+          }
+        ]
+      },
+      "designTokens": [],
+      "variantCount": 2
+    },
+    {
+      "id": "range-slider",
+      "name": "RangeSlider",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/RangeSlider.tsx",
+      "abbr": "Rs",
+      "description": "Numeric range input built on native `<input type=\"range\">`. Single-handle by default, or `range` for a dual-handle min/max selector. Distinct from the `Slider` carousel component.",
+      "status": "stable",
+      "since": "2026-09",
+      "relatedTo": [
+        "slider"
+      ],
+      "designTokens": [],
+      "variantCount": 2
+    },
+    {
+      "id": "popconfirm",
+      "name": "Popconfirm",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/Popconfirm.tsx",
+      "abbr": "Pc",
+      "description": "Inline \"are you sure?\" confirmation popover for destructive or consequential actions — lighter-weight than a full Modal. Built on the same dismiss/focus-trap primitives as Popover.",
+      "status": "stable",
+      "since": "2026-09",
+      "composes": [
+        "button"
+      ],
+      "relatedTo": [
+        "modal"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "alertdialog"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Enter / Space",
+            "action": "Open the trigger"
+          },
+          {
+            "keys": "Tab",
+            "action": "Move between Cancel / Confirm"
+          },
+          {
+            "keys": "Escape",
+            "action": "Dismiss without confirming"
+          }
+        ]
+      },
+      "designTokens": [],
+      "variantCount": 2
+    },
+    {
+      "id": "time-picker",
+      "name": "TimePicker",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/DateRangePicker.tsx",
+      "abbr": "Tp",
+      "description": "Native `<input type=\"time\">`-based time field with label/hint/error slots, matching the Input/DatePicker pattern. M1 baseline — hour/minute only, no timezone or 12h/24h toggle yet (tracked for the DateTimePicker milestone).",
+      "status": "stable",
+      "since": "2026-09",
+      "whenNotToUse": "For combined date + time selection, wait for the upcoming DateTimePicker (composes DatePicker + TimePicker) rather than pairing these two manually.",
+      "designTokens": [],
+      "variantCount": 2
     },
     {
       "id": "chart",

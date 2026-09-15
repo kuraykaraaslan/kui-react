@@ -53,6 +53,36 @@
     "category": "Atom",
     "file": "star-rating.md"
   },
+  "label": {
+    "name": "Label",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "label.md"
+  },
+  "separator": {
+    "name": "Separator",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "separator.md"
+  },
+  "scroll-area": {
+    "name": "ScrollArea",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "scroll-area.md"
+  },
+  "progress": {
+    "name": "Progress",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "progress.md"
+  },
+  "statistic": {
+    "name": "Statistic",
+    "layer": "ui",
+    "category": "Atom",
+    "file": "statistic.md"
+  },
   "input": {
     "name": "Input",
     "layer": "ui",
@@ -148,6 +178,30 @@
     "layer": "ui",
     "category": "Molecule",
     "file": "diff-viewer.md"
+  },
+  "accordion": {
+    "name": "Accordion",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "accordion.md"
+  },
+  "range-slider": {
+    "name": "RangeSlider",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "range-slider.md"
+  },
+  "popconfirm": {
+    "name": "Popconfirm",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "popconfirm.md"
+  },
+  "time-picker": {
+    "name": "TimePicker",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "time-picker.md"
   },
   "chart": {
     "name": "Chart",

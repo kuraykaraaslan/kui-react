@@ -31,6 +31,11 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'skip-link',    title: 'SkipLink + Live', category: 'Atom',     abbr: 'Sl', since: '2025-01' },
       { id: 'brand-logo',   title: 'BrandLogo',       category: 'Atom',     abbr: 'BL', since: '2026-05' },
       { id: 'star-rating',  title: 'StarRating',      category: 'Atom',     abbr: 'SR', since: '2026-05' },
+      { id: 'label',        title: 'Label',           category: 'Atom',     abbr: 'Lb', since: '2026-09' },
+      { id: 'separator',    title: 'Separator',       category: 'Atom',     abbr: 'Se', since: '2026-09' },
+      { id: 'scroll-area',  title: 'ScrollArea',      category: 'Atom',     abbr: 'SA', since: '2026-09' },
+      { id: 'progress',     title: 'Progress',        category: 'Atom',     abbr: 'Pr', since: '2026-09' },
+      { id: 'statistic',    title: 'Statistic',       category: 'Atom',     abbr: 'St', since: '2026-09' },
     ],
   },
   {
@@ -54,6 +59,10 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'color-picker',      title: 'ColorPicker',     category: 'Molecule', abbr: 'Cp', since: '2026-05' },
       { id: 'chart',             title: 'Chart',           category: 'Molecule', abbr: 'Ch', since: '2026-05', status: 'beta' },
       { id: 'diff-viewer',       title: 'DiffViewer',      category: 'Molecule', abbr: 'Dv', since: '2026-05' },
+      { id: 'accordion',         title: 'Accordion',       category: 'Molecule', abbr: 'Ac', since: '2026-09' },
+      { id: 'range-slider',      title: 'RangeSlider',     category: 'Molecule', abbr: 'Rs', since: '2026-09' },
+      { id: 'popconfirm',        title: 'Popconfirm',      category: 'Molecule', abbr: 'Pc', since: '2026-09' },
+      { id: 'time-picker',       title: 'TimePicker',      category: 'Molecule', abbr: 'Tp', since: '2026-09' },
     ],
   },
   {
