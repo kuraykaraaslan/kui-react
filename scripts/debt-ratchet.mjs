@@ -36,6 +36,14 @@ function countMatchingLines(dirs, pattern) {
 function countMatchingFiles(dirs, pattern, extensions) {
   let count = 0;
   for (const relPath of walkSourceFiles(REPO_ROOT, dirs, extensions)) {
+    // Both callers of this (windowDocumentInUi, forwardRefUsages) are about
+    // production component patterns (SSR safety, React-19 modernization),
+    // not general code quality — a *.test.tsx asserting against
+    // document.querySelector or the like is expected and not the debt this
+    // is meant to track. Excluded here rather than in countMatchingLines,
+    // whose three callers (any/eslint-disable/TODO) are general quality
+    // metrics where a hit inside a test file is still real debt.
+    if (relPath.endsWith('.test.tsx') || relPath.endsWith('.test.ts')) continue;
     const content = readFileSync(path.join(REPO_ROOT, relPath), 'utf8');
     if (pattern.test(content)) count++;
   }

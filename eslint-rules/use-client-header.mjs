@@ -12,6 +12,11 @@
 // files, sanitize.ts, tree.ts, useFormState.ts, printTicket.ts, ...). Only
 // .tsx files, which are what can actually contain the client-only React
 // bits (hooks, event handlers, JSX) the directive exists for, are checked.
+//
+// *.test.tsx is also exempt: a Vitest test file uses JSX to render a
+// component under test, but is never itself a Next.js server/client
+// boundary — the directive would be meaningless there. Found by phase 2.1's
+// first-wave component tests immediately flagging themselves.
 
 import path from 'node:path';
 
@@ -35,6 +40,7 @@ const rule = {
     const normalized = filename.split(path.sep).join('/');
     if (!SCOPE_RE.test(normalized)) return {};
     if (!normalized.endsWith('.tsx')) return {};
+    if (normalized.endsWith('.test.tsx')) return {};
 
     return {
       Program(node) {
