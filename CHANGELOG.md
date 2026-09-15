@@ -1,10 +1,52 @@
 # Changelog
 
-All notable changes to this project will be documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the project uses 0-based versioning (`0.x.y`) while pre-1.0.
+All notable changes to this project will be documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- `package.json` gained `license`, `repository`, `homepage`, `bugs`, `engines`, `keywords`. The
+  package has been resolvable from `package.json` alone since 1.0.0 but shipped without this
+  metadata until now.
+- `@types/leaflet` moved from `dependencies` to `devDependencies` — it was only ever needed to
+  build this repo's own `MapView`/`VenueLeafletMap` components, not by consumers of the
+  published package.
+
 ### Fixed
+
+- Four components (`FileInput`, `EmptyErrorState`, `FileUploadSection`, `LoadingState`) were
+  missing the `'use client'` directive required by every file in `modules/ui`/`modules/app`.
+
+### Docs
+
+- `AGENTS.md`: filled in the domain-vertical table (`nft`, `reviews` were shipped but
+  undocumented), the theme table (`nft`, `promozone`), and the ui atoms/molecules tables (17
+  components that existed but had no row).
+- `ROADMAP.md`: six rows (#11, #13, #14, #16, #17, #20) were marked "not implemented" for
+  features that had already shipped (`useA11yCheck`, `announce()`, `useBreakpoint`,
+  `modules/ui/index.ts`, `lazy.tsx`, `isBrowser`); coverage and the summary table are
+  recomputed.
+- Fixed stale absolute-path references (`/home/kuray/00_Config_and_AI_Rules`,
+  `/home/kuray/02_EJS_Components`, a dead GitHub URL) across `AGENTS.md` and module READMEs.
+- Added `docs/adr/` with the first four architecture decision records, and
+  `docs/dev/` with a phased improvement plan (see `docs/dev/README.md`).
+- Added standard repo hygiene files: `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/CODEOWNERS`,
+  issue templates, a PR template.
+
+## [1.0.1] — 2026-06-11
+
+### Added
+
+- README theme-demo screenshot gallery, for the npm registry page.
+
+## [1.0.0] — 2026-06-07
+
+### Added
+
+- **Library build.** `tsup` builds `index.ts`, `modules/ui/index.ts`, `modules/app/index.ts`,
+  and `modules/domains/common/index.ts` to ESM + CJS with type declarations, published as
+  `@kuraykaraaslan/kui-react`. `npm run build:lib`; `prepare` runs it on install.
 
 - **`LanguageSwitcher` and `I18nTypes` no longer guess a country from a language code.** The
   old heuristic was `lang.toUpperCase()`, which is correct only where a language code happens

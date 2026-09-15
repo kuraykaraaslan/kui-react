@@ -1,6 +1,6 @@
 # kui-react vs. react-starter-kit
 
-`.junk/react-starter-kit` (kriasoft) referans alınarak yapılan kısa bir kıyaslama. İki proje de "boilerplate" olarak anılsa da aslında farklı katmanlarda çözüm sunuyorlar — biri saf UI bileşen kütüphanesi, diğeri uçtan uca bir SaaS iskeleti.
+`~/reference-repos/react-starter-kit` (kriasoft) referans alınarak yapılan kısa bir kıyaslama. İki proje de "boilerplate" olarak anılsa da aslında farklı katmanlarda çözüm sunuyorlar — biri saf UI bileşen kütüphanesi, diğeri uçtan uca bir SaaS iskeleti.
 
 ## Özetle
 

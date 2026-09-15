@@ -1,6 +1,6 @@
 # kui-react vs. ant-design-pro
 
-`.junk/ant-design-pro` (resmi Ant Design Pro repo'su, v6.0.3) referans alınarak yapılan kısa bir kıyaslama. İkisi de "React boilerplate" olarak anılsa da farklı problemleri çözüyorlar — biri bir UI bileşen kütüphanesi + tasarım sistemi, diğeri antd üzerine kurulu, sayfaları hazır gelen bir admin/enterprise şablonu.
+`~/reference-repos/ant-design-pro` (resmi Ant Design Pro repo'su, v6.0.3) referans alınarak yapılan kısa bir kıyaslama. İkisi de "React boilerplate" olarak anılsa da farklı problemleri çözüyorlar — biri bir UI bileşen kütüphanesi + tasarım sistemi, diğeri antd üzerine kurulu, sayfaları hazır gelen bir admin/enterprise şablonu.
 
 ## Özetle
 
