@@ -35,6 +35,10 @@ jobs:
         continue-on-error: true
       - name: Spacing audit
         run: npm run audit:spacing
+      - name: Circular import check
+        run: npm run check:circular
+      - name: Cross-vertical domain import check
+        run: npm run check:cross-vertical
       # 11 genuine pre-existing violations in modules/domains/iot and
       # modules/domains/event (arbitrary Tailwind shades close to, but not
       # identical to, existing --secondary/--warning/--text-inverse token
