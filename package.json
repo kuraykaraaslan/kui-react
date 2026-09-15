@@ -47,7 +47,10 @@
     "screenshots": "node scripts/take-screenshots.js",
     "registry:snapshot": "node scripts/build-registry-snapshot.mjs",
     "mcp:server": "node scripts/mcp-server.mjs",
-    "prepare": "npm run build:lib"
+    "prepare": "npm run build:lib",
+    "audit:tokens": "node scripts/audit-tokens.mjs",
+    "audit:spacing": "node scripts/audit-spacing.mjs",
+    "audit:conventions": "node scripts/audit-conventions.mjs"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-svg-core": ">=7",

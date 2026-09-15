@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   check:
-    name: typecheck, lint (report-only), build
+    name: typecheck, lint (report-only), conventions, build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,8 +33,28 @@ jobs:
       - name: Lint (report-only — see comment above)
         run: npm run lint
         continue-on-error: true
+      - name: Spacing audit
+        run: npm run audit:spacing
+      # 11 genuine pre-existing violations in modules/domains/iot and
+      # modules/domains/event (arbitrary Tailwind shades close to, but not
+      # identical to, existing --secondary/--warning/--text-inverse token
+      # values). Blindly find-replacing them would be a real visual change,
+      # not a mechanical rename, so it needs a design look rather than
+      # happening as a side effect of adding this audit. Report-only until
+      # section 1.6's ratchet tracks it down to zero.
+      - name: Token audit (report-only — see comment above)
+        run: npm run audit:tokens
+        continue-on-error: true
       - name: Build
         run: npm run build
+      # 19 vulnerabilities today (1 critical, 12 high), all transitive
+      # through puppeteer's `ws` dependency — `npm audit fix` (non-force)
+      # doesn't touch them; only `--force` would, and that's a real
+      # dependency-version decision, not something to run as a side effect
+      # of wiring this step. Report-only until that's deliberately done.
+      - name: Dependency audit (report-only — see comment above)
+        run: npm audit --audit-level=high
+        continue-on-error: true
 
   stale-strings:
     name: no stale internal paths
