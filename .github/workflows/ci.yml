@@ -55,6 +55,15 @@ jobs:
       - name: Dependency audit (report-only — see comment above)
         run: npm audit --audit-level=high
         continue-on-error: true
+      # This is what makes the two report-only steps above safe to leave
+      # non-blocking: their counts can never quietly rise. Re-measures lint
+      # errors and token-audit violations itself (plus any/eslint-disable/
+      # TODO/window-document/forwardRef/showcase-sourceCode counts) and
+      # fails if any of them exceed scripts/debt-baseline.json. Lower a
+      # count for real, then run `node scripts/debt-ratchet.mjs --update`
+      # and commit the refreshed baseline in the same PR.
+      - name: Debt ratchet (blocking — see comment above)
+        run: npm run debt:check
 
   stale-strings:
     name: no stale internal paths

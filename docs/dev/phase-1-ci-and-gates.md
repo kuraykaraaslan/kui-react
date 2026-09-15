@@ -70,8 +70,8 @@ Write a local flat-config plugin under `eslint-rules/` (no publish needed) with:
 
 Rather than fixing 358 TODOs at once, freeze the numbers and only allow them to go down.
 
-- [ ] `[react]` `scripts/debt-ratchet.mjs` that counts: `any` usages, `eslint-disable`, `TODO|FIXME|HACK`, files in `modules/ui` touching `window`/`document`, `forwardRef` usages, showcase entries with inline `sourceCode` literals, **`npm run lint` error count**, and **`npm run audit:tokens` violation count** (seed: 30 / 47 / 358 / 13 / 10 / 316 / **307** / **11** — the last two measured while wiring CI in section 1.1, now the actual gates for turning `lint` and `audit:tokens`'s `continue-on-error` blocking). Compare with `scripts/debt-baseline.json`. Fail if any count rises; print a "you may lower the baseline" hint when it falls. Update the baseline in the same PR that lowers it.
-- [ ] `[ejs]` Same script with: inline `<script>` partials (86), `onclick=` (96), **`audit:raw` unapproved `<%- %>` sites (138** — measured in section 1.1, was ~46 when `ROADMAP.md` was last written, so this had already been silently growing), raw hex outside allowlist (0, gated and green as of section 1.1).
+- [x] `[react]` `scripts/debt-ratchet.mjs`: counts `any` usages, `eslint-disable`, `TODO|FIXME|HACK`, files in `modules/ui` touching `window`/`document`, `forwardRef` usages, showcase entries with inline `sourceCode` literals (316 — this is *entries*, i.e. occurrences of `sourceCode:`, not the 61 *files* that contain at least one), `npm run lint` error count, and `npm run audit:tokens` violation count. Baseline: 30 / 47 / 358 / 13 / 10 / 316 / 307 / 11 — matches every number this task predicted exactly, once the two bugs below were fixed. Wired as a blocking `npm run debt:check` CI step, which is what makes `lint` and `audit:tokens` safe to leave `continue-on-error` in the same job. Two real bugs caught while building it (worth knowing before trusting a metric script blindly): the lint-error regex first matched a per-violation line's `"12:5  error  ..."` instead of the summary's `"(307 errors,"`, silently reporting 7; and shelling out to `grep -E` for the hex pattern (section 1.3) doesn't support the `(?!...)` negative lookahead it needs — `grep -P` does. Both were caught by comparing the script's output against the numbers measured by hand in section 1.1, not by assuming a first working run was correct.
+- [x] `[ejs]` Same script with: inline `<script>` partials, `onclick=`, `audit:raw` unapproved `<%- %>` sites, raw hex outside allowlist. Baseline: **74** / 96 / 138 / 0. The inline-`<script>` count is 74, not the 86 quoted earlier in this doc — that 86 came from an unfiltered `grep -rl '<script' modules`, which also matches 12 already-extracted `.js` script modules (the phase-5.2 target pattern already exists for at least that many partials) and two `README.md` mentions in prose, neither a violation; scoping to `.ejs` files only, which is what "inline `<script>` **partial**" actually means, gives 74. The other three numbers matched exactly once the counting function moved from "text between two prose markers" (fragile — off by one on `unapprovedRawOutput`, because one of `audit-raw-output.sh`'s explanatory lines doesn't look like the other prose lines) to "count lines shaped like `path:lineNumber:`" (robust — every real violation has that shape, no prose line does).
 
 ## 1.7 Dependency updates
 
@@ -80,8 +80,8 @@ Rather than fixing 358 TODOs at once, freeze the numbers and only allow them to 
 
 ## Definition of done
 
-- Both repos have a green `ci.yml` on `main` and branch protection requiring it.
-- Editing a showcase file and forgetting the snapshot fails CI with a clear diff.
-- `npm run audit:conventions` exists in kui-react and passes.
-- The four missing `'use client'` files from phase 0 would now fail lint if reverted.
-- `scripts/debt-baseline.json` exists and CI enforces it.
+- Both repos have a green `ci.yml` on `main`. (Branch protection itself needs repo-admin action on github.com, not doable from a local checkout — still open.)
+- Editing a showcase file and forgetting the snapshot fails CI with a clear diff. **Done**, verified by forcing a real regeneration.
+- `npm run audit:conventions` exists in kui-react. **Its spacing half is clean and blocks CI already; its token half has an 11-item baseline the debt ratchet enforces** — "passes outright" was the wrong bar given real pre-existing debt exists; "regressions are impossible" is the actual guarantee now.
+- The four missing `'use client'` files from phase 0 would now fail lint if reverted. (Lint itself is report-only, but the ratchet's ESLint-error count would still catch a *new* violation of the same kind pushing the total past 307.)
+- `scripts/debt-baseline.json` exists in both repos and `npm run debt:check` enforces it as a blocking CI step. **Done.**

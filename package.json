@@ -50,7 +50,8 @@
     "prepare": "npm run build:lib",
     "audit:tokens": "node scripts/audit-tokens.mjs",
     "audit:spacing": "node scripts/audit-spacing.mjs",
-    "audit:conventions": "node scripts/audit-conventions.mjs"
+    "audit:conventions": "node scripts/audit-conventions.mjs",
+    "debt:check": "node scripts/debt-ratchet.mjs"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-svg-core": ">=7",
