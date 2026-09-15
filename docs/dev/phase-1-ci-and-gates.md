@@ -9,58 +9,30 @@ Today neither repo has a workflow file. `kui-viewer/.github/workflows/ci.yml` an
 
 ## 1.1 GitHub Actions
 
-- [ ] `[react]` `.github/workflows/ci.yml` with jobs:
-  1. `check`: `npm ci`, `npx tsc --noEmit`, `npm run lint`.
-  2. `build`: `npm run build` with `SKIP_REGISTRY_SNAPSHOT=1` (the `prebuild` hook already skips on Vercel/CI per commit `479eafa`; make the env name explicit and document it in `package.json` scripts).
-  3. `snapshot-drift` (see 1.2).
-  4. `stale-strings`: the grep from phase 0.1.
-  Node 22 on `ubuntu-latest`; cache npm. Run on `push` to `main` and on `pull_request`.
-- [ ] `[ejs]` `.github/workflows/ci.yml` running the existing `npm run ci` (build + token audit + raw-output audit + spacing lint + dead-partials) plus `snapshot-drift` and `stale-strings`.
-- [ ] `[both]` Concurrency group per branch so superseded runs cancel.
-- [ ] `[both]` Enable branch protection on `main`: require the `check` and `snapshot-drift` jobs.
+- [x] `[react]` `.github/workflows/ci.yml` with jobs `check` (tsc, lint, build), `stale-strings`, `snapshot-drift`. Node 22, npm cache, concurrency group, runs on `push` to `main` and on `pull_request`.
+- [x] `[ejs]` `.github/workflows/ci.yml` with jobs `check` (build, token audit, spacing lint, raw-output audit, dead-partial scan), `stale-strings`, `snapshot-drift`.
+- [x] `[both]` Concurrency group per branch so superseded runs cancel.
+- [ ] `[both]` Enable branch protection on `main`: require the `check` and `snapshot-drift` jobs. (Needs repo admin access on github.com — not doable from a local checkout.)
 - [ ] `[both]` Add a CI status badge to `README.md`.
 
-Skeleton for the react workflow:
+**What actually happened wiring this up** (both workflows are verified working, not aspirational — `next build` with `CI=1`, the full `npm run ci` equivalent, and the forced snapshot regeneration were all run locally before committing):
 
-```yaml
-name: ci
-on:
-  push: { branches: [main] }
-  pull_request:
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: npm }
-      - run: npm ci
-      - run: npx tsc --noEmit
-      - run: npm run lint
-      - run: npm run audit:conventions   # from 1.3
-      - run: SKIP_REGISTRY_SNAPSHOT=1 npm run build
-  snapshot-drift:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: npm }
-      - run: npm ci
-      - run: npm run registry:snapshot
-      - run: git diff --exit-code -- public/registry public/components
-```
+- `[react]` `npm run lint` was never green: 1576 errors, and its process exit code (1) doesn't get checked when the output is piped, which is likely why nobody had noticed. Most of that was `eslint.config.mjs` linting directories it was never meant to cover — `dist/` (tsup build output), `public/**` (generated snapshot JSON, markdown, and `public/wasm`'s vendored third-party JS), `scripts/**/*.js` (plain Node/CommonJS tooling, not `modules/`-layer source). Ignoring those correctly drops it to **307 real errors** (mostly `@next/next/no-html-link-for-pages` across `app/theme/**` — `<a>` instead of `next/link`, plus `no-unused-vars` and `no-img-element`). 307 real errors is real, pre-existing debt, not something to fix as a side effect of adding CI. Lint runs with `continue-on-error: true` (report-only) until section 1.6's debt ratchet gives it a baseline; **307 is that baseline**.
+- `[ejs]` `npm run ci` was never green either: `audit:tokens` failed because its allowlist still pointed at `modules/ui/MapView.ejs`, which moved to `modules/ui/MapView/partials/_popup.ejs` in a refactor, and was missing legitimate categories entirely (`Charts.ejs` itself, `ColorPicker`'s swatch palette, `src/registry/registry.ts`'s `DESIGN_TOKENS` — the token contract necessarily contains hex — and `SeoPreview.ejs`'s Google-link-blue). Fixed in `scripts/audit-tokens.sh`; verified green.
+- `[ejs]` `audit:raw` fails too: **138 unapproved `<%- %>` sites** (grown from the ~46 `ROADMAP.md` noted). Most look like legitimate component-slot passthroughs (`locals.children`, `_trigger`, icon slots, `col.render(row)`), but at least one — `MapView.ejs` building a `<script>` literal from `_id`/`_center`/`_zoom` — genuinely needs a per-site XSS review before it's blessed, which is not something to rush through as a CI side effect. `audit:raw` also runs report-only until section 6.9 does that review properly.
+- Both `git diff --exit-code` drift checks needed `-I'"generatedAt"'` — a plain regeneration touches only that one timestamp field every run; without the ignore-pattern the drift job would fail on every single CI run, forever, on both repos. Verified by actually forcing a regeneration and diffing.
 
-The `snapshot-drift` job needs Puppeteer and a Next dev server until phase 6 makes the snapshot browser-free. Budget about 3 minutes for it; that is acceptable as a separate job.
+See `.github/workflows/ci.yml` in each repo for the actual, verified-working workflow (this doc no longer keeps a parallel copy — that's exactly the kind of thing that goes stale). `npm run audit:conventions` from section 1.3 does not exist yet; add it as a `check` step once it does.
+
+The react `snapshot-drift` job needs Puppeteer and a Next dev server until phase 6.2 makes the snapshot browser-free — budget about 3 minutes for it. The ejs one is already fast (browser-free `tsx` invocation).
 
 ## 1.2 Registry snapshot drift
 
 AGENTS.md calls a stale catalog "worse than no catalog", but nothing enforces freshness. The Claude `SessionStart` hook in `.claude/settings.json` (kui-ejs) and `.vscode/tasks.json` help one editor on one machine and nothing else.
 
-- [ ] `[both]` CI job that regenerates the snapshot and fails if `public/registry/**` or `public/components/**` differ from the commit.
-- [ ] `[both]` Make the snapshot builder deterministic: strip `generatedAt` from the diff comparison (write it to a separate `public/registry/meta.json`), sort keys, and end files with a newline, otherwise the drift job flaps.
+- [x] `[both]` CI job that regenerates the snapshot and fails if `public/registry/**` or `public/components/**` differ from the commit. Live as `snapshot-drift` in both `ci.yml` files.
+- [x] `[both]` Interim determinism fix: the drift job's `git diff --exit-code -I'"generatedAt"'` ignores the one line that legitimately changes every run, instead of flapping on every single CI run. Verified by forcing a real regeneration on both repos and diffing.
+- [ ] `[both]` The proper fix is still open: strip `generatedAt` out of `components.json`/`components.index.json` entirely and write it to a separate `public/registry/meta.json`, plus sort keys and a trailing newline, so the committed files are byte-identical across a no-op regeneration and the `-I` workaround above can be deleted.
 - [ ] `[both]` Pre-commit hook (1.5) that runs the snapshot when any file under `modules/showcase/**`, `modules/**/index.ts`, `app/theme/**` (react) or `src/data/**`, `views/theme/**`, `modules/**` (ejs) is staged.
 
 ## 1.3 Convention audits for kui-react
@@ -97,8 +69,8 @@ Write a local flat-config plugin under `eslint-rules/` (no publish needed) with:
 
 Rather than fixing 358 TODOs at once, freeze the numbers and only allow them to go down.
 
-- [ ] `[react]` `scripts/debt-ratchet.mjs` that counts: `any` usages, `eslint-disable`, `TODO|FIXME|HACK`, files in `modules/ui` touching `window`/`document`, `forwardRef` usages, showcase entries with inline `sourceCode` literals. Compare with `scripts/debt-baseline.json` (seed: 30 / 47 / 358 / 13 / 10 / 316). Fail if any count rises; print a "you may lower the baseline" hint when it falls. Update the baseline in the same PR that lowers it.
-- [ ] `[ejs]` Same script with: inline `<script>` partials (86), `onclick=` (96), `<%-` sites without a justification (see phase 6), raw hex outside allowlist (0, already gated).
+- [ ] `[react]` `scripts/debt-ratchet.mjs` that counts: `any` usages, `eslint-disable`, `TODO|FIXME|HACK`, files in `modules/ui` touching `window`/`document`, `forwardRef` usages, showcase entries with inline `sourceCode` literals, **and `npm run lint` error count** (seed: 30 / 47 / 358 / 13 / 10 / 316 / **307** — the last one measured while wiring CI in section 1.1, now the actual gate for turning lint's `continue-on-error` blocking). Compare with `scripts/debt-baseline.json`. Fail if any count rises; print a "you may lower the baseline" hint when it falls. Update the baseline in the same PR that lowers it.
+- [ ] `[ejs]` Same script with: inline `<script>` partials (86), `onclick=` (96), **`audit:raw` unapproved `<%- %>` sites (138** — measured in section 1.1, was ~46 when `ROADMAP.md` was last written, so this had already been silently growing), raw hex outside allowlist (0, gated and green as of section 1.1).
 
 ## 1.7 Dependency updates
 
