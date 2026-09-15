@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-09-15T12:12:44.192Z",
+  "generatedAt": "2026-09-15T18:11:59.861Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -2569,38 +2569,6 @@
       "designTokens": []
     },
     {
-      "id": "user-menu",
-      "name": "UserMenu",
-      "layer": "app",
-      "category": "App",
-      "filePath": "modules/app/UserMenu.tsx",
-      "abbr": "UM",
-      "description": "User dropdown opened by a trigger showing avatar, name and role. Accepts a SafeUser prop; the dropdown header shows the name and email.",
-      "source": "'use client';\nimport { Avatar } from '@/modules/ui/Avatar';\nimport { DropdownMenu } from '@/modules/ui/DropdownMenu';\n\nexport function UserMenu({ user, items, align = 'right' }) {\n  const displayName = user.userProfile?.name ?? user.name ?? user.email;\n  const avatar      = user.userProfile?.profilePicture ?? null;\n\n  const defaultItems = items ?? [\n    { type: 'item', label: 'Profile',  icon: '👤' },\n    { type: 'item', label: 'Settings', icon: '⚙️' },\n    { type: 'separator' },\n    { type: 'item', label: 'Sign out', icon: '↩️', danger: true },\n  ];\n\n  const header = (\n    <div className=\"px-3 py-2.5\">\n      <p className=\"text-sm font-semibold text-text-primary truncate\">{displayName}</p>\n      <p className=\"text-xs text-text-secondary truncate\">{user.email}</p>\n    </div>\n  );\n\n  const trigger = (\n    <button type=\"button\"\n      className=\"flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus\">\n      <Avatar src={avatar} name={displayName} size=\"sm\" />\n      <div className=\"hidden sm:block text-left min-w-0\">\n        <p className=\"text-sm font-medium text-text-primary truncate max-w-[8rem]\">{displayName}</p>\n        <p className=\"text-xs text-text-secondary truncate\">{user.userRole}</p>\n      </div>\n      <span aria-hidden=\"true\" className=\"text-text-disabled text-xs hidden sm:block\">▾</span>\n    </button>\n  );\n\n  return <DropdownMenu trigger={trigger} items={defaultItems} header={header} align={align} />;\n}",
-      "variants": [
-        {
-          "title": "Varsayılan (isim + e-posta + rol)",
-          "code": "<UserMenu\n  user={{\n    userId: 'u1',\n    email: 'jane@acme.com',\n    userRole: 'Admin',\n    userStatus: 'ACTIVE',\n    userPreferences: null,\n    userProfile: { name: 'Jane Doe', profilePicture: null },\n  }}\n/>"
-        },
-        {
-          "title": "Özel items",
-          "code": "<UserMenu\n  user={currentUser}\n  items={[\n    { label: 'View Profile',  icon: '👤', onClick: () => {} },\n    { label: 'Billing',       icon: '💳', onClick: () => {} },\n    { type: 'separator' },\n    { label: 'Sign out',      icon: '↩️', danger: true, onClick: () => {} },\n  ]}\n/>"
-        }
-      ],
-      "status": "stable",
-      "since": "2025-03",
-      "designTokens": [
-        "--border",
-        "--border-focus",
-        "--primary",
-        "--secondary",
-        "--surface-overlay",
-        "--text-disabled",
-        "--text-primary",
-        "--text-secondary"
-      ]
-    },
-    {
       "id": "global-search",
       "name": "GlobalSearch",
       "layer": "app",
@@ -2812,7 +2780,6 @@
         "modal"
       ],
       "relatedTo": [
-        "step-flow",
         "step-shell"
       ],
       "a11y": {

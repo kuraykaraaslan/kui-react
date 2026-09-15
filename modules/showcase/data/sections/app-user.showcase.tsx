@@ -1,19 +1,10 @@
 'use client';
-import { UserMenu } from '@/modules/domains/common/user/UserMenu';
 import { GlobalSearch, type SearchResult } from '@/modules/app/GlobalSearch';
 import { AppCommandBar, type CommandItem } from '@/modules/app/AppCommandBar';
 import { useState } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faUsers, faCreditCard, faReceipt, faPlus } from '@fortawesome/free-solid-svg-icons';
-
-const DEMO_USER = {
-  userId: 'demo-1',
-  email: 'jane@acme.com',
-  userRole: 'ADMIN' as const,
-  userStatus: 'ACTIVE' as const,
-  userProfile: { name: 'Jane Doe', profilePicture: null },
-};
 
 const SEARCH_RESULTS: SearchResult[] = [
   { id: 'dash',        label: 'Dashboard',     description: 'Overview page',               icon: <FontAwesomeIcon icon={faHouse}       className="w-3.5 h-3.5" />, category: 'Pages'    },
@@ -22,37 +13,6 @@ const SEARCH_RESULTS: SearchResult[] = [
   { id: 'audit',       label: 'Audit Logs',     description: 'Security and activity logs',  icon: <FontAwesomeIcon icon={faReceipt}     className="w-3.5 h-3.5" />, category: 'Settings' },
   { id: 'new-project', label: 'Create Project', description: 'Quick action',                icon: <FontAwesomeIcon icon={faPlus}        className="w-3.5 h-3.5" />, category: 'Actions'  },
 ];
-
-function UserMenuDefaultDemo() {
-  return (
-    <div className="flex items-center justify-center p-8">
-      <UserMenu user={DEMO_USER} />
-    </div>
-  );
-}
-
-function UserMenuCustomDemo() {
-  return (
-    <div className="flex items-center justify-center p-8">
-      <UserMenu
-        user={{
-          userId: 'demo-2',
-          email: 'john@acme.com',
-          userRole: 'AUTHOR' as const,
-          userStatus: 'ACTIVE' as const,
-          userProfile: { name: 'John Smith', profilePicture: null },
-        }}
-        items={[
-          { label: 'View Profile',  icon: '👤', onClick: () => {} },
-          { label: 'Billing',       icon: '💳', onClick: () => {} },
-          { label: 'Team Settings', icon: '👥', onClick: () => {} },
-          { type: 'separator' },
-          { label: 'Sign out',      icon: '↩️', danger: true, onClick: () => {} },
-        ]}
-      />
-    </div>
-  );
-}
 
 function GlobalSearchStandaloneDemo() {
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -133,79 +93,6 @@ function AppCommandBarDemo({ variant }: { variant?: 'default' | 'custom' | 'fuzz
 
 export function buildAppUserData(): ShowcaseComponent[] {
   return [
-    {
-      id: 'user-menu',
-      title: 'UserMenu',
-      category: 'App',
-      abbr: 'UM',
-      description: 'User dropdown opened by a trigger showing avatar, name and role. Accepts a SafeUser prop; the dropdown header shows the name and email.',
-      filePath: 'modules/app/UserMenu.tsx',
-      sourceCode: `'use client';
-import { Avatar } from '@/modules/ui/Avatar';
-import { DropdownMenu } from '@/modules/ui/DropdownMenu';
-
-export function UserMenu({ user, items, align = 'right' }) {
-  const displayName = user.userProfile?.name ?? user.name ?? user.email;
-  const avatar      = user.userProfile?.profilePicture ?? null;
-
-  const defaultItems = items ?? [
-    { type: 'item', label: 'Profile',  icon: '👤' },
-    { type: 'item', label: 'Settings', icon: '⚙️' },
-    { type: 'separator' },
-    { type: 'item', label: 'Sign out', icon: '↩️', danger: true },
-  ];
-
-  const header = (
-    <div className="px-3 py-2.5">
-      <p className="text-sm font-semibold text-text-primary truncate">{displayName}</p>
-      <p className="text-xs text-text-secondary truncate">{user.email}</p>
-    </div>
-  );
-
-  const trigger = (
-    <button type="button"
-      className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
-      <Avatar src={avatar} name={displayName} size="sm" />
-      <div className="hidden sm:block text-left min-w-0">
-        <p className="text-sm font-medium text-text-primary truncate max-w-[8rem]">{displayName}</p>
-        <p className="text-xs text-text-secondary truncate">{user.userRole}</p>
-      </div>
-      <span aria-hidden="true" className="text-text-disabled text-xs hidden sm:block">▾</span>
-    </button>
-  );
-
-  return <DropdownMenu trigger={trigger} items={defaultItems} header={header} align={align} />;
-}`,
-      variants: [
-        {
-          title: 'Varsayılan (isim + e-posta + rol)',
-          preview: <UserMenuDefaultDemo />,
-          code: `<UserMenu
-  user={{
-    userId: 'u1',
-    email: 'jane@acme.com',
-    userRole: 'Admin',
-    userStatus: 'ACTIVE',
-    userPreferences: null,
-    userProfile: { name: 'Jane Doe', profilePicture: null },
-  }}
-/>`,
-        },
-        {
-          title: 'Özel items',
-          preview: <UserMenuCustomDemo />,
-          code: `<UserMenu
-  user={currentUser}
-  items={[
-    { label: 'View Profile',  icon: '👤', onClick: () => {} },
-    { label: 'Billing',       icon: '💳', onClick: () => {} },
-    { type: 'separator' },
-    { label: 'Sign out',      icon: '↩️', danger: true, onClick: () => {} },
-  ]}
-/>`,
-        },
-      ],
-    },
     {
       id: 'global-search',
       title: 'GlobalSearch',

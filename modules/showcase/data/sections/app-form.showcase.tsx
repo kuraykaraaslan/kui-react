@@ -490,7 +490,11 @@ const steps: OnboardingStep[] = [
         },
       ],
       composes: ['button', 'modal'],
-      relatedTo: ['step-flow', 'step-shell'],
+      // 'step-flow' removed: modules/app/StepFlow.tsx exists but has no
+      // showcase entry yet (found by modules/registry/registry.test.ts —
+      // tracked as a real gap, not something to fabricate a relatedTo
+      // reference to). Add it back once StepFlow is showcased.
+      relatedTo: ['step-shell'],
       designTokens: ['--primary', '--surface-sunken', '--text-primary', '--text-secondary', '--border'],
       a11y: {
         wcagLevel: 'AA',

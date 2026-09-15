@@ -257,7 +257,6 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'app-top-bar',     title: 'AppTopBar',     category: 'App', abbr: 'AT', since: '2025-03' },
       { id: 'app-nav',         title: 'AppNav',        category: 'App', abbr: 'AN', since: '2025-03' },
       { id: 'nav-drawer',      title: 'NavDrawer',     category: 'App', abbr: 'ND', since: '2025-03' },
-      { id: 'user-menu',       title: 'UserMenu',      category: 'App', abbr: 'UM', since: '2025-03' },
       { id: 'global-search',   title: 'GlobalSearch',  category: 'App', abbr: 'GS', since: '2025-04' },
       { id: 'app-command-bar', title: 'AppCommandBar', category: 'App', abbr: 'CB', since: '2025-04', status: 'beta' },
       { id: 'section-card',    title: 'SectionCard',   category: 'App', abbr: 'SC', since: '2026-05' },

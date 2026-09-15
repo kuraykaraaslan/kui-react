@@ -401,12 +401,6 @@
     "category": "App",
     "file": "nav-drawer.md"
   },
-  "user-menu": {
-    "name": "UserMenu",
-    "layer": "app",
-    "category": "App",
-    "file": "user-menu.md"
-  },
   "global-search": {
     "name": "GlobalSearch",
     "layer": "app",

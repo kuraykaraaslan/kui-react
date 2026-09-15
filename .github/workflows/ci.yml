@@ -22,6 +22,18 @@ jobs:
       - run: npm ci
       - name: Type check
         run: npx tsc --noEmit
+      # Reads the committed public/registry/components.json snapshot
+      # directly (no build/dev-server needed) — see modules/registry/registry.test.ts.
+      # Genuinely green: two originally-failing checks (abbr-collision count,
+      # <2-variant count) are ratcheted against a documented baseline rather
+      # than blocking on 130 pre-existing components at once; everything
+      # else is a hard requirement from day one. Also found and fixed two
+      # real bugs while writing it — a showcase entry for a component
+      # (UserMenu) deleted from modules/app/ two years ago that was never
+      # removed from the showcase, and a relatedTo reference to a component
+      # (StepFlow) that exists but was never showcased.
+      - name: Unit tests
+        run: npm test
       # `npm run lint` genuinely fails today — 307 pre-existing errors in
       # modules/ + app/theme/**, mostly @next/next/no-html-link-for-pages
       # (<a> instead of next/link across theme pages), no-unused-vars, and

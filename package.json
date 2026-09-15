@@ -53,7 +53,9 @@
     "audit:conventions": "node scripts/audit-conventions.mjs",
     "debt:check": "node scripts/debt-ratchet.mjs",
     "check:circular": "madge --circular --extensions ts,tsx --ts-config tsconfig.json modules libs",
-    "check:cross-vertical": "node scripts/check-cross-vertical-imports.mjs"
+    "check:cross-vertical": "node scripts/check-cross-vertical-imports.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-svg-core": ">=7",
@@ -124,14 +126,19 @@
     "@commitlint/config-conventional": "^21.2.2",
     "@hookform/resolvers": "^5.2.2",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.1.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "eslint-plugin-tailwindcss": "^3.18.3",
     "husky": "^9.1.7",
+    "jsdom": "^29.1.1",
     "lint-staged": "^17.5.1",
     "madge": "^8.0.0",
     "next": "16.2.4",
@@ -141,7 +148,8 @@
     "react-hook-form": "^7.75.0",
     "tailwindcss": "^4",
     "tsup": "^8.5.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   },
   "license": "0BSD",
   "repository": {

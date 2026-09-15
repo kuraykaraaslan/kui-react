@@ -9,7 +9,7 @@ Principle: the registry already enumerates every component, variant, theme and r
 
 ## 2.1 kui-react unit tests
 
-- [ ] `[react]` Install `vitest`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`, `jsdom` (or `happy-dom`). `vitest.config.ts` with the `@` alias and `environment: jsdom`. Script `npm test`.
+- [x] `[react]` Installed `vitest`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`, `jsdom`, `@vitejs/plugin-react`. `vitest.config.mts` (`.mts`, not `.ts` — Vite otherwise warns about loading ESM syntax as CommonJS and about `__dirname`, which doesn't exist in real ESM; use `import.meta.dirname`) with the `@` alias and `environment: jsdom`. Script `npm test`. **Pinned to `vitest@4.1.11`, not the latest 5.x** — vitest 5 requires `@types/node@^22 || >=24`, which conflicts with this repo's `@types/node@^20` (matching its stated `engines.node: ">=20"`); vitest 4.1.11 is the newest release that still accepts `^20.0.0`.
 - [ ] `[react]` Test template for a ui atom, stored as `docs/dev/templates/component.test.tsx` and referenced from CONTRIBUTING.md:
   - renders with children
   - each `variant` applies its class from the `variantClasses` record
@@ -18,13 +18,13 @@ Principle: the registry already enumerates every component, variant, theme and r
   - ARIA: `aria-busy` when `loading`, `aria-pressed` when `selected`, `aria-invalid` + `aria-describedby` for inputs with `error`
 - [ ] `[react]` First wave: `Button`, `Input`, `Select`, `Toggle`, `Checkbox`, `Modal` (focus trap via `useFocusTrap`), `Drawer`, `TabGroup`, `DropdownMenu`, `Pagination`, `Tooltip`. Second wave: every remaining `modules/ui` atom. Domain components are lower priority; their logic is mostly composition.
 - [ ] `[react]` Hooks: `useFocusTrap`, `useBreakpoint` (SSR default, resize), `announce()` writes to the live region.
-- [ ] `[react]` Registry consistency test (`modules/registry/registry.test.ts`), runs in seconds and replaces several manual AGENTS.md checks:
-  - every `showcase.menu.ts` item has showcase data
-  - every showcase component has at least 2 variants (AGENTS.md rule)
-  - every `filePath` exists on disk
-  - `id` and `abbr` are globally unique
-  - every id in `composes[]` and `relatedTo[]` resolves
-  - every theme route in `themes[]` has a matching `app/theme/<v>/page.tsx`
+- [x] `[react]` Registry consistency test (`modules/registry/registry.test.ts`, 8 assertions), runs in ~0.7s against the committed `public/registry/components.json` snapshot (not the live registry — that still needs a browser until phase 6.2) and replaces several manual AGENTS.md checks:
+  - `id` is globally unique — clean, hard requirement
+  - `filePath` exists on disk — clean now; **found and fixed a real bug**: the showcase entry for `UserMenu` (id `user-menu`, in `app-user.showcase.tsx`) pointed at `modules/app/UserMenu.tsx`, which commit `5ef1606` deleted when the component moved to `modules/domains/common/user/UserMenu.tsx` — the showcase entry (with a full duplicated `sourceCode` string, an unused import, and two demo components used nowhere else) was simply never removed. The real, current, correctly-pathed entry already exists as `common-user-menu` — this was pure dead cruft, safe to delete outright rather than "fix."
+  - `composes[]` and `relatedTo[]` resolve — `relatedTo` **found a second real gap**: `app-form.showcase.tsx`'s `StepShellField`(-adjacent) entry listed `relatedTo: ['step-flow', 'step-shell']`, but `modules/app/StepFlow.tsx` exists and is exported yet has **zero showcase coverage** — never added to `showcase.menu.ts` or any section file, so it's invisible to `/api/registry` and every AI agent reading it. Removed the dangling reference (with a comment pointing at the real gap) rather than fabricating a showcase entry as a side effect of writing a test; giving `StepFlow` real variants is content work for later.
+  - abbr uniqueness and ≥2-variants (AGENTS.md rule): **not clean** — 101 components share an abbreviation with an earlier one, 29 have only 1 variant. Both are real, large, pre-existing gaps that surfaced only by actually running the test, not estimated in advance. Neither is a mechanical fix (a new abbr must avoid a *new* collision; a second variant needs someone to design a meaningfully different demo state). Ratcheted in the test itself against a documented baseline constant (`ABBR_COLLISION_BASELINE = 101`, `LOW_VARIANT_BASELINE = 29`) rather than hard-failing on 130 components at once or being left out of the suite entirely — a regression is still caught, a fix still needs its own dedicated pass.
+  - every theme route in `themes[]` has a matching `app/theme/<v>/page.tsx` — clean
+  - `npm test` is genuinely green end to end and wired as a **blocking** CI step (`Unit tests`), not report-only — verified with a full `tsc --noEmit` and a real `CI=1 npm run build` after the fixes above, and `scripts/debt-baseline.json`'s `showcaseSourceLiterals` count correctly fell 316→315 (the deleted entry's inlined source) and was lowered in the same commit.
 - [ ] `[react]` Wire `useA11yCheck` into the showcase `Widget` in development (0 call sites today). It costs nothing in production because the axe import is behind a `NODE_ENV` check.
 
 ## 2.2 kui-ejs route smoke tests
