@@ -19,7 +19,7 @@ Top-level `.tsx` files cover shell, navigation, forms, content, states, notifica
 
 ## Parity
 
-NextJS-first. The following organisms have pixel-parity EJS partials under `/home/kuray/02_EJS_Components/modules/app/`:
+NextJS-first. The following organisms have pixel-parity EJS partials under `$KUIEJS_ROOT/modules/app/`:
 
 - `MaintenancePage.tsx` ↔ `MaintenancePage.ejs`
 - `ShareDialog.tsx` ↔ `ShareDialog.ejs`

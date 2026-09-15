@@ -1,5 +1,5 @@
 <!-- BEGIN:nextjs-agent-rules -->
-> **Note:** `../00_Config_and_AI_Rules` is always tagged and must be loaded before any work begins.
+> **Note:** load the rulesets referenced for `$KUIREACT_ROOT` in `internal-ai-rules/LOCAL_PATHS.json` before any work begins.
 
 # This is NOT the Next.js you know
 
@@ -98,6 +98,13 @@ Stateless or locally-stateful primitive components. No business logic, no extern
 | SkipLink | `SkipLink.tsx` | `href` — accessibility skip-to-content |
 | LiveRegion | `LiveRegion.tsx` | `message`, `politeness` — ARIA live region |
 | Spinner | `Spinner.tsx` | `size` (xs–xl) — CSS border-based loading indicator |
+| BrandLogo | `BrandLogo.tsx` | `size` (sm–2xl) |
+| Label | `Label.tsx` | `required`, `disabled` — form label wrapper |
+| Progress | `Progress.tsx` | `value`, `variant`, `size`, `shape` (bar\|circle), `showLabel` |
+| ScrollArea | `ScrollArea.tsx` | `orientation` (vertical\|horizontal\|both) |
+| Separator | `Separator.tsx` | `orientation`, `decorative`, `label` |
+| StarRating | `StarRating.tsx` | `value` (0–5), `readonly`, `onChange`, `size` |
+| Statistic | `Statistic.tsx` | `label`, `value`, `precision`, `prefix`, `suffix`, `trend`, `loading` |
 
 ### Molecules — composed from atoms
 
@@ -132,6 +139,16 @@ Stateless or locally-stateful primitive components. No business logic, no extern
 | ContentScoreBar | `ContentScoreBar.tsx` | `score` (0–100), `label`, `thresholds` |
 | DropdownMenu | `DropdownMenu.tsx` | `trigger`, `items` (label\|icon\|danger\|disabled\|separator), `align` (left\|right) |
 | Slider | `Slider.tsx` | `slides`, `autoPlay`, `autoPlayInterval`, `showDots`, `showArrows`, `loop` — accessible carousel |
+| Accordion | `Accordion.tsx` | `items`, `openIds`, `onChange`, `allowMultiple` |
+| ColorPicker | `ColorPicker/` | `value`, `onChange`, `format` (hex\|rgb\|hsl) |
+| Popconfirm | `Popconfirm.tsx` | `trigger`, `title`, `description`, `danger`, `onConfirm`, `onCancel` |
+| RangeSlider | `RangeSlider.tsx` | `value`/`onChange`, `range` (single or `[min,max]`), `min`, `max`, `step` |
+| BulkActionTable | `BulkActionTable.tsx` | `columns`, `rows`, `rowId`, `selected`, `onSelectedChange`, `actions` |
+| ServerDataTable | `ServerDataTable.tsx` | `columns`, server-driven `rows`/`total`/`loading`, `onQueryChange` |
+| StatCard | `StatCard.tsx` | `label`, `value`, `accent` |
+| TabButton | `TabButton.tsx` | `active`, `onClick`, `count` |
+| Timeline | `Timeline.tsx` | `items`, `groupByDay`, `timeZone`, `locale` |
+| ViewToggle | `ViewToggle.tsx` | `value` (horizontal\|vertical), `onChange`, `labels` |
 
 ---
 
@@ -256,7 +273,9 @@ For the full and always-up-to-date list with every exported component, see the r
 | Jobs | `jobs/` | `JobCard`, `CompanyCard`, `JobMeta`, `ApplicationStatusBadge` |
 | Landing | `landing/` | `HeroSection`, `PricingGrid`, `FeatureCard`, `FaqAccordion` |
 | Media | `media/` | `VideoCard`, `ChannelCard`, `VideoStatusBadge` |
+| NFT marketplace | `nft/` | `NftCard`, `NftDetailHeader`, `CollectionCard`, `RarityBadge` |
 | Real estate | `real-estate/` | `PropertyCard`, `AgentCard`, `MortgageCalculator` |
+| Reviews (cross-domain) | `reviews/` | `ReviewCard`, `ReviewSummaryCard`, `RatingDistribution`, `ReviewSubmitForm` |
 | Social | `social/` | `PostCard`, `SocialProfileCard`, `MarketplaceListingCard` |
 | Travel | `travel/` | `FlightCard`, `HotelCard`, `FlightSeatPicker`, `BookingStatusBadge` |
 
@@ -376,6 +395,8 @@ One theme demo per domain vertical. For the live route + status of each, see the
 | Jobs board | `/theme/jobs/` | `modules/domains/jobs/` |
 | Landing page | `/theme/landing/` | `modules/domains/landing/` |
 | Media (video) | `/theme/media/` | `modules/domains/media/` |
+| NFT marketplace | `/theme/nft/` | `modules/domains/nft/` |
+| Personalise (B2B promo catalog) | `/theme/promozone/` | theme-local components under `app/theme/promozone/` (no domain vertical yet) |
 | Real estate | `/theme/real-estate/` | `modules/domains/real-estate/` |
 | Social feed | `/theme/social/` | `modules/domains/social/` |
 | Travel (flight + hotel) | `/theme/travel/` | `modules/domains/travel/` |

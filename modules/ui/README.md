@@ -61,7 +61,7 @@ lazy.tsx
 
 ## Parity
 
-NextJS-only. EJS uses server-rendered partials under `/home/kuray/02_EJS_Components/views/partials/` and `views/theme/common/` instead of a primitives layer.
+NextJS-only. EJS uses server-rendered partials under `$KUIEJS_ROOT/views/partials/` and `views/theme/common/` instead of a primitives layer.
 
 ## Conventions
 

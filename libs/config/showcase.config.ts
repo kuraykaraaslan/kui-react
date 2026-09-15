@@ -20,7 +20,7 @@ export const SHOWCASE_BRAND = {
 
 export const SHOWCASE_LINKS = {
   siteUrl: "https://next-js-components.kuray.dev",
-  github: "https://github.com/kuraykaraaslan/next_js_components",
+  github: "https://github.com/kuraykaraaslan/kui-react",
   author: {
     name: "Kuray Karaaslan",
     url: "https://kuray.dev",

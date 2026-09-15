@@ -28,8 +28,8 @@ travel/
 
 | Theme | EJS counterpart |
 |-------|-----------------|
-| `common/` | `/home/kuray/02_EJS_Components/views/theme/common/` |
-| `api-doc/` | `/home/kuray/02_EJS_Components/views/theme/api-doc/` |
+| `common/` | `$KUIEJS_ROOT/views/theme/common/` |
+| `api-doc/` | `$KUIEJS_ROOT/views/theme/api-doc/` |
 | all others | NextJS-only, no EJS counterpart |
 
 EJS extras (`invoice`, `modem`, `ups`) have no NextJS theme yet.

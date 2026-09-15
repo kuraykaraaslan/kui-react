@@ -50,15 +50,15 @@
     "prepare": "npm run build:lib"
   },
   "peerDependencies": {
+    "@fortawesome/fontawesome-svg-core": ">=7",
+    "@fortawesome/free-brands-svg-icons": ">=7",
+    "@fortawesome/free-regular-svg-icons": ">=7",
+    "@fortawesome/free-solid-svg-icons": ">=7",
+    "@fortawesome/react-fontawesome": ">=3",
+    "next": "^14 || ^15 || ^16",
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19",
-    "next": "^14 || ^15 || ^16",
-    "tailwindcss": "^4",
-    "@fortawesome/react-fontawesome": ">=3",
-    "@fortawesome/fontawesome-svg-core": ">=7",
-    "@fortawesome/free-solid-svg-icons": ">=7",
-    "@fortawesome/free-brands-svg-icons": ">=7",
-    "@fortawesome/free-regular-svg-icons": ">=7"
+    "tailwindcss": "^4"
   },
   "peerDependenciesMeta": {
     "tailwindcss": {
@@ -93,13 +93,12 @@
     }
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^7.2.0",
-    "@fortawesome/free-brands-svg-icons": "^7.2.0",
-    "@fortawesome/free-regular-svg-icons": "^7.2.0",
-    "@fortawesome/free-solid-svg-icons": "^7.2.0",
-    "@fortawesome/react-fontawesome": "^3.3.1",
+    "@fortawesome/fontawesome-svg-core": ">=7",
+    "@fortawesome/free-brands-svg-icons": ">=7",
+    "@fortawesome/free-regular-svg-icons": ">=7",
+    "@fortawesome/free-solid-svg-icons": ">=7",
+    "@fortawesome/react-fontawesome": ">=3",
     "@kuraykaraaslan/kui-viewer": "^0.0.8",
-    "@types/leaflet": "^1.9.21",
     "chart.js": "^4.5.1",
     "clsx": "^2.1.1",
     "countries-list": "^3.3.0",
@@ -117,6 +116,7 @@
     "@axe-core/react": "^4.11.3",
     "@hookform/resolvers": "^5.2.2",
     "@tailwindcss/postcss": "^4",
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -131,5 +131,25 @@
     "tailwindcss": "^4",
     "tsup": "^8.5.1",
     "typescript": "^5"
-  }
+  },
+  "license": "0BSD",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kuraykaraaslan/kui-react.git"
+  },
+  "homepage": "https://next-js-components.kuray.dev",
+  "bugs": {
+    "url": "https://github.com/kuraykaraaslan/kui-react/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "react",
+    "nextjs",
+    "tailwindcss",
+    "design-system",
+    "component-library",
+    "ui-kit"
+  ]
 }

@@ -30,8 +30,8 @@ index.ts
 
 | Vertical | EJS counterpart |
 |----------|-----------------|
-| `common/` | `/home/kuray/02_EJS_Components/modules/domain/common/` |
-| `api-doc/` | `/home/kuray/02_EJS_Components/modules/domain/api-doc/` |
+| `common/` | `$KUIEJS_ROOT/modules/domain/common/` |
+| `api-doc/` | `$KUIEJS_ROOT/modules/domain/api-doc/` |
 | all others | NextJS-only, no EJS counterpart |
 
 EJS extras (`invoice`, `modem`, `ups`) have no NextJS counterpart yet.

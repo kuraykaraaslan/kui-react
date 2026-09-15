@@ -1,3 +1,4 @@
+'use client';
 import { cn } from '@/libs/utils/cn';
 import { AlertBanner } from '@/modules/ui/AlertBanner';
 import { Button } from '@/modules/ui/Button';
