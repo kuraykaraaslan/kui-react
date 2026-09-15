@@ -258,6 +258,17 @@ Domain-specific components that compose UI + App layers for real-world use cases
 
 For the full and always-up-to-date list with every exported component, see the registry: `GET /api/registry` (filter by `layer === 'domain'`).
 
+### Parity with kui-ejs (`$KUIEJS_ROOT`)
+
+kui-react and kui-ejs are two implementations of the same design system (see `docs/adr/0003-react-ejs-parity-contract.md`). Parity is **not** all-or-nothing — the exceptions below are deliberate, not gaps to silently close:
+
+- Shared verticals, kept in parity: `common`, `api-doc`.
+- React-only by design (13 verticals): `ai`, `blog`, `commerce`, `event`, `fintech`, `food`, `forum`, `iot`, `jobs`, `landing`, `media`, `nft`, `real-estate`, `reviews`, `social`, `travel`.
+- EJS-only by design: `invoice`, `modem`, `ups` — device/admin-panel demos with no React counterpart.
+- App-layer exceptions: kui-ejs deliberately reverted `Gantt` and `FormBuilder` after shipping them ("moved out of scope" commits) — do not re-add without deciding scope first.
+
+Before adding a component to only one repo, check whether it belongs in the other too. When it is deliberately one-sided, say so in the PR description; `docs/dev/phase-4-shared-tooling-and-parity.md` tracks turning this into a generated, CI-checked matrix instead of a hand-maintained list.
+
 | Vertical | Directory | Sample components |
 |----------|-----------|-------------------|
 | AI | `ai/` | `ModelCard`, `ChatMessage`, `ChatInputBar`, `UsageStatsCard` |
