@@ -45,7 +45,8 @@ kui-ejs already has `scripts/audit-tokens.sh`, `lint-spacing.sh`, `audit-raw-out
 - [ ] `[react]` Dead exports and unused dependencies: adopt `knip` (`npx knip`) rather than writing a custom scanner. Configure entry points as `index.ts`, `modules/*/index.ts`, `app/**`.
 - [ ] `[react]` Circular imports: `npx madge --circular --extensions ts,tsx modules libs`. Fail CI on any cycle. (ROADMAP #31.)
 - [ ] `[react]` Cross-vertical import check: `modules/domains/<a>/**` must not import `modules/domains/<b>/**` unless `<b>` is `common`. Implement as a madge dependency filter or a 20-line script over `import` statements.
-- [ ] `[ejs]` Keep `npm run ci` as the aggregate; add `stale-strings` and, once phase 6 makes it precise, promote `dead-partials` from informational to a gate.
+- [x] `[ejs]` `stale-strings` added — as its own CI job rather than folded into `npm run ci` (matches how it's wired in kui-react: a separate, fast, independent job rather than one more step in an already-multi-purpose aggregate script).
+- [ ] `[ejs]` Promoting `dead-partials` from informational to a gate still waits on phase 6 making it precise (it has real false positives today — same-named files in different directories confuse the basename-based matching).
 
 ## 1.4 ESLint rules that encode AGENTS.md
 
