@@ -58,14 +58,16 @@ Seventeen full-page demos — one per industry vertical — built entirely from 
 
 ```
 modules/
-├── ui/          ← 47 primitive components (atoms + molecules)
-├── app/         ← 25 application patterns (shells, navigation, forms, states)
-├── domains/     ← 16 industry verticals (ai, blog, commerce, event, …)
+├── ui/          ← primitive components (atoms + molecules)
+├── app/         ← application patterns (shells, navigation, forms, states)
+├── domains/     ← industry verticals (ai, blog, commerce, event, …)
 ├── registry/    ← AI-discoverability layer — machine-readable catalog builder
 └── showcase/    ← Live preview site + interactive playground
-app/theme/       ← 16 full-page theme demos, one per domain vertical
+app/theme/       ← full-page theme demos, one per domain vertical
 libs/utils/      ← Shared utilities (e.g. cn)
 ```
+
+Counts drift as components ship, so this README doesn't hardcode them — see the live registry: `GET /api/registry?index=1`, or the sidebar counts in the [showcase](https://next-js-components.kuray.dev). As of the last snapshot: 63 ui, 35 app, 217 domain components across 18 verticals, 18 full-page themes.
 
 Every layer builds on the one above. Business logic stays in `domains/` / `app/`; `ui/` is pure presentation.
 
