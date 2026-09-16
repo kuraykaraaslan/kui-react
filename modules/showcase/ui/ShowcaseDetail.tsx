@@ -65,7 +65,7 @@ const MIN_PREVIEW_PCT = 20;
 const MAX_PREVIEW_PCT = 80;
 const DEFAULT_PREVIEW_PCT = 40;
 
-function VariantBlock({ variant }: { variant: ShowcaseVariant }) {
+function VariantBlock({ variant, index }: { variant: ShowcaseVariant; index: number }) {
   const hasCode = !!variant.code;
   const stack = variant.layout === 'stack';
   const containerRef = useRef<HTMLDivElement>(null);
@@ -156,6 +156,7 @@ function VariantBlock({ variant }: { variant: ShowcaseVariant }) {
 
   return (
     <div
+      data-variant-index={index}
       className={cn(
         'bg-surface-raised border border-border rounded-xl overflow-hidden',
         isFullscreen && 'fixed inset-0 z-50 rounded-none border-0 flex flex-col'
@@ -317,12 +318,13 @@ export function ShowcaseDetail({ slug }: { slug: string }) {
           ? 'grid-cols-1 xl:grid-cols-2'
           : 'grid-cols-1'
       )}>
-        {selected.variants.map((variant: ShowcaseVariant) => (
+        {selected.variants.map((variant: ShowcaseVariant, index: number) => (
           <div
             key={variant.title}
             className={variantLayout === 'grid' && variant.layout === 'stack' ? 'xl:col-span-2' : ''}
           >
             <VariantBlock
+              index={index}
               variant={variantLayout === 'side' || variantLayout === 'stack'
                 ? { ...variant, layout: variantLayout }
                 : variant}

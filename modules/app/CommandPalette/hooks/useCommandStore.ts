@@ -12,7 +12,16 @@ type Listener = () => void;
 const registry = new Map<string, CommandItem>();
 const listeners = new Set<Listener>();
 
+// useSyncExternalStore requires getSnapshot() to return a referentially
+// stable value when nothing has changed — React calls it on every render to
+// check for staleness, and a fresh array each time makes it look changed on
+// every single call, forcing another immediate re-render forever (React
+// error 185, "Maximum update depth exceeded"). Cache the array and only
+// recompute it when the registry actually mutates.
+let cachedSnapshot: CommandItem[] | null = null;
+
 function emit() {
+  cachedSnapshot = null;
   for (const fn of listeners) fn();
 }
 
@@ -24,7 +33,10 @@ function subscribe(fn: Listener) {
 }
 
 function getSnapshot(): CommandItem[] {
-  return Array.from(registry.values());
+  if (cachedSnapshot === null) {
+    cachedSnapshot = Array.from(registry.values());
+  }
+  return cachedSnapshot;
 }
 
 function getServerSnapshot(): CommandItem[] {

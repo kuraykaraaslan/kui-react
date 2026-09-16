@@ -55,7 +55,9 @@
     "check:circular": "madge --circular --extensions ts,tsx --ts-config tsconfig.json modules libs",
     "check:cross-vertical": "node scripts/check-cross-vertical-imports.mjs",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:visual": "playwright test",
+    "test:visual:update": "playwright test --update-snapshots"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-svg-core": ">=7",
@@ -125,6 +127,7 @@
     "@commitlint/cli": "^21.2.2",
     "@commitlint/config-conventional": "^21.2.2",
     "@hookform/resolvers": "^5.2.2",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",

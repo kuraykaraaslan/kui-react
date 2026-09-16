@@ -15,6 +15,14 @@ import type { Device, CloudWorkspace, RuleNode, RuleEdge } from '@/modules/domai
 
 /* ─── demo data ─── */
 
+// Fixed anchor rather than Date.now(): every "lastSeenAt"/"at"/"timestamp"
+// below is an offset from this instant, so the demo keeps its relative
+// ordering (e.g. "5 minutes before resolved") without the absolute times it
+// displays drifting on every render — which showed up as a real visual
+// regression flake (tests/visual/showcase.spec.ts screenshotting a
+// different wall-clock time on each run).
+const DEMO_NOW = new Date('2026-05-03T19:20:00Z').getTime();
+
 const DEMO_DEVICE_ONLINE: Device = {
   deviceId: 'dev-demo-001',
   name: 'Press Line Sensor A1',
@@ -27,7 +35,7 @@ const DEMO_DEVICE_ONLINE: Device = {
   firmware: 'v2.4.1',
   tags: ['production', 'critical'],
   location: { lat: 52.52, lng: 13.405, label: 'Hall A — Bay 3' },
-  lastSeenAt: new Date(Date.now() - 45_000),
+  lastSeenAt: new Date(DEMO_NOW - 45_000),
 };
 
 const DEMO_DEVICE_ERROR: Device = {
@@ -42,7 +50,7 @@ const DEMO_DEVICE_ERROR: Device = {
   firmware: 'v2.3.8',
   tags: ['coolant', 'temperature'],
   location: { lat: 52.519, lng: 13.404, label: 'Hall A — Coolant Station' },
-  lastSeenAt: new Date(Date.now() - 720_000),
+  lastSeenAt: new Date(DEMO_NOW - 720_000),
 };
 
 const DEMO_GATEWAY: Device = {
@@ -56,7 +64,7 @@ const DEMO_GATEWAY: Device = {
   model: 'Nexus GW500',
   firmware: 'v3.1.0',
   tags: ['assembly', 'gateway'],
-  lastSeenAt: new Date(Date.now() - 12_000),
+  lastSeenAt: new Date(DEMO_NOW - 12_000),
 };
 
 const DEMO_WORKSPACE_ACTIVE: CloudWorkspace = {
@@ -436,11 +444,11 @@ export function RulesetEditor({ initialNodes, initialEdges, readOnly, className 
           layout: 'stack',
           preview: (
             <ol className="rounded-xl border border-border overflow-hidden bg-surface-base max-w-3xl">
-              <LogStreamRow timestamp={new Date()} level="debug" source="sensor.driver" message="Read cycle 0x9F1 — within tolerance" />
-              <LogStreamRow timestamp={new Date()} level="info"  source="mqtt.client"   message="Published telemetry payload (4 fields, 218 bytes)" />
-              <LogStreamRow timestamp={new Date()} level="warn"  source="rule.engine"   message='Vibration trending up — re-check at next sample' />
-              <LogStreamRow timestamp={new Date()} level="error" source="firmware.watch" message="Calibration timer reset due to missed tick" />
-              <LogStreamRow timestamp={new Date()} level="fatal" source="kernel"        message="Subsystem panic — restarting in 5s" />
+              <LogStreamRow timestamp={new Date(DEMO_NOW)} level="debug" source="sensor.driver" message="Read cycle 0x9F1 — within tolerance" />
+              <LogStreamRow timestamp={new Date(DEMO_NOW)} level="info"  source="mqtt.client"   message="Published telemetry payload (4 fields, 218 bytes)" />
+              <LogStreamRow timestamp={new Date(DEMO_NOW)} level="warn"  source="rule.engine"   message='Vibration trending up — re-check at next sample' />
+              <LogStreamRow timestamp={new Date(DEMO_NOW)} level="error" source="firmware.watch" message="Calibration timer reset due to missed tick" />
+              <LogStreamRow timestamp={new Date(DEMO_NOW)} level="fatal" source="kernel"        message="Subsystem panic — restarting in 5s" />
             </ol>
           ),
           code: `<LogStreamRow timestamp={date} level="warn" source="..." message="..." />`,
@@ -468,7 +476,7 @@ export function RulesetEditor({ initialNodes, initialEdges, readOnly, className 
               status="OPEN"
               deviceName="Coolant Temp Monitor"
               deviceHref="#"
-              openedAt={new Date(Date.now() - 720_000)}
+              openedAt={new Date(DEMO_NOW - 720_000)}
               onAcknowledge={() => undefined}
               onResolve={() => undefined}
               onOpenRunbook={() => undefined}
@@ -486,7 +494,7 @@ export function RulesetEditor({ initialNodes, initialEdges, readOnly, className 
               severity="WARNING"
               status="ACKNOWLEDGED"
               deviceName="Press Line Sensor A1"
-              openedAt={new Date(Date.now() - 3_600_000)}
+              openedAt={new Date(DEMO_NOW - 3_600_000)}
               onResolve={() => undefined}
               onOpenRunbook={() => undefined}
             />
@@ -511,11 +519,11 @@ export function RulesetEditor({ initialNodes, initialEdges, readOnly, className 
           preview: (
             <AlertEventTimeline
               events={[
-                { eventId: 'e1', kind: 'opened',       by: 'rule-engine', at: new Date(Date.now() - 720_000), note: 'Triggered by rule "Coolant > 85°C".' },
-                { eventId: 'e2', kind: 'automation',   by: 'paging-bot',  at: new Date(Date.now() - 700_000), note: 'On-call paged via SMS + Slack.' },
-                { eventId: 'e3', kind: 'note',         by: 'jane.k',      at: new Date(Date.now() - 540_000), note: 'Investigating — coolant pump pressure normal.' },
-                { eventId: 'e4', kind: 'acknowledged', by: 'mike.t',      at: new Date(Date.now() - 300_000) },
-                { eventId: 'e5', kind: 'resolved',     by: 'mike.t',      at: new Date(Date.now() - 60_000),  note: 'Faulty sensor replaced.' },
+                { eventId: 'e1', kind: 'opened',       by: 'rule-engine', at: new Date(DEMO_NOW - 720_000), note: 'Triggered by rule "Coolant > 85°C".' },
+                { eventId: 'e2', kind: 'automation',   by: 'paging-bot',  at: new Date(DEMO_NOW - 700_000), note: 'On-call paged via SMS + Slack.' },
+                { eventId: 'e3', kind: 'note',         by: 'jane.k',      at: new Date(DEMO_NOW - 540_000), note: 'Investigating — coolant pump pressure normal.' },
+                { eventId: 'e4', kind: 'acknowledged', by: 'mike.t',      at: new Date(DEMO_NOW - 300_000) },
+                { eventId: 'e5', kind: 'resolved',     by: 'mike.t',      at: new Date(DEMO_NOW - 60_000),  note: 'Faulty sensor replaced.' },
               ]}
             />
           ),
