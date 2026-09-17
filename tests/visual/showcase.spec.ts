@@ -129,7 +129,7 @@
 
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -151,6 +151,17 @@ const RATCHETED_RULES = [
 const ratchetedViolationCounts: Record<string, number> = Object.fromEntries(
   RATCHETED_RULES.map((id) => [id, 0]),
 );
+
+// Written only when a page actually fails the strict check below, so CI
+// (docs/dev/phase-2-testing.md 2.5) has the full axe payload — not just
+// the truncated one-line-per-rule summary in the assertion message — to
+// upload as an artifact. Ratcheted-rule pages that pass every other rule
+// never write anything here.
+const AXE_OUT_DIR = path.join(REPO_ROOT, 'test-results/axe');
+function writeAxeFailure(id: string, violations: unknown) {
+  mkdirSync(AXE_OUT_DIR, { recursive: true });
+  writeFileSync(path.join(AXE_OUT_DIR, `${id}.json`), JSON.stringify(violations, null, 2));
+}
 
 test.describe('showcase component variants', () => {
   for (const component of components) {
@@ -176,6 +187,7 @@ test.describe('showcase component variants', () => {
       }
 
       const strict = bad.filter((v) => !RATCHETED_RULES.includes(v.id));
+      if (strict.length > 0) writeAxeFailure(component.id, strict);
       const details = strict
         .map((v) => `  [${v.impact}] ${v.id} (${v.nodes.length} nodes) — ${v.help}`)
         .join('\n');

@@ -18,14 +18,22 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 2 : undefined,
-  reporter: 'list',
+  // CI gets an HTML report (browsable trace viewer) alongside the
+  // terminal list; local runs stay list-only. See docs/dev/phase-2-testing.md
+  // 2.5 — CI uploads playwright-report/ and test-results/ as artifacts
+  // on failure, so a nightly/PR failure is debuggable without rerunning.
+  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   timeout: 30_000,
   expect: {
     toHaveScreenshot: { maxDiffPixelRatio: 0.02 },
   },
   use: {
     baseURL: 'http://localhost:3002',
-    trace: 'on-first-retry',
+    // Retries are what 'on-first-retry' needs to ever produce a trace —
+    // outside CI there are none, so no trace ever gets written for a
+    // local failure investigated in the same run. CI always wants a
+    // trace on every failed attempt, retried or not.
+    trace: process.env.CI ? 'retain-on-failure' : 'on-first-retry',
   },
   projects: [
     {

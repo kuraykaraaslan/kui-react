@@ -1,0 +1,18 @@
+name: nightly
+
+# docs/dev/phase-2-testing.md 2.5 — the visual regression + axe suite is
+# too slow (< 15 min budget, ~330 pages) to run on every PR, so it runs
+# nightly here instead, plus on-demand from ci.yml for PRs labelled
+# `visual`. See visual.yml for the actual job (shared between both
+# triggers via workflow_call).
+
+on:
+  schedule:
+    # 03:00 UTC daily — after most contributors' working hours in the
+    # timezones this project has seen activity from, before the next day.
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  visual:
+    uses: ./.github/workflows/visual.yml

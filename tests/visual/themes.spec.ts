@@ -11,7 +11,7 @@
 
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -34,6 +34,14 @@ const ratchetedViolationCounts: Record<string, number> = Object.fromEntries(
   RATCHETED_RULES.map((id) => [id, 0]),
 );
 
+// See showcase.spec.ts's own AXE_OUT_DIR comment — same reasoning, one
+// directory shared between both spec files.
+const AXE_OUT_DIR = path.join(REPO_ROOT, 'test-results/axe');
+function writeAxeFailure(id: string, violations: unknown) {
+  mkdirSync(AXE_OUT_DIR, { recursive: true });
+  writeFileSync(path.join(AXE_OUT_DIR, `theme-${id}.json`), JSON.stringify(violations, null, 2));
+}
+
 test.describe('theme landing pages', () => {
   for (const theme of themes) {
     test(theme.id, async ({ page }) => {
@@ -53,6 +61,7 @@ test.describe('theme landing pages', () => {
       }
 
       const strict = bad.filter((v) => !RATCHETED_RULES.includes(v.id));
+      if (strict.length > 0) writeAxeFailure(theme.id, strict);
       const details = strict
         .map((v) => `  [${v.impact}] ${v.id} (${v.nodes.length} nodes) — ${v.help}`)
         .join('\n');

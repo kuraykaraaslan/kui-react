@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
+    # `labeled` on top of the defaults (opened/synchronize/reopened) so
+    # adding the `visual` label to an already-open PR fires the visual
+    # job below without needing a new commit to re-trigger it.
+    types: [opened, synchronize, reopened, labeled]
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -117,3 +121,8 @@ jobs:
             echo "::error::public/registry/** or public/components/** is out of date. Run 'npm run registry:snapshot' and commit the result.";
             exit 1;
           }
+
+  visual:
+    name: visual regression + axe (PR labelled 'visual')
+    if: github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'visual')
+    uses: ./.github/workflows/visual.yml
