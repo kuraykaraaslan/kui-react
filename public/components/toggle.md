@@ -51,7 +51,7 @@ function Demo() {
             <p className="text-sm font-medium">{label}</p>
             <p className="text-xs text-text-secondary">{desc}</p>
           </div>
-          <Toggle id={key} label="" checked={s[key]} onChange={() => setS(p => ({ ...p, [key]: !p[key] }))} />
+          <Toggle id={key} label="" ariaLabel={label} checked={s[key]} onChange={() => setS(p => ({ ...p, [key]: !p[key] }))} />
         </div>
       ))}
     </div>
