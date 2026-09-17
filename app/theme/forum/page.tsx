@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -100,9 +101,9 @@ export default function ForumHomePage() {
                             Moderators:{' '}
                             {cat.moderators.map((mod, mi) => (
                               <span key={mod}>
-                                <a href="/theme/forum" className="text-text-secondary hover:text-primary hover:underline">
+                                <Link href="/theme/forum" className="text-text-secondary underline hover:text-primary">
                                   {mod}
-                                </a>
+                                </Link>
                                 {mi < cat.moderators!.length - 1 && ', '}
                               </span>
                             ))}
@@ -137,9 +138,9 @@ export default function ForumHomePage() {
                           <div className="text-text-disabled mt-0.5 leading-snug">
                             {formatLastPost(cat.lastActivityAt)}<br />
                             by{' '}
-                            <a href="/theme/forum" className="text-primary hover:underline">
+                            <Link href="/theme/forum" className="text-primary hover:underline">
                               {lastTopic.authorName}
-                            </a>
+                            </Link>
                           </div>
                         </div>
                       ) : (

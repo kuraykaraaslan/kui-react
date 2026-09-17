@@ -57,7 +57,7 @@ export default function VenueLeafletMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       />
-      <Marker position={[lat, lng]} icon={markerIcon}>
+      <Marker position={[lat, lng]} icon={markerIcon} keyboard={interactive} alt={name}>
         <Popup>{name}</Popup>
       </Marker>
     </MapContainer>

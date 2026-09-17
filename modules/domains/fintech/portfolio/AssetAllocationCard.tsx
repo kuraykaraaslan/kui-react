@@ -94,6 +94,7 @@ export function AssetAllocationCard({
       <div className="mx-auto mt-4 max-w-xs">
         <Doughnut
           data={chartData}
+          aria-label="Asset allocation chart"
           options={{
             responsive: true,
             cutout: '68%',

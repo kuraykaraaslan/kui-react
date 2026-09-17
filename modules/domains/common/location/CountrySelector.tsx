@@ -51,6 +51,15 @@ export function CountrySelector({
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [rect, setRect] = useState<DOMRect | null>(null);
+  // Reset the search field when the panel closes. Doing this during render
+  // (the React-recommended pattern for "adjust state when a value changes")
+  // rather than as a setState call inside the effect below avoids an extra
+  // cascading render (react-hooks/set-state-in-effect).
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (!open) setSearch('');
+  }
   const triggerRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const portalId = `country-selector-portal-${id.replace(/:/g, '')}`;
@@ -74,7 +83,7 @@ export function CountrySelector({
   }
 
   useEffect(() => {
-    if (!open) { setSearch(''); return; }
+    if (!open) return;
     setTimeout(() => searchRef.current?.focus(), 0);
 
     function onOutside(e: MouseEvent) {
@@ -178,6 +187,8 @@ export function CountrySelector({
           size="sm"
           disabled={disabled}
           onClick={handleOpen}
+          role="combobox"
+          aria-label={label || placeholder}
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-describedby={[hintId, errorId].filter(Boolean).join(' ') || undefined}

@@ -46,14 +46,7 @@ export function FieldRow({
           : 'border-border hover:border-border-strong',
       )}
     >
-      <button
-        type="button"
-        onClick={() => onSelect(field.id)}
-        className={cn(
-          'w-full flex items-start gap-2 px-2 py-2 text-left',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-md',
-        )}
-      >
+      <div className="w-full flex items-start gap-2 px-2 py-2">
         <span
           draggable
           onDragStart={(e) => {
@@ -63,15 +56,24 @@ export function FieldRow({
           onDragEnd={onDragEnd}
           aria-label="Drag handle"
           role="button"
-          tabIndex={-1}
+          tabIndex={0}
           className={cn(
             'fb-row-handle shrink-0 grid place-items-center w-6 h-6 rounded',
             'text-text-secondary cursor-grab active:cursor-grabbing',
             'hover:bg-surface-overlay',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
           )}
         >
           <FontAwesomeIcon icon={faGripVertical} className="w-3 h-3" aria-hidden="true" />
         </span>
+        <button
+          type="button"
+          onClick={() => onSelect(field.id)}
+          className={cn(
+            'flex-1 min-w-0 flex items-start text-left',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded-md',
+          )}
+        >
         <span className="flex-1 min-w-0">
           <span className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-text-secondary">
             {icon && (
@@ -91,7 +93,8 @@ export function FieldRow({
             </span>
           )}
         </span>
-      </button>
+        </button>
+      </div>
 
       <div className="absolute right-1 top-1 flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
         <button

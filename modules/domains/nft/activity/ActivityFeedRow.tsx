@@ -49,6 +49,7 @@ export function ActivityFeedRow({ event, className }: ActivityFeedRowProps) {
       )}
     >
       <span
+        role="img"
         className={cn(
           'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
           meta.classes,

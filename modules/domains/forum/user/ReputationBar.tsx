@@ -74,6 +74,7 @@ export function ReputationBar({
       <div
         className="relative h-2 w-full overflow-hidden rounded-full bg-surface-sunken"
         role="progressbar"
+        aria-label="Reputation progress to next tier"
         aria-valuenow={Math.round(progressPct)}
         aria-valuemin={0}
         aria-valuemax={100}

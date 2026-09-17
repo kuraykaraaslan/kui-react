@@ -24,7 +24,7 @@ export function TestimonialCard({ testimonial, className }: TestimonialCardProps
       />
 
       {testimonial.rating && (
-        <div className="flex items-center gap-0.5" aria-label={`${testimonial.rating} out of 5 stars`}>
+        <div role="img" className="flex items-center gap-0.5" aria-label={`${testimonial.rating} out of 5 stars`}>
           {Array.from({ length: 5 }).map((_, i) => (
             <FontAwesomeIcon
               key={i}

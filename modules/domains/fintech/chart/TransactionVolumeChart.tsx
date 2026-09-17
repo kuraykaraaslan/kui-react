@@ -68,6 +68,7 @@ export function TransactionVolumeChart({ data, className }: TransactionVolumeCha
       </div>
       <Bar
         data={chartData}
+        aria-label="Transaction volume chart"
         options={{
           responsive: true,
           plugins: {

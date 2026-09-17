@@ -26,15 +26,17 @@ function ControlInput({
     'w-full rounded-md border border-border bg-surface-base px-2.5 py-1.5 text-sm text-text-primary',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
   );
+  const inputId = `props-editor-${control.key}`;
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-medium text-text-secondary select-none">
+      <label htmlFor={inputId} className="text-xs font-medium text-text-secondary select-none">
         {control.label}
       </label>
 
       {control.type === 'select' && (
         <select
+          id={inputId}
           className={inputBase}
           value={value as string}
           onChange={(e) => onChange(e.target.value)}
@@ -47,6 +49,7 @@ function ControlInput({
 
       {control.type === 'boolean' && (
         <button
+          id={inputId}
           type="button"
           role="switch"
           aria-checked={value as boolean}
@@ -68,6 +71,7 @@ function ControlInput({
 
       {control.type === 'text' && (
         <input
+          id={inputId}
           type="text"
           className={inputBase}
           value={value as string}
@@ -78,6 +82,7 @@ function ControlInput({
       {control.type === 'number' && (
         <div className="flex items-center gap-2">
           <input
+            id={inputId}
             type="range"
             min={control.min ?? 0}
             max={control.max ?? 100}

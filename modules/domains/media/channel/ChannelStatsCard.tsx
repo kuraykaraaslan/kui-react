@@ -74,23 +74,23 @@ export function ChannelStatsCard({
                 {meta.suffix && (
                   <span className="ml-0.5 text-sm font-medium text-text-secondary">{meta.suffix}</span>
                 )}
+                {s.deltaPct !== undefined && (
+                  <span
+                    className={cn(
+                      'flex items-center gap-1 text-xs font-medium font-normal mt-1',
+                      positive ? 'text-success' : 'text-error',
+                    )}
+                  >
+                    <FontAwesomeIcon
+                      icon={positive ? faArrowUp : faArrowDown}
+                      className="w-3 h-3"
+                      aria-hidden="true"
+                    />
+                    {Math.abs(s.deltaPct).toFixed(1)}%
+                    {s.helper && <span className="text-text-secondary font-normal ml-1">{s.helper}</span>}
+                  </span>
+                )}
               </dd>
-              {s.deltaPct !== undefined && (
-                <p
-                  className={cn(
-                    'flex items-center gap-1 text-xs font-medium',
-                    positive ? 'text-success' : 'text-error',
-                  )}
-                >
-                  <FontAwesomeIcon
-                    icon={positive ? faArrowUp : faArrowDown}
-                    className="w-3 h-3"
-                    aria-hidden="true"
-                  />
-                  {Math.abs(s.deltaPct).toFixed(1)}%
-                  {s.helper && <span className="text-text-secondary font-normal ml-1">{s.helper}</span>}
-                </p>
-              )}
             </div>
           );
         })}

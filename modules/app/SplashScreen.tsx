@@ -46,6 +46,7 @@ export function SplashScreen({
             aria-valuenow={progress}
             aria-valuemin={0}
             aria-valuemax={100}
+            aria-label="Loading progress"
             role="progressbar"
           />
         </div>

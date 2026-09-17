@@ -32,10 +32,16 @@ export function MarkerPart({ marker, L, RLMarker, RLTooltip, onMarkerClick }: Ma
   // TODO M2: activeMarkerId visual state (scale + ring)
   // TODO M2: custom marker.icon (ReactNode | FontAwesome)
 
+  // Leaflet's marker element is a keyboard-focusable role="button" div, but
+  // has no accessible name unless one is set explicitly (axe:
+  // aria-command-name). `alt` is react-leaflet's pass-through for it.
+  const accessibleName = marker.tooltip?.title ?? marker.label ?? 'Map marker';
+
   return (
     <RLMarker
       position={marker.position}
       icon={icon}
+      alt={accessibleName}
       eventHandlers={{ click: () => onMarkerClick?.(marker.id) }}
     >
       {marker.tooltip && (

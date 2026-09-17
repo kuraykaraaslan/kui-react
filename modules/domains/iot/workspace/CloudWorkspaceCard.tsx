@@ -101,6 +101,7 @@ export function CloudWorkspaceCard({ workspace, className, onClick }: CloudWorks
             className="h-full rounded-full bg-success transition-all"
             style={{ width: `${onlinePercent}%` }}
             role="progressbar"
+            aria-label="Online devices"
             aria-valuenow={onlinePercent}
             aria-valuemin={0}
             aria-valuemax={100}

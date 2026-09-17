@@ -62,7 +62,7 @@ export function Progress({
         aria-valuenow={clamped}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label={label}
+        aria-label={label ?? `${Math.round(clamped)}% complete`}
         className={cn('relative inline-flex items-center justify-center', className)}
         style={{ width: dim, height: dim }}
         {...rest}
@@ -94,7 +94,7 @@ export function Progress({
         aria-valuenow={clamped}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label={label}
+        aria-label={label ?? `${Math.round(clamped)}% complete`}
         className={cn('w-full overflow-hidden rounded-full bg-surface-sunken', barHeightMap[size])}
       >
         <div

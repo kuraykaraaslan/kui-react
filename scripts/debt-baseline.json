@@ -1,10 +1,10 @@
 {
-  "anyUsages": 30,
+  "anyUsages": 29,
   "eslintDisable": 48,
   "todoFixmeHack": 358,
   "windowDocumentInUi": 13,
   "forwardRefUsages": 10,
   "showcaseSourceLiterals": 315,
-  "lintErrors": 307,
+  "lintErrors": 303,
   "tokenViolations": 11
 }

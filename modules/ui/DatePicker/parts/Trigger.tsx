@@ -51,7 +51,6 @@ export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(function Trig
     controlsId,
     ariaLabel,
     ariaDescribedBy,
-    required,
     testId,
     className,
   },
@@ -79,7 +78,6 @@ export const Trigger = forwardRef<HTMLButtonElement, TriggerProps>(function Trig
         aria-label={ariaLabel}
         aria-describedby={ariaDescribedBy}
         aria-invalid={invalid || undefined}
-        aria-required={required || undefined}
         data-testid={testId}
         className={cn(
           'flex-1 text-left px-3 py-2 text-sm bg-transparent rounded-l-md',

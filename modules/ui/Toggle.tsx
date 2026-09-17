@@ -10,6 +10,7 @@ const sizeMap = {
 export function Toggle({
   id,
   label,
+  ariaLabel,
   description,
   checked,
   onChange,
@@ -19,6 +20,9 @@ export function Toggle({
 }: {
   id: string;
   label: string;
+  /** Accessible name to use when `label` is empty (e.g. the visible text
+   * lives in a sibling element instead, like a settings-row layout). */
+  ariaLabel?: string;
   description?: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
@@ -46,6 +50,7 @@ export function Toggle({
           onChange={(e) => onChange(e.target.checked)}
           disabled={disabled}
           aria-checked={checked}
+          aria-label={!label && ariaLabel ? ariaLabel : undefined}
           data-testid={`toggle-${id}`}
           className="sr-only"
         />

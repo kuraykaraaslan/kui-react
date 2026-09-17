@@ -41,6 +41,7 @@ export function MintProgressBar({
           )}
           style={{ width: `${pct}%` }}
           role="progressbar"
+          aria-label={label}
           aria-valuenow={mintedCount}
           aria-valuemin={0}
           aria-valuemax={totalSupply}

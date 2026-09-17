@@ -53,6 +53,7 @@ export function PortfolioDonutChart({ assets, className }: PortfolioDonutChartPr
       <div className="mx-auto max-w-xs">
         <Doughnut
           data={chartData}
+          aria-label="Portfolio allocation chart"
           options={{
             responsive: true,
             cutout: '68%',

@@ -123,7 +123,7 @@ export function MentionPicker({
       {filtered.length === 0 ? (
         <p className="px-3 py-4 text-sm text-center text-text-secondary">{emptyMessage}</p>
       ) : (
-        <ul className="max-h-64 overflow-y-auto py-1">
+        <ul role="listbox" aria-label="Mentions" className="max-h-64 overflow-y-auto py-1">
           {filtered.map((user, i) => {
             const isActive = i === safeActive;
             return (

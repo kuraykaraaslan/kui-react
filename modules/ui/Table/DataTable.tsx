@@ -204,7 +204,12 @@ function ClientView<T extends Record<string, unknown>>(
         />
       )}
 
-      <div className="w-full overflow-x-auto rounded-lg border border-border">
+      <div
+        className="w-full overflow-x-auto rounded-lg border border-border"
+        tabIndex={0}
+        role="region"
+        aria-label={caption ?? 'Data table'}
+      >
         <table className="w-full text-sm">
           {caption && <caption className="sr-only">{caption}</caption>}
           <thead className="bg-surface-sunken border-b border-border">
@@ -334,7 +339,12 @@ function ServerView<T extends Record<string, unknown>>(
         rowsPerPageLabel={msgs.rowsPerPage}
       />
 
-      <div className="w-full overflow-x-auto rounded-lg border border-border">
+      <div
+        className="w-full overflow-x-auto rounded-lg border border-border"
+        tabIndex={0}
+        role="region"
+        aria-label={caption ?? 'Data table'}
+      >
         <table className="w-full text-sm">
           {caption && <caption className="sr-only">{caption}</caption>}
           <thead className="bg-surface-sunken border-b border-border">
@@ -466,6 +476,7 @@ function LegacyAdvancedView<T extends Record<string, unknown>>(
           'w-full rounded-lg border border-border',
           stickyHeader && 'overflow-auto max-h-80',
         )}
+        {...(stickyHeader ? { tabIndex: 0, role: 'region', 'aria-label': caption ?? 'Data table' } : {})}
       >
         <table className="w-full text-sm">
           {caption && <caption className="sr-only">{caption}</caption>}
@@ -706,7 +717,12 @@ function LegacyServerView<T extends Record<string, unknown>>(
           <span className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div
+          className="overflow-x-auto"
+          tabIndex={0}
+          role="region"
+          aria-label={caption ?? 'Data table'}
+        >
           <table className="w-full text-sm">
             {caption && <caption className="sr-only">{caption}</caption>}
             <thead>

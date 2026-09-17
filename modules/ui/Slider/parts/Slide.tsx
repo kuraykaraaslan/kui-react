@@ -24,6 +24,11 @@ export function Slide({ index, total, isActive, className, children }: SlideProp
       aria-roledescription="slide"
       aria-label={`Slide ${index + 1} of ${total}`}
       aria-hidden={!isActive}
+      // `aria-hidden` alone doesn't remove descendants from the tab order —
+      // a keyboard user could still Tab into an off-screen slide's links
+      // (axe: aria-hidden-focus). `inert` removes the whole subtree from
+      // both focus and pointer interaction, matching the hidden state.
+      inert={!isActive}
       className={cn('w-full shrink-0', className)}
     >
       {children}

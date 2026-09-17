@@ -56,6 +56,7 @@ export function CardLimitMeter({
       <div
         className="relative h-2 w-full overflow-hidden rounded-full bg-surface-sunken"
         role="progressbar"
+        aria-label={`${label} progress`}
         aria-valuenow={Math.round(pct)}
         aria-valuemin={0}
         aria-valuemax={100}

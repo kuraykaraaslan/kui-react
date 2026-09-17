@@ -9,7 +9,7 @@ export function GithubButton() {
     }
 
     return (
-        <Button variant="outline" size="sm" onClick={onClick} iconLeft={<FontAwesomeIcon icon={faGithub} />}>
+        <Button variant="outline" size="sm" onClick={onClick} aria-label="GitHub" iconLeft={<FontAwesomeIcon icon={faGithub} />}>
         </Button>
     );
 }

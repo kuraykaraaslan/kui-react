@@ -54,6 +54,7 @@ export function PricingGrid({
               type="button"
               role="switch"
               aria-checked={interval === 'YEARLY'}
+              aria-label="Toggle yearly billing"
               onClick={() => setInterval((prev) => prev === 'MONTHLY' ? 'YEARLY' : 'MONTHLY')}
               className={cn(
                 'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',

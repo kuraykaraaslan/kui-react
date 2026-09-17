@@ -58,6 +58,7 @@ export function ProcessingStatusIndicator({
         <div className={cn('w-full rounded-full bg-surface-sunken overflow-hidden', s.bar)}>
           <div
             role="progressbar"
+            aria-label={label ?? meta.label}
             aria-valuenow={progress}
             aria-valuemin={0}
             aria-valuemax={100}

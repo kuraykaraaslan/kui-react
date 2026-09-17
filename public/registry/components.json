@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-09-16T17:26:20.999Z",
+  "generatedAt": "2026-09-17T18:13:13.783Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -954,7 +954,7 @@
         },
         {
           "title": "Settings list (controlled)",
-          "code": "function Demo() {\n  const [s, setS] = useState({ notifications: true, marketing: false });\n  return (\n    <div className=\"divide-y border rounded-lg\">\n      {[{ key: 'notifications', label: 'Push notifications', desc: 'Alerts for new activity' }, ...].map(({ key, label, desc }) => (\n        <div key={key} className=\"flex items-center justify-between px-4 py-3\">\n          <div>\n            <p className=\"text-sm font-medium\">{label}</p>\n            <p className=\"text-xs text-text-secondary\">{desc}</p>\n          </div>\n          <Toggle id={key} label=\"\" checked={s[key]} onChange={() => setS(p => ({ ...p, [key]: !p[key] }))} />\n        </div>\n      ))}\n    </div>\n  );\n}"
+          "code": "function Demo() {\n  const [s, setS] = useState({ notifications: true, marketing: false });\n  return (\n    <div className=\"divide-y border rounded-lg\">\n      {[{ key: 'notifications', label: 'Push notifications', desc: 'Alerts for new activity' }, ...].map(({ key, label, desc }) => (\n        <div key={key} className=\"flex items-center justify-between px-4 py-3\">\n          <div>\n            <p className=\"text-sm font-medium\">{label}</p>\n            <p className=\"text-xs text-text-secondary\">{desc}</p>\n          </div>\n          <Toggle id={key} label=\"\" ariaLabel={label} checked={s[key]} onChange={() => setS(p => ({ ...p, [key]: !p[key] }))} />\n        </div>\n      ))}\n    </div>\n  );\n}"
         }
       ],
       "status": "stable",

@@ -82,6 +82,7 @@ export function RevenueBarChart({ className }: { className?: string }) {
     >
       <Bar
         data={BAR_DATA}
+        aria-label="Revenue vs Expenses chart"
         options={{
           responsive: true,
           plugins: { legend: { position: 'top' } },
@@ -124,6 +125,7 @@ export function UserActivityLineChart({ className }: { className?: string }) {
     >
       <Line
         data={LINE_DATA}
+        aria-label="User Activity chart"
         options={{
           responsive: true,
           plugins: { legend: { position: 'top' } },
@@ -163,6 +165,7 @@ export function SalesByCategoryDoughnut({ className }: { className?: string }) {
       <div className="mx-auto max-w-xs">
         <Doughnut
           data={DOUGHNUT_DATA}
+          aria-label="Sales by Category chart"
           options={{
             responsive: true,
             plugins: { legend: { position: 'bottom' } },
@@ -204,6 +207,7 @@ export function ProductComparisonRadar({ className }: { className?: string }) {
     >
       <Radar
         data={RADAR_DATA}
+        aria-label="Product Comparison chart"
         options={{
           responsive: true,
           plugins: { legend: { position: 'top' } },
@@ -242,6 +246,7 @@ export function RegionalSalesPolar({ className }: { className?: string }) {
       <div className="mx-auto max-w-xs">
         <PolarArea
           data={POLAR_DATA}
+          aria-label="Regional Sales chart"
           options={{
             responsive: true,
             plugins: { legend: { position: 'bottom' } },

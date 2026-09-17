@@ -38,14 +38,34 @@ export function DropdownMenu({
     };
   }, [open]);
 
+  const toggle = () => setOpen((p) => !p);
+
+  // aria-haspopup/aria-expanded belong on the trigger's own interactive
+  // element (a real <button> in every current usage) — a plain wrapping
+  // <div> has an implicit "generic" role, which doesn't support those
+  // attributes at all (axe: aria-allowed-attr, critical). Clone them onto
+  // the trigger when it's a single element; the wrapper's onClick still
+  // works either way since the click bubbles up from the real trigger.
+  type TriggerProps = {
+    onClick?: (e: React.MouseEvent) => void;
+    'aria-haspopup'?: React.AriaAttributes['aria-haspopup'];
+    'aria-expanded'?: boolean;
+  };
+  const triggerNode = React.isValidElement<TriggerProps>(trigger)
+    ? React.cloneElement(trigger, {
+        'aria-haspopup': 'menu',
+        'aria-expanded': open,
+        onClick: (e: React.MouseEvent) => {
+          trigger.props.onClick?.(e);
+          toggle();
+        },
+      })
+    : trigger;
+
   return (
     <div ref={containerRef} className={cn('relative inline-block', className)}>
-      <div
-        onClick={() => setOpen((p) => !p)}
-        aria-haspopup="menu"
-        aria-expanded={open}
-      >
-        {trigger}
+      <div onClick={React.isValidElement(trigger) ? undefined : toggle}>
+        {triggerNode}
       </div>
       {open && (
         <div

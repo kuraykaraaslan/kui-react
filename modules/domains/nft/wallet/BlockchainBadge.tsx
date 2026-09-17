@@ -37,7 +37,12 @@ export function BlockchainBadge({ chain, size = 'md', iconOnly = false, classNam
         iconOnly && 'aspect-square justify-center px-0 w-5',
         className,
       )}
-      aria-label={meta.label}
+      // aria-label is only valid on an element with a role that supports it
+      // — a plain <span> doesn't (axe: aria-prohibited-attr). When the
+      // label text is rendered visibly, that's already the accessible
+      // name and no extra attribute is needed; icon-only needs role="img"
+      // to make the label attribute meaningful at all.
+      {...(iconOnly ? { role: 'img', 'aria-label': meta.label } : {})}
     >
       <FontAwesomeIcon icon={icon} className="w-3 h-3" aria-hidden="true" />
       {!iconOnly && meta.label}

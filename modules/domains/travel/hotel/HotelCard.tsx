@@ -26,7 +26,7 @@ type HotelCardProps = {
 
 function StarRating({ stars }: { stars: number }) {
   return (
-    <div className="flex items-center gap-0.5" aria-label={`${stars} out of 5 stars`}>
+    <div role="img" className="flex items-center gap-0.5" aria-label={`${stars} out of 5 stars`}>
       {Array.from({ length: 5 }).map((_, i) => {
         if (i < Math.floor(stars)) {
           return <FontAwesomeIcon key={i} icon={faStar} className="w-3 h-3 text-warning" aria-hidden="true" />;

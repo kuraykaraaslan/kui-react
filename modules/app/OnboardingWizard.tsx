@@ -39,6 +39,7 @@ function ProgressBar({ value, total }: { value: number; total: number }) {
     <div
       className="h-1 w-full rounded-full bg-surface-sunken overflow-hidden"
       role="progressbar"
+      aria-label={`Step ${value + 1} of ${total}`}
       aria-valuemin={0}
       aria-valuemax={total}
       aria-valuenow={value + 1}
@@ -56,6 +57,7 @@ function ProgressDots({ value, total }: { value: number; total: number }) {
     <div
       className="flex items-center gap-2"
       role="progressbar"
+      aria-label={`Step ${value + 1} of ${total}`}
       aria-valuemin={0}
       aria-valuemax={total}
       aria-valuenow={value + 1}

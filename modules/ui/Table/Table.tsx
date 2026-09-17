@@ -64,6 +64,9 @@ export function Table<T extends Record<string, unknown>>({
         'w-full overflow-x-auto rounded-lg border border-border',
         className,
       )}
+      tabIndex={0}
+      role="region"
+      aria-label={caption ?? 'Table'}
     >
       <table className="w-full text-sm">
         {caption && <caption className="sr-only">{caption}</caption>}

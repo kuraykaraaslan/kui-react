@@ -82,6 +82,7 @@ export function DropZone({
         multiple={multiple}
         accept={accept}
         disabled={disabled}
+        aria-label={browseLabel}
         className="sr-only"
         onChange={(e) => onFiles(e.target.files)}
       />

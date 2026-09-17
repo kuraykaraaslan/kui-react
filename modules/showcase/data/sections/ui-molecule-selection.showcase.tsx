@@ -256,7 +256,7 @@ export function Toggle({ id, label, description, checked, onChange, disabled, si
             id="pg-toggle"
             label={p.label as string}
             checked={p.checked as boolean}
-            size={p.size as any}
+            size={p.size as 'sm' | 'md' | 'lg'}
             description={p.description as string || undefined}
             disabled={p.disabled as boolean}
             onChange={() => {}}
@@ -323,7 +323,7 @@ export function Toggle({ id, label, description, checked, onChange, disabled, si
                         <p className="text-sm font-medium text-text-primary">{label}</p>
                         <p className="text-xs text-text-secondary">{desc}</p>
                       </div>
-                      <Toggle id={`ctrl-${key}`} label="" checked={s[key]} onChange={() => toggle(key)} />
+                      <Toggle id={`ctrl-${key}`} label="" ariaLabel={label} checked={s[key]} onChange={() => toggle(key)} />
                     </div>
                   ))}
                 </div>
@@ -331,7 +331,7 @@ export function Toggle({ id, label, description, checked, onChange, disabled, si
             }
             return <ToggleSettingsDemo />;
           })(),
-          code: `function Demo() {\n  const [s, setS] = useState({ notifications: true, marketing: false });\n  return (\n    <div className="divide-y border rounded-lg">\n      {[{ key: 'notifications', label: 'Push notifications', desc: 'Alerts for new activity' }, ...].map(({ key, label, desc }) => (\n        <div key={key} className="flex items-center justify-between px-4 py-3">\n          <div>\n            <p className="text-sm font-medium">{label}</p>\n            <p className="text-xs text-text-secondary">{desc}</p>\n          </div>\n          <Toggle id={key} label="" checked={s[key]} onChange={() => setS(p => ({ ...p, [key]: !p[key] }))} />\n        </div>\n      ))}\n    </div>\n  );\n}`,
+          code: `function Demo() {\n  const [s, setS] = useState({ notifications: true, marketing: false });\n  return (\n    <div className="divide-y border rounded-lg">\n      {[{ key: 'notifications', label: 'Push notifications', desc: 'Alerts for new activity' }, ...].map(({ key, label, desc }) => (\n        <div key={key} className="flex items-center justify-between px-4 py-3">\n          <div>\n            <p className="text-sm font-medium">{label}</p>\n            <p className="text-xs text-text-secondary">{desc}</p>\n          </div>\n          <Toggle id={key} label="" ariaLabel={label} checked={s[key]} onChange={() => setS(p => ({ ...p, [key]: !p[key] }))} />\n        </div>\n      ))}\n    </div>\n  );\n}`,
         },
       ],
     },

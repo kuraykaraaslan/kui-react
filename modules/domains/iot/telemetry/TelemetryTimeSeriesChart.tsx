@@ -62,6 +62,7 @@ export function TelemetryTimeSeriesChart({
       </div>
       <Line
         data={chartData}
+        aria-label={title}
         options={{
           responsive: true,
           interaction: { mode: 'index', intersect: false },

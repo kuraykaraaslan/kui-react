@@ -63,6 +63,7 @@ export function WatchTimeChart({
       </div>
       <Line
         data={chartData}
+        aria-label={title}
         options={{
           responsive: true,
           plugins: {

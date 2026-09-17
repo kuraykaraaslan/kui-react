@@ -51,7 +51,6 @@ export function DependencyLayer({
 
   return (
     <svg
-      aria-hidden="true"
       className="absolute left-0 top-0 pointer-events-none"
       width={totalWidth}
       height={totalHeight}

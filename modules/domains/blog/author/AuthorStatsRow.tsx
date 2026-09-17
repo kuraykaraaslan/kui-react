@@ -44,10 +44,10 @@ export function AuthorStatsRow({ stats, className }: AuthorStatsRowProps) {
     >
       {visible.map(({ key, icon, label }) => (
         <div key={key} className="flex flex-col items-center justify-center p-3 gap-1 min-w-0">
-          <div className="flex items-center gap-1.5 text-text-secondary">
+          <dt className="flex items-center gap-1.5 text-text-secondary text-[10px] uppercase tracking-wider">
             <FontAwesomeIcon icon={icon} className="w-3 h-3" aria-hidden="true" />
-            <dt className="text-[10px] uppercase tracking-wider">{label}</dt>
-          </div>
+            {label}
+          </dt>
           <dd className="font-bold text-lg text-text-primary leading-tight">
             {compactNumber(stats[key] ?? 0)}
           </dd>
