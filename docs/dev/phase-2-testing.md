@@ -76,8 +76,8 @@ The cheapest, highest-value tests in the EJS repo: boot the app in-process and r
 | visual regression + axe | nightly, and on PRs labelled `visual` | < 15 min |
 | cross-repo parity diff | nightly | report only |
 
-- [ ] `[both]` Add the jobs to `ci.yml` and a `nightly.yml` with `schedule: cron`.
-- [ ] `[both]` Upload Playwright traces and axe JSON as workflow artifacts on failure.
+- [x] `[both]` Add the jobs to `ci.yml` and a `nightly.yml` with `schedule: cron`. The visual+axe job itself lives in a new `workflow_call` reusable workflow (`visual.yml`) so it isn't duplicated between the two triggers: `nightly.yml` (`0 3 * * *` + `workflow_dispatch`) and `ci.yml`'s new `visual` job, gated on the PR carrying a `visual` label (`labeled` added to `ci.yml`'s `pull_request` trigger types so adding the label to an already-open PR fires it without a new commit).
+- [x] `[both]` Upload Playwright traces and axe JSON as workflow artifacts on failure. `playwright.config.ts` switches to `retain-on-failure` tracing + an HTML reporter in CI only (`on-first-retry` + list-only locally, unchanged) — CI's 2 retries mean `on-first-retry` would only ever trace the *second* attempt, losing the original failure. `showcase.spec.ts`/`themes.spec.ts` in both repos now write the full axe violation payload for any page that fails the strict check to `test-results/axe/<id>.json` (the assertion's own failure message only has a one-line summary per rule); the `visual` job uploads both `playwright-report/` and `test-results/` on failure.
 
 ## Definition of done
 
