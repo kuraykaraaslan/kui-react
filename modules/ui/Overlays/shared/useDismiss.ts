@@ -14,6 +14,13 @@ import { isFocusTrapTopLayer } from './useFocusTrap';
  * Pass `escape: false` to opt out (e.g. when useFocusTrap already owns
  * Escape) or `outsidePointer: false` to disable click-outside (Modal
  * uses an explicit backdrop click handler instead).
+ *
+ * `ref` is used for the outside-click containment check (typically the
+ * outer wrapper, so a click on the trigger doesn't count as "outside").
+ * The top-of-stack check needs the *same* ref useFocusTrap pushed onto
+ * its layer stack (typically the panel itself, a different element) —
+ * pass that as `layerRef` when it differs from `ref`, or the check
+ * always fails and Escape/outside-click silently do nothing.
  */
 
 type Options = {
@@ -22,6 +29,7 @@ type Options = {
   onDismiss: () => void;
   escape?: boolean;
   outsidePointer?: boolean;
+  layerRef?: React.RefObject<HTMLElement | null>;
 };
 
 export function useDismiss({
@@ -30,6 +38,7 @@ export function useDismiss({
   onDismiss,
   escape = true,
   outsidePointer = true,
+  layerRef = ref,
 }: Options) {
   useEffect(() => {
     if (!active) return;
@@ -37,7 +46,7 @@ export function useDismiss({
     function onKey(e: KeyboardEvent) {
       if (!escape) return;
       if (e.key !== 'Escape') return;
-      if (!isFocusTrapTopLayer(ref)) return;
+      if (!isFocusTrapTopLayer(layerRef)) return;
       onDismiss();
     }
 
@@ -46,7 +55,7 @@ export function useDismiss({
       const root = ref.current;
       if (!root) return;
       if (root.contains(e.target as Node)) return;
-      if (!isFocusTrapTopLayer(ref)) return;
+      if (!isFocusTrapTopLayer(layerRef)) return;
       onDismiss();
     }
 
@@ -56,5 +65,5 @@ export function useDismiss({
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('pointerdown', onPointer, true);
     };
-  }, [active, ref, onDismiss, escape, outsidePointer]);
+  }, [active, ref, layerRef, onDismiss, escape, outsidePointer]);
 }

@@ -1,6 +1,7 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
 import React, { useEffect, useRef, useState } from 'react';
+import { useFocusTrap } from './Overlays/shared/useFocusTrap';
 
 export type DropdownItem =
   | { type?: 'item'; label: string; icon?: React.ReactNode; onClick?: () => void; danger?: boolean; disabled?: boolean }
@@ -21,20 +22,18 @@ export function DropdownMenu({
 }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(menuRef, { active: open, onEscape: () => setOpen(false) });
 
   useEffect(() => {
     if (!open) return;
     function onOutside(e: MouseEvent) {
       if (!containerRef.current?.contains(e.target as Node)) setOpen(false);
     }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false);
-    }
     document.addEventListener('mousedown', onOutside);
-    document.addEventListener('keydown', onKey);
     return () => {
       document.removeEventListener('mousedown', onOutside);
-      document.removeEventListener('keydown', onKey);
     };
   }, [open]);
 
@@ -69,6 +68,7 @@ export function DropdownMenu({
       </div>
       {open && (
         <div
+          ref={menuRef}
           role="menu"
           className={cn(
             'absolute z-[60] mt-1 min-w-[10rem] rounded-lg border border-border bg-surface-raised shadow-lg py-1',

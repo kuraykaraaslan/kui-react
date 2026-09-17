@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DropdownMenu, type DropdownItem } from './DropdownMenu';
 
@@ -81,5 +81,33 @@ describe('DropdownMenu', () => {
     render(<DropdownMenu trigger={<button>Options</button>} items={ITEMS} align="right" />);
     await user.click(screen.getByText('Options'));
     expect(screen.getByRole('menu').className).toContain('right-0');
+  });
+
+  it('moves focus into the menu (first item) on open', async () => {
+    const user = userEvent.setup();
+    render(<DropdownMenu trigger={<button>Options</button>} items={ITEMS} />);
+    await user.click(screen.getByText('Options'));
+    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Edit' })).toHaveFocus());
+  });
+
+  it('returns focus to the trigger when closed via Escape', async () => {
+    const user = userEvent.setup();
+    render(<DropdownMenu trigger={<button>Options</button>} items={ITEMS} />);
+    const trigger = screen.getByText('Options');
+    await user.click(trigger);
+    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Edit' })).toHaveFocus());
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
+  it('Tab from the last focusable item (disabled items are skipped) wraps to the first', async () => {
+    const user = userEvent.setup();
+    render(<DropdownMenu trigger={<button>Options</button>} items={ITEMS} />);
+    await user.click(screen.getByText('Options'));
+    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Edit' })).toHaveFocus());
+    // Archive is disabled, so Delete is the last *focusable* item.
+    screen.getByRole('menuitem', { name: 'Delete' }).focus();
+    await user.tab();
+    expect(screen.getByRole('menuitem', { name: 'Edit' })).toHaveFocus();
   });
 });

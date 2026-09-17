@@ -33,6 +33,10 @@ export function Popover({
   useDismiss({
     active: open,
     ref: containerRef,
+    // useFocusTrap below pushes panelRef (not containerRef) onto the
+    // layer stack — the top-of-stack check needs the same ref or it
+    // never matches, silently disabling Escape/outside-click.
+    layerRef: panelRef,
     onDismiss: () => setOpen(false),
   });
 

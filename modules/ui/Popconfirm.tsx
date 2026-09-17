@@ -37,7 +37,10 @@ export function Popconfirm({
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  useDismiss({ active: open, ref: containerRef, onDismiss: () => setOpen(false) });
+  // useFocusTrap below pushes panelRef (not containerRef) onto the layer
+  // stack — the top-of-stack check needs the same ref or it never
+  // matches, silently disabling Escape/outside-click.
+  useDismiss({ active: open, ref: containerRef, layerRef: panelRef, onDismiss: () => setOpen(false) });
   useFocusTrap(panelRef, { active: open, onEscape: () => setOpen(false), handleEscape: false });
 
   function handleCancel() {
