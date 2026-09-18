@@ -38,6 +38,7 @@
   "scripts": {
     "dev": "next dev --port 3002",
     "parity:open": "node scripts/parity-open.mjs",
+    "new:component": "node scripts/new-component.mjs",
     "predev": "node scripts/sync-kui-viewer-assets.mjs",
     "kui-viewer:assets": "node scripts/sync-kui-viewer-assets.mjs",
     "prebuild": "npm run kui-viewer:assets && npm run registry:snapshot",
