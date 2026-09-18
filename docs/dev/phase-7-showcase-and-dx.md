@@ -50,12 +50,12 @@ The registry already carries `composes[]` and `usedBy[]`.
 
 ## 7.6 Developer experience
 
-- [ ] `[both]` `.vscode/extensions.json` (ESLint, Tailwind IntelliSense, EJS language support for kui-ejs) and `launch.json` for the dev server.
-- [ ] `[both]` README "Ports" line: kui-react dev on 3002, kui-ejs on 3003, so both can run side by side for parity work.
-- [ ] `[both]` `npm run parity:open <id>`: opens the same component in both showcases (needs both servers running).
+- [x] `[both]` `.vscode/extensions.json` and `launch.json` for the dev server. kui-react: ESLint + Tailwind IntelliSense. kui-ejs: Tailwind IntelliSense + EJS language support only — it has no eslint config at all (uses the bash-script token/spacing audits instead), so recommending the ESLint extension there would be wrong.
+- [x] `[both]` README "Ports" line. Also fixed a real bug found along the way: kui-react's README claimed `npm run dev` serves `http://localhost:3000`; `package.json`'s `dev` script has run on 3002 for a while.
+- [x] `[both]` `npm run parity:open <id>`: prints both dev URLs and tries the platform's native browser launcher, falling through to just the printed URLs with no local browser to open (headless/remote dev, this session included).
 - [ ] `[react]` `npm run new:component <layer> <Name>` scaffold: component file from the AGENTS.md template, showcase meta + previews files, test file, menu entry, and a reminder to run the snapshot. Removes the five-step manual procedure from AGENTS.md.
 - [ ] `[ejs]` Same scaffold: partial, `.locals.ts`, showcase entry, menu entry.
-- [ ] `[both]` Remove the editor-specific snapshot triggers (`.vscode/tasks.json` `runOn: folderOpen`, Claude `SessionStart` hook) once the pre-commit hook and CI drift check from phase 1 exist; they hide the problem from CI-only contributors.
+- [ ] `[both]` Remove the editor-specific snapshot triggers (`.vscode/tasks.json` `runOn: folderOpen`, Claude `SessionStart` hook) once the pre-commit hook and CI drift check from phase 1 exist; they hide the problem from CI-only contributors. **Not yet** — checked both repos' pre-commit hooks (husky/lint-staged): they only run `eslint --fix`/audit scripts, not `registry:snapshot`. CI's `snapshot-drift` job catches staleness but nothing locally auto-fixes it the way this task does for VS Code users, so removing it now would be a real regression with no replacement, not the "these are redundant now" cleanup the phase text describes.
 
 ## Definition of done
 
