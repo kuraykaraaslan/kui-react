@@ -14,8 +14,14 @@ Next.js 16.2.4 · React 19.2.4 · TypeScript 5 · Tailwind CSS 4 · App Router �
 
 ```bash
 npm install
-npm run dev          # http://localhost:3000
+npm run dev          # http://localhost:3002
 ```
+
+## Ports
+
+kui-react's dev server runs on **3002**, kui-ejs's on **3003** — chosen so
+both can run side by side when comparing a component across the two
+implementations (`docs/adr/0003-react-ejs-parity-contract.md`).
 
 ## Theme demos
 
