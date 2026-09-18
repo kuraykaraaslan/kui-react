@@ -1,7 +1,0 @@
-User-agent: *
-Allow: /
-
-# Crawl-delay can be added if needed e.g. "Crawl-delay: 10"
-# Replace the example URL below with your real site URL or set NEXT_PUBLIC_SITE_URL
-Sitemap: https://example.com/sitemap.xml
-Host: https://example.com
