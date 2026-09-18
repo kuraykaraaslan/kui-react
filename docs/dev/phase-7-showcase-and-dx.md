@@ -35,10 +35,10 @@ Both repos hardcode `lang="en"` and English strings inside components (`aria-lab
 
 ## 7.4 Sitemap, robots, SEO
 
-- [ ] `[react]` Done in phase 6.7 (`app/sitemap.ts`, `app/robots.ts`); confirm every theme page and showcase slug is listed.
-- [ ] `[ejs]` `/sitemap.xml` and `/robots.txt` routes generated from the registry; the phase 5.8 pre-render writes them as static files. `public/` has neither today.
-- [ ] `[both]` `<link rel="canonical">` per page (kui-ejs `_head.ejs` currently points every page at `site.url`).
-- [ ] `[both]` JSON-LD `ItemList` for the showcase index so search engines see the component catalog.
+- [x] `[react]` `app/sitemap.ts` + `app/robots.ts`, reading the committed registry snapshot (334 URLs: homepage + every showcase slug + every theme root route). Found two stale placeholder files (`public/robots.txt` pointed at `example.com`, `public/sitemap.xml` had exactly one URL) silently shadowing the dynamic routes — Next.js's static `public/` serving wins over `app/` special files with the same path, so they were dead code until the placeholders were deleted.
+- [x] `[ejs]` `GET /sitemap.xml` and `GET /robots.txt` added to `src/routes/api.ts`, built from `buildRegistryIndex()` (213 URLs). No pre-render step (phase 5.8 not started) — served dynamically on every request instead, same as the AI-discoverability endpoints already in that file.
+- [x] `[both]` `<link rel="canonical">` per page. react: `app/[slug]/page.tsx`'s `generateMetadata` now returns `alternates.canonical` (covers all ~315 showcase pages; the 127 theme `page.tsx` files still fall back to the layout's canonical — left as a follow-up, out of scope for this pass). ejs: both `views/partials/_head.ejs` (theme pages) and `views/showcase/index.ejs` (component + homepage, which renders with `layout: false` and has its own separate `<head>`) needed independent fixes, both now built from `res.locals.currentPath`.
+- [x] `[both]` JSON-LD `ItemList` for the showcase index. react: `app/page.tsx`. ejs: appended to `views/showcase/index.ejs`'s existing `@graph`, only on the homepage.
 
 ## 7.5 Dependency graph page
 
