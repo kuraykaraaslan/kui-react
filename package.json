@@ -152,7 +152,7 @@
     "react-hook-form": "^7.75.0",
     "tailwindcss": "^4",
     "tsup": "^8.5.1",
-    "typescript": "^5",
+    "typescript": "^7",
     "vitest": "^4.1.11"
   },
   "license": "0BSD",
