@@ -6,6 +6,7 @@ import {
   faRocket, faTerminal, faLayerGroup, faDiagramProject, faPalette,
 } from '@fortawesome/free-solid-svg-icons';
 import { faNodeJs, faCss3Alt, faJs } from '@fortawesome/free-brands-svg-icons';
+import { BrandMark } from './BrandMark';
 import { GithubButton } from './GithubButton';
 import { SHOWCASE_BRAND, SHOWCASE_LINKS } from '@/libs/config/showcase.config';
 
@@ -52,12 +53,7 @@ export function HomePanel() {
       {/* Hero */}
       <div className="mb-10">
         <div className="flex items-center gap-3 mb-3">
-          <span
-            className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-fg text-lg font-bold shrink-0"
-            aria-hidden="true"
-          >
-            {SHOWCASE_BRAND.initial}
-          </span>
+          <BrandMark className="w-10 h-10" />
           <div>
             <h1 className="text-2xl font-bold text-text-primary leading-tight">{SHOWCASE_BRAND.name}</h1>
             <p className="text-sm text-text-secondary">{SHOWCASE_BRAND.tagline}</p>

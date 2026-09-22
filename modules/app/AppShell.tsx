@@ -10,6 +10,9 @@ type AppShellProps = {
   compactLogo?: React.ReactNode;
   sidebarCollapsed?: boolean;
   mobileSidebarTitle?: string;
+  /** Custom content for the mobile drawer's h-14 header bar (e.g. the brand
+   *  lockup). Defaults to the plain `mobileSidebarTitle` row. */
+  mobileSidebarHeader?: React.ReactNode;
   sidebar?: React.ReactNode;
   topbar?: React.ReactNode;
   asideClassName?: string;
@@ -24,6 +27,7 @@ export function AppShell({
   compactLogo,
   sidebarCollapsed = false,
   mobileSidebarTitle = 'Navigation',
+  mobileSidebarHeader,
   sidebar,
   topbar,
   asideClassName,
@@ -80,6 +84,7 @@ export function AppShell({
             open={mobileSidebarOpen}
             onClose={() => setMobileSidebarOpen(false)}
             title={mobileSidebarTitle}
+            header={mobileSidebarHeader}
             side="left"
             className="w-72"
           >

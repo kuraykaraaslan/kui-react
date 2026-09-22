@@ -14,6 +14,12 @@ export type DrawerProps = {
   open: boolean;
   onClose: () => void;
   title: string;
+  /**
+   * Replaces the default title row with custom content in a fixed h-14 bar
+   * (the close button stays on the right). `title` is still the dialog's
+   * accessible name.
+   */
+  header?: React.ReactNode;
   side?: 'left' | 'right';
   children?: React.ReactNode;
   footer?: React.ReactNode;
@@ -35,6 +41,7 @@ export function Drawer({
   open,
   onClose,
   title,
+  header,
   side = 'right',
   children,
   footer,
@@ -95,17 +102,31 @@ export function Drawer({
           className,
         )}
       >
-        <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-border shrink-0">
-          <h2 className="text-base font-semibold text-text-primary">{title}</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close drawer"
-            className="text-text-disabled hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
-          >
-            <FontAwesomeIcon icon={faXmark} className="w-4 h-4" aria-hidden="true" />
-          </button>
-        </div>
+        {header ? (
+          <div className="flex items-center gap-3 h-14 px-4 border-b border-border shrink-0">
+            <div className="flex-1 min-w-0">{header}</div>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close drawer"
+              className="p-1.5 rounded text-text-secondary hover:text-text-primary hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+            >
+              <FontAwesomeIcon icon={faXmark} className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between gap-3 px-4 py-4 border-b border-border shrink-0">
+            <h2 className="text-base font-semibold text-text-primary">{title}</h2>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close drawer"
+              className="text-text-disabled hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
+            >
+              <FontAwesomeIcon icon={faXmark} className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </div>
+        )}
         <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4">{children}</div>
         {footer && (
           <div className="px-4 py-4 border-t border-border shrink-0">{footer}</div>

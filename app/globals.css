@@ -43,6 +43,11 @@
   --info:            #06b6d4;
   --info-subtle:     #ecfeff;
   --info-fg:         #164e63;
+  /* Brand mark (brand/geometry.mjs) — on top of the family contract. The
+     in-app mark reads these; only generated static assets use raw hex. */
+  --brand-tone-one: #3b82f6;
+  --brand-tone-two: #8b5cf6;
+  --brand-tile:     #0f172a;
 }
 
 .dark {
@@ -88,6 +93,9 @@
   --info:            #22d3ee;
   --info-subtle:     #083344;
   --info-fg:         #cffafe;
+  --brand-tone-one: #60a5fa;
+  --brand-tone-two: #8b5cf6;
+  --brand-tile:     #0f172a;
 }
 
 @theme inline {

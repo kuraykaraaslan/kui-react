@@ -8,7 +8,10 @@ import { cn } from '@/libs/utils/cn';
 import SHOWCASE_NAV_GROUPS from '@/modules/showcase/data/showcase.menu';
 import { ThemeSwitcher } from '@/modules/app/ThemeSwitcher';
 import { UserMenu } from '@/modules/domains/common/user/UserMenu';
+import { SHOWCASE_BRAND } from '@/libs/config/showcase.config';
+import { BrandMark } from './BrandMark';
 import { GithubButton } from './GithubButton';
+import { SidebarBrand } from './SidebarBrand';
 import { LayoutSwitcher, type VariantLayout } from './LayoutSwitcher';
 import { VariantLayoutContext } from './VariantLayoutContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -54,13 +57,10 @@ export function ShowcaseShell({ children }: { children: React.ReactNode }) {
   return (
     <VariantLayoutContext.Provider value={{ variantLayout, setVariantLayout }}>
       <AppShell
-        logo={
-          <div>
-            <p className="text-sm font-semibold text-text-primary">UI Showcase</p>
-            <p className="text-xs text-text-secondary">Component library</p>
-          </div>
-        }
-        compactLogo={<span className="text-sm font-black text-primary">UI</span>}
+        logo={<SidebarBrand />}
+        compactLogo={<BrandMark className="w-7 h-7" />}
+        mobileSidebarTitle={SHOWCASE_BRAND.name}
+        mobileSidebarHeader={<SidebarBrand />}
         sidebarCollapsed={sidebarCollapsed}
         sidebar={
           <AppSidebar
