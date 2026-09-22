@@ -23,9 +23,7 @@
   </g>
 
   <text x="96" y="352" font-family="Geist, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
-        font-size="76" font-weight="600" letter-spacing="-2" xml:space="preserve">
-    <tspan fill="#60a5fa">kui</tspan><tspan fill="#f1f5f9"> react</tspan>
-  </text>
+        font-size="76" font-weight="600" letter-spacing="-2" xml:space="preserve"><tspan fill="#60a5fa">kui</tspan><tspan fill="#f1f5f9"> react</tspan></text>
   <text x="96" y="410" font-family="Geist, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
         font-size="28" font-weight="400" fill="#cbd5e1">A modular React component library</text>
 </svg>

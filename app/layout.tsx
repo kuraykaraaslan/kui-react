@@ -31,7 +31,6 @@ const SITE_NAME = SHOWCASE_BRAND.name;
 const SITE_TITLE = `${SHOWCASE_BRAND.name} — ${SHOWCASE_BRAND.tagline}`;
 const SITE_DESCRIPTION = SHOWCASE_BRAND.description;
 const SITE_URL = SHOWCASE_LINKS.siteUrl;
-const OG_TITLE = encodeURIComponent(SHOWCASE_BRAND.name);
 
 const SITE_KEYWORDS = [
   "React UI components",
@@ -100,7 +99,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     images: [
       {
-        url: `${SITE_URL}/api/og?title=${OG_TITLE}`,
+        url: `${SITE_URL}/og-image.png`,
         width: 1200,
         height: 630,
         alt: `${SITE_NAME} Preview`,
@@ -113,7 +112,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: [`${SITE_URL}/api/og?title=${OG_TITLE}`],
+    images: [`${SITE_URL}/og-image.png`],
   },
 
   robots: {
