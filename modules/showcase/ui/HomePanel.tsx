@@ -8,6 +8,7 @@ import {
 import { faNodeJs, faCss3Alt, faJs } from '@fortawesome/free-brands-svg-icons';
 import { BrandMark } from './BrandMark';
 import { GithubButton } from './GithubButton';
+import { FamilyPanel } from './FamilyPanel';
 import { SHOWCASE_BRAND, SHOWCASE_LINKS } from '@/libs/config/showcase.config';
 
 const stack = [
@@ -150,6 +151,9 @@ export function HomePanel() {
           Each layer builds on the one above it. Keep business logic in domain/app layers; ui components stay generic.
         </p>
       </div>
+
+      {/* KUI family */}
+      <FamilyPanel current="react" />
 
       {/* Themes */}
       <div className="rounded-xl border border-border bg-surface-raised p-5 mb-8">
