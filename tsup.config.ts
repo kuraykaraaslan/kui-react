@@ -12,6 +12,9 @@ export default defineConfig({
   dts: {
     compilerOptions: {
       incremental: false,
+      // tsup's DTS build sets `baseUrl` itself, which TypeScript 6 flags as
+      // deprecated (TS5101); the project's own tsconfig doesn't use it.
+      ignoreDeprecations: '6.0',
     },
   },
   clean: true,
