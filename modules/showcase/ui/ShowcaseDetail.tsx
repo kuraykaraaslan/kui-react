@@ -309,7 +309,7 @@ export function ShowcaseDetail({ slug }: { slug: string }) {
       </div>
 
       {selected.playground && (
-        <PropsEditor {...selected.playground} />
+        <PropsEditor key={selected.id} {...selected.playground} />
       )}
 
       <div className={cn(

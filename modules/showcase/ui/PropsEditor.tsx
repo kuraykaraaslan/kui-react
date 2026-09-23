@@ -1,7 +1,8 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useSyncExternalStore } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { CopyButton } from './CopyButton';
+import { PROPS_PARAM, encodePropsState, decodePropsState } from './propsEditorState';
 import type { ControlDef, PlaygroundDef } from '../data/showcase.types';
 
 const DOT_GRID: React.CSSProperties = {
@@ -11,6 +12,24 @@ const DOT_GRID: React.CSSProperties = {
 
 function initValues(controls: ControlDef[]): Record<string, unknown> {
   return Object.fromEntries(controls.map((c) => [c.key, c.default]));
+}
+
+// The URL's ?p= param is read through useSyncExternalStore rather than a
+// useState initializer or an effect: the server snapshot is always null, so
+// the first client render matches the server HTML (no hydration mismatch),
+// then React re-renders with the real param — no setState-in-effect needed.
+const subscribeToUrl = (onChange: () => void) => {
+  window.addEventListener('popstate', onChange);
+  return () => window.removeEventListener('popstate', onChange);
+};
+const readUrlParam = () => new URLSearchParams(window.location.search).get(PROPS_PARAM);
+const readUrlParamOnServer = () => null;
+
+function writeUrlParam(encoded: string | null) {
+  const url = new URL(window.location.href);
+  if (encoded) url.searchParams.set(PROPS_PARAM, encoded);
+  else url.searchParams.delete(PROPS_PARAM);
+  window.history.replaceState(window.history.state, '', url);
 }
 
 function ControlInput({
@@ -101,12 +120,21 @@ function ControlInput({
 }
 
 export function PropsEditor({ controls, render, generateCode }: PlaygroundDef) {
-  const [values, setValues] = useState<Record<string, unknown>>(() =>
-    initValues(controls),
+  const urlParam = useSyncExternalStore(subscribeToUrl, readUrlParam, readUrlParamOnServer);
+  // null until the user touches a control; until then the URL param (if any)
+  // supplies the initial values. Once set, it always wins over the URL.
+  const [overrides, setOverrides] = useState<Record<string, unknown> | null>(null);
+  const values = useMemo(
+    () => overrides ?? decodePropsState(controls, urlParam) ?? initValues(controls),
+    [overrides, controls, urlParam],
   );
 
-  const set = (key: string, v: unknown) =>
-    setValues((prev) => ({ ...prev, [key]: v }));
+  const commit = (next: Record<string, unknown>) => {
+    setOverrides(next);
+    writeUrlParam(encodePropsState(controls, next));
+  };
+
+  const set = (key: string, v: unknown) => commit({ ...values, [key]: v });
 
   const code = useMemo(
     () =>
@@ -129,7 +157,7 @@ export function PropsEditor({ controls, render, generateCode }: PlaygroundDef) {
         </div>
         <button
           type="button"
-          onClick={() => setValues(initValues(controls))}
+          onClick={() => commit(initValues(controls))}
           className={cn(
             'px-2.5 py-1 text-xs rounded-md font-medium transition-colors',
             'bg-surface-overlay text-text-secondary hover:text-text-primary hover:bg-surface-sunken',
