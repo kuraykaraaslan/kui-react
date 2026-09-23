@@ -8,7 +8,7 @@ A modular Next.js 16 / React 19 component library organised by atomic design —
 
 ## Stack
 
-Next.js 16.2.4 · React 19.2.4 · TypeScript 5 · Tailwind CSS 4 · App Router · ESLint 9 · Zustand · Zod · Leaflet · Chart.js · Font Awesome
+Next.js 16.3.6 · React 19.3.0 · TypeScript 6 · Tailwind CSS 4 · App Router · ESLint 9 · Zustand · Zod · Leaflet · Chart.js · Font Awesome
 
 ## Quick start
 

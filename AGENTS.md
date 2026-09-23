@@ -53,7 +53,7 @@ const matches = reg.components.filter(c =>
 
 # Project Architecture
 
-**Stack:** Next.js 16.2.4 · React 19 · TypeScript 5 · Tailwind CSS 4 · App Router
+**Stack:** Next.js 16.3.6 · React 19 · TypeScript 6 · Tailwind CSS 4 · App Router
 
 ## Module Layers
 

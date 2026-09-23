@@ -12,9 +12,9 @@ import { FamilyPanel } from './FamilyPanel';
 import { SHOWCASE_BRAND, SHOWCASE_LINKS } from '@/libs/config/showcase.config';
 
 const stack = [
-  { icon: faNodeJs,  brand: true,  label: 'Next.js',    value: '16.2.4' },
+  { icon: faNodeJs,  brand: true,  label: 'Next.js',    value: '16.3.6' },
   { icon: faJs,      brand: true,  label: 'React',       value: '19' },
-  { icon: faJs,      brand: true,  label: 'TypeScript',  value: '5' },
+  { icon: faJs,      brand: true,  label: 'TypeScript',  value: '6' },
   { icon: faCss3Alt, brand: true,  label: 'Tailwind CSS',value: '4' },
 ];
 
