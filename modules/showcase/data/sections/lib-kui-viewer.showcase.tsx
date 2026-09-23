@@ -30,9 +30,6 @@ import {
   useFitToScene,
   useFitToSelection,
 } from '@kuraykaraaslan/kui-viewer/react';
-// `ZoomSlider` has no React wrapper, so we mount the vanilla factory's element
-// ourselves (same pattern the package's own `<NavCube/>` uses internally).
-import { ZoomSlider } from '@kuraykaraaslan/kui-viewer';
 import type { ShowcaseComponent } from '../showcase.types';
 
 type KUIViewerProps = {
@@ -80,25 +77,41 @@ function NavCubeOverlay() {
   );
 }
 
-/** Horizontal dolly slider mounted directly under the NavCube. The vanilla
- *  factory returns `{ el, dispose }`; we append the element and tear it down
- *  on unmount so it never outlives the viewer. */
+/** Horizontal dolly slider mounted directly under the NavCube. `ZoomSlider`
+ *  has no React wrapper, so we mount the vanilla factory's element ourselves
+ *  (same pattern the package's own `<NavCube/>` uses internally): it returns
+ *  `{ el, dispose }`; we append the element and tear it down on unmount so it
+ *  never outlives the viewer.
+ *
+ *  Imported inside the effect, not at module top: since 0.3 the package root
+ *  also defines the `<kui-viewer>` custom element (`class … extends
+ *  HTMLElement`) on load, which throws on the server — and this section is
+ *  pulled into server code by modules/registry (the /api/registry route). */
 function ZoomSliderOverlay() {
   const viewer = useViewer();
   const hostRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
-    // Wider than the 200 m default — the sample model is a multi-storey
-    // building and users like to pull back for site context.
-    const { el, dispose } = ZoomSlider(viewer.camera, viewer.controls, {
-      minDistance: 1,
-      maxDistance: 300,
+    let cleanup: (() => void) | undefined;
+    let cancelled = false;
+    import('@kuraykaraaslan/kui-viewer').then(({ ZoomSlider }) => {
+      if (cancelled) return;
+      // Wider than the 200 m default — the sample model is a multi-storey
+      // building and users like to pull back for site context.
+      const { el, dispose } = ZoomSlider(viewer.camera, viewer.controls, {
+        minDistance: 1,
+        maxDistance: 300,
+      });
+      host.appendChild(el);
+      cleanup = () => {
+        dispose();
+        el.remove();
+      };
     });
-    host.appendChild(el);
     return () => {
-      dispose();
-      el.remove();
+      cancelled = true;
+      cleanup?.();
     };
   }, [viewer]);
   // top = navcube top (12) + navcube height (96) + 20 gap.
