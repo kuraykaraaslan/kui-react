@@ -1,13 +1,15 @@
 import type { MetadataRoute } from 'next';
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import { SHOWCASE_LINKS } from '@/libs/config/showcase.config';
+import registry from '@/public/registry/components.index.json';
 
-// Reads the committed registry snapshot rather than importing the live
+// Statically imports the committed registry snapshot rather than the live
 // showcase data — same reasoning as modules/registry/registry.test.ts:
 // this needs to run at build time without pulling in all 66 showcase
 // section files, and the snapshot is already the source of truth every
-// other AI-facing surface (llms.txt, /api/registry) reads from.
+// other AI-facing surface (llms.txt, /api/registry) reads from. A static
+// import rather than readFileSync(path.join(process.cwd(), ...)) because
+// Turbopack treats cwd-relative fs access as "trace the whole project"
+// and pulls every file into the route's output.
 //
 // Lists every showcase component slug and every theme's root route.
 // Themes with dynamic sub-pages (listing/detail, per AGENTS.md's theme
@@ -15,11 +17,6 @@ import { SHOWCASE_LINKS } from '@/libs/config/showcase.config';
 // file imported individually, and this already covers the two page
 // kinds most worth a search engine indexing: the component reference
 // and each theme's landing page.
-const REPO_ROOT = path.resolve(process.cwd());
-const registry = JSON.parse(
-  readFileSync(path.join(REPO_ROOT, 'public/registry/components.index.json'), 'utf8')
-);
-
 const components: { id: string }[] = registry.components;
 const themes: { route: string }[] = registry.themes;
 
