@@ -20,15 +20,15 @@ export type FamilyKit = 'react' | 'ejs' | 'native';
 type Member = { id: string; name: string; meta: string; href: string; label: string; tone: string };
 
 const KITS: (Member & { id: FamilyKit })[] = [
-  { id: 'react',  name: 'KUIreact',  meta: 'Next.js · React',     href: 'https://next-js-components.kuray.dev', label: 'next-js-components.kuray.dev', tone: '#8b5cf6' },
-  { id: 'ejs',    name: 'KUIejs',    meta: 'Express · EJS',       href: 'https://ejs-components.kuray.dev',     label: 'ejs-components.kuray.dev',     tone: '#ec4899' },
-  { id: 'native', name: 'KUInative', meta: 'Expo · React Native', href: 'https://kui-native.kuray.dev',         label: 'kui-native.kuray.dev',         tone: '#f97316' },
+  { id: 'react',  name: 'KUIreact',  meta: 'Next.js · React',     href: 'https://kui-react.kuray.dev', label: 'kui-react.kuray.dev', tone: '#8b5cf6' },
+  { id: 'ejs',    name: 'KUIejs',    meta: 'Express · EJS',       href: 'https://kui-ejs.kuray.dev', label: 'kui-ejs.kuray.dev', tone: '#ec4899' },
+  { id: 'native', name: 'KUInative', meta: 'Expo · React Native', href: 'https://kui-native.kuray.dev', label: 'kui-native.kuray.dev', tone: '#f97316' },
 ];
 
 const LIBRARIES: Member[] = [
-  { id: 'player', name: 'KUI Player', meta: 'Video player',       href: 'https://www.npmjs.com/package/@kuraykaraaslan/kui-player', label: '@kuraykaraaslan/kui-player', tone: '#22c55e' },
-  { id: 'gantt',  name: 'KUI Gantt',  meta: 'Gantt chart',        href: 'https://www.npmjs.com/package/@kuraykaraaslan/kui-gantt',  label: '@kuraykaraaslan/kui-gantt',  tone: '#ef4444' },
-  { id: 'viewer', name: 'KUI Viewer', meta: 'IFC / BIM 3D viewer', href: 'https://kui-viewer.kuray.dev',                            label: 'kui-viewer.kuray.dev',       tone: '#ffb020' },
+  { id: 'player', name: 'KUI Player', meta: 'Video player',       href: 'https://kui-player.kuray.dev', label: 'kui-player.kuray.dev', tone: '#22c55e' },
+  { id: 'gantt',  name: 'KUI Gantt',  meta: 'Gantt chart',        href: 'https://kui-gantt.kuray.dev', label: 'kui-gantt.kuray.dev', tone: '#ef4444' },
+  { id: 'viewer', name: 'KUI Viewer', meta: 'IFC / BIM 3D viewer', href: 'https://kui-viewer.kuray.dev', label: 'kui-viewer.kuray.dev', tone: '#ffb020' },
 ];
 
 /** The family mark (shared K construction), second arm in the member's tone. */
