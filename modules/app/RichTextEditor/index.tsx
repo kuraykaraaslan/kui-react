@@ -1,5 +1,5 @@
 'use client';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { Toolbar } from './Toolbar';
 import { PopupOverlays } from './PopupOverlays';
@@ -21,8 +21,8 @@ import './quill.styles.css';
 export type { RichTextEditorHandle, RichTextEditorProps, MentionUser, SlashCommand } from './types';
 
 export const RichTextEditor = forwardRef<RichTextEditorHandle, RichTextEditorProps>(function RichTextEditor(props, ref) {
-  const store = useMemo(() => createRichTextEditorStore(props.value ?? props.defaultValue ?? ''), []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // One store per editor instance, seeded from the initial value.
+  const [store] = useState(() => createRichTextEditorStore(props.value ?? props.defaultValue ?? ''));
   return (
     <RichTextEditorStoreProvider store={store}>
       <Inner {...props} _store={store} ref={ref} />

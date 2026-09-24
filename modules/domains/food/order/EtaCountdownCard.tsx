@@ -24,12 +24,13 @@ export function EtaCountdownCard({
   className,
 }: EtaCountdownCardProps) {
   const target = new Date(estimatedArrival);
-  const [minutes, setMinutes] = useState(() => diffMinutes(target));
+  const targetMs = target.getTime();
+  const [minutes, setMinutes] = useState(() => diffMinutes(new Date(targetMs)));
 
   useEffect(() => {
-    const id = setInterval(() => setMinutes(diffMinutes(target)), 30_000);
+    const id = setInterval(() => setMinutes(diffMinutes(new Date(targetMs))), 30_000);
     return () => clearInterval(id);
-  }, [target]);
+  }, [targetMs]);
 
   const arrived = minutes === 0;
   const urgent = variant === 'urgent' || minutes <= 5;

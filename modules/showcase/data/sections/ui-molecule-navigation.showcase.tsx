@@ -1,5 +1,4 @@
 'use client';
-import { Button } from '@/modules/ui/Button';
 import { Badge } from '@/modules/ui/Badge';
 import { Pagination } from '@/modules/ui/Pagination';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
@@ -270,7 +269,7 @@ export function TabGroup({ tabs, defaultTab, label = 'Tabs', className }) {
           layout: 'stack' as const,
           preview: (() => {
             function LazyTabContent({ label, onMount }: { label: string; onMount: () => void }) {
-              useEffect(() => { onMount(); }, []);
+              useEffect(() => { onMount(); }, [onMount]);
               return <p className="text-sm text-text-secondary">{label} mounted on first activation.</p>;
             }
             function LazyDemo() {

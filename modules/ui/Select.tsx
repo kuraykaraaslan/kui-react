@@ -78,6 +78,7 @@ function CustomSelect({
         tabIndex={disabled ? -1 : 0}
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-controls={`${id}-listbox`}
         aria-labelledby={`${id}-label`}
         aria-describedby={describedBy}
         aria-disabled={disabled}
@@ -118,7 +119,7 @@ function CustomSelect({
               />
             </div>
           )}
-          <ul role="listbox" aria-labelledby={`${id}-label`} className="py-1 max-h-48 overflow-y-auto">
+          <ul id={`${id}-listbox`} role="listbox" aria-labelledby={`${id}-label`} className="py-1 max-h-48 overflow-y-auto">
             {placeholder && !search && (
               <li
                 role="option"

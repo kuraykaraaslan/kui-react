@@ -68,7 +68,8 @@ export default function ApiDocLayout({ children }: { children: React.ReactNode }
   function toggleTag(tag: string) {
     setCollapsed((prev) => {
       const next = new Set(prev);
-      next.has(tag) ? next.delete(tag) : next.add(tag);
+      if (next.has(tag)) next.delete(tag);
+      else next.add(tag);
       return next;
     });
   }

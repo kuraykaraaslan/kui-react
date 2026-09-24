@@ -13,7 +13,7 @@
 // TODO M5: full a11y (aria-live progress announcements), reduced-motion,
 //          messages prop richer i18n.
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFolderOpen, faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -81,10 +81,10 @@ export function FileInput({
 
   const isDisabled = disabled || uploadState === 'uploading';
 
-  const msg: FileInputMessages = {
-    ...DEFAULT_MESSAGES,
-    ...messages,
-  };
+  const msg: FileInputMessages = useMemo(
+    () => ({ ...DEFAULT_MESSAGES, ...messages }),
+    [messages],
+  );
 
   const validate = useCallback(
     (file: File): string | undefined => {

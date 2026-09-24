@@ -1,11 +1,13 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { CartSummary } from '@/modules/domains/common/cart/CartSummary';
 import { DEMO_CART } from '../common.data';
 import type { Cart } from '@/modules/domains/common/CartTypes';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 export default function CartPage() {
+  const router = useRouter();
   const [cart, setCart] = useState<Cart>(DEMO_CART);
   const [appliedCoupon, setAppliedCoupon] = useState<string | undefined>();
 
@@ -80,7 +82,7 @@ export default function CartPage() {
         onCouponApply={handleCouponApply}
         onCouponRemove={handleCouponRemove}
         appliedCoupon={appliedCoupon}
-        onCheckout={() => { window.location.href = '/theme/common/payment/checkout'; }}
+        onCheckout={() => router.push('/theme/common/payment/checkout')}
         checkoutLabel="Proceed to Checkout →"
         showTotals
         showCoupon

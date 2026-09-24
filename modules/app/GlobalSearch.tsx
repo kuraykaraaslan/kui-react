@@ -1,6 +1,6 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { SearchBar } from '@/modules/ui/SearchBar';
 
 export type SearchResult = {
@@ -30,6 +30,7 @@ export function GlobalSearch({
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [highlighted, setHighlighted] = useState(-1);
+  const listboxId = useId();
 
   useEffect(() => {
     function onOutside(e: MouseEvent) {
@@ -78,7 +79,7 @@ export function GlobalSearch({
 
   return (
     <div ref={containerRef} className={cn('relative w-full max-w-md', className)}>
-      <div onKeyDown={handleKeyDown} role="combobox" aria-expanded={open} aria-haspopup="listbox">
+      <div onKeyDown={handleKeyDown} role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-controls={listboxId}>
         <SearchBar
           value={query}
           onChange={handleChange}
@@ -88,6 +89,7 @@ export function GlobalSearch({
 
       {open && (
         <div
+          id={listboxId}
           role="listbox"
           aria-label="Search results"
           className="absolute top-full mt-1.5 left-0 right-0 z-50 rounded-lg border border-border bg-surface-raised shadow-xl overflow-hidden max-h-72 overflow-y-auto"
