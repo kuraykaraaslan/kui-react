@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Pagination } from '@/modules/ui/Pagination';
-import { Badge } from '@/modules/ui/Badge';
 import { TransactionRow } from '@/modules/domains/fintech/transaction/TransactionRow';
 import { TransactionVolumeChart } from '@/modules/domains/fintech/chart/TransactionVolumeChart';
 import { PortfolioDonutChart } from '@/modules/domains/fintech/chart/PortfolioDonutChart';

@@ -381,7 +381,7 @@ const DEMO_RESOURCES_ITEMS = [
 ];
 
 function MegaMenuProductDemo() {
-  const { openId, open, scheduleClose, close } = useMegaMenu();
+  const { openId, open, scheduleClose } = useMegaMenu();
   return (
     <div className="flex justify-center py-8" style={{ minHeight: 340 }}>
       <MegaMenu.Root id="product" openId={openId} onOpen={open} onScheduleClose={scheduleClose}>
@@ -411,7 +411,7 @@ function MegaMenuProductDemo() {
 }
 
 function MegaMenuResourcesDemo() {
-  const { openId, open, scheduleClose, close } = useMegaMenu();
+  const { openId, open, scheduleClose } = useMegaMenu();
   return (
     <div className="flex justify-center py-8" style={{ minHeight: 260 }}>
       <MegaMenu.Root id="resources" openId={openId} onOpen={open} onScheduleClose={scheduleClose}>

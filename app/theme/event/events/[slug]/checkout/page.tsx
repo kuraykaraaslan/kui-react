@@ -21,7 +21,7 @@ import {
   getSeatMapConfig,
   VENUES,
 } from '@/app/theme/event/event.data';
-import type { EventSectionPricing, BuyerInfo, CartItem } from '@/modules/domains/event/types';
+import type { BuyerInfo, CartItem } from '@/modules/domains/event/types';
 import type { CreditCardInput } from '@/modules/domains/common/PaymentTypes';
 import type { OrderTotals } from '@/modules/domains/common/MoneyTypes';
 

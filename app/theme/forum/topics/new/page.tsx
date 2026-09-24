@@ -36,7 +36,6 @@ export default function NewTopicPage() {
         initialCategoryValue={categoryOptions[1]?.value}
         onSubmit={(data) => {
           // Demo: log the submission. A real flow would POST to an API and redirect to the topic.
-           
           console.log('New topic submitted:', data);
         }}
         onCancel={() => {

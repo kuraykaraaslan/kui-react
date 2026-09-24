@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExternalLink, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { TabGroup } from '@/modules/ui/TabGroup';
 import { Badge } from '@/modules/ui/Badge';
-import { EmptyState } from '@/modules/ui/EmptyState';
 import { SchemaViewer } from './SchemaViewer';
 import { ParameterTable } from './ParameterTable';
 import { ResponseCard } from './ResponseCard';

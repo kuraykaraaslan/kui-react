@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { Button } from '@/modules/ui/Button';
-import { Badge } from '@/modules/ui/Badge';
 import { Avatar } from '@/modules/ui/Avatar';
 import { JobStatusBadge } from '@/modules/domains/jobs/job/JobStatusBadge';
 import { JobTypeBadge } from '@/modules/domains/jobs/job/JobTypeBadge';

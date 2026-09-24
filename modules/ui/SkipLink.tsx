@@ -1,6 +1,5 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
-import { useState } from 'react';
 
 export function SkipLink({
   href = '#main-content',

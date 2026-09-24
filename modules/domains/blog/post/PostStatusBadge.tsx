@@ -1,6 +1,5 @@
 'use client';
 import { Badge } from '@/modules/ui/Badge';
-import { cn } from '@/libs/utils/cn';
 import type { PostStatus } from '../types';
 
 const statusMeta: Record<PostStatus, { label: string; variant: 'warning' | 'success' | 'neutral' | 'info' }> = {

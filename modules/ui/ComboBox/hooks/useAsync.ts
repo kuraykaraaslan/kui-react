@@ -62,7 +62,7 @@ export function useAsync(
       let value: ComboBoxOption[] | Promise<ComboBoxOption[]>;
       try {
         value = onSearch(query.trim(), controller.signal);
-      } catch (err) {
+      } catch {
         if (!controller.signal.aborted) {
           setResults([]);
           setLoading(false);

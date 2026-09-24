@@ -3,7 +3,6 @@ import { Button } from '@/modules/ui/Button';
 import { AlertBanner } from '@/modules/ui/AlertBanner';
 import { Toaster, toast, useToastStore } from '@/modules/ui/Toast';
 import { EmptyState } from '@/modules/ui/EmptyState';
-import { useState } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
 
 function ToastVariantsDemo() {

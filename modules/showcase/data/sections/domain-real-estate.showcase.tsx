@@ -24,22 +24,6 @@ const DEMO_PROPERTY_SALE = {
   imageUrl: 'https://picsum.photos/seed/prop1/640/400',
 };
 
-const DEMO_PROPERTY_RENT = {
-  propertyId: 'demo-02',
-  title: 'Modern Studio Apartment in Alsancak',
-  slug: 'modern-studio-apartment-alsancak',
-  price: 12_500,
-  currency: 'TRY',
-  type: 'APARTMENT' as const,
-  listingType: 'RENT' as const,
-  status: 'ACTIVE' as const,
-  bedrooms: 1,
-  bathrooms: 1,
-  area: 52,
-  city: 'Izmir',
-  imageUrl: 'https://picsum.photos/seed/prop4/640/400',
-};
-
 const DEMO_VILLA = {
   propertyId: 'demo-03',
   title: 'Beachfront Villa with Private Pool — Lara',

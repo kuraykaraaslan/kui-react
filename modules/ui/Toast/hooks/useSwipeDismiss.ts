@@ -22,7 +22,6 @@ export type SwipeDismissOptions = {
  * No-op stub. Returns no live handlers — the toast card simply ignores
  * swipe gestures until M3 lands.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function useSwipeDismiss(_opts: SwipeDismissOptions): void {
   // TODO M3: implement.
 }

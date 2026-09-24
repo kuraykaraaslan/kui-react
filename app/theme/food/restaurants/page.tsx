@@ -25,7 +25,6 @@ const FILTER_TABS = [
 ];
 
 export default function RestaurantsListingPage() {
-  const freeDelivery = RESTAURANTS.filter((r) => r.deliveryFee === 0);
   const withPromo    = RESTAURANTS.filter((r) => r.promoText);
 
   return (

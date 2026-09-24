@@ -14,7 +14,6 @@ import {
   faShieldHalved,
   faQrcode,
   faEye,
-  faEyeSlash,
   faPlus,
   faBolt,
   faGlobe,

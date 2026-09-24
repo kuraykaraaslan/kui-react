@@ -3,7 +3,6 @@ import { cn } from '@/libs/utils/cn';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faTriangleExclamation, faLock } from '@fortawesome/free-solid-svg-icons';
-import { Badge } from '@/modules/ui/Badge';
 import { HttpMethodBadge } from './HttpMethodBadge';
 import { OperationPanel } from './OperationPanel';
 import type { Operation } from './types';

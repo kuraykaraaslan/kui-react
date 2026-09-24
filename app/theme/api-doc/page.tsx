@@ -38,7 +38,7 @@ function buildTagMap(paths: PathItem[]): Map<string, PathItem[]> {
 }
 
 export default function ApiDocPage() {
-  const { info, status, openapi, tags, components, servers } = SAMPLE_SPEC;
+  const { info, status, openapi, tags, components } = SAMPLE_SPEC;
   const tagMap = buildTagMap(SAMPLE_SPEC.paths);
 
   const securitySchemes = components?.securitySchemes

@@ -21,7 +21,6 @@ import type { CodeEditorEngineProps } from '../types';
 export function MonacoEngine(props: CodeEditorEngineProps) {
   // TODO M2: replace this transparent fallback with the real Monaco mount.
   if (typeof window !== 'undefined') {
-    // eslint-disable-next-line no-console
     console.warn(
       '[CodeEditor] engine="monaco" is not implemented yet — falling back to codemirror engine. See PLANS/36-CodeEditor.md M2.'
     );

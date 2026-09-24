@@ -1,5 +1,4 @@
 'use client';
-import { useState } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { CartItem } from './CartItem';
 import { OrderTotalsCard } from '../money/OrderTotalsCard';
@@ -7,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartShopping } from '@fortawesome/free-solid-svg-icons';
 import { CouponInput } from '../discount/CouponInput';
 import { Button } from '@/modules/ui/Button';
-import type { Cart, CartItem as CartItemType } from '../CartTypes';
+import type { Cart } from '../CartTypes';
 
 type CartSummaryProps = {
   cart: Cart;

@@ -39,7 +39,7 @@ type RootProps = {
   className?: string;
 };
 
-function Root({ id, openId, onOpen, onScheduleClose, children, className }: RootProps) {
+function Root({ id, onOpen, onScheduleClose, children, className }: RootProps) {
   return (
     <div
       className={cn('relative', className)}

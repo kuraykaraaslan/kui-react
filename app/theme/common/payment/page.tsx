@@ -8,7 +8,6 @@ import { PaymentSummaryCard } from '@/modules/domains/common/payment/PaymentSumm
 import { SavedCardSelector } from '@/modules/domains/common/payment/SavedCardSelector';
 import { OrderTotalsCard } from '@/modules/domains/common/money/OrderTotalsCard';
 import { PriceDisplay } from '@/modules/domains/common/money/PriceDisplay';
-import { Button } from '@/modules/ui/Button';
 import { SAVED_CARDS, ORDER_TOTALS } from '../common.data';
 import type { PaymentBase } from '@/modules/domains/common/PaymentTypes';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';

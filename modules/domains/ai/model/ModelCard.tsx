@@ -6,7 +6,6 @@ import { ModelTypeBadge } from './ModelTypeBadge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCircleCheck,
-  faCircleXmark,
   faMicrochip,
   faDollarSign,
 } from '@fortawesome/free-solid-svg-icons';

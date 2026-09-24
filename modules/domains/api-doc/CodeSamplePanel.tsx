@@ -3,8 +3,6 @@ import { cn } from '@/libs/utils/cn';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faCopy } from '@fortawesome/free-solid-svg-icons';
-import { Button } from '@/modules/ui/Button';
-import { ButtonGroup } from '@/modules/ui/ButtonGroup';
 
 type CodeSample = {
   lang: string;

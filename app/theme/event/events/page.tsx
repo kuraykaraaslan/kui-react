@@ -7,9 +7,8 @@ import { Button } from '@/modules/ui/Button';
 import { Select } from '@/modules/ui/Select';
 import { EmptyState } from '@/modules/ui/EmptyState';
 import { EventCard } from '@/modules/domains/event/EventCard';
-import { EventCategoryBadge } from '@/modules/domains/event/EventCategoryBadge';
 import { EVENTS, EVENT_CATEGORIES } from '@/app/theme/event/event.data';
-import type { EventFormat, EventStatus } from '@/modules/domains/event/types';
+import type { EventFormat } from '@/modules/domains/event/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTicket } from '@fortawesome/free-solid-svg-icons';
 

@@ -117,7 +117,6 @@ export function highlightMatches(label: string, matches: number[]): React.ReactN
         buf = '';
       }
       out.push(
-        // eslint-disable-next-line react/no-array-index-key
         <mark key={`m-${i}`} className="bg-warning-subtle text-text-primary rounded-sm px-0.5">
           {label[i]}
         </mark>

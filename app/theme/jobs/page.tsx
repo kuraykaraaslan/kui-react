@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
 import { Badge } from '@/modules/ui/Badge';
-import { SearchBar } from '@/modules/ui/SearchBar';
 import { JobCard } from '@/modules/domains/jobs/job/JobCard';
 import { CompanyCard } from '@/modules/domains/jobs/company/CompanyCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

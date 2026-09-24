@@ -14,7 +14,6 @@ export function runScript(node: RuleNode, msg: unknown, metadata: unknown, messa
   const sideEffects: string[] = [];
   const t0 = performance.now();
   try {
-    // eslint-disable-next-line no-new-func
     const fn = new Function('msg','metadata','message_type','send','getDeviceLabel','getDeviceTags', script);
     const output = fn(
       JSON.parse(JSON.stringify(msg ?? {})),

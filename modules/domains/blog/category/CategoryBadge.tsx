@@ -1,6 +1,5 @@
 'use client';
 import { Badge } from '@/modules/ui/Badge';
-import { cn } from '@/libs/utils/cn';
 import type { Category } from '../types';
 
 type CategoryBadgeProps = {

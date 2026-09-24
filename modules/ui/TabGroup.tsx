@@ -1,6 +1,6 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 export type Tab = {
   id: string;

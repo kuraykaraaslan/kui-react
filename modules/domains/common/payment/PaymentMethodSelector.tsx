@@ -7,10 +7,9 @@ import {
   faGoogle,
   faBitcoin,
 } from '@fortawesome/free-brands-svg-icons';
-import { faChevronDown, faCreditCard } from '@fortawesome/free-solid-svg-icons';
+import { faCreditCard } from '@fortawesome/free-solid-svg-icons';
 import { cn } from '@/libs/utils/cn';
 import { RadioGroup, RadioOption } from '@/modules/ui/RadioGroup';
-import { DropdownMenu, type DropdownItem } from '@/modules/ui/DropdownMenu';
 import type { PaymentMethod } from '../PaymentTypes';
 
 const paymentOptions: RadioOption[] = [

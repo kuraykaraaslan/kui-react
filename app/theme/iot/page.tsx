@@ -5,7 +5,6 @@ import {
   faMicrochip,
   faCircleCheck,
   faCircleExclamation,
-  faWrench,
   faBell,
   faArrowRight,
 } from '@fortawesome/free-solid-svg-icons';

@@ -1,7 +1,7 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
 import { MIME_PALETTE, MIME_CANVAS } from '../hooks/useDragDrop';
-import type { FormSchema, FieldType } from '../types';
+import type { FormSchema } from '../types';
 import { FieldRow } from './FieldRow';
 
 type CanvasProps = {

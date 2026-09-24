@@ -14,7 +14,7 @@ export default function SettingsPage() {
   const [prefState, setPrefState] = useState<SaveState>('idle');
   const [pwState,   setPwState]   = useState<SaveState>('idle');
 
-  async function handlePreferences(values: UserPreferences) {
+  async function handlePreferences(_values: UserPreferences) {
     await new Promise((r) => setTimeout(r, 800));
     setPrefState('saved');
     setTimeout(() => setPrefState('idle'), 3000);

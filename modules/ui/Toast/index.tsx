@@ -220,7 +220,7 @@ export function Toast({
   // single-shot variant was barely used. Instead we just push the toast into
   // the store and let the Toaster handle it. `onDismiss` runs on auto-cleanup.
   useEffect(() => {
-    const id = useToastStore.getState().add({
+    useToastStore.getState().add({
       variant,
       message,
       duration,

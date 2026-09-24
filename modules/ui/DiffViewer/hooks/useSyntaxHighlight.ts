@@ -18,7 +18,6 @@ export type HighlightedChange = Change & {
  */
 export function useSyntaxHighlight(
   changes: Change[],
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _language?: string
 ): HighlightedChange[] {
   // TODO M2: lazy-load shiki, tokenise each change, return enriched array.

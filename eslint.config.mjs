@@ -26,6 +26,22 @@ const eslintConfig = defineConfig([
     // scripts (ESM) are still linted normally.
     "scripts/**/*.js",
   ]),
+  // A leading underscore marks a deliberately unused binding (stub props
+  // for not-yet-built milestones, `{ omitted, ...rest }` destructuring).
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
+    },
+  },
   // Local rules encoding AGENTS.md's Component Authoring Rules for the
   // modules/ui, modules/app, modules/domains layers. See eslint-rules/index.mjs
   // and docs/dev/phase-1-ci-and-gates.md section 1.4.

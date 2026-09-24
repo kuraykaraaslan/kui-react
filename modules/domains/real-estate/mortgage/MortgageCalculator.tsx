@@ -23,7 +23,7 @@ export function MortgageCalculator({ defaultPrice = 1_000_000, currency = 'TRY',
   const [rateStr, setRateStr] = useState('3.5');
   const [years, setYears] = useState(20);
 
-  const { monthly, total, interest, loanAmount } = useMemo(() => {
+  const { monthly, interest, loanAmount } = useMemo(() => {
     const rate = parseFloat(rateStr) || 0;
     const loan = price * (1 - downPct / 100);
     if (loan <= 0 || rate <= 0) return { monthly: 0, total: 0, interest: 0, loanAmount: loan };

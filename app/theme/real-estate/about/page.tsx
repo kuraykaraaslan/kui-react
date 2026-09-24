@@ -12,7 +12,6 @@ import {
   faLightbulb,
   faShieldHalved,
   faHeart,
-  faChartLine,
 } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/modules/ui/Button';
 import { AGENTS } from '../real-estate.data';

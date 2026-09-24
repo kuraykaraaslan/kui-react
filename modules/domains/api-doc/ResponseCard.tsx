@@ -28,7 +28,6 @@ export function ResponseCard({ response, defaultOpen = false, className }: Props
   const [open, setOpen] = useState(defaultOpen);
 
   const contentEntries = response.content ? Object.entries(response.content) : [];
-  const firstSchema = contentEntries[0]?.[1]?.schema;
 
   return (
     <div className={cn('rounded-lg border border-border overflow-hidden', className)}>
