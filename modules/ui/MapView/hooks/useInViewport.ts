@@ -1,5 +1,9 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+
+const subscribeNoop = () => () => {};
+const lacksIntersectionObserver = () => typeof IntersectionObserver === 'undefined';
+const serverHasObserver = () => false;
 
 /**
  * Returns `true` once the referenced element has entered the viewport at least
@@ -13,22 +17,20 @@ export function useInViewport<T extends Element = HTMLDivElement>(
   options?: IntersectionObserverInit,
 ) {
   const ref = useRef<T | null>(null);
-  const [visible, setVisible] = useState(false);
+  const [intersected, setIntersected] = useState(false);
+  // Very old browser fallback: no IntersectionObserver → render immediately.
+  const noObserver = useSyncExternalStore(subscribeNoop, lacksIntersectionObserver, serverHasObserver);
+  const visible = intersected || noObserver;
 
   useEffect(() => {
     if (visible) return;
     const el = ref.current;
     if (!el) return;
-    // SSR + very old browser fallback: render immediately.
-    if (typeof IntersectionObserver === 'undefined') {
-      setVisible(true);
-      return;
-    }
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            setVisible(true);
+            setIntersected(true);
             io.disconnect();
             break;
           }

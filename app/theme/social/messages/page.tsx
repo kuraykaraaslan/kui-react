@@ -34,9 +34,11 @@ export default function MessagesPage() {
   const [draft, setDraft] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (selected) setMessages(buildInitialMessages(selected));
-  }, [selected]);
+  function selectConversation(conv: ConversationWithParticipant) {
+    if (conv === selected) return;
+    setSelected(conv);
+    setMessages(buildInitialMessages(conv));
+  }
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -71,7 +73,7 @@ export default function MessagesPage() {
             <button
               key={conv.conversationId}
               type="button"
-              onClick={() => setSelected(conv)}
+              onClick={() => selectConversation(conv)}
               className={cn(
                 'w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
                 selected?.conversationId === conv.conversationId && 'bg-primary-subtle'

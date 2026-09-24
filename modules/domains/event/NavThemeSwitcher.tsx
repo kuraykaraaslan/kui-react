@@ -1,11 +1,16 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSun, faMoon, faDesktop, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { useIsClient } from '@/libs/hooks/useIsClient';
 import { useNavPopover } from './useNavPopover';
 import { NavDropdown, NavDropdownHeader, NavTriggerButton } from './NavDropdown';
 
 type ThemeOption = 'light' | 'dark' | 'system';
+
+const subscribeNoop = () => () => {};
+const readStoredTheme = () => localStorage.getItem('theme') as ThemeOption | null;
+const readNoTheme = () => null;
 
 const THEME_OPTIONS: { id: ThemeOption; icon: React.ReactNode; label: string }[] = [
   { id: 'light',  icon: <FontAwesomeIcon icon={faSun} className="w-3.5 h-3.5" aria-hidden="true" />,     label: 'Açık'   },
@@ -15,14 +20,11 @@ const THEME_OPTIONS: { id: ThemeOption; icon: React.ReactNode; label: string }[]
 
 export function NavThemeSwitcher() {
   const { open, setOpen, ref } = useNavPopover();
-  const [theme, setTheme] = useState<ThemeOption>('system');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const stored = localStorage.getItem('theme') as ThemeOption | null;
-    if (stored) setTheme(stored);
-  }, []);
+  // `null` until the user picks — until then the stored preference applies.
+  const [picked, setTheme] = useState<ThemeOption | null>(null);
+  const mounted = useIsClient();
+  const stored = useSyncExternalStore(subscribeNoop, readStoredTheme, readNoTheme);
+  const theme: ThemeOption = picked ?? (stored || 'system');
 
   useEffect(() => {
     if (!mounted) return;

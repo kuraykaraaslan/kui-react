@@ -39,8 +39,15 @@ function CustomSelect({
     ? options.filter((o) => o.label.toLowerCase().includes(search.toLowerCase()))
     : options;
 
+  // Closing the menu clears the search box.
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (!open) setSearch('');
+  }
+
   useEffect(() => {
-    if (!open) { setSearch(''); return; }
+    if (!open) return;
     if (searchable) setTimeout(() => searchRef.current?.focus(), 30);
     function onOutside(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) setOpen(false);

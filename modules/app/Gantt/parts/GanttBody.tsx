@@ -186,13 +186,15 @@ export function GanttBody({
   }, []);
 
   // Suppress tooltip while a drag or dep-draw is in flight.
+  const [prevInteraction, setPrevInteraction] = useState({ drag, depDraw });
+  if (prevInteraction.drag !== drag || prevInteraction.depDraw !== depDraw) {
+    setPrevInteraction({ drag, depDraw });
+    if (drag || depDraw) setHover(null);
+  }
   useEffect(() => {
-    if (drag || depDraw) {
-      if (hoverTimerRef.current) {
-        clearTimeout(hoverTimerRef.current);
-        hoverTimerRef.current = null;
-      }
-      setHover(null);
+    if ((drag || depDraw) && hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
     }
   }, [drag, depDraw]);
 

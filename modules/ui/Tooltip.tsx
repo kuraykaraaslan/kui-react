@@ -1,6 +1,6 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 
 type TooltipTheme = 'default' | 'dark' | 'light';
 type TooltipPlacement = 'top' | 'bottom' | 'left' | 'right';
@@ -52,7 +52,7 @@ export function Tooltip({
 }) {
   const [visible, setVisible] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const id = useRef(`tooltip-${Math.random().toString(36).slice(2)}`).current;
+  const id = `tooltip-${useId()}`;
 
   function show() {
     if (delay > 0) {

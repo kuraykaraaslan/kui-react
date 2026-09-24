@@ -1,6 +1,6 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock } from '@fortawesome/free-solid-svg-icons';
 
@@ -13,10 +13,14 @@ type AuctionCountdownProps = {
 
 type TimeParts = { days: number; hours: number; minutes: number; seconds: number; ended: boolean };
 
-function diff(target: Date): TimeParts {
-  const ms = target.getTime() - Date.now();
-  if (ms <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0, ended: true };
-  const total = Math.floor(ms / 1000);
+/** Whole seconds left until `targetMs`, or -1 once it has passed. */
+function secondsLeft(targetMs: number): number {
+  const ms = targetMs - Date.now();
+  return ms <= 0 ? -1 : Math.floor(ms / 1000);
+}
+
+function toParts(total: number): TimeParts {
+  if (total < 0) return { days: 0, hours: 0, minutes: 0, seconds: 0, ended: true };
   return {
     days:    Math.floor(total / 86_400),
     hours:   Math.floor((total % 86_400) / 3_600),
@@ -26,6 +30,11 @@ function diff(target: Date): TimeParts {
   };
 }
 
+function subscribeEverySecond(onTick: () => void) {
+  const id = setInterval(onTick, 1000);
+  return () => clearInterval(id);
+}
+
 const sizeMap = {
   sm: { value: 'text-lg', label: 'text-[10px]', cell: 'min-w-10 p-1.5' },
   md: { value: 'text-2xl', label: 'text-[11px]', cell: 'min-w-12 p-2' },
@@ -33,15 +42,14 @@ const sizeMap = {
 };
 
 export function AuctionCountdown({ endsAt, label = 'Auction ends in', size = 'md', className }: AuctionCountdownProps) {
-  const target = new Date(endsAt);
-  const [parts, setParts] = useState<TimeParts | null>(null);
-
-  useEffect(() => {
-    setParts(diff(target));
-    const id = setInterval(() => setParts(diff(target)), 1000);
-    return () => clearInterval(id);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [target.getTime()]);
+  const targetMs = new Date(endsAt).getTime();
+  // Wall-clock subscription: re-read once a second; `null` during SSR/hydration.
+  const remaining = useSyncExternalStore(
+    subscribeEverySecond,
+    () => secondsLeft(targetMs),
+    () => null,
+  );
+  const parts: TimeParts | null = remaining === null ? null : toParts(remaining);
 
   const s = sizeMap[size];
 

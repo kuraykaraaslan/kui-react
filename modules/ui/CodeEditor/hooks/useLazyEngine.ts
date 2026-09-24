@@ -13,23 +13,23 @@
 //           in a module-level Map so navigating between editors on the same
 //           page doesn't re-fetch the chunk.
 
-import { useMemo } from 'react';
 import { CodeMirrorEngine } from '../engines/codemirror';
 import { MonacoEngine } from '../engines/monaco';
 import type { CodeEditorEngine, CodeEditorEngineProps } from '../types';
 
 type EngineComponent = (props: CodeEditorEngineProps) => React.ReactElement;
 
+/**
+ * Module-level engine registry — one stable component per engine kind, so the
+ * editor never remounts just because its parent re-rendered.
+ */
+export const ENGINES: Record<CodeEditorEngine, EngineComponent> = {
+  // TODO M2: lazy import('@monaco-editor/react') here.
+  monaco: MonacoEngine as EngineComponent,
+  // TODO M1+: lazy import('@codemirror/state') here.
+  codemirror: CodeMirrorEngine as EngineComponent,
+};
+
 export function useLazyEngine(engine: CodeEditorEngine): EngineComponent {
-  return useMemo<EngineComponent>(() => {
-    switch (engine) {
-      case 'monaco':
-        // TODO M2: lazy import('@monaco-editor/react') here.
-        return MonacoEngine as EngineComponent;
-      case 'codemirror':
-      default:
-        // TODO M1+: lazy import('@codemirror/state') here.
-        return CodeMirrorEngine as EngineComponent;
-    }
-  }, [engine]);
+  return ENGINES[engine] ?? ENGINES.codemirror;
 }

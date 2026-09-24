@@ -14,25 +14,20 @@ type LiveRegionProps = {
  * otherwise skip identical sequential messages.
  */
 export function LiveRegion({ message }: LiveRegionProps) {
-  const [a, setA] = useState('');
-  const [b, setB] = useState('');
-  const [alt, setAlt] = useState(false);
+  const [regions, setRegions] = useState({ a: '', b: '', alt: false });
 
   useEffect(() => {
     if (!message) return;
-    if (alt) {
-      setB(message);
-      setAlt(false);
-    } else {
-      setA(message);
-      setAlt(true);
-    }
-  }, [message]);  // eslint-disable-line react-hooks/exhaustive-deps
+    // The text has to land in the DOM *after* the live region is mounted for
+    // screen readers to announce it, so this update is deliberately post-commit.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- live-region announcements must be post-mount DOM changes
+    setRegions((r) => (r.alt ? { ...r, b: message, alt: false } : { ...r, a: message, alt: true }));
+  }, [message]);
 
   return (
     <>
-      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">{a}</div>
-      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">{b}</div>
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">{regions.a}</div>
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">{regions.b}</div>
     </>
   );
 }

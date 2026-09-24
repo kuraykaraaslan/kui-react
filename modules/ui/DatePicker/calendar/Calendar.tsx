@@ -83,12 +83,14 @@ export function Calendar({
   const captionId = useId();
 
   // Keep focus inside the visible month when the parent flips months.
-  useEffect(() => {
+  const monthKey = month.getFullYear() * 12 + month.getMonth();
+  const [checkedMonthKey, setCheckedMonthKey] = useState<number | null>(null);
+  if (!Object.is(checkedMonthKey, monthKey)) {
+    setCheckedMonthKey(monthKey);
     if (!isSameMonth(focus, month)) {
       setFocus(clampToBounds(new Date(month.getFullYear(), month.getMonth(), Math.min(focus.getDate(), 28)), min, max));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [month.getFullYear(), month.getMonth()]);
+  }
 
   const goMonth = useCallback(
     (delta: number) => {

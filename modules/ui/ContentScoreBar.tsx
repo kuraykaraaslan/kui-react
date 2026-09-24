@@ -33,13 +33,10 @@ export function ContentScoreBar({
   className?: string;
 }) {
   const { score, results } = useMemo(() => {
-    let earned = 0, total = 0;
-    const results = rules.map((rule) => {
-      const pass = rule.check(value);
-      if (pass) earned += rule.points;
-      total += rule.points;
-      return { label: rule.label, pass, hint: rule.hint };
-    });
+    const checked = rules.map((rule) => ({ rule, pass: rule.check(value) }));
+    const earned = checked.reduce((sum, c) => (c.pass ? sum + c.rule.points : sum), 0);
+    const total = rules.reduce((sum, rule) => sum + rule.points, 0);
+    const results = checked.map(({ rule, pass }) => ({ label: rule.label, pass, hint: rule.hint }));
     return { score: total > 0 ? Math.round((earned / total) * 100) : 0, results };
   }, [value, rules]);
 

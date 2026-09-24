@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { Badge } from '@/modules/ui/Badge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -52,7 +53,9 @@ export function InterviewScheduleRow({
 }: InterviewScheduleRowProps) {
   const meta = MODE_META[mode];
   const { date, time } = dateAndTime(scheduledAt);
-  const upcoming = new Date(scheduledAt).getTime() > Date.now();
+  // Reference time captured once per mount — keeps render pure.
+  const [now] = useState(() => Date.now());
+  const upcoming = new Date(scheduledAt).getTime() > now;
 
   return (
     <div

@@ -1,6 +1,7 @@
 'use client';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useIsClient } from '@/libs/hooks/useIsClient';
 import type { Task } from '../types';
 
 const MS_PER_DAY = 86400000;
@@ -21,14 +22,12 @@ type HoverTooltipProps = {
  */
 export function HoverTooltip({ task, anchorRect, predecessorNames, isCritical, locale }: HoverTooltipProps) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();
   const [pos, setPos] = useState<{ top: number; left: number; placement: 'above' | 'below' }>({
     top: 0,
     left: 0,
     placement: 'above',
   });
-
-  useEffect(() => { setMounted(true); }, []);
 
   useLayoutEffect(() => {
     if (!task || !anchorRect || !ref.current) return;

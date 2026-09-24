@@ -25,11 +25,13 @@ export function TabGroup({
   className?: string;
 }) {
   const [active, setActive] = useState(defaultTab ?? tabs[0]?.id ?? '');
-  const activated = useRef<Set<string>>(new Set([defaultTab ?? tabs[0]?.id ?? '']));
+  const [activated, setActivated] = useState<ReadonlySet<string>>(
+    () => new Set([defaultTab ?? tabs[0]?.id ?? '']),
+  );
 
   function activate(id: string) {
     setActive(id);
-    activated.current.add(id);
+    setActivated((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
   }
 
   function handleKeyDown(e: React.KeyboardEvent, index: number) {
@@ -84,7 +86,7 @@ export function TabGroup({
       </div>
       {tabs.map((tab) => {
         const isActive = tab.id === active;
-        const everActivated = activated.current.has(tab.id);
+        const everActivated = activated.has(tab.id);
         const shouldRender = !lazy || everActivated;
         return (
           <div

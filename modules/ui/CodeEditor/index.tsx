@@ -19,7 +19,7 @@
 
 import { useEffect, useRef } from 'react';
 import { cn } from '@/libs/utils/cn';
-import { useLazyEngine } from './hooks/useLazyEngine';
+import { ENGINES } from './hooks/useLazyEngine';
 import { useDiagnostics } from './hooks/useDiagnostics';
 import { useAutocomplete } from './hooks/useAutocomplete';
 import type { CodeEditorProps } from './types';
@@ -51,7 +51,7 @@ export function CodeEditor({
   keymap: _keymap,
   messages: _messages,
 }: CodeEditorProps) {
-  const Engine = useLazyEngine(engine);
+  const Engine = ENGINES[engine] ?? ENGINES.codemirror;
   const hiddenInputRef = useRef<HTMLInputElement | null>(null);
 
   // TODO M3: pipe markers + suggestions/hover into the active engine ref.

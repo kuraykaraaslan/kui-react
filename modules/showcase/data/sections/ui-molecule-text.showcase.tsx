@@ -4,7 +4,7 @@ import { Input } from '@/modules/ui/Input';
 import { Textarea } from '@/modules/ui/Textarea';
 import { SearchBar } from '@/modules/ui/SearchBar';
 import { Spinner } from '@/modules/ui/Spinner';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
 
 function InputDemoControlled({ prefixIcon, suffixIcon, clearable, success, readOnly, showCount }: {
@@ -12,8 +12,9 @@ function InputDemoControlled({ prefixIcon, suffixIcon, clearable, success, readO
   clearable?: boolean; success?: string; readOnly?: boolean; showCount?: boolean;
 }) {
   const [v, setV] = useState('');
+  const id = useId();
   return (
-    <Input id={`input-demo-${Math.random().toString(36).slice(2)}`} label="Label"
+    <Input id={`input-demo-${id}`} label="Label"
       value={v} onChange={(e) => setV(e.target.value)}
       prefixIcon={prefixIcon} suffixIcon={suffixIcon}
       clearable={clearable} onClear={() => setV('')}

@@ -96,12 +96,14 @@ export function useAsync(
   }, [enabled, cacheKey, query, onSearch, debounceMs]);
 
   // Reset when async is disabled (so consumers fall back to local options).
-  useEffect(() => {
+  const [prevEnabled, setPrevEnabled] = useState(enabled);
+  if (enabled !== prevEnabled) {
+    setPrevEnabled(enabled);
     if (!enabled) {
       setResults(null);
       setLoading(false);
     }
-  }, [enabled]);
+  }
 
   const appendResults = useCallback((next: ComboBoxOption[]) => {
     setResults((prev) => {

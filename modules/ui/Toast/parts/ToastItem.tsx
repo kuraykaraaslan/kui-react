@@ -139,10 +139,14 @@ export function ToastItem({ item, onRemove, reducedMotion = false }: ToastItemPr
   }, [hasDuration]);
 
   // Re-sync remaining when duration changes (e.g. loading → success via promise()).
-  useEffect(() => {
-    remainingRef.current = duration ?? 0;
+  const [prevDuration, setPrevDuration] = useState(duration);
+  if (duration !== prevDuration) {
+    setPrevDuration(duration);
     setProgress(100);
     setExiting(false);
+  }
+  useEffect(() => {
+    remainingRef.current = duration ?? 0;
   }, [duration]);
 
   const { container, iconColor, progressColor, defaultIcon } = variantMap[item.variant];

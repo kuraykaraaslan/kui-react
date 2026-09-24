@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   type Field,
   type FieldType,
@@ -31,8 +31,11 @@ export function useSchemaState(
   );
 
   const current = isControlled ? (schema as FormSchema) : internal;
+  // Latest schema for the stable mutation callbacks below.
   const currentRef = useRef(current);
-  currentRef.current = current;
+  useEffect(() => {
+    currentRef.current = current;
+  });
 
   const commit = useCallback(
     (next: FormSchema) => {

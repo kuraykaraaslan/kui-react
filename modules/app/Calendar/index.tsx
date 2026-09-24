@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useRef, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useCallback, useState } from 'react';
 import { cn } from '@/libs/utils/cn';
 import type { CalendarProps, View } from './types';
 import { HeaderBar } from './parts/HeaderBar';
@@ -43,22 +43,21 @@ export type {
 export { MiniCalendar } from './parts/MiniCalendar';
 
 export function Calendar(props: CalendarProps) {
-  // One store per <Calendar> instance — ref keeps it stable across re-renders.
-  const storeRef = useRef<CalendarStoreHook | null>(null);
-  if (storeRef.current === null) {
-    storeRef.current = createCalendarStore({
+  // One store per <Calendar> instance — lazy state keeps it stable across re-renders.
+  const [store] = useState<CalendarStoreHook>(() =>
+    createCalendarStore({
       date: props.defaultDate ?? new Date(),
       view: props.view ?? 'month',
-    });
-  }
+    }),
+  );
 
   // Reflect controlled `view` prop into the store.
   useEffect(() => {
-    if (props.view) storeRef.current?.getState().setView(props.view);
-  }, [props.view]);
+    if (props.view) store.getState().setView(props.view);
+  }, [props.view, store]);
 
   return (
-    <CalendarStoreProvider store={storeRef.current}>
+    <CalendarStoreProvider store={store}>
       <CalendarInner {...props} />
     </CalendarStoreProvider>
   );

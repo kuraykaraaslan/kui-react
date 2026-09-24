@@ -1,7 +1,8 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { useFocusTrap } from '@/modules/ui/Overlays/shared/useFocusTrap';
+import { useIsClient } from '@/libs/hooks/useIsClient';
 
 export { SkipLink, LiveRegion, Announcer } from '@/modules/ui/SkipLink';
 export { Tooltip } from '@/modules/ui/Tooltip';
@@ -47,6 +48,17 @@ function setQueue(next: AnnounceQueue) {
   for (const fn of listeners) fn(next);
 }
 
+function subscribeQueue(onChange: () => void) {
+  listeners.add(onChange);
+  return () => {
+    listeners.delete(onChange);
+  };
+}
+
+function getQueue() {
+  return queue;
+}
+
 /**
  * Imperative announcer. Returns a function that pushes a message into a
  * page-level `aria-live` region (one polite + one assertive, mounted by
@@ -72,16 +84,8 @@ export function useAnnounce() {
  * outlet is unaffected by parent overflow / transforms.
  */
 export function AnnouncerOutlet() {
-  const [{ polite, assertive }, setLocal] = useState(queue);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    listeners.add(setLocal);
-    return () => {
-      listeners.delete(setLocal);
-    };
-  }, []);
+  const { polite, assertive } = useSyncExternalStore(subscribeQueue, getQueue, getQueue);
+  const mounted = useIsClient();
 
   if (!mounted) return null;
 

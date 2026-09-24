@@ -5,7 +5,7 @@ import { NODE_W, NODE_HEADER_H } from '../geometry';
 import { DEFAULT_SCRIPTS } from '../default-scripts';
 import type { RuleNode, RuleNodeType } from '../../../types';
 
-export function usePaletteDrop({ setNodes, nodeSeq, containerRef }: {
+export function usePaletteDrop({ setNodes, nodeSeq: nodeSeqRef, containerRef }: {
   setNodes: React.Dispatch<React.SetStateAction<RuleNode[]>>;
   nodeSeq: React.RefObject<number>;
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -20,9 +20,10 @@ export function usePaletteDrop({ setNodes, nodeSeq, containerRef }: {
     if (!paletteDrag) return;
     const r = containerRef.current?.getBoundingClientRect();
     const pt = r ? { x: e.clientX - r.left, y: e.clientY - r.top } : { x: 0, y: 0 };
-    nodeSeq.current++;
+    nodeSeqRef.current++;
+    const nodeId = `n${nodeSeqRef.current}`;
     setNodes((p) => [...p, {
-      nodeId: `n${nodeSeq.current}`, type: paletteDrag,
+      nodeId, type: paletteDrag,
       label: NODE_VISUALS[paletteDrag].displayLabel,
       x: Math.round(pt.x - NODE_W / 2), y: Math.round(pt.y - NODE_HEADER_H / 2),
       script: DEFAULT_SCRIPTS[paletteDrag],

@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useLayoutEffect } from 'react';
 import { getDirection, isRTL, type AppLanguage } from '../I18nTypes';
 
 type DirectionContextValue = {
@@ -27,10 +27,12 @@ type DirectionProviderProps = {
 export function DirectionProvider({ lang, children, applyToDocument = false }: DirectionProviderProps) {
   const dir = getDirection(lang);
 
-  if (applyToDocument && typeof document !== 'undefined') {
+  // Layout effect so <html dir/lang> is updated before the browser paints.
+  useLayoutEffect(() => {
+    if (!applyToDocument) return;
     document.documentElement.dir  = dir;
     document.documentElement.lang = lang;
-  }
+  }, [applyToDocument, dir, lang]);
 
   return (
     <DirectionContext.Provider value={{ lang, dir, isRTL: isRTL(lang) }}>

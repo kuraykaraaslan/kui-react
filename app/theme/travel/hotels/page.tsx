@@ -98,7 +98,9 @@ export default function HotelsPage() {
 
   const hasFilters = !!destination || minStars > 0 || maxPrice > 0 || minRating > 0 || amenities.length > 0;
 
-  const FilterPanel = () => (
+  // A JSX value rather than an inline component, so the panel (and the search
+  // input's focus) survives re-renders instead of remounting on every keystroke.
+  const filterPanel = (
     <aside className="space-y-4 text-sm">
       {/* Destination */}
       <div className="bg-surface-raised border border-border rounded-xl p-4 space-y-3">
@@ -245,7 +247,7 @@ export default function HotelsPage() {
       <div className="flex gap-6 items-start">
         {/* ── Sidebar (desktop) ── */}
         <div className="hidden lg:block w-60 shrink-0">
-          <FilterPanel />
+          {filterPanel}
         </div>
 
         {/* ── Main ── */}
@@ -293,7 +295,7 @@ export default function HotelsPage() {
           {/* Mobile filter panel */}
           {filtersOpen && (
             <div className="lg:hidden mb-5">
-              <FilterPanel />
+              {filterPanel}
             </div>
           )}
 

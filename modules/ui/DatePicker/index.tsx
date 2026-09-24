@@ -136,12 +136,14 @@ export function DatePicker({
   useDismissOnOutside(wrapperRef, open, () => setOpen(false));
 
   // Sync visible month when an external value lands outside it.
-  useEffect(() => {
+  const valueTime = value?.getTime();
+  const [syncedValueTime, setSyncedValueTime] = useState(valueTime);
+  if (!Object.is(syncedValueTime, valueTime)) {
+    setSyncedValueTime(valueTime);
     if (value && !isSameMonth(value, visibleMonth)) {
       setVisibleMonth(startOfMonth(value));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value?.getTime()]);
+  }
 
   const display = formatDate(value, fmt);
 

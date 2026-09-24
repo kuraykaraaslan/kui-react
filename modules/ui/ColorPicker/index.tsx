@@ -74,10 +74,12 @@ export function ColorPicker({
   });
 
   // Keep the legacy hex field + RGBA state in sync with the controlled prop.
-  useEffect(() => {
+  const [syncedValue, setSyncedValue] = useState(value);
+  if (value !== syncedValue) {
+    setSyncedValue(value);
     setHex(value ?? '');
     syncFromString(value ?? null);
-  }, [value, syncFromString]);
+  }
 
   useEffect(() => {
     if (!open) return;

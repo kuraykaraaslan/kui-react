@@ -50,6 +50,42 @@ export function LeafletCanvas(props: LeafletCanvasProps) {
   return <InnerMap {...props} bundle={bundle} />;
 }
 
+// Side-effect components that need a live map instance. react-leaflet's hooks
+// come from the lazily-loaded bundle.
+
+function ClickHandler({
+  bundle,
+  addMode,
+  onMapClick,
+}: {
+  bundle: LeafletBundle;
+  addMode: boolean;
+  onMapClick: (lat: number, lng: number) => void;
+}) {
+  const { useMapEvents } = bundle;
+  useMapEvents({
+    click(e: { latlng: { lat: number; lng: number } }) {
+      if (addMode) onMapClick(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
+}
+
+function FitBounds({
+  bundle,
+  markers,
+  padding,
+}: {
+  bundle: LeafletBundle;
+  markers: MapMarker[];
+  padding?: number;
+}) {
+  const { useMap, L } = bundle;
+  const map = useMap() as LeafletMap;
+  useFitBounds(map, L, markers, padding);
+  return null;
+}
+
 function InnerMap({
   center,
   zoom,
@@ -64,25 +100,9 @@ function InnerMap({
   onMarkerClick,
   bundle,
 }: LeafletCanvasProps & { bundle: LeafletBundle }) {
-  const { MapContainer, TileLayer, Marker, Tooltip, Polygon, Polyline, useMap, useMapEvents, L } = bundle;
+  const { MapContainer, TileLayer, Marker, Tooltip, Polygon, Polyline, L } = bundle;
   const isDark = useDarkMode();
   const tiles = isDark ? LEAFLET_TILES.dark : LEAFLET_TILES.light;
-
-  function ClickHandler() {
-    useMapEvents({
-      click(e: { latlng: { lat: number; lng: number } }) {
-        if (addMode) onMapClick(e.latlng.lat, e.latlng.lng);
-      },
-    });
-    return null;
-  }
-
-  // Side-effect components that need a live map instance.
-  function FitBounds() {
-    const map = useMap() as LeafletMap;
-    useFitBounds(map, L, markers, fitBoundsPadding);
-    return null;
-  }
 
   return (
     <MapContainer
@@ -93,8 +113,8 @@ function InnerMap({
     >
       <TileLayer key={isDark ? 'dark' : 'light'} attribution={tiles.attribution} url={tiles.url} />
 
-      <ClickHandler />
-      <FitBounds />
+      <ClickHandler bundle={bundle} addMode={addMode} onMapClick={onMapClick} />
+      <FitBounds bundle={bundle} markers={markers} padding={fitBoundsPadding} />
 
       {showZones && zones.map((zone) => (
         <ZoneShape key={zone.id} zone={zone} Polygon={Polygon} Tooltip={Tooltip} />

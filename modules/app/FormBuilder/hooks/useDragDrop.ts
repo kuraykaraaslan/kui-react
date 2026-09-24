@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { FieldType } from '../types';
 
 /**
@@ -21,10 +21,6 @@ export function useDragDrop() {
     | null
   >(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
-
-  // Mirror in a ref for safety inside drag handlers.
-  const sourceRef = useRef(dragSource);
-  sourceRef.current = dragSource;
 
   const onPaletteDragStart = useCallback(
     (e: React.DragEvent, type: FieldType) => {

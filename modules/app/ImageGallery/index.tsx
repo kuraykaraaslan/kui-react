@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { GalleryGrid } from './parts/GalleryGrid';
 import { Lightbox } from './parts/Lightbox';
 import { useReorder } from './hooks/useReorder';
@@ -22,9 +22,12 @@ export function ImageGallery({
 }: ImageGalleryProps) {
   /* — Image order state — */
   const [images, setImages] = useState<ImageGalleryImage[]>(imagesProp);
-  useEffect(() => {
+  // Re-seed the local order whenever the caller passes a new images array.
+  const [prevImagesProp, setPrevImagesProp] = useState(imagesProp);
+  if (imagesProp !== prevImagesProp) {
+    setPrevImagesProp(imagesProp);
     setImages(imagesProp);
-  }, [imagesProp]);
+  }
 
   /* — Lightbox state — */
   const [activeIndex, setActiveIndex] = useState<number | null>(null);

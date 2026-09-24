@@ -6,7 +6,7 @@ import type { RuleNode, RuleEdge } from '../../../types';
 
 type Connecting = { nodeId: string; portIdx: number; x: number; y: number } | null;
 
-export function useEdgeConnect({ nodes, setEdges, edgeSeq, readOnly, setMouse }: {
+export function useEdgeConnect({ nodes, setEdges, edgeSeq: edgeSeqRef, readOnly, setMouse }: {
   nodes: RuleNode[];
   setEdges: React.Dispatch<React.SetStateAction<RuleEdge[]>>;
   edgeSeq: React.RefObject<number>;
@@ -32,8 +32,8 @@ export function useEdgeConnect({ nodes, setEdges, edgeSeq, readOnly, setMouse }:
     const srcPort = NODE_VISUALS[src.type].outputs[connecting.portIdx]?.id;
     const tgtPort = NODE_VISUALS[tgt.type].inputs[portIdx]?.id;
     if (!srcPort || !tgtPort) { setConnecting(null); return; }
-    edgeSeq.current++;
-    const newEdge: RuleEdge = { edgeId: `e${edgeSeq.current}`, sourceNodeId: connecting.nodeId, sourcePort: srcPort, targetNodeId: nodeId, targetPort: tgtPort };
+    edgeSeqRef.current++;
+    const newEdge: RuleEdge = { edgeId: `e${edgeSeqRef.current}`, sourceNodeId: connecting.nodeId, sourcePort: srcPort, targetNodeId: nodeId, targetPort: tgtPort };
     setEdges((p) => p.some((ed) => ed.sourceNodeId === newEdge.sourceNodeId && ed.sourcePort === newEdge.sourcePort && ed.targetNodeId === newEdge.targetNodeId) ? p : [...p, newEdge]);
     setConnecting(null);
   }

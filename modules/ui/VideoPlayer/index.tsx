@@ -37,7 +37,9 @@ export function VideoPlayer({
   const [speed, setSpeed] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [seekHoverX, setSeekHoverX] = useState<number | null>(null);
+  // Hover position over the seek bar, in px and as a % of the bar's width
+  // (measured in the mousemove handler, never during render).
+  const [seekHover, setSeekHover] = useState<{ x: number; pct: number } | null>(null);
   const [selectedQuality, setSelectedQuality] = useState<string>(defaultQuality ?? qualities?.[0]?.value ?? '');
   const [selectedSubtitle, setSelectedSubtitle] = useState<number | null>(null);
   const [selectedAudioTrack, setSelectedAudioTrack] = useState<number>(0);
@@ -79,12 +81,13 @@ export function VideoPlayer({
   const handleSeekMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const bar = progressRef.current; if (!bar) return;
     const rect = bar.getBoundingClientRect();
-    setSeekHoverX(Math.max(0, Math.min(rect.width, e.clientX - rect.left)));
+    const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+    setSeekHover({ x, pct: (x / rect.width) * 100 });
   }, []);
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const seekHoverPct = seekHoverX !== null && progressRef.current
-    ? (seekHoverX / progressRef.current.getBoundingClientRect().width) * 100 : null;
+  const seekHoverX = seekHover?.x ?? null;
+  const seekHoverPct = seekHover?.pct ?? null;
   const hoverTime = seekHoverPct !== null ? formatTime((seekHoverPct / 100) * duration) : null;
 
   return (
@@ -116,7 +119,7 @@ export function VideoPlayer({
         <div className="relative px-4 pb-3 pt-6 space-y-2.5">
           {title && (<p className="text-white/90 text-sm font-medium truncate leading-tight">{title}</p>)}
           <ProgressBar ref={progressRef} progress={progress} buffered={buffered} seekHoverX={seekHoverX} seekHoverPct={seekHoverPct}
-            hoverTime={hoverTime} onSeek={handleSeek} onSeekMouseMove={handleSeekMouseMove} onSeekLeave={() => setSeekHoverX(null)} />
+            hoverTime={hoverTime} onSeek={handleSeek} onSeekMouseMove={handleSeekMouseMove} onSeekLeave={() => setSeekHover(null)} />
           <ControlRow playing={playing} muted={muted} volume={volume} currentTime={currentTime} duration={duration}
             isFullscreen={isFullscreen} showSettings={showSettings} enableCast={enableCast} castState={castState}
             onPlay={togglePlay} onSeekBy={seekBy} onToggleMute={toggleMute} onVolumeChange={handleVolumeChange}

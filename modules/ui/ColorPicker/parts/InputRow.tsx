@@ -44,9 +44,11 @@ export function InputRow({ rgba, format, onFormatChange, onRgbaChange }: InputRo
   const copyTimer = useRef<number | null>(null);
 
   // Re-sync draft whenever the underlying color or format changes.
-  useEffect(() => {
-    setDraft(formatRgbaAs(rgba, format));
-  }, [rgba, format]);
+  const [synced, setSynced] = useState({ rgba, format });
+  if (synced.rgba !== rgba || synced.format !== format) {
+    setSynced({ rgba, format });
+    setDraft(formatted);
+  }
 
   // Cleanup the copied flag timer on unmount.
   useEffect(() => {

@@ -20,9 +20,12 @@ export function FilterPopover<T extends Record<string, unknown>>({
   const wrapperRef = useRef<HTMLSpanElement>(null);
   const [draft, setDraft] = useState(value);
 
-  useEffect(() => {
+  // Re-seed the draft when the applied filter value changes from outside.
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
     setDraft(value);
-  }, [value]);
+  }
 
   useEffect(() => {
     if (!open) return;

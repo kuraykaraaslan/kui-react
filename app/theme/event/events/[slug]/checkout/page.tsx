@@ -1,5 +1,6 @@
 'use client';
-import { useState, use, useMemo } from 'react';
+import Link from 'next/link';
+import { useState, use } from 'react';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
@@ -52,26 +53,25 @@ export default function CheckoutPage({ params }: { params: Promise<{ slug: strin
   const [couponCode, setCouponCode] = useState<string | undefined>();
   const [discountPct, setDiscountPct] = useState(0);
   const [paying, setPaying] = useState(false);
-  const [ticketId] = useState(`TKT-${Math.random().toString(36).slice(2, 9).toUpperCase()}`);
-  const [orderId] = useState(`ORD-${Math.random().toString(36).slice(2, 9).toUpperCase()}`);
+  const [ticketId] = useState(() => `TKT-${Math.random().toString(36).slice(2, 9).toUpperCase()}`);
+  const [orderId] = useState(() => `ORD-${Math.random().toString(36).slice(2, 9).toUpperCase()}`);
 
   /* ── seat map tree (only for physical events) ── */
-  const sectionTree = useMemo(() => {
-    if (!seatMapConfig) return [];
-    return buildSectionTree(seatMapConfig.sections, seatMapConfig.seatInfos, pricings);
-  }, [seatMapConfig, pricings]);
+  const sectionTree = seatMapConfig
+    ? buildSectionTree(seatMapConfig.sections, seatMapConfig.seatInfos, pricings)
+    : [];
 
   if (!event) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
         <DocumentTitle text={`Checkout — ${THEME_TITLES.event}`} />
         <p className="text-text-secondary">Etkinlik bulunamadı.</p>
-        <a
+        <Link
           href="/theme/event/events"
           className="inline-flex items-center justify-center mt-4 rounded-md border border-border text-text-primary hover:bg-surface-overlay px-4 py-2 text-sm font-medium transition-colors"
         >
           Etkinliklere Dön
-        </a>
+        </Link>
       </div>
     );
   }

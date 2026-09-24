@@ -40,17 +40,40 @@ export function useServerTable<T>({
   const [error, setError] = useState<string | null>(externalError);
 
   const fetchRef = useRef(fetchPage);
-  fetchRef.current = fetchPage;
+  useEffect(() => {
+    fetchRef.current = fetchPage;
+  });
 
   // Track the in-flight request key so a stale response doesn't clobber a newer
   // one. M1: just discard out-of-order responses. M3 will swap in AbortController.
   const reqIdRef = useRef(0);
 
+  // A new query starts loading (and clears the previous error) in the same
+  // render that requests it; an external error set by the caller wins.
+  const [requested, setRequested] = useState<{
+    page: number; pageSize: number; sort: SortState[]; search: string; filters: FilterState;
+  } | null>(null);
+  if (
+    !requested ||
+    requested.page !== page ||
+    requested.pageSize !== pageSize ||
+    requested.sort !== sort ||
+    requested.search !== search ||
+    requested.filters !== filters
+  ) {
+    setRequested({ page, pageSize, sort, search, filters });
+    setLoading(true);
+    setError(null);
+  }
+  const [appliedExternalError, setAppliedExternalError] = useState<string | null | undefined>(undefined);
+  if (appliedExternalError !== externalError) {
+    setAppliedExternalError(externalError);
+    setError(externalError);
+  }
+
   useEffect(() => {
     const id = ++reqIdRef.current;
     let cancelled = false;
-    setLoading(true);
-    setError(null);
     fetchRef
       .current({ page, pageSize, sort, search, filters })
       .then((res) => {
@@ -70,10 +93,6 @@ export function useServerTable<T>({
       cancelled = true;
     };
   }, [page, pageSize, sort, search, filters]);
-
-  useEffect(() => {
-    setError(externalError);
-  }, [externalError]);
 
   const toggleSort = useCallback((key: string, shiftKey: boolean) => {
     setSort((curr) => nextSortState(curr, key, shiftKey));

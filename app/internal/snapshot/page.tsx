@@ -6,25 +6,37 @@
 // use React hooks). This page renders client-side, builds the registry,
 // and exposes it on window so a headless browser can capture it.
 
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useMemo } from 'react';
 import { buildRegistry } from '@/modules/registry/registry';
+import { useIsClient } from '@/libs/hooks/useIsClient';
+
+type BuildResult =
+  | { status: 'ready'; registry: ReturnType<typeof buildRegistry> }
+  | { status: 'error'; error: string };
 
 export default function RegistrySnapshotPage() {
-  const [status, setStatus] = useState<'building' | 'ready' | 'error'>('building');
-  const [count, setCount] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const isClient = useIsClient();
 
-  useEffect(() => {
+  // Built on the client only — never during SSR.
+  const result = useMemo<BuildResult | null>(() => {
+    if (!isClient) return null;
     try {
-      const reg = buildRegistry();
-      (window as unknown as { __KUI_REGISTRY__?: unknown }).__KUI_REGISTRY__ = reg;
-      setCount(reg.components.length);
-      setStatus('ready');
+      return { status: 'ready', registry: buildRegistry() };
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-      setStatus('error');
+      return { status: 'error', error: e instanceof Error ? e.message : String(e) };
     }
-  }, []);
+  }, [isClient]);
+
+  // Publish before the browser can observe the "ready" marker.
+  useLayoutEffect(() => {
+    if (result?.status === 'ready') {
+      (window as unknown as { __KUI_REGISTRY__?: unknown }).__KUI_REGISTRY__ = result.registry;
+    }
+  }, [result]);
+
+  const status = result?.status ?? 'building';
+  const count = result?.status === 'ready' ? result.registry.components.length : 0;
+  const error = result?.status === 'error' ? result.error : null;
 
   return (
     <main id="main-content" className="min-h-screen bg-surface-base p-8 font-mono text-text-primary">

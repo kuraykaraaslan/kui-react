@@ -23,7 +23,9 @@ export function useTaskDrag(opts: {
 }): UseTaskDragApi {
   const storeApi = useGanttStoreApi();
   const optsRef = useRef(opts);
-  optsRef.current = opts;
+  useEffect(() => {
+    optsRef.current = opts;
+  });
 
   /** Per-drag context — width is needed for the progress mode only. */
   const ctxRef = useRef<{ barWidth: number } | null>(null);

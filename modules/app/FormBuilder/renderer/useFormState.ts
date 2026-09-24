@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
   Field,
   FormErrors,
@@ -73,8 +73,11 @@ export function useFormState({ schema, values, onChange, messages }: UseFormStat
   const controlled = values !== undefined && typeof onChange === 'function';
   const [internal, setInternal] = useState<FormValues>(() => seedValues(schema));
   const current = controlled ? (values as FormValues) : internal;
+  // Latest values for the stable callbacks below.
   const currentRef = useRef(current);
-  currentRef.current = current;
+  useEffect(() => {
+    currentRef.current = current;
+  });
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);

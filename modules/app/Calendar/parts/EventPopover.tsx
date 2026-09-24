@@ -61,9 +61,11 @@ export function EventPopover({
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   // Reset delete-confirm when the popover (re)opens for a new event.
-  useEffect(() => {
+  const [confirmForId, setConfirmForId] = useState(event?.id);
+  if (confirmForId !== event?.id) {
+    setConfirmForId(event?.id);
     setConfirmDelete(false);
-  }, [event?.id]);
+  }
 
   // Measure + position after render.
   useLayoutEffect(() => {

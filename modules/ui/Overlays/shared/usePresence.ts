@@ -27,13 +27,17 @@ export function usePresence(open: boolean): {
 } {
   const [state, setState] = useState<PresenceState>(open ? 'open' : 'closed');
 
-  useEffect(() => {
-    if (open) {
-      setState('open');
-      return;
-    }
+  // Transition synchronously when `open` flips…
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     // Only run the closing animation if we were previously mounted.
-    setState((prev) => (prev === 'closed' ? 'closed' : 'closing'));
+    setState(open ? 'open' : state === 'closed' ? 'closed' : 'closing');
+  }
+
+  // …and unmount once the exit animation has had time to play.
+  useEffect(() => {
+    if (open) return;
     const t = window.setTimeout(() => setState('closed'), EXIT_MS);
     return () => window.clearTimeout(t);
   }, [open]);

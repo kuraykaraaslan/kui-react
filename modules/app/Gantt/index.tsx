@@ -21,6 +21,16 @@ export type {
   DragMode,
 } from './types';
 
+type TelemetrySink = GanttProps['onTelemetry'];
+
+function createTelemetryRelay(initial: TelemetrySink) {
+  let sink = initial;
+  return {
+    emit: (e: Parameters<NonNullable<TelemetrySink>>[0]) => sink?.(e),
+    setSink: (next: TelemetrySink) => { sink = next; },
+  };
+}
+
 export function Gantt({
   tasks,
   dependencies,
@@ -46,8 +56,10 @@ export function Gantt({
     [messageOverrides],
   );
 
-  const onTelemetryRef = useRef(onTelemetry);
-  useEffect(() => { onTelemetryRef.current = onTelemetry; });
+  // The store is created once, so it emits through a relay that always
+  // forwards to the latest `onTelemetry` prop.
+  const [telemetry] = useState(() => createTelemetryRelay(onTelemetry));
+  useEffect(() => { telemetry.setSink(onTelemetry); });
 
   const [store] = useState(() =>
     createGanttStore({
@@ -55,7 +67,7 @@ export function Gantt({
       dependencies: dependencies ?? [],
       scale: scale ?? 'week',
       criticalPath: criticalPath ?? false,
-      onTelemetry: (e) => onTelemetryRef.current?.(e),
+      onTelemetry: telemetry.emit,
     }),
   );
 

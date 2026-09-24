@@ -28,7 +28,9 @@ export function useDependencyDraw(opts: {
 }): UseDependencyDrawApi {
   const storeApi = useGanttStoreApi();
   const optsRef = useRef(opts);
-  optsRef.current = opts;
+  useEffect(() => {
+    optsRef.current = opts;
+  });
 
   useEffect(() => {
     function onPointerMove(e: PointerEvent) {

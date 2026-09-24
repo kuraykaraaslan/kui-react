@@ -18,7 +18,11 @@ export function useRecurrence(
   windowStart: Date,
   windowEnd: Date,
 ): EventOccurrence[] {
+  const startMs = windowStart.getTime();
+  const endMs = windowEnd.getTime();
   return useMemo(() => {
+    const windowStart = new Date(startMs);
+    const windowEnd = new Date(endMs);
     const out: EventOccurrence[] = [];
     for (const ev of events) {
       if (!ev.rrule) {
@@ -49,5 +53,5 @@ export function useRecurrence(
       }
     }
     return out;
-  }, [events, windowStart.getTime(), windowEnd.getTime()]);
+  }, [events, startMs, endMs]);
 }

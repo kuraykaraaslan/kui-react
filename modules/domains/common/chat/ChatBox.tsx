@@ -48,9 +48,15 @@ export function ChatBox({
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // Opening the chat marks everything as read.
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) setUnread(0);
+  }
+
   useEffect(() => {
     if (open) {
-      setUnread(0);
       setTimeout(() => inputRef.current?.focus(), 120);
     }
   }, [open]);

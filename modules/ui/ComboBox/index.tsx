@@ -74,12 +74,16 @@ export function ComboBox({
   const labelId = `${id}-label`;
   const inputId = `${id}-input`;
 
-  useEffect(() => {
+  // While closed, the input mirrors the selected option's label.
+  const selectedLabel = selectedOption?.label;
+  const [syncedClosedState, setSyncedClosedState] = useState<{ open: boolean; label?: string } | null>(null);
+  if (!syncedClosedState || syncedClosedState.open !== open || syncedClosedState.label !== selectedLabel) {
+    setSyncedClosedState({ open, label: selectedLabel });
     if (!open) {
-      setQuery(selectedOption?.label ?? '');
+      setQuery(selectedLabel ?? '');
       setHighlightedIndex(-1);
     }
-  }, [open, selectedOption?.label]);
+  }
 
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {
