@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
@@ -178,13 +179,13 @@ export default async function RestaurantDetailPage({ params }: Props) {
                         </div>
                       </div>
 
-                      <a
+                      <Link
                         href="/theme/food/cart"
                         className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-fg hover:bg-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
                       >
                         <FontAwesomeIcon icon={faCartShopping} className="w-4 h-4" aria-hidden="true" />
                         Go to Cart
-                      </a>
+                      </Link>
                     </>
                   ) : (
                     <p className="text-sm text-text-secondary text-center py-4">

@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UserMenu } from '@/modules/domains/common/user/UserMenu';
 import { DEMO_USER } from '../common.data';
@@ -22,9 +23,9 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
       {/* top bar */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <a href="/theme/common" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
+          <Link href="/theme/common" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
             ← Common Theme
-          </a>
+          </Link>
           <h1 className="text-2xl font-bold text-text-primary mt-1">Account</h1>
         </div>
         <UserMenu user={DEMO_USER} />

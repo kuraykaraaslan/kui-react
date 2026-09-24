@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { SkipLink } from '@/modules/ui/SkipLink';
@@ -82,12 +83,12 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex items-center gap-2 h-14">
 
-            <a href={BASE} className="flex items-center gap-2 flex-shrink-0 mr-3">
+            <Link href={BASE} className="flex items-center gap-2 flex-shrink-0 mr-3">
               <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary text-primary-fg">
                 <FontAwesomeIcon icon={faBolt} className="w-3.5 h-3.5" aria-hidden="true" />
               </div>
               <span className="text-sm font-bold text-text-primary tracking-tight">Velox</span>
-            </a>
+            </Link>
 
             {/* Desktop nav */}
             <nav className="hidden lg:flex items-center gap-0.5" aria-label="Main navigation">
@@ -134,12 +135,12 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
 
               <span className="w-px h-4 bg-border mx-1" aria-hidden="true" />
 
-              <a href={`${BASE}/pricing`} className="px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
+              <Link href={`${BASE}/pricing`} className="px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
                 Pricing
-              </a>
-              <a href={`${BASE}/about`} className="px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
+              </Link>
+              <Link href={`${BASE}/about`} className="px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
                 Company
-              </a>
+              </Link>
             </nav>
 
             <div className="ml-auto flex items-center gap-1.5">
@@ -147,7 +148,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                 Sign in
               </a>
               <span className="hidden sm:block w-px h-4 bg-border mx-0.5" aria-hidden="true" />
-              <a
+              <Link
                 href={`${BASE}/pricing`}
                 className={cn(
                   'inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors',
@@ -157,7 +158,7 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
               >
                 Start free
                 <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" aria-hidden="true" />
-              </a>
+              </Link>
               <button
                 type="button"
                 aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
@@ -210,15 +211,15 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
                 </div>
               ))}
 
-              <a href={`${BASE}/pricing`} onClick={() => setMobileOpen(false)} className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-text-primary hover:bg-surface-overlay transition-colors">Pricing</a>
-              <a href={`${BASE}/about`} onClick={() => setMobileOpen(false)} className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-text-primary hover:bg-surface-overlay transition-colors">Company</a>
+              <Link href={`${BASE}/pricing`} onClick={() => setMobileOpen(false)} className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-text-primary hover:bg-surface-overlay transition-colors">Pricing</Link>
+              <Link href={`${BASE}/about`} onClick={() => setMobileOpen(false)} className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-text-primary hover:bg-surface-overlay transition-colors">Company</Link>
 
               <div className="pt-2 mt-1 border-t border-border space-y-1.5">
                 <a href="#" className="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-text-secondary hover:bg-surface-overlay transition-colors">Sign in</a>
-                <a href={`${BASE}/pricing`} onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-1.5 w-full px-3 py-2.5 rounded-lg text-sm font-semibold bg-primary text-primary-fg hover:bg-primary-hover transition-colors">
+                <Link href={`${BASE}/pricing`} onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-1.5 w-full px-3 py-2.5 rounded-lg text-sm font-semibold bg-primary text-primary-fg hover:bg-primary-hover transition-colors">
                   Start free
                   <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" aria-hidden="true" />
-                </a>
+                </Link>
               </div>
             </div>
           </nav>
@@ -231,12 +232,12 @@ export default function LandingLayout({ children }: { children: React.ReactNode 
         <div className="mx-auto max-w-6xl px-6 py-12">
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
             <div className="col-span-2 sm:col-span-1">
-              <a href={BASE} className="flex items-center gap-2">
+              <Link href={BASE} className="flex items-center gap-2">
                 <div className="flex items-center justify-center w-7 h-7 rounded-md bg-primary text-primary-fg">
                   <FontAwesomeIcon icon={faBolt} className="w-3.5 h-3.5" aria-hidden="true" />
                 </div>
                 <span className="text-sm font-bold text-text-primary">Velox</span>
-              </a>
+              </Link>
               <p className="mt-3 text-xs text-text-secondary leading-relaxed max-w-[180px]">
                 Ship better products, faster. Trusted by 5 000+ teams worldwide.
               </p>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
@@ -261,7 +262,7 @@ export default function WalletsPage() {
             <p className="text-sm font-bold text-text-primary">Your funds are protected</p>
             <p className="text-sm text-text-secondary mt-1">
               PayFlow keeps your balance in regulated bank accounts. Your money is safe and insured up to ₺500,000.{' '}
-              <a href="/theme/fintech" className="text-primary font-medium hover:underline">Learn more</a>
+              <Link href="/theme/fintech" className="text-primary font-medium hover:underline">Learn more</Link>
             </p>
           </div>
         </div>

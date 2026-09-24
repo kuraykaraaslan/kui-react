@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -76,13 +77,13 @@ export default function IoTDashboardPage() {
           <h1 className="text-xl font-bold text-text-primary">Dashboard</h1>
           <p className="text-sm text-text-secondary mt-0.5">{activeCloud.name} · {activeCloud.region}</p>
         </div>
-        <a
+        <Link
           href="/theme/iot/devices"
           className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:bg-primary-hover transition-colors"
         >
           All Devices
           <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-        </a>
+        </Link>
       </div>
 
       {/* Stat cards */}
@@ -105,14 +106,14 @@ export default function IoTDashboardPage() {
         <section className="rounded-xl border border-border bg-surface-base overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <h2 className="text-sm font-semibold text-text-primary">Recent Devices</h2>
-            <a href="/theme/iot/devices" className="text-xs text-primary hover:underline">
+            <Link href="/theme/iot/devices" className="text-xs text-primary hover:underline">
               View all
-            </a>
+            </Link>
           </div>
           <ul className="divide-y divide-border">
             {recentDevices.map((device) => (
               <li key={device.deviceId}>
-                <a
+                <Link
                   href={`/theme/iot/devices/${device.slug}`}
                   className="flex items-center justify-between gap-3 px-5 py-3 hover:bg-surface-overlay transition-colors"
                 >
@@ -126,7 +127,7 @@ export default function IoTDashboardPage() {
                     </span>
                     <DeviceStatusBadge status={device.status} size="sm" />
                   </div>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -136,9 +137,9 @@ export default function IoTDashboardPage() {
         <section className="rounded-xl border border-border bg-surface-base overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <h2 className="text-sm font-semibold text-text-primary">Open Alerts</h2>
-            <a href="/theme/iot/alerts" className="text-xs text-primary hover:underline">
+            <Link href="/theme/iot/alerts" className="text-xs text-primary hover:underline">
               View all
-            </a>
+            </Link>
           </div>
           {recentAlerts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">

@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { BrandLogo } from '@/modules/ui/BrandLogo';
 import { LoginForm } from '@/modules/domains/common/auth/LoginForm';
@@ -59,9 +60,9 @@ export default function LoginPage() {
               <LoginForm onSubmit={handleLogin} />
 
               <p className="text-center text-xs text-text-secondary">
-                <a href="/theme/common/auth/forgot-password" className="text-primary hover:underline">
+                <Link href="/theme/common/auth/forgot-password" className="text-primary hover:underline">
                   Forgot your password?
-                </a>
+                </Link>
               </p>
             </>
           )}
@@ -69,9 +70,9 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-text-secondary">
           Don&apos;t have an account?{' '}
-          <a href="/theme/common/auth/register" className="text-primary font-medium hover:underline">
+          <Link href="/theme/common/auth/register" className="text-primary font-medium hover:underline">
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
     </div>

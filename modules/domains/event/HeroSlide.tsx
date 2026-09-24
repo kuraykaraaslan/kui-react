@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { Badge } from '@/modules/ui/Badge';
 import { EventCategoryBadge } from '@/modules/domains/event/EventCategoryBadge';
 import { EventStatusBadge } from '@/modules/domains/event/EventStatusBadge';
@@ -72,7 +73,7 @@ export function HeroSlide({ event }: HeroSlideProps) {
           </div>
 
           <div className="flex flex-wrap gap-3 pt-1">
-            <a
+            <Link
               href={`/theme/event/events/${event.slug}/checkout`}
               className="inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-bold text-white transition-all"
               style={{
@@ -81,14 +82,14 @@ export function HeroSlide({ event }: HeroSlideProps) {
               }}
             >
               Bilet Al
-            </a>
-            <a
+            </Link>
+            <Link
               href={`/theme/event/events/${event.slug}`}
               className="inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-colors"
               style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)' }}
             >
               Detaylar
-            </a>
+            </Link>
           </div>
 
           {event.remainingCapacity != null && event.remainingCapacity < 5000 && !isSoldOut && (

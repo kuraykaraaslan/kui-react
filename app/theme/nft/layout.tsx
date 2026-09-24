@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { SkipLink } from '@/modules/ui/SkipLink';
 import { Button } from '@/modules/ui/Button';
@@ -94,12 +95,12 @@ export default function NftThemeLayout({ children }: { children: React.ReactNode
             </button>
 
             {/* Logo */}
-            <a href="/theme/nft" className="flex items-center gap-2.5 shrink-0">
+            <Link href="/theme/nft" className="flex items-center gap-2.5 shrink-0">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary text-secondary-fg">
                 <FontAwesomeIcon icon={faPalette} className="w-4 h-4" aria-hidden="true" />
               </div>
               <span className="text-lg font-extrabold tracking-tight text-text-primary">Glyph</span>
-            </a>
+            </Link>
 
             {/* Desktop nav */}
             <nav className="hidden lg:flex items-center gap-1 ml-4" aria-label="Main navigation">
@@ -196,12 +197,12 @@ export default function NftThemeLayout({ children }: { children: React.ReactNode
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
             {/* Brand */}
             <div className="col-span-2 sm:col-span-3 lg:col-span-1 space-y-4">
-              <a href="/theme/nft" className="flex items-center gap-2 text-lg font-extrabold tracking-tight text-text-primary">
+              <Link href="/theme/nft" className="flex items-center gap-2 text-lg font-extrabold tracking-tight text-text-primary">
                 <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary text-secondary-fg">
                   <FontAwesomeIcon icon={faPalette} className="w-3.5 h-3.5" aria-hidden="true" />
                 </div>
                 Glyph
-              </a>
+              </Link>
               <p className="text-sm text-text-secondary leading-relaxed max-w-xs">
                 Discover, collect, and trade digital art across the most active chains in Web3.
               </p>
@@ -250,9 +251,9 @@ export default function NftThemeLayout({ children }: { children: React.ReactNode
             </p>
             <div className="flex gap-4">
               {['Terms', 'Privacy', 'Royalties', 'Accessibility'].map((label) => (
-                <a key={label} href="/theme/nft" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
+                <Link key={label} href="/theme/nft" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
                   {label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>

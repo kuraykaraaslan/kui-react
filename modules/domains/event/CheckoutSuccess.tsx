@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { Button } from '@/modules/ui/Button';
 import { TicketCard } from '@/modules/domains/event/TicketCard';
 import type { EventSectionPricing } from '@/modules/domains/event/types';
@@ -103,18 +104,18 @@ export function CheckoutSuccess({
         <Button variant="outline" fullWidth onClick={() => window.print()}>
           Yazdır / PDF
         </Button>
-        <a
+        <Link
           href="/theme/event/orders"
           className="flex flex-1 items-center justify-center rounded-md border border-border bg-surface-raised hover:bg-surface-overlay px-4 py-2 text-sm font-medium text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
         >
           Siparişlerim
-        </a>
-        <a
+        </Link>
+        <Link
           href={`/theme/event/events/${event.slug}`}
           className="flex flex-1 items-center justify-center rounded-md bg-primary text-primary-fg hover:bg-primary-hover px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
         >
           Etkinliğe Dön
-        </a>
+        </Link>
       </div>
     </div>
   );

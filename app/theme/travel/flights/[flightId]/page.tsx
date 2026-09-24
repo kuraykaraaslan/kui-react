@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
@@ -28,13 +29,13 @@ export default async function FlightDetailPage({ params }: { params: Promise<{ f
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
-      <a
+      <Link
         href="/theme/travel/flights"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-6 transition-colors"
       >
         <FontAwesomeIcon icon={faChevronLeft} className="w-3 h-3" aria-hidden="true" />
         Back to flights
-      </a>
+      </Link>
 
       <FlightBookingFlow flight={flight} />
     </div>

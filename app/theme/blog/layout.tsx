@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { BrandLogo } from '@/modules/ui/BrandLogo';
 import { AppFooter } from '@/modules/app/AppFooter';
 import { NavDrawer } from '@/modules/app/NavDrawer';
@@ -40,7 +41,7 @@ export default function BlogDomainLayout({ children }: { children: React.ReactNo
 
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="flex items-center gap-4 py-4">
-              <a href="/domains/blog" className="group inline-flex items-center gap-3">
+              <Link href="/domains/blog" className="group inline-flex items-center gap-3">
                 <BrandLogo className="h-11 w-11 text-base font-semibold">N</BrandLogo>
                 <div className="leading-tight">
                   <div className="flex items-center gap-2">
@@ -49,7 +50,7 @@ export default function BlogDomainLayout({ children }: { children: React.ReactNo
                   </div>
                   <span className="text-xs text-text-secondary">Editorial studio + engineering notes</span>
                 </div>
-              </a>
+              </Link>
 
               <nav className="hidden lg:flex items-center gap-1 rounded-full border border-border bg-surface-base px-2 py-1 shadow-sm">
                 {NAV_ITEMS.map((item) => (

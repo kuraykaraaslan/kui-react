@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -64,13 +65,13 @@ export function AgentDetailClient({
       {/* ── Back nav ── */}
       <div className="border-b border-border bg-surface-raised">
         <div className="mx-auto max-w-7xl px-6 py-3">
-          <a
+          <Link
             href="/theme/real-estate/agents"
             className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
           >
             <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" aria-hidden="true" />
             Back to Agents
-          </a>
+          </Link>
         </div>
       </div>
 

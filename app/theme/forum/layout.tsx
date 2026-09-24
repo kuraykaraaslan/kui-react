@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { SkipLink } from '@/modules/ui/SkipLink';
 import { Button } from '@/modules/ui/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -31,14 +32,14 @@ export default function ForumThemeLayout({ children }: { children: React.ReactNo
         {/* Brand bar */}
         <div className="bg-primary text-primary-fg">
           <div className="mx-auto max-w-5xl px-4 py-2 flex items-center justify-between gap-4">
-            <a
+            <Link
               href="/theme/forum"
               className="flex items-center gap-2 text-primary-fg hover:text-primary-fg/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-fg rounded"
             >
               <FontAwesomeIcon icon={faLayerGroup} className="w-5 h-5" aria-hidden="true" />
               <span className="text-lg font-bold tracking-tight">Agora</span>
               <span className="text-primary-fg/50 text-xs hidden sm:inline ml-1">:: Open Developer Community</span>
-            </a>
+            </Link>
             <div className="flex items-center gap-1.5 text-xs text-primary-fg/75">
               <FontAwesomeIcon icon={faCircleUser} className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Not logged in</span>
@@ -120,9 +121,9 @@ export default function ForumThemeLayout({ children }: { children: React.ReactNo
               <span>Total members: <strong className="text-text-primary">{BOARD_STATS.totalMembers.toLocaleString()}</strong></span>
               <span>
                 Newest member:{' '}
-                <a href="/theme/forum" className="text-primary hover:underline font-medium">
+                <Link href="/theme/forum" className="text-primary hover:underline font-medium">
                   {BOARD_STATS.newestMember}
-                </a>
+                </Link>
               </span>
             </div>
           </div>

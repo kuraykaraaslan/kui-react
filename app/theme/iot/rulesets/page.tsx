@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState, useId } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -114,13 +115,13 @@ export default function RulesetsPage() {
       header: 'Name',
       sortable: true,
       render: (row) => (
-        <a
+        <Link
           href={`/theme/iot/rulesets/${row.slug}`}
           className="inline-flex items-center gap-2 font-medium text-text-primary hover:text-primary transition-colors"
         >
           <FontAwesomeIcon icon={faDiagramProject} className="w-3.5 h-3.5 text-text-secondary shrink-0" aria-hidden="true" />
           {row.name}
-        </a>
+        </Link>
       ),
     },
     {

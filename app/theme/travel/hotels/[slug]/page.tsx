@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
@@ -79,13 +80,13 @@ export default async function HotelDetailPage({ params }: { params: Promise<{ sl
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 py-10">
       {/* Back */}
-      <a
+      <Link
         href="/theme/travel/hotels"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-6 transition-colors"
       >
         <FontAwesomeIcon icon={faChevronLeft} className="w-3 h-3" aria-hidden="true" />
         Back to hotels
-      </a>
+      </Link>
 
       {/* Hero image */}
       <div className="relative rounded-2xl overflow-hidden h-64 sm:h-80 mb-8 bg-surface-sunken">

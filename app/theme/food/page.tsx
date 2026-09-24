@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
@@ -103,7 +104,7 @@ export default function FoodThemePage() {
               const icon = CATEGORY_ICONS[cat.id] ?? faUtensils;
               const isActive = i === 0;
               return (
-                <a
+                <Link
                   key={cat.id}
                   href="/theme/food/restaurants"
                   role="listitem"
@@ -116,7 +117,7 @@ export default function FoodThemePage() {
                 >
                   <FontAwesomeIcon icon={icon} className="w-3.5 h-3.5" aria-hidden="true" />
                   {cat.label}
-                </a>
+                </Link>
               );
             })}
           </div>
@@ -127,7 +128,7 @@ export default function FoodThemePage() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 pt-8 pb-2">
         <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
           {PROMO_BANNERS.map((banner, i) => (
-            <a
+            <Link
               key={banner.id}
               href="/theme/food/restaurants"
               className={[
@@ -140,7 +141,7 @@ export default function FoodThemePage() {
               </span>
               <p className="text-lg font-extrabold text-white leading-tight">{banner.title}</p>
               <p className="text-xs text-white/80 leading-snug">{banner.subtitle}</p>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -149,13 +150,13 @@ export default function FoodThemePage() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-text-primary">Popular near you</h2>
-          <a
+          <Link
             href="/theme/food/restaurants"
             className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
           >
             See all
             <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -173,13 +174,13 @@ export default function FoodThemePage() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 pb-8">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-text-primary">Offers near you</h2>
-          <a
+          <Link
             href="/theme/food/restaurants"
             className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
           >
             See all
             <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

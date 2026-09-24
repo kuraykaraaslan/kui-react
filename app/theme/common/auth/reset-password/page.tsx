@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { Input } from '@/modules/ui/Input';
 import { Button } from '@/modules/ui/Button';
@@ -46,10 +47,10 @@ export default function ResetPasswordPage() {
             <h1 className="text-2xl font-bold text-text-primary">Password updated</h1>
             <p className="text-sm text-text-secondary">You can now sign in with your new password.</p>
           </div>
-          <a href="/theme/common/auth/login"
+          <Link href="/theme/common/auth/login"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-fg hover:bg-primary-hover transition-colors">
             Go to login <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
       </div>
       </>
@@ -105,7 +106,7 @@ export default function ResetPasswordPage() {
 
         <p className="text-center text-sm text-text-secondary">
           Remembered it?{' '}
-          <a href="/theme/common/auth/login" className="text-primary font-medium hover:underline">Back to login</a>
+          <Link href="/theme/common/auth/login" className="text-primary font-medium hover:underline">Back to login</Link>
         </p>
       </div>
     </div>

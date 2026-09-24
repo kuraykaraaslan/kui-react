@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/libs/utils/cn';
@@ -85,9 +86,9 @@ export default function TravelThemeLayout({ children }: { children: React.ReactN
           <div className="bg-primary text-primary-fg py-2 px-4 text-center text-xs sm:text-sm relative">
             <FontAwesomeIcon icon={faBolt} className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
             <strong>Flash Sale:</strong> Up to 30% off selected hotels —{' '}
-            <a href="/theme/travel/hotels" className="underline font-semibold hover:opacity-80">
+            <Link href="/theme/travel/hotels" className="underline font-semibold hover:opacity-80">
               Book now
-            </a>
+            </Link>
             <button
               type="button"
               onClick={() => setPromoVisible(false)}
@@ -105,25 +106,25 @@ export default function TravelThemeLayout({ children }: { children: React.ReactN
             <div className="flex items-center h-14 gap-4">
 
               {/* Logo */}
-              <a href="/theme/travel" className="inline-flex items-center gap-2 shrink-0">
+              <Link href="/theme/travel" className="inline-flex items-center gap-2 shrink-0">
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-fg">
                   <FontAwesomeIcon icon={faGlobe} className="w-4 h-4" aria-hidden="true" />
                 </span>
                 <span className="text-lg font-extrabold tracking-tight text-text-primary hidden sm:block">
                   Voya<span className="text-primary">ger</span>
                 </span>
-              </a>
+              </Link>
 
               {/* Right: currency + auth + mobile menu */}
               <div className="ml-auto flex items-center gap-2 shrink-0">
                 {/* Deals */}
-                <a
+                <Link
                   href="/theme/travel/hotels"
                   className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-error bg-error-subtle rounded-lg hover:bg-error/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
                 >
                   <FontAwesomeIcon icon={faTag} className="w-3 h-3" aria-hidden="true" />
                   Deals
-                </a>
+                </Link>
                 {/* Currency */}
                 <select
                   aria-label="Currency"
@@ -216,14 +217,14 @@ export default function TravelThemeLayout({ children }: { children: React.ReactN
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-4">
             {/* Brand column */}
             <div className="col-span-2 sm:col-span-3 lg:col-span-1 space-y-4">
-              <a href="/theme/travel" className="inline-flex items-center gap-2">
+              <Link href="/theme/travel" className="inline-flex items-center gap-2">
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-fg">
                   <FontAwesomeIcon icon={faGlobe} className="w-4 h-4" aria-hidden="true" />
                 </span>
                 <span className="text-base font-extrabold tracking-tight">
                   Voya<span className="text-primary">ger</span>
                 </span>
-              </a>
+              </Link>
               <p className="text-sm text-text-secondary leading-relaxed max-w-xs">
                 Your trusted travel companion. Discover flights, hotels, and adventures around the world.
               </p>

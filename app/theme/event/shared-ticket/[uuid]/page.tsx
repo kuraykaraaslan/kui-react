@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { use, useState } from 'react';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
@@ -63,12 +64,12 @@ export default function SharedTicketPage({ params }: { params: Promise<{ uuid: s
         <p className="text-sm text-text-secondary text-center max-w-xs">
           Bu bağlantı geçersiz ya da süresi dolmuş olabilir.
         </p>
-        <a
+        <Link
           href="/theme/event"
           className="mt-2 px-5 py-2.5 rounded-lg bg-primary text-primary-fg text-sm font-semibold hover:bg-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
         >
           Etkinliklere Göz At
-        </a>
+        </Link>
       </div>
     );
   }
@@ -82,13 +83,13 @@ export default function SharedTicketPage({ params }: { params: Promise<{ uuid: s
       {/* ── minimal header ── */}
       <header className="border-b border-border bg-surface-raised print:hidden">
         <div className="mx-auto max-w-2xl px-4 h-14 flex items-center justify-between">
-          <a
+          <Link
             href="/theme/event"
             className="flex items-center gap-2 text-sm font-bold text-text-primary hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
           >
             <FontAwesomeIcon icon={faTicket} className="w-5 h-5" aria-hidden="true" />
             <span>BiletMaster</span>
-          </a>
+          </Link>
           <span className="text-xs text-text-secondary">Paylaşılan Bilet</span>
         </div>
       </header>

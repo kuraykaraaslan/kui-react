@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -72,13 +73,13 @@ export function SocialNotificationItem({ notification, onClick, className }: Soc
       <div className="flex-1 min-w-0">
         <p className="text-sm text-text-primary leading-snug">
           {actor && (
-            <a
+            <Link
               href={`/theme/social/profile/${actor.userId}`}
               className="font-semibold hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
               onClick={(e) => e.stopPropagation()}
             >
               {actor.name}
-            </a>
+            </Link>
           )}{' '}
           {notification.message}
         </p>

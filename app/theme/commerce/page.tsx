@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
@@ -139,7 +140,7 @@ export default function CommerceHomePage() {
         <h2 className="text-xl font-bold text-text-primary mb-6">Shop by Category</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           {CATEGORIES.map((cat) => (
-            <a
+            <Link
               key={cat.categoryId}
               href={`/theme/commerce/products?category=${cat.slug}`}
               className="group relative rounded-2xl overflow-hidden aspect-[4/3] bg-surface-sunken block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
@@ -160,7 +161,7 @@ export default function CommerceHomePage() {
                   <FontAwesomeIcon icon={faArrowRight} className="w-2.5 h-2.5" aria-hidden="true" />
                 </p>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -172,9 +173,9 @@ export default function CommerceHomePage() {
             <FontAwesomeIcon icon={faFire} className="w-5 h-5 text-error" aria-hidden="true" />
             Best Sellers
           </h2>
-          <a href="/theme/commerce/products" className="text-sm text-[var(--success-fg)] font-medium hover:underline flex items-center gap-1">
+          <Link href="/theme/commerce/products" className="text-sm text-[var(--success-fg)] font-medium hover:underline flex items-center gap-1">
             View all <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {bestsellers.map((product) => (
@@ -222,9 +223,9 @@ export default function CommerceHomePage() {
               <FontAwesomeIcon icon={faTag} className="w-5 h-5 text-[var(--warning)]" aria-hidden="true" />
               {"Today's Deals"}
             </h2>
-            <a href="/theme/commerce/products" className="text-sm text-[var(--success-fg)] font-medium hover:underline flex items-center gap-1">
+            <Link href="/theme/commerce/products" className="text-sm text-[var(--success-fg)] font-medium hover:underline flex items-center gap-1">
               All deals <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" aria-hidden="true" />
-            </a>
+            </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {deals.map((product) => (
@@ -245,9 +246,9 @@ export default function CommerceHomePage() {
             <FontAwesomeIcon icon={faBolt} className="w-5 h-5 text-[var(--success)]" aria-hidden="true" />
             New Arrivals
           </h2>
-          <a href="/theme/commerce/products" className="text-sm text-[var(--success-fg)] font-medium hover:underline flex items-center gap-1">
+          <Link href="/theme/commerce/products" className="text-sm text-[var(--success-fg)] font-medium hover:underline flex items-center gap-1">
             View all <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {newArrivals.map((product) => (

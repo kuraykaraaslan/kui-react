@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { BrandLogo } from '@/modules/ui/BrandLogo';
 import { RegisterForm } from '@/modules/domains/common/auth/RegisterForm';
@@ -38,12 +39,12 @@ export default function RegisterPage() {
                 Welcome aboard. We sent a confirmation to{' '}
                 <span className="font-mono">{successEmail}</span>.
               </p>
-              <a
+              <Link
                 href="/theme/common/auth/login"
                 className="inline-block mt-2 text-sm font-medium text-primary hover:underline"
               >
                 Go to login <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-              </a>
+              </Link>
             </div>
           ) : (
             <>
@@ -74,9 +75,9 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-text-secondary">
           Already have an account?{' '}
-          <a href="/theme/common/auth/login" className="text-primary font-medium hover:underline">
+          <Link href="/theme/common/auth/login" className="text-primary font-medium hover:underline">
             Sign in
-          </a>
+          </Link>
         </p>
       </div>
     </div>

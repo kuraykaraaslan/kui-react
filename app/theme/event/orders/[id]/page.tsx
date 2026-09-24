@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
@@ -141,12 +142,12 @@ export default async function OrderDetailPage({ params }: Props) {
               </div>
             </div>
 
-            <a
+            <Link
               href={`/theme/event/events/${order.event.slug}`}
               className="flex w-full items-center justify-center rounded-xl border border-border bg-surface-raised hover:bg-surface-overlay px-4 py-2.5 text-sm font-semibold text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
             >
               Etkinlik Sayfasına Git →
-            </a>
+            </Link>
           </div>
         </div>
       </div>

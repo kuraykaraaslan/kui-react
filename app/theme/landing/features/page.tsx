@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { FeatureGrid } from '@/modules/domains/landing/feature/FeatureGrid';
@@ -74,12 +75,12 @@ export default function FeaturesPage() {
             No credit card required. Full Pro access from day one.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <a
+            <Link
               href={`${BASE}/pricing`}
               className="inline-flex items-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-primary hover:bg-primary-subtle transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               View pricing
-            </a>
+            </Link>
             <a
               href="#"
               className="inline-flex items-center rounded-xl border border-white/40 px-6 py-3 text-sm font-semibold text-primary-fg hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -36,13 +37,13 @@ export default async function DeviceMetricsPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
-      <a
+      <Link
         href={`/theme/iot/devices/${slug}`}
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"
       >
         <FontAwesomeIcon icon={faArrowLeft} className="w-3 h-3" aria-hidden="true" />
         Back to device
-      </a>
+      </Link>
 
       <header className="mb-6">
         <p className="text-xs uppercase tracking-wide text-text-secondary font-medium">Telemetry</p>

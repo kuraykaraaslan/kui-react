@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { ForgotPasswordForm } from '@/modules/domains/common/auth/ForgotPasswordForm';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
@@ -32,15 +33,15 @@ export default function ForgotPasswordPage() {
         <div className="text-center space-y-2">
           <p className="text-sm text-text-secondary">
             Remember your password?{' '}
-            <a href="/theme/common/auth/login" className="text-primary font-medium hover:underline">
+            <Link href="/theme/common/auth/login" className="text-primary font-medium hover:underline">
               Back to login
-            </a>
+            </Link>
           </p>
           <p className="text-sm text-text-secondary">
             No account yet?{' '}
-            <a href="/theme/common/auth/register" className="text-primary font-medium hover:underline">
+            <Link href="/theme/common/auth/register" className="text-primary font-medium hover:underline">
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>

@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { use } from 'react';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
@@ -21,13 +22,13 @@ export default function ForumUserProfilePage({
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <DocumentTitle text={`${user.displayName ?? user.username} — ${THEME_TITLES.forum}`} />
-      <a
+      <Link
         href="/theme/forum"
         className="inline-flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary mb-4 transition-colors"
       >
         <FontAwesomeIcon icon={faArrowLeft} className="w-3 h-3" aria-hidden="true" />
         Back to board index
-      </a>
+      </Link>
 
       <div className="space-y-5">
         <ForumUserCard

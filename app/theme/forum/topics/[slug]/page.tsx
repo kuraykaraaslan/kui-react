@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
@@ -148,12 +149,12 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ sl
                     <Avatar name={post.authorName} size="lg" />
 
                     <div>
-                      <a
+                      <Link
                         href="/theme/forum"
                         className="font-bold text-primary hover:underline text-sm leading-tight block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
                       >
                         {post.authorName}
-                      </a>
+                      </Link>
                       <span className="text-xs text-text-disabled block">{rank}</span>
 
                       {/* Rank stars */}
@@ -289,14 +290,14 @@ export default async function TopicDetailPage({ params }: { params: Promise<{ sl
                 }`}
               >
                 <div>
-                  <a
+                  <Link
                     href={`/theme/forum/topics/${t.slug}`}
                     className="font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
                   >
                     {t.title}
-                  </a>
+                  </Link>
                   <span className="text-text-disabled ml-2">
-                    by <a href="/theme/forum" className="text-primary hover:underline">{t.authorName}</a>
+                    by <Link href="/theme/forum" className="text-primary hover:underline">{t.authorName}</Link>
                   </span>
                 </div>
                 <div className="flex items-center gap-3 text-text-disabled ml-4 shrink-0">

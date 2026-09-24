@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { use } from 'react';
 import { notFound } from 'next/navigation';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
@@ -32,13 +33,13 @@ export default function OrderTrackingPage({
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <DocumentTitle text={`Order #${order.orderNumber} — ${THEME_TITLES['food']}`} />
-      <a
+      <Link
         href="/theme/food/orders"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"
       >
         <FontAwesomeIcon icon={faArrowLeft} className="w-3 h-3" aria-hidden="true" />
         Back to orders
-      </a>
+      </Link>
 
       <header className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>

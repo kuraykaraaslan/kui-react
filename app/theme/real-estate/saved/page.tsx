@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
@@ -71,13 +72,13 @@ export default function SavedPropertiesPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
       <DocumentTitle text={`Saved Properties — ${THEME_TITLES['real-estate']}`} />
-      <a
+      <Link
         href="/theme/real-estate"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"
       >
         <FontAwesomeIcon icon={faArrowLeft} className="w-3 h-3" aria-hidden="true" />
         Back home
-      </a>
+      </Link>
 
       <header className="mb-8">
         <p className="text-xs uppercase tracking-wide font-medium text-text-secondary">My account</p>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Slider } from '@/modules/ui/Slider';
@@ -58,13 +59,13 @@ export default function EventThemePage() {
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-10">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-text-primary">Kategoriler</h2>
-          <a href="/theme/event/events" className="text-sm text-primary hover:underline">
+          <Link href="/theme/event/events" className="text-sm text-primary hover:underline">
             Tümünü gör →
-          </a>
+          </Link>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
           {EVENT_CATEGORIES.map((cat) => (
-            <a
+            <Link
               key={cat.categoryId}
               href={`/theme/event/events?category=${cat.slug}`}
               className="flex flex-col items-center gap-2 rounded-xl border border-border bg-surface-raised p-4 hover:border-primary hover:bg-primary-subtle transition-all text-center group"
@@ -73,7 +74,7 @@ export default function EventThemePage() {
               <span className="text-xs font-semibold text-text-secondary group-hover:text-primary transition-colors">
                 {cat.title}
               </span>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -87,12 +88,12 @@ export default function EventThemePage() {
               {EVENTS.length} etkinlik sizi bekliyor
             </p>
           </div>
-          <a
+          <Link
             href="/theme/event/events"
             className="inline-flex items-center justify-center rounded-md border border-border text-text-primary hover:bg-surface-overlay px-3 py-1.5 text-sm font-medium transition-colors"
           >
             Tümünü Gör
-          </a>
+          </Link>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

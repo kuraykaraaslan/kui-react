@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -92,19 +93,19 @@ export default function NftHomePage() {
             </div>
           </div>
           <div className="flex gap-2">
-            <a
+            <Link
               href={`/theme/nft/collections/${HERO.slug}`}
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:bg-primary-hover transition-colors"
             >
               Explore collection
               <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-            </a>
-            <a
+            </Link>
+            <Link
               href="/theme/nft/explore"
               className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-base px-4 py-2 text-sm font-medium text-text-primary hover:bg-surface-overlay transition-colors"
             >
               Browse all
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -128,9 +129,9 @@ export default function NftHomePage() {
       <section className="space-y-3">
         <div className="flex items-end justify-between">
           <h2 className="text-lg font-bold text-text-primary">Trending collections</h2>
-          <a href="/theme/nft/collections" className="text-xs font-medium text-primary hover:underline">
+          <Link href="/theme/nft/collections" className="text-xs font-medium text-primary hover:underline">
             View all
-          </a>
+          </Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {TRENDING.map((c) => (
@@ -147,9 +148,9 @@ export default function NftHomePage() {
       <section className="space-y-3">
         <div className="flex items-end justify-between">
           <h2 className="text-lg font-bold text-text-primary">Top listed items</h2>
-          <a href="/theme/nft/explore" className="text-xs font-medium text-primary hover:underline">
+          <Link href="/theme/nft/explore" className="text-xs font-medium text-primary hover:underline">
             View all
-          </a>
+          </Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
           {TOP_ASSETS.map((a) => (
@@ -163,7 +164,7 @@ export default function NftHomePage() {
         <section className="lg:col-span-2 rounded-xl border border-border bg-surface-base overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <h2 className="text-sm font-semibold text-text-primary">Live activity</h2>
-            <a href="/theme/nft/activity" className="text-xs text-primary hover:underline">View all</a>
+            <Link href="/theme/nft/activity" className="text-xs text-primary hover:underline">View all</Link>
           </div>
           <div className="divide-y divide-border">
             {FEED.map((e) => (

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
@@ -206,13 +207,13 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
             </div>
 
             {/* Back */}
-            <a
+            <Link
               href="/theme/jobs/jobs"
               className="flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors"
             >
               <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" aria-hidden="true" />
               Back to all jobs
-            </a>
+            </Link>
           </aside>
         </div>
       </div>

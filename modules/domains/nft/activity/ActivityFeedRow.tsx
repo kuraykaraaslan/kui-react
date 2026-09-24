@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -70,12 +71,12 @@ export function ActivityFeedRow({ event, className }: ActivityFeedRowProps) {
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm text-text-primary">
           <span className="font-semibold">{meta.label}</span>{' '}
-          <a
+          <Link
             href={`/theme/nft/assets/${event.assetId}`}
             className="font-medium text-primary hover:underline"
           >
             {event.assetName}
-          </a>
+          </Link>
         </p>
         <p className="truncate text-xs text-text-secondary">
           {event.collectionName}

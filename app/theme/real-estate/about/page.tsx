@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -109,13 +110,13 @@ export default function AboutPage() {
               short-term rental, our platform is built to serve you — in your language, at your pace,
               with your interests front and centre.
             </p>
-            <a
+            <Link
               href="/theme/real-estate/properties"
               className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
             >
               Browse properties
               <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-            </a>
+            </Link>
           </div>
           <div className="relative">
             <img
@@ -204,17 +205,17 @@ export default function AboutPage() {
               <h2 className="text-2xl font-bold text-text-primary">Meet the Team</h2>
               <p className="text-text-secondary mt-1 text-sm">Our certified agents are the backbone of EstateView</p>
             </div>
-            <a
+            <Link
               href="/theme/real-estate/agents"
               className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline shrink-0"
             >
               All agents
               <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-            </a>
+            </Link>
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
             {AGENTS.map((agent) => (
-              <a
+              <Link
                 key={agent.agentId}
                 href={`/theme/real-estate/agents/${agent.agentId}`}
                 className="rounded-2xl border border-border bg-surface-base overflow-hidden hover:shadow-md hover:border-border-focus transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
@@ -236,7 +237,7 @@ export default function AboutPage() {
                     </div>
                   )}
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -249,18 +250,18 @@ export default function AboutPage() {
           Join thousands of satisfied clients who found their perfect home, office, or investment through EstateView.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <a href="/theme/real-estate/properties">
+          <Link href="/theme/real-estate/properties">
             <Button variant="primary" size="md">
               <FontAwesomeIcon icon={faBuilding} className="w-4 h-4 mr-2" aria-hidden="true" />
               Browse Properties
             </Button>
-          </a>
-          <a href="/theme/real-estate/contact">
+          </Link>
+          <Link href="/theme/real-estate/contact">
             <Button variant="outline" size="md">
               <FontAwesomeIcon icon={faUsers} className="w-4 h-4 mr-2" aria-hidden="true" />
               Get in Touch
             </Button>
-          </a>
+          </Link>
         </div>
       </section>
     </div>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -52,13 +53,13 @@ export default async function CollectionDetailPage({
 
       <div className="px-6 max-w-7xl mx-auto space-y-6 -mt-20 relative">
         {/* Back */}
-        <a
+        <Link
           href="/theme/nft/collections"
           className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors"
         >
           <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" aria-hidden="true" />
           All collections
-        </a>
+        </Link>
 
         {/* Header */}
         <div className="flex flex-wrap items-end gap-4">
@@ -76,7 +77,7 @@ export default async function CollectionDetailPage({
               )}
             </div>
             <p className="mt-1 flex items-center gap-2 text-sm text-text-secondary">
-              by <a href={`/theme/nft/creators/${collection.creatorHandle}`} className="font-medium text-text-primary hover:text-primary">{collection.creatorHandle}</a>
+              by <Link href={`/theme/nft/creators/${collection.creatorHandle}`} className="font-medium text-text-primary hover:text-primary">{collection.creatorHandle}</Link>
               <BlockchainBadge chain={collection.blockchain} size="sm" />
             </p>
           </div>

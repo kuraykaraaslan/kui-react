@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
@@ -109,7 +110,7 @@ export default function CompaniesPage() {
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {SPOTLIGHTS.map(({ company, headline, perks, rating }) => (
-            <a
+            <Link
               key={company.companyId}
               href="/theme/jobs/companies"
               className="group relative flex flex-col gap-4 rounded-2xl border border-border bg-surface-raised p-5 hover:shadow-md hover:border-border-focus transition-all duration-200"
@@ -153,7 +154,7 @@ export default function CompaniesPage() {
                   <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" aria-hidden="true" />
                 </span>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </section>

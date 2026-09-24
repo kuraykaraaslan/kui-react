@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { SkipLink } from '@/modules/ui/SkipLink';
 import { Button } from '@/modules/ui/Button';
@@ -91,9 +92,9 @@ export default function CommerceThemeLayout({ children }: { children: React.Reac
             </button>
 
             {/* Logo */}
-            <a href="/theme/commerce" className="shrink-0 text-xl font-extrabold tracking-tight text-[var(--text-inverse)]">
+            <Link href="/theme/commerce" className="shrink-0 text-xl font-extrabold tracking-tight text-[var(--text-inverse)]">
               Shop<span className="text-[var(--warning)]">Flow</span>
-            </a>
+            </Link>
 
             {/* Desktop nav */}
             <nav className="hidden lg:flex items-center gap-1 ml-6" aria-label="Main navigation">
@@ -164,7 +165,7 @@ export default function CommerceThemeLayout({ children }: { children: React.Reac
             </button>
 
             {/* Cart */}
-            <a
+            <Link
               href="/theme/commerce/cart"
               className="relative flex items-center justify-center w-9 h-9 rounded text-[var(--text-inverse)]/80 hover:text-[var(--text-inverse)] hover:bg-[var(--success)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-inverse)]"
               aria-label={`Cart, ${cartCount} items`}
@@ -179,7 +180,7 @@ export default function CommerceThemeLayout({ children }: { children: React.Reac
                   {cartCount}
                 </Badge>
               )}
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -217,9 +218,9 @@ export default function CommerceThemeLayout({ children }: { children: React.Reac
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
             {/* Brand */}
             <div className="col-span-2 sm:col-span-3 lg:col-span-1 space-y-4">
-              <a href="/theme/commerce" className="text-lg font-extrabold tracking-tight text-text-primary">
+              <Link href="/theme/commerce" className="text-lg font-extrabold tracking-tight text-text-primary">
                 Shop<span className="text-[var(--success-fg)]">Flow</span>
-              </a>
+              </Link>
               <p className="text-sm text-text-secondary leading-relaxed max-w-xs">
                 Discover thousands of products you will love, delivered fast with easy returns.
               </p>
@@ -260,9 +261,9 @@ export default function CommerceThemeLayout({ children }: { children: React.Reac
             </p>
             <div className="flex gap-4">
               {['Privacy Policy', 'Terms', 'Accessibility'].map((label) => (
-                <a key={label} href="/theme/commerce" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
+                <Link key={label} href="/theme/commerce" className="text-xs text-text-secondary hover:text-text-primary transition-colors">
                   {label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>

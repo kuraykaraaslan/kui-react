@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLocationDot, faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { DataTable } from '@/modules/ui/DataTable';
@@ -64,12 +65,12 @@ const columns: TableColumn<DeviceRow>[] = [
     header: 'Name',
     sortable: true,
     render: (row) => (
-      <a
+      <Link
         href={`/theme/iot/devices/${row.slug}`}
         className="font-medium text-text-primary hover:text-primary transition-colors"
       >
         {row.name}
-      </a>
+      </Link>
     ),
   },
   {

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -41,13 +42,13 @@ export default async function NftDetailPage({
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <a
+      <Link
         href="/theme/nft/explore"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors"
       >
         <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" aria-hidden="true" />
         Back to explore
-      </a>
+      </Link>
 
       <div className="grid gap-8 lg:grid-cols-5">
         {/* Image */}

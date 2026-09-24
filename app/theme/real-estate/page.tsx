@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
@@ -178,13 +179,13 @@ export default function RealEstateHomePage() {
             {/* City quick links */}
             <div className="flex flex-wrap gap-2">
               {CITIES.map((city) => (
-                <a
+                <Link
                   key={city}
                   href="/theme/real-estate/properties"
                   className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-white/20 backdrop-blur text-white hover:bg-white/30 border border-white/30 transition-colors"
                 >
                   {city}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -213,12 +214,12 @@ export default function RealEstateHomePage() {
             <h2 className="text-xl font-bold text-text-primary">Featured Properties</h2>
             <p className="text-sm text-text-secondary mt-0.5">Hand-picked by our expert agents</p>
           </div>
-          <a
+          <Link
             href="/theme/real-estate/properties"
             className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline"
           >
             View all <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -243,9 +244,9 @@ export default function RealEstateHomePage() {
               </div>
               <h2 className="text-xl font-bold text-text-primary">Newest on the Market</h2>
             </div>
-            <a href="/theme/real-estate/properties" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
+            <Link href="/theme/real-estate/properties" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
               See all <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-            </a>
+            </Link>
           </div>
           <div className="grid gap-5 sm:grid-cols-3">
             {newListings.map((p) => (
@@ -267,7 +268,7 @@ export default function RealEstateHomePage() {
             const meta = TYPE_META[type];
             const count = PROPERTIES.filter((p) => p.type === type).length;
             return (
-              <a
+              <Link
                 key={type}
                 href="/theme/real-estate/properties"
                 className="flex flex-col items-center gap-2 rounded-xl border border-border bg-surface-raised p-4 hover:border-primary hover:shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
@@ -277,7 +278,7 @@ export default function RealEstateHomePage() {
                 </span>
                 <span className="text-sm font-semibold text-text-primary">{meta.label}</span>
                 <span className="text-xs text-text-secondary">{count} listing{count !== 1 ? 's' : ''}</span>
-              </a>
+              </Link>
             );
           })}
         </div>
@@ -294,7 +295,7 @@ export default function RealEstateHomePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {NEIGHBORHOODS.map((n) => (
-              <a
+              <Link
                 key={n.id}
                 href="/theme/real-estate/properties"
                 className="group relative rounded-2xl overflow-hidden h-52 block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
@@ -313,7 +314,7 @@ export default function RealEstateHomePage() {
                     <span className="text-white/70 text-xs">{n.listingCount} listings</span>
                   </div>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -415,13 +416,13 @@ export default function RealEstateHomePage() {
                   <FontAwesomeIcon icon={faChartLine} className="w-4 h-4 mr-2" aria-hidden="true" />
                   List Property — It&apos;s Free
                 </Button>
-                <a
+                <Link
                   href="/theme/real-estate/agents"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-white/40 text-white text-sm font-medium hover:bg-white/10 transition-colors"
                 >
                   <FontAwesomeIcon icon={faUsers} className="w-4 h-4" aria-hidden="true" />
                   Talk to an Agent
-                </a>
+                </Link>
               </div>
             </div>
           </div>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Badge } from '@/modules/ui/Badge';
 import { ModelCard } from '@/modules/domains/ai/model/ModelCard';
@@ -39,10 +40,10 @@ export default async function ModelDetailPage({
     return (
       <div className="mx-auto max-w-7xl px-6 py-16 text-center">
         <h1 className="text-2xl font-bold text-text-primary">Model not found</h1>
-        <a href="/theme/ai/models" className="mt-4 inline-flex items-center gap-2 text-sm text-primary hover:underline">
+        <Link href="/theme/ai/models" className="mt-4 inline-flex items-center gap-2 text-sm text-primary hover:underline">
           <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" aria-hidden="true" />
           Back to models
-        </a>
+        </Link>
       </div>
     );
   }
@@ -57,10 +58,10 @@ export default async function ModelDetailPage({
       <nav aria-label="Breadcrumb" className="mb-6">
         <ol className="flex items-center gap-2 text-sm text-text-secondary">
           <li>
-            <a href="/theme/ai/models" className="hover:text-text-primary transition-colors inline-flex items-center gap-1.5">
+            <Link href="/theme/ai/models" className="hover:text-text-primary transition-colors inline-flex items-center gap-1.5">
               <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" aria-hidden="true" />
               Models
-            </a>
+            </Link>
           </li>
           <li aria-hidden="true">/</li>
           <li className="text-text-primary font-medium">{model.name}</li>
@@ -165,13 +166,13 @@ export default async function ModelDetailPage({
           </div>
 
           {/* Try in playground */}
-          <a
+          <Link
             href="/theme/ai/playground"
             className="block rounded-xl border border-primary/30 bg-primary-subtle px-5 py-4 text-center hover:border-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
           >
             <p className="text-sm font-semibold text-primary">Try in Playground</p>
             <p className="text-xs text-text-secondary mt-1">Interactive chat with this model</p>
-          </a>
+          </Link>
         </div>
       </div>
 

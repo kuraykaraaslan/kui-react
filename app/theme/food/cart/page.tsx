@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
@@ -115,13 +116,13 @@ export default function CartPage() {
                     </div>
                   </div>
 
-                  <a
+                  <Link
                     href="/theme/food"
                     className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-fg hover:bg-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
                   >
                     Proceed to Checkout
                     <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-                  </a>
+                  </Link>
                 </div>
               </Card>
             </aside>
@@ -133,13 +134,13 @@ export default function CartPage() {
               <p className="font-semibold text-text-primary text-lg">Your cart is empty</p>
               <p className="text-sm text-text-secondary mt-1">Add some delicious items to get started.</p>
             </div>
-            <a
+            <Link
               href="/theme/food/restaurants"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-fg text-sm font-semibold hover:bg-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
             >
               Browse Restaurants
               <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-            </a>
+            </Link>
           </div>
         )}
       </div>

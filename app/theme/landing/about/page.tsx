@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { TeamMemberCard } from '@/modules/domains/landing/team/TeamMemberCard';
@@ -134,12 +135,12 @@ export default function AboutPage() {
             >
               View open roles
             </a>
-            <a
+            <Link
               href={`${BASE}/pricing`}
               className="inline-flex items-center rounded-xl border border-white/40 px-6 py-3 text-sm font-semibold text-primary-fg hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               Start using Velox
-            </a>
+            </Link>
           </div>
         </div>
       </section>

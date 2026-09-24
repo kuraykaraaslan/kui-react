@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { SkipLink } from '@/modules/ui/SkipLink';
 import { Button } from '@/modules/ui/Button';
@@ -76,7 +77,7 @@ export default function FintechThemeLayout({ children }: { children: React.React
       {/* Top promo bar */}
       <div className="bg-primary text-primary-fg text-center text-xs py-2 px-4 font-medium">
         New: Send money internationally with zero fees until June 2026.{' '}
-        <a href="/theme/fintech/transfer" className="underline font-semibold">Start sending →</a>
+        <Link href="/theme/fintech/transfer" className="underline font-semibold">Start sending →</Link>
       </div>
 
       <header className="sticky top-0 z-50 bg-surface-base border-b border-border shadow-sm">
@@ -84,11 +85,11 @@ export default function FintechThemeLayout({ children }: { children: React.React
           <div className="flex items-center gap-4 h-16">
 
             {/* Logo */}
-            <a href="/theme/fintech" className="inline-flex items-center gap-1 shrink-0">
+            <Link href="/theme/fintech" className="inline-flex items-center gap-1 shrink-0">
               <span className="text-2xl font-black tracking-tighter">
                 <span className="text-primary">Pay</span><span className="text-[#003087]">Flow</span>
               </span>
-            </a>
+            </Link>
 
             {/* Desktop nav */}
             <nav className="hidden md:flex items-center border-l border-border pl-4 ml-2 gap-0.5" aria-label="Primary navigation">
@@ -209,11 +210,11 @@ export default function FintechThemeLayout({ children }: { children: React.React
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {/* Brand column */}
             <div className="col-span-2 sm:col-span-2 lg:col-span-1 space-y-4">
-              <a href="/theme/fintech" className="inline-flex items-center">
+              <Link href="/theme/fintech" className="inline-flex items-center">
                 <span className="text-2xl font-black tracking-tighter">
                   <span className="text-primary">Pay</span><span className="text-[#003087]">Flow</span>
                 </span>
-              </a>
+              </Link>
               <p className="text-sm text-text-secondary leading-relaxed max-w-xs">
                 The safer, easier way to pay and get paid. Trusted by millions worldwide.
               </p>

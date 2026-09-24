@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faEnvelope } from '@fortawesome/free-solid-svg-icons';
@@ -80,10 +81,10 @@ export default function VerifyEmailPage() {
             <h1 className="text-2xl font-bold text-text-primary">Email verified!</h1>
             <p className="text-sm text-text-secondary">Your account is now active. Welcome aboard.</p>
           </div>
-          <a href="/theme/common/auth/login"
+          <Link href="/theme/common/auth/login"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-fg hover:bg-primary-hover transition-colors">
             Continue to login <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
       </div>
       </>
@@ -154,7 +155,7 @@ export default function VerifyEmailPage() {
 
         <p className="text-center text-xs text-text-secondary">
           Wrong email?{' '}
-          <a href="/theme/common/auth/register" className="text-primary hover:underline">Go back</a>
+          <Link href="/theme/common/auth/register" className="text-primary hover:underline">Go back</Link>
         </p>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
@@ -178,9 +179,9 @@ export default function FintechDashboardPage() {
           <section className="lg:col-span-2 space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-text-primary">Recent Activity</h2>
-              <a href="/theme/fintech/transactions" className="flex items-center gap-1.5 text-sm text-primary font-semibold hover:underline">
+              <Link href="/theme/fintech/transactions" className="flex items-center gap-1.5 text-sm text-primary font-semibold hover:underline">
                 See all <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-              </a>
+              </Link>
             </div>
             <div className="rounded-2xl border border-border bg-surface-base shadow-sm overflow-hidden">
               {recentTx.map((tx, i) => (
@@ -195,7 +196,7 @@ export default function FintechDashboardPage() {
           <section className="space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-text-primary">My Wallets</h2>
-              <a href="/theme/fintech/wallets" className="text-sm text-primary font-semibold hover:underline">Manage</a>
+              <Link href="/theme/fintech/wallets" className="text-sm text-primary font-semibold hover:underline">Manage</Link>
             </div>
             <div className="space-y-2">
               {WALLETS.filter((w) => w.status === 'ACTIVE').map((wallet) => (
@@ -220,23 +221,23 @@ export default function FintechDashboardPage() {
                   </div>
                 </div>
               ))}
-              <a
+              <Link
                 href="/theme/fintech/wallets"
                 className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-border py-3 text-sm text-primary font-medium hover:bg-primary-subtle transition-colors"
               >
                 <FontAwesomeIcon icon={faPlus} className="w-3.5 h-3.5" aria-hidden="true" />
                 Add a wallet
-              </a>
+              </Link>
             </div>
 
             {/* Security card */}
             <div className="rounded-2xl overflow-hidden border border-border bg-gradient-to-br from-[#003087] to-primary p-5 text-white mt-4">
               <div className="flex items-center gap-3 mb-3">
                 <FontAwesomeIcon icon={faShieldHalved} className="w-6 h-6 text-white/80" aria-hidden="true" />
-                <p className="font-semibold">You're protected</p>
+                <p className="font-semibold">You&apos;re protected</p>
               </div>
               <p className="text-xs text-white/80 leading-relaxed mb-4">
-                PayFlow's Purchase Protection covers your eligible transactions, keeping your money safe.
+                PayFlow&apos;s Purchase Protection covers your eligible transactions, keeping your money safe.
               </p>
               <div className="flex flex-col gap-1.5">
                 {['Fraud monitoring 24/7', 'Encrypted transactions', 'Dispute resolution'].map((item) => (

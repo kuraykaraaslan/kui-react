@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { AppShell } from '@/modules/app/AppShell';
 import { AppSidebar, type AppSidebarNavGroup } from '@/modules/app/AppSidebar';
 import { Button } from '@/modules/ui/Button';
@@ -56,10 +57,10 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
             <p className="text-sm font-semibold text-text-primary">Alex Müller</p>
             <p className="text-xs text-text-secondary">alex@acme.io · OWNER</p>
           </div>
-          <a href="/theme/iot" className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-overlay hover:text-text-primary transition-colors">
+          <Link href="/theme/iot" className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-overlay hover:text-text-primary transition-colors">
             <FontAwesomeIcon icon={faCircleUser} className="w-4 h-4" aria-hidden="true" />
             Profile
-          </a>
+          </Link>
           <button className="flex w-full items-center gap-3 px-4 py-2 text-sm text-error hover:bg-error-subtle transition-colors">
             <FontAwesomeIcon icon={faArrowRightFromBracket} className="w-4 h-4" aria-hidden="true" />
             Sign out
@@ -75,12 +76,12 @@ export default function IoTThemeLayout({ children }: { children: React.ReactNode
     <AppShell
       mobileSidebarTitle="Nexus"
       logo={
-        <a href="/theme/iot" className="flex items-center gap-2.5">
+        <Link href="/theme/iot" className="flex items-center gap-2.5">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-fg">
             <FontAwesomeIcon icon={faServer} className="w-3.5 h-3.5" aria-hidden="true" />
           </div>
           <span className="text-sm font-bold text-text-primary tracking-tight">Nexus</span>
-        </a>
+        </Link>
       }
       sidebar={
         <AppSidebar

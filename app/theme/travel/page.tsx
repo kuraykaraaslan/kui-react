@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
@@ -176,7 +177,7 @@ export default function TravelHomePage() {
         <p className="text-sm text-text-secondary mb-6">Trending cities travelers are searching right now</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {POPULAR_DESTINATIONS.map((dest) => (
-            <a
+            <Link
               key={dest.code}
               href="/theme/travel/hotels"
               className="relative rounded-xl overflow-hidden h-40 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
@@ -191,7 +192,7 @@ export default function TravelHomePage() {
                 <p className="text-white font-bold text-sm leading-tight">{dest.name}</p>
                 <p className="text-white/70 text-xs">{dest.hotelCount.toLocaleString()} hotels</p>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -205,10 +206,10 @@ export default function TravelHomePage() {
               <h2 className="text-2xl font-bold text-text-primary">Hot Deals</h2>
               <span className="text-xs bg-warning text-white px-2 py-0.5 rounded-full font-bold tracking-wide">LIMITED</span>
             </div>
-            <a href="/theme/travel/hotels" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
+            <Link href="/theme/travel/hotels" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
               See all deals
               <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-            </a>
+            </Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {featuredHotels.map((hotel, i) => (
@@ -230,10 +231,10 @@ export default function TravelHomePage() {
             <h2 className="text-2xl font-bold text-text-primary">Cheapest Flights This Week</h2>
             <p className="text-sm text-text-secondary mt-1">Best fares found across all airlines</p>
           </div>
-          <a href="/theme/travel/flights" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
+          <Link href="/theme/travel/flights" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
             All flights
             <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {featuredFlights.map((flight) => (

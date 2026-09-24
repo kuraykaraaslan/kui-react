@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
@@ -369,7 +370,7 @@ export default function PropertiesPage() {
             ) : (
               <div className="space-y-3">
                 {filtered.map((property) => (
-                  <a
+                  <Link
                     key={property.propertyId}
                     href={`/theme/real-estate/properties/${property.slug}`}
                     className="group flex gap-4 rounded-xl border border-border bg-surface-raised hover:border-border-focus hover:shadow-sm transition-all overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
@@ -407,7 +408,7 @@ export default function PropertiesPage() {
                         </p>
                       )}
                     </div>
-                  </a>
+                  </Link>
                 ))}
               </div>
             )

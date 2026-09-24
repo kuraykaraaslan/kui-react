@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { DataTable } from '@/modules/ui/DataTable';
 import type { TableColumn } from '@/modules/ui/DataTable';
 import { AlertSeverityBadge } from '@/modules/domains/iot/alert/AlertSeverityBadge';
@@ -116,14 +117,14 @@ const columns: TableColumn<AlertRow>[] = [
     header: 'Actions',
     align: 'right',
     render: (row) => (
-      <a
+      <Link
         href={`/theme/iot/alerts/${row.alertId}`}
         className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface-base px-2.5 py-1 text-xs font-medium text-text-primary hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
         aria-label={`Open alert ${row.title}`}
       >
         <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="w-3 h-3 text-primary" aria-hidden="true" />
         Open
-      </a>
+      </Link>
     ),
   },
 ];

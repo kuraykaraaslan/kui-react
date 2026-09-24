@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -26,7 +27,7 @@ export function CreatorLeaderboardRow({ rank, creator, changePct, className }: C
     'bg-surface-overlay text-text-secondary';
 
   return (
-    <a
+    <Link
       href={`/theme/nft/creators/${creator.handle}`}
       className={cn(
         'flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-surface-overlay',
@@ -78,6 +79,6 @@ export function CreatorLeaderboardRow({ rank, creator, changePct, className }: C
           </p>
         )}
       </div>
-    </a>
+    </Link>
   );
 }

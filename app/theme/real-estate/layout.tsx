@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState, useRef } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { SkipLink } from '@/modules/ui/SkipLink';
@@ -179,8 +180,8 @@ export default function RealEstateThemeLayout({ children }: { children: React.Re
 
               {/* Right: language + quick links */}
               <div className="flex items-center gap-4 text-white/60">
-                <a href="/theme/real-estate" className="hover:text-white transition-colors">Blog</a>
-                <a href="/theme/real-estate" className="hover:text-white transition-colors">Contact</a>
+                <Link href="/theme/real-estate" className="hover:text-white transition-colors">Blog</Link>
+                <Link href="/theme/real-estate" className="hover:text-white transition-colors">Contact</Link>
                 <div className="w-px h-3.5 bg-white/20" />
                 <button className="inline-flex items-center gap-1 hover:text-white transition-colors">
                   <FontAwesomeIcon icon={faGlobe} className="w-3 h-3" aria-hidden="true" />
@@ -197,14 +198,14 @@ export default function RealEstateThemeLayout({ children }: { children: React.Re
             <div className="flex items-center h-16 gap-2">
 
               {/* Logo */}
-              <a href="/theme/real-estate" className="inline-flex items-center gap-2.5 shrink-0 mr-4">
+              <Link href="/theme/real-estate" className="inline-flex items-center gap-2.5 shrink-0 mr-4">
                 <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-fg shadow-sm">
                   <FontAwesomeIcon icon={faBuilding} className="w-4 h-4" aria-hidden="true" />
                 </span>
                 <span className="text-xl font-black tracking-tight text-text-primary hidden sm:block">
                   Estate<span className="text-primary">View</span>
                 </span>
-              </a>
+              </Link>
 
               {/* Desktop nav */}
               <nav className="hidden lg:flex items-center gap-0.5 flex-1" aria-label="Primary navigation">
@@ -236,24 +237,24 @@ export default function RealEstateThemeLayout({ children }: { children: React.Re
                       <p className="text-xs font-semibold text-text-secondary uppercase tracking-widest mb-2.5">Popular cities</p>
                       <div className="flex flex-wrap gap-2">
                         {POPULAR_CITIES.map((city) => (
-                          <a
+                          <Link
                             key={city}
                             href="/theme/real-estate/properties"
                             className="inline-flex items-center gap-1 px-3 py-1 rounded-full border border-border text-xs text-text-secondary hover:border-primary hover:text-primary transition-colors"
                           >
                             <FontAwesomeIcon icon={faLocationDot} className="w-2.5 h-2.5" aria-hidden="true" />
                             {city}
-                          </a>
+                          </Link>
                         ))}
                       </div>
                     </div>
-                    <a
+                    <Link
                       href="/theme/real-estate/properties"
                       className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
                     >
                       View all properties for sale
                       <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" aria-hidden="true" />
-                    </a>
+                    </Link>
                   </div>
                 </MegaDropdown>
 
@@ -287,33 +288,33 @@ export default function RealEstateThemeLayout({ children }: { children: React.Re
                         </a>
                       ))}
                     </div>
-                    <a
+                    <Link
                       href="/theme/real-estate/properties"
                       className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
                     >
                       View all rental listings
                       <FontAwesomeIcon icon={faArrowRight} className="w-3 h-3" aria-hidden="true" />
-                    </a>
+                    </Link>
                   </div>
                 </MegaDropdown>
 
                 {/* Simple links */}
-                <a
+                <Link
                   href="/theme/real-estate/properties"
                   className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface-overlay transition-colors"
                 >
                   <FontAwesomeIcon icon={faFire} className="w-3.5 h-3.5 text-warning" aria-hidden="true" />
                   New Listings
                   <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-warning text-white text-xs font-bold leading-none">8</span>
-                </a>
+                </Link>
 
-                <a
+                <Link
                   href="/theme/real-estate/agents"
                   className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-surface-overlay transition-colors"
                 >
                   <FontAwesomeIcon icon={faUsers} className="w-3.5 h-3.5" aria-hidden="true" />
                   Agents
-                </a>
+                </Link>
               </nav>
 
               {/* Right actions */}
@@ -439,14 +440,14 @@ export default function RealEstateThemeLayout({ children }: { children: React.Re
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-4">
             {/* Brand column */}
             <div className="col-span-2 sm:col-span-3 lg:col-span-1 space-y-4">
-              <a href="/theme/real-estate" className="inline-flex items-center gap-2">
+              <Link href="/theme/real-estate" className="inline-flex items-center gap-2">
                 <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-fg">
                   <FontAwesomeIcon icon={faBuilding} className="w-4 h-4" aria-hidden="true" />
                 </span>
                 <span className="text-base font-black tracking-tight">
                   Estate<span className="text-primary">View</span>
                 </span>
-              </a>
+              </Link>
               <p className="text-sm text-text-secondary leading-relaxed max-w-xs">
                 Find your perfect property in Turkey. Thousands of verified listings from trusted agents.
               </p>

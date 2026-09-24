@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
@@ -325,7 +326,7 @@ export default function TransferPage() {
               <div className="flex items-center gap-2 rounded-xl border border-border bg-surface-raised px-4 py-3">
                 <FontAwesomeIcon icon={faArrowRightArrowLeft} className="w-4 h-4 text-primary flex-shrink-0" aria-hidden="true" />
                 <p className="text-xs text-text-secondary">
-                  Great exchange rates on international transfers. <a href="/theme/fintech/transactions" className="text-primary font-semibold">Compare rates</a>
+                  Great exchange rates on international transfers. <Link href="/theme/fintech/transactions" className="text-primary font-semibold">Compare rates</Link>
                 </p>
               </div>
 
@@ -355,9 +356,9 @@ export default function TransferPage() {
 
               <p className="text-center text-xs text-text-secondary">
                 By sending, you agree to our{' '}
-                <a href="/theme/fintech" className="text-primary hover:underline">User Agreement</a>{' '}
+                <Link href="/theme/fintech" className="text-primary hover:underline">User Agreement</Link>{' '}
                 and{' '}
-                <a href="/theme/fintech" className="text-primary hover:underline">Privacy Policy</a>.
+                <Link href="/theme/fintech" className="text-primary hover:underline">Privacy Policy</Link>.
               </p>
             </form>
           )}

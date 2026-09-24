@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { SkipLink } from '@/modules/ui/SkipLink';
 import { Button } from '@/modules/ui/Button';
@@ -83,14 +84,14 @@ export default function MediaThemeLayout({ children }: { children: React.ReactNo
             <div className="flex items-center gap-3 h-16">
 
               {/* Logo */}
-              <a href="/theme/media" className="inline-flex items-center gap-2 shrink-0 mr-1">
+              <Link href="/theme/media" className="inline-flex items-center gap-2 shrink-0 mr-1">
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-error text-white">
                   <FontAwesomeIcon icon={faPlay} className="w-4 h-4 translate-x-0.5" aria-hidden="true" />
                 </span>
                 <span className="text-lg font-extrabold tracking-tight text-text-primary hidden sm:block">
                   Stream<span className="text-error">Vault</span>
                 </span>
-              </a>
+              </Link>
 
               {/* Search bar — desktop */}
               <div className="hidden md:flex flex-1 max-w-2xl items-stretch rounded-xl border border-border bg-surface-raised overflow-hidden focus-within:ring-2 focus-within:ring-border-focus transition-shadow">
@@ -198,16 +199,16 @@ export default function MediaThemeLayout({ children }: { children: React.ReactNo
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-4">
             {/* Brand column */}
             <div className="col-span-2 sm:col-span-3 lg:col-span-1 space-y-4">
-              <a href="/theme/media" className="inline-flex items-center gap-2">
+              <Link href="/theme/media" className="inline-flex items-center gap-2">
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-error text-white">
                   <FontAwesomeIcon icon={faPlay} className="w-4 h-4 translate-x-0.5" aria-hidden="true" />
                 </span>
                 <span className="text-base font-extrabold tracking-tight">
                   Stream<span className="text-error">Vault</span>
                 </span>
-              </a>
+              </Link>
               <p className="text-sm text-text-secondary leading-relaxed max-w-xs">
-                Your home for high-quality videos from the world's most passionate creators.
+                Your home for high-quality videos from the world&apos;s most passionate creators.
               </p>
               <div className="flex items-center gap-3">
                 <a href="https://x.com" aria-label="X (Twitter)" className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-secondary hover:text-text-primary hover:border-border-strong transition-colors">

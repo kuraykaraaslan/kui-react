@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { MY_ORDERS } from '@/app/theme/event/event.data';
@@ -43,7 +44,7 @@ export default function OrdersPage() {
       {/* list */}
       <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8 space-y-4">
         {MY_ORDERS.map((order) => (
-          <a
+          <Link
             key={order.orderId}
             href={`/theme/event/orders/${order.orderId}`}
             className={cn(
@@ -82,7 +83,7 @@ export default function OrdersPage() {
                 {FMT_CURRENCY.format(order.total)}
               </p>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
 

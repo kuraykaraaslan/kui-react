@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { use, useState, useMemo } from 'react';
 import { notFound } from 'next/navigation';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
@@ -84,13 +85,13 @@ export default function ConversationThreadPage({
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       <DocumentTitle text={`${active.name} — Messages — ${THEME_TITLES.social}`} />
-      <a
+      <Link
         href="/theme/social/messages"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"
       >
         <FontAwesomeIcon icon={faArrowLeft} className="w-3 h-3" aria-hidden="true" />
         Back to inbox
-      </a>
+      </Link>
 
       <div className="grid gap-4 lg:grid-cols-[320px_1fr] rounded-xl border border-border bg-surface-base overflow-hidden">
         {/* Sidebar: conversations */}

@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -15,13 +16,13 @@ export default function NewTopicPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <DocumentTitle text={`New Topic — ${THEME_TITLES.forum}`} />
-      <a
+      <Link
         href="/theme/forum/topics"
         className="inline-flex items-center gap-1.5 text-xs text-text-secondary hover:text-text-primary mb-4 transition-colors"
       >
         <FontAwesomeIcon icon={faArrowLeft} className="w-3 h-3" aria-hidden="true" />
         Back to topics
-      </a>
+      </Link>
 
       <header className="mb-5">
         <h1 className="text-2xl font-bold text-text-primary">Start a new topic</h1>
@@ -35,7 +36,7 @@ export default function NewTopicPage() {
         initialCategoryValue={categoryOptions[1]?.value}
         onSubmit={(data) => {
           // Demo: log the submission. A real flow would POST to an API and redirect to the topic.
-          // eslint-disable-next-line no-console
+           
           console.log('New topic submitted:', data);
         }}
         onCancel={() => {

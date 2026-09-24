@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { SkipLink } from '@/modules/ui/SkipLink';
 import { Button } from '@/modules/ui/Button';
@@ -93,14 +94,14 @@ export default function JobsThemeLayout({ children }: { children: React.ReactNod
             <div className="flex items-center gap-3 h-16">
 
               {/* Logo */}
-              <a href="/theme/jobs" className="inline-flex items-center gap-2 shrink-0 mr-1">
+              <Link href="/theme/jobs" className="inline-flex items-center gap-2 shrink-0 mr-1">
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-fg">
                   <FontAwesomeIcon icon={faBriefcase} className="w-4 h-4" aria-hidden="true" />
                 </span>
                 <span className="text-lg font-extrabold tracking-tight text-text-primary hidden sm:block">
                   Work<span className="text-primary">Board</span>
                 </span>
-              </a>
+              </Link>
 
               {/* Search — desktop */}
               <div className="hidden md:flex flex-1 max-w-2xl items-stretch rounded-xl border border-border bg-surface-raised overflow-hidden focus-within:ring-2 focus-within:ring-border-focus transition-shadow">
@@ -237,14 +238,14 @@ export default function JobsThemeLayout({ children }: { children: React.ReactNod
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
             {/* Brand column */}
             <div className="col-span-2 sm:col-span-3 lg:col-span-1 space-y-4">
-              <a href="/theme/jobs" className="inline-flex items-center gap-2">
+              <Link href="/theme/jobs" className="inline-flex items-center gap-2">
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-fg">
                   <FontAwesomeIcon icon={faBriefcase} className="w-4 h-4" aria-hidden="true" />
                 </span>
                 <span className="text-base font-extrabold tracking-tight">
                   Work<span className="text-primary">Board</span>
                 </span>
-              </a>
+              </Link>
               <p className="text-sm text-text-secondary leading-relaxed max-w-xs">
                 The modern job platform connecting top talent with great companies worldwide.
               </p>

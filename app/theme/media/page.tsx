@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -44,13 +45,13 @@ export default function MediaThemePage() {
             <p className="text-white/70 text-sm">
               {(FEATURED_VIDEO.viewCount / 1_000_000).toFixed(1)}M views &middot; {FEATURED_VIDEO.category}
             </p>
-            <a
+            <Link
               href={`/theme/media/videos/${FEATURED_VIDEO.slug}`}
               className="inline-flex items-center gap-2 rounded-xl bg-white text-gray-900 font-semibold px-5 py-2.5 text-sm hover:bg-white/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <FontAwesomeIcon icon={faPlay} className="w-4 h-4 translate-x-0.5" aria-hidden="true" />
               Watch Now
-            </a>
+            </Link>
           </div>
 
           {/* Thumbnail */}
@@ -70,13 +71,13 @@ export default function MediaThemePage() {
         <div className="mx-auto max-w-7xl px-6 py-4 flex items-center gap-2 overflow-x-auto">
           <span className="text-xs font-semibold text-text-secondary uppercase tracking-wide shrink-0 mr-2">Browse:</span>
           {CATEGORIES.map((cat) => (
-            <a
+            <Link
               key={cat}
               href={`/theme/media/videos`}
               className="shrink-0 inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border border-border bg-surface-base text-text-secondary hover:border-border-focus hover:text-text-primary transition-colors"
             >
               {cat}
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -88,9 +89,9 @@ export default function MediaThemePage() {
             <FontAwesomeIcon icon={faFire} className="w-5 h-5 text-error" aria-hidden="true" />
             Trending Videos
           </h2>
-          <a href="/theme/media/videos" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
+          <Link href="/theme/media/videos" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
             View all <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {trendingVideos.map((video) => {
@@ -124,9 +125,9 @@ export default function MediaThemePage() {
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-text-primary">Top Channels</h2>
-            <a href="/theme/media/channels" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
+            <Link href="/theme/media/channels" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
               All channels <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-            </a>
+            </Link>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {topChannels.map((channel) => (
@@ -156,12 +157,12 @@ export default function MediaThemePage() {
           <p className="text-primary-fg/80 max-w-md mx-auto text-sm leading-relaxed">
             Join thousands of creators sharing their passion on StreamVault. Upload your first video today — it&apos;s free.
           </p>
-          <a
+          <Link
             href="/theme/media"
             className="inline-flex items-center gap-2 rounded-xl bg-white text-primary font-semibold px-6 py-2.5 text-sm hover:bg-white/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
           >
             Start Uploading
-          </a>
+          </Link>
         </div>
       </section>
     </div>

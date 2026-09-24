@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
@@ -343,13 +344,13 @@ export default function SalariesPage() {
             <h2 className="text-xl font-bold text-text-primary">Want to see roles at your target salary?</h2>
             <p className="text-text-secondary text-sm mt-1">Browse open positions filtered by compensation range.</p>
           </div>
-          <a
+          <Link
             href="/theme/jobs/jobs"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-fg font-semibold text-sm hover:bg-primary-hover transition-colors shrink-0"
           >
             Browse Jobs
             <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
       </section>
     </div>

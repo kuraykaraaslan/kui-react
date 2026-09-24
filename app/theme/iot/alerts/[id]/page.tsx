@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { use } from 'react';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -25,13 +26,13 @@ export default function AlertDetailPage({
     <>
       <DocumentTitle text="Alert Detail — IoT Theme" />
       <div className="mx-auto max-w-5xl px-4 py-6">
-      <a
+      <Link
         href="/theme/iot/alerts"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"
       >
         <FontAwesomeIcon icon={faArrowLeft} className="w-3 h-3" aria-hidden="true" />
         Back to alerts
-      </a>
+      </Link>
 
       <div className="space-y-5">
         <AlertDetailHeader
@@ -70,22 +71,22 @@ export default function AlertDetailPage({
               <ul className="space-y-1.5 text-sm">
                 {device && (
                   <li>
-                    <a
+                    <Link
                       href={`/theme/iot/devices/${device.slug}`}
                       className="text-primary hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
                     >
                       Device — {device.name}
-                    </a>
+                    </Link>
                   </li>
                 )}
                 {device && (
                   <li>
-                    <a
+                    <Link
                       href={`/theme/iot/devices/${device.slug}/metrics`}
                       className="text-primary hover:text-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
                     >
                       Device metrics & logs
-                    </a>
+                    </Link>
                   </li>
                 )}
               </ul>

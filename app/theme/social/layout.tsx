@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { AppShell } from '@/modules/app/AppShell';
@@ -81,20 +82,20 @@ function SidebarFooter({ collapsed }: { collapsed: boolean }) {
             <p className="text-sm font-semibold text-text-primary truncate">{ME.name}</p>
             <p className="text-xs text-text-secondary truncate">@{ME.username}</p>
           </div>
-          <a
+          <Link
             href={`/theme/social/profile/${ME.userId}`}
             className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-overlay hover:text-text-primary transition-colors"
           >
             <FontAwesomeIcon icon={faCircleUser} className="w-4 h-4" aria-hidden="true" />
             Profile
-          </a>
-          <a
+          </Link>
+          <Link
             href="/theme/social/settings"
             className="flex items-center gap-3 px-4 py-2 text-sm text-text-secondary hover:bg-surface-overlay hover:text-text-primary transition-colors"
           >
             <FontAwesomeIcon icon={faGear} className="w-4 h-4" aria-hidden="true" />
             Settings
-          </a>
+          </Link>
           <button
             type="button"
             className="flex w-full items-center gap-3 px-4 py-2 text-sm text-error hover:bg-error-subtle transition-colors"
@@ -128,7 +129,7 @@ export default function SocialThemeLayout({ children }: { children: React.ReactN
     <AppShell
       mobileSidebarTitle="Nexus"
       logo={
-        <a
+        <Link
           href="/theme/social"
           className="flex items-center gap-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
         >
@@ -136,7 +137,7 @@ export default function SocialThemeLayout({ children }: { children: React.ReactN
             <FontAwesomeIcon icon={faUsers} className="w-3.5 h-3.5" aria-hidden="true" />
           </div>
           <span className="text-sm font-bold text-text-primary tracking-tight">Nexus</span>
-        </a>
+        </Link>
       }
       sidebar={
         <AppSidebar

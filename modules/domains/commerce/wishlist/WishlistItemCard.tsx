@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faCartShopping, faTrash, faTag } from '@fortawesome/free-solid-svg-icons';
@@ -87,12 +88,12 @@ export function WishlistItemCard({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             {item.slug ? (
-              <a
+              <Link
                 href={`/theme/commerce/products/${item.slug}`}
                 className="font-semibold text-text-primary hover:text-primary focus-visible:outline-none focus-visible:underline truncate block"
               >
                 {item.title}
-              </a>
+              </Link>
             ) : (
               <p className="font-semibold text-text-primary truncate">{item.title}</p>
             )}

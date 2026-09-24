@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SkipLink } from '@/modules/ui/SkipLink';
@@ -133,7 +134,7 @@ export default function EventThemeLayout({ children }: { children: React.ReactNo
               Yardım
             </a>
             <TopBarDivider />
-            <a
+            <Link
               href="/theme/event/orders"
               className="text-xs transition-colors"
               style={{ color: 'rgba(255,255,255,0.45)' }}
@@ -141,9 +142,9 @@ export default function EventThemeLayout({ children }: { children: React.ReactNo
               onMouseOut={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.45)')}
             >
               Siparişlerim
-            </a>
+            </Link>
             <TopBarDivider />
-            <a
+            <Link
               href="/theme/event/tickets"
               className="flex items-center gap-1.5 text-xs transition-colors"
               style={{ color: 'rgba(255,255,255,0.45)' }}
@@ -152,7 +153,7 @@ export default function EventThemeLayout({ children }: { children: React.ReactNo
             >
               <FontAwesomeIcon icon={faTicket} className="w-3 h-3" aria-hidden="true" />
               <span>Biletlerim</span>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -171,7 +172,7 @@ export default function EventThemeLayout({ children }: { children: React.ReactNo
           <div className="flex items-center gap-4 h-[62px]">
 
             {/* Logo */}
-            <a
+            <Link
               href="/theme/event"
               className="flex items-center gap-3 shrink-0 rounded-lg group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
             >
@@ -195,7 +196,7 @@ export default function EventThemeLayout({ children }: { children: React.ReactNo
                   Türkiye&apos;nin Bilet Platformu
                 </div>
               </div>
-            </a>
+            </Link>
 
             {/* Search */}
             <form
@@ -371,7 +372,7 @@ export default function EventThemeLayout({ children }: { children: React.ReactNo
 
             {/* brand */}
             <div className="col-span-2 md:col-span-4 lg:col-span-1 space-y-4">
-              <a href="/theme/event" className="flex items-center gap-2.5">
+              <Link href="/theme/event" className="flex items-center gap-2.5">
                 <div
                   className="flex h-10 w-10 items-center justify-center rounded-xl"
                   style={{ background: 'linear-gradient(135deg,#3b82f6,#6366f1)', boxShadow: '0 4px 14px rgba(59,130,246,0.4)' }}
@@ -384,7 +385,7 @@ export default function EventThemeLayout({ children }: { children: React.ReactNo
                     Bilet Platformu
                   </div>
                 </div>
-              </a>
+              </Link>
 
               <p className="text-xs leading-relaxed max-w-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
                 Türkiye&apos;nin en büyük etkinlik biletleme platformu. Konser, spor, tiyatro ve daha fazlası.

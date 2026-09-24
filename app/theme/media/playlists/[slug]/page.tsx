@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -34,13 +35,13 @@ export default async function PlaylistDetailPage({
   return (
     <div className="bg-surface-base text-text-primary">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
-        <a
+        <Link
           href="/theme/media"
           className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"
         >
           <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" aria-hidden="true" />
           Back to Home
-        </a>
+        </Link>
 
         <div className="mb-6">
           <PlaylistHeaderCard

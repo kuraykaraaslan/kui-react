@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
@@ -88,21 +89,21 @@ export default function CategoriesPage() {
                         aria-hidden="true"
                       />
                       <div className="min-w-0">
-                        <a
+                        <Link
                           href={`/theme/forum/topics?category=${cat.slug}`}
                           className="font-semibold text-sm text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
                         >
                           {cat.title}
-                        </a>
+                        </Link>
                         <p className="text-text-secondary mt-0.5 leading-snug">{cat.description}</p>
                         {cat.moderators && (
                           <p className="text-text-disabled mt-1">
                             Moderators:{' '}
                             {cat.moderators.map((mod, mi) => (
                               <span key={mod}>
-                                <a href="/theme/forum" className="text-text-secondary hover:text-primary hover:underline">
+                                <Link href="/theme/forum" className="text-text-secondary hover:text-primary hover:underline">
                                   {mod}
-                                </a>
+                                </Link>
                                 {mi < cat.moderators!.length - 1 && ', '}
                               </span>
                             ))}
@@ -123,18 +124,18 @@ export default function CategoriesPage() {
                     <div className="px-3 py-2.5 text-text-secondary w-48 hidden md:flex items-start">
                       {lastTopic ? (
                         <div>
-                          <a
+                          <Link
                             href={`/theme/forum/topics/${lastTopic.slug}`}
                             className="text-primary hover:underline font-medium line-clamp-1"
                           >
                             {lastTopic.title.length > 30 ? lastTopic.title.slice(0, 30) + '…' : lastTopic.title}
-                          </a>
+                          </Link>
                           <div className="text-text-disabled mt-0.5 leading-snug">
                             {formatLastPost(cat.lastActivityAt)}<br />
                             by{' '}
-                            <a href="/theme/forum" className="text-primary hover:underline">
+                            <Link href="/theme/forum" className="text-primary hover:underline">
                               {lastTopic.authorName}
-                            </a>
+                            </Link>
                           </div>
                         </div>
                       ) : (

@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState, useRef } from 'react';
 import { Button } from '@/modules/ui/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -60,10 +61,10 @@ export default function TwoFactorPage() {
             <h1 className="text-2xl font-bold text-text-primary">Signed in!</h1>
             <p className="text-sm text-text-secondary">Two-factor authentication passed.</p>
           </div>
-          <a href="/theme/common/account/profile"
+          <Link href="/theme/common/account/profile"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-fg hover:bg-primary-hover transition-colors">
             Go to account <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
       </div>
       </>
@@ -116,7 +117,7 @@ export default function TwoFactorPage() {
           </form>
 
           <div className="rounded-lg bg-surface-overlay border border-border px-4 py-3 space-y-1">
-            <p className="text-xs font-semibold text-text-primary">Can't access your authenticator?</p>
+            <p className="text-xs font-semibold text-text-primary">Can&apos;t access your authenticator?</p>
             <p className="text-xs text-text-secondary">
               Use a{' '}
               <span className="text-primary cursor-pointer hover:underline">recovery code</span>
@@ -127,7 +128,7 @@ export default function TwoFactorPage() {
         </div>
 
         <p className="text-center text-sm text-text-secondary">
-          <a href="/theme/common/auth/login" className="text-primary hover:underline">← Back to login</a>
+          <Link href="/theme/common/auth/login" className="text-primary hover:underline">← Back to login</Link>
         </p>
       </div>
     </div>

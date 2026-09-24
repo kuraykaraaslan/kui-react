@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
@@ -47,13 +48,13 @@ export default function LandingHomePage() {
         className="bg-surface-base"
       />
       <div className="flex justify-center pb-16 -mt-6">
-        <a
+        <Link
           href={`${BASE}/features`}
           className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
         >
           See all features
           <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-        </a>
+        </Link>
       </div>
 
       <div className="bg-surface-raised">
@@ -84,18 +85,18 @@ export default function LandingHomePage() {
             Join 5 000+ teams. Free forever on Starter — no credit card required.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <a
+            <Link
               href={`${BASE}/pricing`}
               className="inline-flex items-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-primary hover:bg-primary-subtle transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               See pricing
-            </a>
-            <a
+            </Link>
+            <Link
               href={`${BASE}/about`}
               className="inline-flex items-center rounded-xl border border-white/40 px-6 py-3 text-sm font-semibold text-primary-fg hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               Meet the team
-            </a>
+            </Link>
           </div>
         </div>
       </section>

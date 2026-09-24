@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
@@ -256,9 +257,9 @@ export default function TransactionsPage() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-text-primary">See something wrong?</p>
-            <p className="text-xs text-text-secondary mt-0.5">If you don't recognize a transaction, you can dispute it within 180 days.</p>
+            <p className="text-xs text-text-secondary mt-0.5">If you don&apos;t recognize a transaction, you can dispute it within 180 days.</p>
           </div>
-          <a href="/theme/fintech" className="text-sm text-primary font-semibold hover:underline shrink-0">Open Dispute</a>
+          <Link href="/theme/fintech" className="text-sm text-primary font-semibold hover:underline shrink-0">Open Dispute</Link>
         </div>
 
       </div>

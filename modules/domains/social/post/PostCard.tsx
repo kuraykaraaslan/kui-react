@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -76,12 +77,12 @@ export function PostCard({ post, className, onLike, onComment, onShare, onBookma
         />
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-1.5 flex-wrap">
-            <a
+            <Link
               href={`/theme/social/profile/${author.userId}`}
               className="font-semibold text-text-primary text-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
             >
               {author.name}
-            </a>
+            </Link>
             {author.isVerified && (
               <span className="text-primary text-xs" title="Verified">✓</span>
             )}

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -154,7 +155,7 @@ export default function AgentsPage() {
               className="rounded-2xl border border-border bg-surface-raised overflow-hidden hover:shadow-md hover:border-border-focus transition-all"
             >
               {/* Header band — click navigates to profile */}
-              <a
+              <Link
                 href={`/theme/real-estate/agents/${agent.agentId}`}
                 className="block h-20 bg-gradient-to-r from-primary-subtle to-primary/20 focus-visible:outline-none focus-visible:ring-inset focus-visible:ring-2 focus-visible:ring-border-focus"
                 aria-label={`View ${agent.name}'s profile`}
@@ -232,12 +233,12 @@ export default function AgentsPage() {
                 </div>
 
                 <div className="flex gap-2">
-                  <a
+                  <Link
                     href={`/theme/real-estate/agents/${agent.agentId}`}
                     className="flex-1 inline-flex items-center justify-center rounded-lg border border-border bg-surface-overlay text-sm font-medium text-text-secondary hover:text-text-primary hover:border-border-focus transition-colors py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
                   >
                     View Profile
-                  </a>
+                  </Link>
                   <a
                     href={`mailto:${agent.email}`}
                     className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-fg text-sm font-medium px-3 py-2 hover:bg-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
@@ -258,12 +259,12 @@ export default function AgentsPage() {
           <p className="text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
             Join our network of certified agents and reach thousands of buyers and renters every month.
           </p>
-          <a
+          <Link
             href="/theme/real-estate/contact"
             className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-fg text-sm font-medium px-5 py-2.5 hover:bg-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
           >
             Apply to Join EstateView
-          </a>
+          </Link>
         </div>
       </section>
     </div>

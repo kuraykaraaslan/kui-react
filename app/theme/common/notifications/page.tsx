@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faCheckDouble, faBellSlash } from '@fortawesome/free-solid-svg-icons';
@@ -112,13 +113,13 @@ export default function NotificationsPage() {
     <>
       <DocumentTitle text="Notifications — Common Theme" />
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <a
+      <Link
         href="/theme/common"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"
       >
         <FontAwesomeIcon icon={faArrowLeft} className="w-3 h-3" aria-hidden="true" />
         Back home
-      </a>
+      </Link>
 
       <header className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>

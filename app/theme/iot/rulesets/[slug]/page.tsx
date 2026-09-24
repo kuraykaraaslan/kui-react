@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { use, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -30,13 +31,13 @@ export default function RulesetEditorPage({ params }: { params: Promise<{ slug: 
 
       {/* ── Toolbar ── */}
       <div className="shrink-0 flex items-center gap-3 border-b border-border bg-surface-base px-4 py-2.5">
-        <a
+        <Link
           href="/theme/iot/rulesets"
           className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors"
         >
           <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" aria-hidden="true" />
           Rulesets
-        </a>
+        </Link>
 
         <span className="text-border-strong">·</span>
 

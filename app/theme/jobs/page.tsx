@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
@@ -94,13 +95,13 @@ export default function JobsThemePage() {
             {/* Popular searches */}
             <div className="flex flex-wrap justify-center gap-2 pt-2">
               {JOB_CATEGORIES.map((cat) => (
-                <a
+                <Link
                   key={cat.categoryId}
                   href={`/theme/jobs/jobs?category=${cat.slug}`}
                   className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border border-border bg-surface-raised text-text-secondary hover:border-border-focus hover:text-text-primary transition-colors"
                 >
                   {cat.title}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -171,9 +172,9 @@ export default function JobsThemePage() {
       <section className="mx-auto max-w-7xl px-6 pb-14">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-text-primary">Latest Jobs</h2>
-          <a href="/theme/jobs/jobs" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
+          <Link href="/theme/jobs/jobs" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
             View all <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -192,9 +193,9 @@ export default function JobsThemePage() {
         <div className="mx-auto max-w-7xl px-6 py-14">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-text-primary">Top Hiring Companies</h2>
-            <a href="/theme/jobs" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
+            <Link href="/theme/jobs" className="flex items-center gap-1.5 text-sm text-primary font-medium hover:underline">
               All companies <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-            </a>
+            </Link>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

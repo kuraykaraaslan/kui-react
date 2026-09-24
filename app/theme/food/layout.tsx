@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { SkipLink } from '@/modules/ui/SkipLink';
 import { Button } from '@/modules/ui/Button';
 import { NavDrawer } from '@/modules/app/NavDrawer';
@@ -78,14 +79,14 @@ export default function FoodThemeLayout({ children }: { children: React.ReactNod
           <div className="mx-auto max-w-7xl px-4 sm:px-6">
             <div className="flex items-center gap-4 h-16">
               {/* Logo */}
-              <a href="/theme/food" className="inline-flex items-center gap-2 shrink-0">
+              <Link href="/theme/food" className="inline-flex items-center gap-2 shrink-0">
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-fg">
                   <FontAwesomeIcon icon={faUtensils} className="w-4 h-4" aria-hidden="true" />
                 </span>
                 <span className="text-base font-extrabold tracking-tight text-text-primary hidden sm:block">
                   Yum<span className="text-primary">Dash</span>
                 </span>
-              </a>
+              </Link>
 
               {/* Delivery address chip */}
               <button
@@ -126,7 +127,7 @@ export default function FoodThemeLayout({ children }: { children: React.ReactNod
               {/* Cart + mobile hamburger */}
               <div className="ml-auto md:ml-0 flex items-center gap-2 shrink-0">
                 {/* Cart with badge */}
-                <a
+                <Link
                   href="/theme/food/cart"
                   className="relative hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-sm font-medium text-text-secondary hover:text-text-primary hover:border-border-strong transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
                   aria-label={`Cart, ${CART_ITEM_COUNT} items`}
@@ -138,7 +139,7 @@ export default function FoodThemeLayout({ children }: { children: React.ReactNod
                       {CART_ITEM_COUNT}
                     </span>
                   )}
-                </a>
+                </Link>
 
                 {/* Mobile hamburger */}
                 <div className="md:hidden">
@@ -230,14 +231,14 @@ export default function FoodThemeLayout({ children }: { children: React.ReactNod
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-4">
             {/* Brand column */}
             <div className="col-span-2 sm:col-span-3 lg:col-span-1 space-y-4">
-              <a href="/theme/food" className="inline-flex items-center gap-2">
+              <Link href="/theme/food" className="inline-flex items-center gap-2">
                 <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-fg">
                   <FontAwesomeIcon icon={faUtensils} className="w-4 h-4" aria-hidden="true" />
                 </span>
                 <span className="text-base font-extrabold tracking-tight">
                   Yum<span className="text-primary">Dash</span>
                 </span>
-              </a>
+              </Link>
               <p className="text-sm text-text-secondary leading-relaxed max-w-xs">
                 Your favourite food, delivered fast. Hundreds of restaurants, one app.
               </p>

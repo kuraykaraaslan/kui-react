@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
@@ -97,13 +98,13 @@ export default function OrdersPage() {
 
                 {/* Action */}
                 {order.orderStatus === 'DELIVERED' && (
-                  <a
+                  <Link
                     href={`/theme/food/restaurants/${order.restaurantId}`}
                     className="inline-flex items-center gap-2 self-start text-xs font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
                   >
                     <FontAwesomeIcon icon={faUtensils} className="w-3.5 h-3.5" aria-hidden="true" />
                     Reorder
-                  </a>
+                  </Link>
                 )}
               </div>
             </Card>
@@ -115,12 +116,12 @@ export default function OrdersPage() {
               <p className="font-medium text-text-primary">No orders yet</p>
               <p className="text-sm text-text-secondary mt-1">Your order history will appear here.</p>
             </div>
-            <a
+            <Link
               href="/theme/food/restaurants"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-fg text-sm font-medium hover:bg-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
             >
               Browse Restaurants
-            </a>
+            </Link>
           </div>
         )}
       </div>

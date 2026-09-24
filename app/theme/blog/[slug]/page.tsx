@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/modules/ui/Badge';
@@ -173,12 +174,12 @@ export default async function BlogPostPage({
                         </Card>
 
                         <Card title="Continue reading" subtitle="Return to the full archive.">
-                            <a
+                            <Link
                                 href="/domains/blog/archive"
                                 className="inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors px-3 py-1.5 text-sm bg-primary text-primary-fg hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
                             >
                                 View archive
-                            </a>
+                            </Link>
                         </Card>
                     </div>
                 </div>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -38,13 +39,13 @@ export default async function VideoDetailPage({
     <div className="bg-surface-base text-text-primary">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
         {/* Back link */}
-        <a
+        <Link
           href="/theme/media/videos"
           className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-6 transition-colors"
         >
           <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" aria-hidden="true" />
           Back to Videos
-        </a>
+        </Link>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Main column */}

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { ProductCard } from '@/modules/domains/commerce/product/ProductCard';
@@ -41,7 +42,7 @@ export default function ProductsPage() {
         {/* Breadcrumb */}
         <nav className="text-xs text-text-secondary mb-4" aria-label="Breadcrumb">
           <ol className="flex items-center gap-1">
-            <li><a href="/theme/commerce" className="hover:text-primary hover:underline">Home</a></li>
+            <li><Link href="/theme/commerce" className="hover:text-primary hover:underline">Home</Link></li>
             <li className="text-text-disabled">›</li>
             <li className="text-text-primary">All Products</li>
           </ol>
@@ -57,21 +58,21 @@ export default function ProductsPage() {
               </h2>
               <ul className="space-y-1">
                 <li>
-                  <a
+                  <Link
                     href="/theme/commerce/products"
                     className="block px-1 py-0.5 text-sm font-semibold text-primary"
                   >
                     All Departments
-                  </a>
+                  </Link>
                 </li>
                 {CATEGORIES.map((cat) => (
                   <li key={cat.categoryId}>
-                    <a
+                    <Link
                       href={`/theme/commerce/products?category=${cat.slug}`}
                       className="block px-1 py-0.5 text-sm text-text-secondary hover:text-primary hover:underline transition-colors"
                     >
                       {cat.title}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -131,12 +132,12 @@ export default function ProductsPage() {
               <ul className="space-y-1">
                 {(['Physical', 'Digital', 'Service'] as const).map((type) => (
                   <li key={type}>
-                    <a
+                    <Link
                       href={`/theme/commerce/products?type=${type.toUpperCase()}`}
                       className="block px-1 py-0.5 text-sm text-text-secondary hover:text-primary hover:underline"
                     >
                       {type}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

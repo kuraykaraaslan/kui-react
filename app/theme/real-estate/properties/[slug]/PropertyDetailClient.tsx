@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState } from 'react';
 import { PropertyCard } from '@/modules/domains/real-estate/property/PropertyCard';
 import { AgentCard } from '@/modules/domains/real-estate/agent/AgentCard';
@@ -129,13 +130,13 @@ export function PropertyDetailClient({
 
           {/* Top-left: back link */}
           <div className="absolute top-4 left-4">
-            <a
+            <Link
               href="/theme/real-estate/properties"
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/50 text-white text-sm hover:bg-black/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" aria-hidden="true" />
               Back
-            </a>
+            </Link>
           </div>
 
           {/* Top-right: actions */}

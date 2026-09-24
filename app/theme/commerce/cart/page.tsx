@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
@@ -43,12 +44,12 @@ export default function CartPage() {
             ))}
 
             <div className="pt-4">
-              <a
+              <Link
                 href="/theme/commerce/products"
                 className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
               >
                 Continue Shopping
-              </a>
+              </Link>
             </div>
           </div>
 

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { THEME_TITLES } from '@/libs/config/showcase.config';
 import { Avatar } from '@/modules/ui/Avatar';
@@ -88,7 +89,7 @@ export default function SocialFeedPage() {
           </div>
           <div className="divide-y divide-border">
             {TRENDING_TAGS.map((t) => (
-              <a
+              <Link
                 key={t.tag}
                 href="/theme/social"
                 className="flex items-center justify-between px-4 py-2.5 hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
@@ -100,7 +101,7 @@ export default function SocialFeedPage() {
                   </p>
                   <p className="text-xs text-text-secondary">{formatTagCount(t.postCount)} posts</p>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </div>

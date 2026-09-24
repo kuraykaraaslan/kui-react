@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -51,13 +52,13 @@ export default async function DeviceDetailPage({ params }: { params: Promise<{ s
   return (
     <div className="p-6 space-y-6">
       {/* Back */}
-      <a
+      <Link
         href="/theme/iot/devices"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors"
       >
         <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" aria-hidden="true" />
         Devices
-      </a>
+      </Link>
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -71,13 +72,13 @@ export default async function DeviceDetailPage({ params }: { params: Promise<{ s
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <a
+          <Link
             href={`/theme/iot/devices/${device.slug}/metrics`}
             className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface-base px-3 py-1.5 text-sm font-medium text-text-primary hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
           >
             <FontAwesomeIcon icon={faChartLine} className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
             View metrics
-          </a>
+          </Link>
           <DeviceStatusBadge status={device.status} size="md" />
         </div>
       </div>

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { buildPageTitle, THEME_TITLES } from '@/libs/config/showcase.config';
 import { Button } from '@/modules/ui/Button';
@@ -86,9 +87,9 @@ export default function TopicsPage() {
       <div className="mb-3 flex items-center gap-1.5 flex-wrap">
         <span className="text-xs text-text-secondary">Category:</span>
         {FORUM_CATEGORIES.map((cat) => (
-          <a key={cat.categoryId} href={`/theme/forum/topics?category=${cat.slug}`}>
+          <Link key={cat.categoryId} href={`/theme/forum/topics?category=${cat.slug}`}>
             <Badge variant="neutral" size="sm">{cat.title}</Badge>
-          </a>
+          </Link>
         ))}
       </div>
 
@@ -120,22 +121,22 @@ export default function TopicsPage() {
               <div className="px-2 py-2.5">
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <TopicStatusBadge status={topic.status} size="sm" />
-                  <a
+                  <Link
                     href={`/theme/forum/topics/${topic.slug}`}
                     className="font-semibold text-text-primary hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
                   >
                     {topic.title}
-                  </a>
+                  </Link>
                 </div>
                 <div className="text-text-disabled mt-0.5">
                   by{' '}
-                  <a href="/theme/forum" className="text-primary hover:underline">{topic.authorName}</a>
+                  <Link href="/theme/forum" className="text-primary hover:underline">{topic.authorName}</Link>
                   {cat && (
                     <span className="ml-2">
                       in{' '}
-                      <a href={`/theme/forum/topics?category=${cat.slug}`} className="text-primary hover:underline">
+                      <Link href={`/theme/forum/topics?category=${cat.slug}`} className="text-primary hover:underline">
                         {cat.title}
-                      </a>
+                      </Link>
                     </span>
                   )}
                   <span className="sm:hidden ml-2">&bull; {topic.replyCount} replies</span>
@@ -149,7 +150,7 @@ export default function TopicsPage() {
               </div>
               <div className="px-3 py-2.5 text-text-secondary w-36 hidden md:flex items-start flex-col justify-center">
                 <span className="text-text-disabled">{formatDate(topic.createdAt)}</span>
-                <span>by <a href="/theme/forum" className="text-primary hover:underline">{topic.authorName}</a></span>
+                <span>by <Link href="/theme/forum" className="text-primary hover:underline">{topic.authorName}</Link></span>
               </div>
             </div>
           );
@@ -174,22 +175,22 @@ export default function TopicsPage() {
                   {(topic.status === 'LOCKED' || topic.status === 'ARCHIVED') && (
                     <TopicStatusBadge status={topic.status} size="sm" />
                   )}
-                  <a
+                  <Link
                     href={`/theme/forum/topics/${topic.slug}`}
                     className="font-semibold text-text-primary hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus rounded"
                   >
                     {topic.title}
-                  </a>
+                  </Link>
                 </div>
                 <div className="text-text-disabled mt-0.5">
                   by{' '}
-                  <a href="/theme/forum" className="text-primary hover:underline">{topic.authorName}</a>
+                  <Link href="/theme/forum" className="text-primary hover:underline">{topic.authorName}</Link>
                   {cat && (
                     <span className="ml-2">
                       in{' '}
-                      <a href={`/theme/forum/topics?category=${cat.slug}`} className="text-primary hover:underline">
+                      <Link href={`/theme/forum/topics?category=${cat.slug}`} className="text-primary hover:underline">
                         {cat.title}
-                      </a>
+                      </Link>
                     </span>
                   )}
                   <span className="sm:hidden ml-2">&bull; {topic.replyCount} replies</span>
@@ -203,7 +204,7 @@ export default function TopicsPage() {
               </div>
               <div className="px-3 py-2.5 text-text-secondary w-36 hidden md:flex items-start flex-col justify-center">
                 <span className="text-text-disabled">{formatDate(topic.createdAt)}</span>
-                <span>by <a href="/theme/forum" className="text-primary hover:underline">{topic.authorName}</a></span>
+                <span>by <Link href="/theme/forum" className="text-primary hover:underline">{topic.authorName}</Link></span>
               </div>
             </div>
           );

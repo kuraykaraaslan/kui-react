@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -34,13 +35,13 @@ export function NftDetailHeader({
 }: NftDetailHeaderProps) {
   return (
     <div className={cn('space-y-3', className)}>
-      <a
+      <Link
         href={`/theme/nft/collections/${collectionSlug}`}
         className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
       >
         {collectionName}
         <FontAwesomeIcon icon={faCircleCheck} className="w-3.5 h-3.5" aria-hidden="true" />
-      </a>
+      </Link>
 
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
@@ -84,9 +85,9 @@ export function NftDetailHeader({
         <span className="flex items-center gap-1.5">
           <Avatar src={ownerAvatar} name={asset.ownerHandle} size="xs" />
           Owned by{' '}
-          <a href={`/theme/nft/creators/${asset.ownerHandle}`} className="font-medium text-text-primary hover:text-primary">
+          <Link href={`/theme/nft/creators/${asset.ownerHandle}`} className="font-medium text-text-primary hover:text-primary">
             {asset.ownerHandle}
-          </a>
+          </Link>
         </span>
         <BlockchainBadge chain={asset.blockchain} size="sm" />
         <RarityBadge tier={asset.rarityTier} rank={asset.rarityRank} size="sm" />

@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { Button } from '@/modules/ui/Button';
 import { cn } from '@/libs/utils/cn';
 import type { EventSectionPricing } from '@/modules/domains/event/types';
@@ -61,12 +62,12 @@ export function TicketPurchaseBox({
         )}
 
         {canBuy ? (
-          <a
+          <Link
             href={`/theme/event/events/${eventSlug}/checkout`}
             className="flex w-full items-center justify-center rounded-md bg-primary text-primary-fg hover:bg-primary-hover px-5 py-2.5 text-base font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
           >
             Bilet Satın Al
-          </a>
+          </Link>
         ) : (
           <Button fullWidth size="lg" disabled>
             {isSoldOut ? 'Biletler Tükendi' : isCancelled ? 'İptal Edildi' : 'Mevcut Değil'}

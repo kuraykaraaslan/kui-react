@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { CreditCardVisual } from '@/modules/domains/common/payment/CreditCardVisual';
@@ -37,12 +38,12 @@ export default function PaymentOverviewPage() {
           and{' '}
           <code className="rounded bg-surface-overlay px-1.5 py-0.5 text-sm font-mono">common/money</code>.
         </p>
-        <a
+        <Link
           href="/theme/common/payment/checkout"
           className="inline-flex items-center gap-1 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:bg-primary-hover transition-colors"
         >
           Go to full checkout <FontAwesomeIcon icon={faArrowRight} className="w-3.5 h-3.5" aria-hidden="true" />
-        </a>
+        </Link>
       </div>
 
       {/* Credit card visual */}

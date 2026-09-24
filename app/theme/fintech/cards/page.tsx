@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
@@ -13,13 +14,13 @@ export default function CardsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
       <DocumentTitle text={`Cards — ${THEME_TITLES['fintech']}`} />
-      <a
+      <Link
         href="/theme/fintech"
         className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary mb-4 transition-colors"
       >
         <FontAwesomeIcon icon={faArrowLeft} className="w-3 h-3" aria-hidden="true" />
         Back to summary
-      </a>
+      </Link>
 
       <header className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
