@@ -72,7 +72,7 @@ export default function FriendsPage() {
       {filtered(following).length === 0 && filtered(suggestions).length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-text-secondary gap-2">
           <FontAwesomeIcon icon={faUsers} className="w-10 h-10 text-text-disabled" aria-hidden="true" />
-          <p className="text-sm">No results for "{search}"</p>
+          <p className="text-sm">No results for &quot;{search}&quot;</p>
         </div>
       )}
 

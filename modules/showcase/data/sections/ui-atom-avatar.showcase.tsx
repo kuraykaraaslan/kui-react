@@ -57,8 +57,8 @@ export function Avatar({ src, name, size = 'md', className }) {
         render: (p) => (
           <Avatar
             name={p.name as string}
-            size={p.size as any}
-            status={p.status !== 'none' ? (p.status as any) : undefined}
+            size={p.size as React.ComponentProps<typeof Avatar>['size']}
+            status={p.status !== 'none' ? (p.status as React.ComponentProps<typeof Avatar>['status']) : undefined}
           />
         ),
         generateCode: (p) => {

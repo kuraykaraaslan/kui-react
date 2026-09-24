@@ -52,7 +52,7 @@ export function Badge({ children, variant = 'neutral', className }) {
           { key: 'dot',     label: 'Dot',     type: 'boolean', default: false },
         ],
         render: (p) => (
-          <Badge variant={p.variant as any} size={p.size as any} dot={p.dot as boolean}>
+          <Badge variant={p.variant as React.ComponentProps<typeof Badge>['variant']} size={p.size as React.ComponentProps<typeof Badge>['size']} dot={p.dot as boolean}>
             {p.label as string}
           </Badge>
         ),

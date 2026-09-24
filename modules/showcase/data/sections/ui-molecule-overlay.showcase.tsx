@@ -352,8 +352,8 @@ export function Tooltip({ content, placement = 'top', children, className }) {
         render: (p) => (
           <Tooltip
             content={p.content as string}
-            placement={p.placement as any}
-            theme={p.theme as any}
+            placement={p.placement as React.ComponentProps<typeof Tooltip>['placement']}
+            theme={p.theme as React.ComponentProps<typeof Tooltip>['theme']}
             arrow={p.arrow as boolean}
           >
             <Button variant="outline" size="sm">Hover me</Button>

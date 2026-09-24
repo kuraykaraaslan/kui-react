@@ -16,7 +16,7 @@ function LiveRegionDemo() {
   return (
     <div className="space-y-3">
       <Button variant="outline" size="sm" onClick={announce}>Send announcement</Button>
-      {msg && <p className="text-xs text-text-secondary">(screen reader hears: "{msg}")</p>}
+      {msg && <p className="text-xs text-text-secondary">(screen reader hears: &quot;{msg}&quot;)</p>}
       <LiveRegion message={msg} />
     </div>
   );

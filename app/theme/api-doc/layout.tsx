@@ -117,7 +117,7 @@ export default function ApiDocLayout({ children }: { children: React.ReactNode }
       {/* Tag nav */}
       <nav aria-label="API endpoints" className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
         {filteredTagMap.size === 0 && (
-          <p className="px-3 py-6 text-xs text-text-disabled text-center">No results for "{query}"</p>
+          <p className="px-3 py-6 text-xs text-text-disabled text-center">No results for &quot;{query}&quot;</p>
         )}
 
         {[...filteredTagMap.entries()].map(([tag, entries]) => {

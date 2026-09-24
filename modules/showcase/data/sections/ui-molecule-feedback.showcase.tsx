@@ -171,7 +171,7 @@ export function AlertBanner({ variant = 'info', title, message, dismissible = fa
         render: (p) => (
           <div className="w-full max-w-md">
             <AlertBanner
-              variant={p.variant as any}
+              variant={p.variant as React.ComponentProps<typeof AlertBanner>['variant']}
               title={p.title as string || undefined}
               message={p.message as string}
               dismissible={p.dismissible as boolean}

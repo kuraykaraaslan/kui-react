@@ -3,10 +3,9 @@
 //
 // M4 STUB — JSON tree diff with added/removed/changed key highlights.
 
-type JsonDiffProps = {
-  // TODO M4: oldJson: unknown;
-  // TODO M4: newJson: unknown;
-};
+// TODO M4: oldJson: unknown;
+// TODO M4: newJson: unknown;
+type JsonDiffProps = Record<never, never>;
 
 export function JsonDiff(_props: JsonDiffProps) {
   // TODO M4: render a collapsible tree with side-by-side annotations and

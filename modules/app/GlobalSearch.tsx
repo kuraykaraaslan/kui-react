@@ -98,7 +98,7 @@ export function GlobalSearch({
             </div>
           ) : results.length === 0 ? (
             <div className="px-4 py-6 text-center text-sm text-text-secondary">
-              No results for <strong className="text-text-primary">"{query}"</strong>
+              No results for <strong className="text-text-primary">&quot;{query}&quot;</strong>
             </div>
           ) : (
             Object.entries(grouped).map(([cat, items]) => (

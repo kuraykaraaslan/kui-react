@@ -136,8 +136,8 @@ export function rgbaToHwb(c: RGBA): HWB {
 }
 
 export function hwbToRgba(c: HWB): RGBA {
-  let w = clamp(c.w, 0, 100) / 100;
-  let bk = clamp(c.b, 0, 100) / 100;
+  const w = clamp(c.w, 0, 100) / 100;
+  const bk = clamp(c.b, 0, 100) / 100;
   if (w + bk >= 1) {
     const gray = w / (w + bk);
     const v = Math.round(gray * 255);

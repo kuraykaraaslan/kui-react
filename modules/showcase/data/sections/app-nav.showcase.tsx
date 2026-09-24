@@ -2,17 +2,17 @@
 import { AppNav } from '@/modules/app/AppNav';
 import { NavDrawer } from '@/modules/app/NavDrawer';
 import { UserMenu } from '@/modules/domains/common/user/UserMenu';
+import type { SafeUser } from '@/modules/domains/common/types';
 import { Button } from '@/modules/ui/Button';
 import type { ShowcaseComponent } from '../showcase.types';
 
-const DEMO_USER = {
+const DEMO_USER: SafeUser = {
   userId: 'demo-1',
   email: 'jane@acme.com',
   userRole: 'ADMIN',
   userStatus: 'ACTIVE',
-  userPreferences: null,
   userProfile: { name: 'Jane Doe', profilePicture: null },
-} as const;
+};
 
 const NAV_ITEMS = [
   { label: 'Home',     href: '#', active: true },
@@ -50,7 +50,7 @@ function AppNavAppDemo() {
           { label: 'Settings'  },
         ]}
       >
-        <UserMenu user={DEMO_USER as any} />
+        <UserMenu user={DEMO_USER} />
       </AppNav>
       <div className="px-6 py-6 text-sm text-text-secondary bg-surface-base">Page content</div>
     </div>

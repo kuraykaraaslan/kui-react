@@ -3,11 +3,10 @@
 //
 // M4 STUB — image diff (slider / swipe / onion-skin / 2-up).
 
-type ImageDiffProps = {
-  // TODO M4: oldImage: string;
-  // TODO M4: newImage: string;
-  // TODO M4: mode?: 'slider' | 'swipe' | 'onion' | '2-up';
-};
+// TODO M4: oldImage: string;
+// TODO M4: newImage: string;
+// TODO M4: mode?: 'slider' | 'swipe' | 'onion' | '2-up';
+type ImageDiffProps = Record<never, never>;
 
 export function ImageDiff(_props: ImageDiffProps) {
   // TODO M4: render a slider with two overlapping images and a draggable

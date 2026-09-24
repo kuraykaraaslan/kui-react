@@ -148,7 +148,7 @@ export function useDrag({
       }
 
       // Base step = 1 slide if threshold passed; otherwise rely on velocity below.
-      let step = distance >= dragThreshold ? 1 : 0;
+      const step = distance >= dragThreshold ? 1 : 0;
 
       // Momentum: every VELOCITY_PER_EXTRA_SLIDE px/ms of release velocity
       // adds another slide of travel in the flick direction.

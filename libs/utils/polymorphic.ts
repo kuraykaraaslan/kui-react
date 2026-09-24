@@ -10,7 +10,7 @@
  */
 export type PolymorphicProps<
   C extends React.ElementType,
-  OwnProps = {}
+  OwnProps = Record<never, never>
 > = OwnProps &
   Omit<React.ComponentPropsWithRef<C>, keyof OwnProps> & {
     as?: C;

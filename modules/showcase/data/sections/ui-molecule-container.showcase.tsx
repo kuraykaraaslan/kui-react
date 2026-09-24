@@ -84,7 +84,7 @@ export function Card({ title, subtitle, headerRight, footer, children, variant =
         render: (p) => (
           <div className="w-full max-w-sm">
             <Card
-              variant={p.variant as any}
+              variant={p.variant as React.ComponentProps<typeof Card>['variant']}
               title={p.title as string}
               subtitle={p.subtitle as string}
               hoverable={p.hoverable as boolean}

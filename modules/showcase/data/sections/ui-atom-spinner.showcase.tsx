@@ -31,7 +31,7 @@ export function Spinner({ size = 'md', className }) {
         controls: [
           { key: 'size', label: 'Size', type: 'select', options: ['xs', 'sm', 'md', 'lg', 'xl'] as const, default: 'md' },
         ],
-        render: (p) => <Spinner size={p.size as any} />,
+        render: (p) => <Spinner size={p.size as React.ComponentProps<typeof Spinner>['size']} />,
         generateCode: (p) => `<Spinner size="${p.size}" />`,
       },
       variants: [

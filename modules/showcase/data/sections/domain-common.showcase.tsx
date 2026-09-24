@@ -1677,9 +1677,9 @@ function CurrencySelectorNoLabelDemo() {
 function DirectionProviderRTLDemo() {
   return (
     <div className="w-full max-w-sm mx-auto p-4">
-      <DirectionProvider lang={'ar' as any}>
+      <DirectionProvider lang={'ar' as AppLanguage}>
         <div className="space-y-2 p-4 bg-surface-raised border border-border rounded-lg">
-          <p className="text-sm font-semibold text-text-primary">dir="rtl"</p>
+          <p className="text-sm font-semibold text-text-primary">dir=&quot;rtl&quot;</p>
           <p className="text-sm text-text-secondary">مرحبا بالعالم — Hello World</p>
           <p className="text-xs text-text-disabled">Text flows right to left</p>
         </div>
@@ -1691,9 +1691,9 @@ function DirectionProviderRTLDemo() {
 function DirectionProviderLTRDemo() {
   return (
     <div className="w-full max-w-sm mx-auto p-4">
-      <DirectionProvider lang={'en' as any}>
+      <DirectionProvider lang={'en' as AppLanguage}>
         <div className="space-y-2 p-4 bg-surface-raised border border-border rounded-lg">
-          <p className="text-sm font-semibold text-text-primary">dir="ltr"</p>
+          <p className="text-sm font-semibold text-text-primary">dir=&quot;ltr&quot;</p>
           <p className="text-sm text-text-secondary">Hello World — مرحبا بالعالم</p>
           <p className="text-xs text-text-disabled">Text flows left to right</p>
         </div>
