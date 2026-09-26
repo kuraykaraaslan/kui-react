@@ -3,11 +3,14 @@ import { NODE_VISUALS, portColor, portEdgeLabel } from '../node-meta';
 import { NODE_W, inputPortY, outputPortY, bezier } from '../geometry';
 import type { RuleNode, RuleEdge as RuleEdgeType } from '../../../types';
 
-export function RuleEdge({ edge, nodes, readOnly, onDelete }: {
+/** A click selects the connection (it is deleted with Delete / Backspace or the
+ *  canvas button), so a stray click no longer removes it. */
+export function RuleEdge({ edge, nodes, readOnly, selected, onSelect }: {
   edge: RuleEdgeType;
   nodes: RuleNode[];
   readOnly: boolean;
-  onDelete: (edgeId: string) => void;
+  selected: boolean;
+  onSelect: (edgeId: string) => void;
 }) {
   const src = nodes.find((n) => n.nodeId === edge.sourceNodeId);
   const tgt = nodes.find((n) => n.nodeId === edge.targetNodeId);
@@ -22,11 +25,12 @@ export function RuleEdge({ edge, nodes, readOnly, onDelete }: {
   const lw = label ? label.length * 5.5 + 16 : 0;
   return (
     <g className="group">
-      <path d={bezier(sx,sy,tx,ty)} stroke="transparent" strokeWidth={14} fill="none"
-        style={{ pointerEvents:'auto', cursor: readOnly ? 'default' : 'pointer' }}
-        onClick={() => !readOnly && onDelete(edge.edgeId)} />
-      <path d={bezier(sx,sy,tx,ty)} stroke={color} strokeWidth={2} fill="none"
-        markerEnd="url(#re-arrow)" className="transition-opacity group-hover:opacity-60" />
+      <path d={bezier(sx,sy,tx,ty)} stroke="transparent" strokeWidth={14} fill="none" data-edge-id={edge.edgeId}
+        style={{ pointerEvents:'stroke', cursor: readOnly ? 'default' : 'pointer' }}
+        onPointerDown={(e) => { e.stopPropagation(); if (!readOnly) onSelect(edge.edgeId); }} />
+      <path d={bezier(sx,sy,tx,ty)} stroke={color} strokeWidth={selected ? 3 : 2} fill="none"
+        markerEnd="url(#re-arrow)" className="transition-opacity group-hover:opacity-60"
+        style={selected ? { filter:'drop-shadow(0 0 3px var(--primary))' } : undefined} />
       {label && (
         <g style={{ pointerEvents:'none' }}>
           <rect x={midX-lw/2} y={midY-9} width={lw} height={18} rx={9} fill="var(--surface-base)" stroke={color} strokeWidth={1.5} />

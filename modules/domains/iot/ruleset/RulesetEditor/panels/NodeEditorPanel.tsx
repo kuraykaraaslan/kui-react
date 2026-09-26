@@ -17,7 +17,7 @@ export function NodeEditorPanel({ node, readOnly, draftLabel, draftScript, onLab
 }) {
   const visual = NODE_VISUALS[node.type];
   return (
-    <aside className="flex w-80 shrink-0 flex-col overflow-hidden border-l border-border bg-surface-raised">
+    <aside className="flex w-80 shrink-0 flex-col overflow-hidden border-l border-border bg-surface-raised max-md:absolute max-md:inset-0 max-md:z-50 max-md:w-auto max-md:border-l-0">
       {/* Header */}
       <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">
         <div className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-lg', visual.headerBg)}>

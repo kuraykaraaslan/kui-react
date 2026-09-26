@@ -30,21 +30,31 @@ export function portEdgeLabel(id: string) { return PORT_META[id]?.label ?? id; }
 /* ─── Node visuals ────────────────────────────────────────────────────────── */
 
 export type PortDef = { id: string; label: string };
+export type NodeGroup = 'input' | 'routing' | 'processing' | 'output';
 export type NodeVisual = {
-  type: RuleNodeType; displayLabel: string; description: string;
+  type: RuleNodeType; group: NodeGroup; displayLabel: string; description: string;
   icon: IconDefinition; iconColor: string; headerBg: string;
   inputs: PortDef[]; outputs: PortDef[];
 };
 
 export const NODE_VISUALS: Record<RuleNodeType, NodeVisual> = {
-  TRIGGER:    { type:'TRIGGER',    displayLabel:'Trigger',         description:'Entry point — MQTT / HTTP / Schedule',   icon:faBolt,        iconColor:'text-primary',       headerBg:'bg-primary-subtle',  inputs:[],                                                           outputs:[{id:'out',label:'out'}] },
-  FILTER:     { type:'FILTER',     displayLabel:'Filter',          description:'Boolean gate — passes or blocks',         icon:faFilter,      iconColor:'text-warning',       headerBg:'bg-warning-subtle',  inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'true',label:'True'},{id:'false',label:'False'}] },
-  SWITCH:     { type:'SWITCH',     displayLabel:'Switch',          description:'Multi-way router by attribute',           icon:faCodeBranch,  iconColor:'text-[#7c3aed]',     headerBg:'bg-[#f5f3ff]',      inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'c1',label:'Case 1'},{id:'c2',label:'Case 2'},{id:'def',label:'Default'}] },
-  TRANSFORM:  { type:'TRANSFORM',  displayLabel:'Transform',       description:'Reshape or enrich payload inline',        icon:faGears,       iconColor:'text-success-fg',    headerBg:'bg-success-subtle',  inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'out',label:'out'}] },
-  ACTION:     { type:'ACTION',     displayLabel:'Action',          description:'Terminal side-effect (alert, publish)',   icon:faBullseye,    iconColor:'text-error',         headerBg:'bg-error-subtle',    inputs:[{id:'in',label:'in'}],                                        outputs:[] },
-  DELAY:      { type:'DELAY',      displayLabel:'Delay',           description:'Hold message for configured duration',    icon:faClock,       iconColor:'text-[#d97706]',     headerBg:'bg-[#fffbeb]',      inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'out',label:'out'},{id:'timeout',label:'Timeout'}] },
-  ALARM:      { type:'ALARM',      displayLabel:'Alarm',           description:'Create or clear a device alarm',          icon:faBell,        iconColor:'text-warning',       headerBg:'bg-warning-subtle',  inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'created',label:'Created'},{id:'cleared',label:'Cleared'}] },
-  ENRICHMENT: { type:'ENRICHMENT', displayLabel:'Enrichment',      description:'Fetch external context into message',     icon:faDatabase,    iconColor:'text-[#7c3aed]',     headerBg:'bg-[#f5f3ff]',      inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'success',label:'Success'},{id:'failure',label:'Failure'}] },
-  REST_API:   { type:'REST_API',   displayLabel:'REST API',        description:'Outbound HTTP call to external service',  icon:faGlobe,       iconColor:'text-info',          headerBg:'bg-info-subtle',     inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'success',label:'Success'},{id:'failure',label:'Failure'}] },
-  SAVE_TS:    { type:'SAVE_TS',    displayLabel:'Save Timeseries', description:'Persist telemetry to time-series DB',     icon:faServer,      iconColor:'text-success-fg',    headerBg:'bg-success-subtle',  inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'success',label:'Success'},{id:'failure',label:'Failure'}] },
+  TRIGGER:    { type:'TRIGGER', group:'input',    displayLabel:'Trigger',         description:'Entry point — MQTT / HTTP / Schedule',   icon:faBolt,        iconColor:'text-primary',       headerBg:'bg-primary-subtle',  inputs:[],                                                           outputs:[{id:'out',label:'out'}] },
+  FILTER:     { type:'FILTER', group:'routing',     displayLabel:'Filter',          description:'Boolean gate — passes or blocks',         icon:faFilter,      iconColor:'text-warning',       headerBg:'bg-warning-subtle',  inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'true',label:'True'},{id:'false',label:'False'}] },
+  SWITCH:     { type:'SWITCH', group:'routing',     displayLabel:'Switch',          description:'Multi-way router by attribute',           icon:faCodeBranch,  iconColor:'text-[#7c3aed]',     headerBg:'bg-[#f5f3ff]',      inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'c1',label:'Case 1'},{id:'c2',label:'Case 2'},{id:'def',label:'Default'}] },
+  TRANSFORM:  { type:'TRANSFORM', group:'processing',  displayLabel:'Transform',       description:'Reshape or enrich payload inline',        icon:faGears,       iconColor:'text-success-fg',    headerBg:'bg-success-subtle',  inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'out',label:'out'}] },
+  ACTION:     { type:'ACTION', group:'output',     displayLabel:'Action',          description:'Terminal side-effect (alert, publish)',   icon:faBullseye,    iconColor:'text-error',         headerBg:'bg-error-subtle',    inputs:[{id:'in',label:'in'}],                                        outputs:[] },
+  DELAY:      { type:'DELAY', group:'processing',      displayLabel:'Delay',           description:'Hold message for configured duration',    icon:faClock,       iconColor:'text-[#d97706]',     headerBg:'bg-[#fffbeb]',      inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'out',label:'out'},{id:'timeout',label:'Timeout'}] },
+  ALARM:      { type:'ALARM', group:'output',      displayLabel:'Alarm',           description:'Create or clear a device alarm',          icon:faBell,        iconColor:'text-warning',       headerBg:'bg-warning-subtle',  inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'created',label:'Created'},{id:'cleared',label:'Cleared'}] },
+  ENRICHMENT: { type:'ENRICHMENT', group:'processing', displayLabel:'Enrichment',      description:'Fetch external context into message',     icon:faDatabase,    iconColor:'text-[#7c3aed]',     headerBg:'bg-[#f5f3ff]',      inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'success',label:'Success'},{id:'failure',label:'Failure'}] },
+  REST_API:   { type:'REST_API', group:'output',   displayLabel:'REST API',        description:'Outbound HTTP call to external service',  icon:faGlobe,       iconColor:'text-info',          headerBg:'bg-info-subtle',     inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'success',label:'Success'},{id:'failure',label:'Failure'}] },
+  SAVE_TS:    { type:'SAVE_TS', group:'output',    displayLabel:'Save Timeseries', description:'Persist telemetry to time-series DB',     icon:faServer,      iconColor:'text-success-fg',    headerBg:'bg-success-subtle',  inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'success',label:'Success'},{id:'failure',label:'Failure'}] },
 };
+
+/* ─── Palette groups (in display order) ──────────────────────────────────── */
+
+export const NODE_GROUPS: { id: NodeGroup; label: string }[] = [
+  { id: 'input',      label: 'Input' },
+  { id: 'routing',    label: 'Routing' },
+  { id: 'processing', label: 'Processing' },
+  { id: 'output',     label: 'Output' },
+];

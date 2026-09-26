@@ -15,7 +15,7 @@ export function useEdgeConnect({ nodes, setEdges, edgeSeq: edgeSeqRef, readOnly,
 }) {
   const [connecting, setConnecting] = useState<Connecting>(null);
 
-  function onOutputPortDown(e: React.MouseEvent, nodeId: string, portIdx: number) {
+  function onOutputPortDown(e: React.PointerEvent, nodeId: string, portIdx: number) {
     e.stopPropagation();
     if (readOnly) return;
     const node = nodes.find((n) => n.nodeId === nodeId)!;
@@ -23,8 +23,7 @@ export function useEdgeConnect({ nodes, setEdges, edgeSeq: edgeSeqRef, readOnly,
     setMouse({ x: node.x + NODE_W, y: outputPortY(node, portIdx) });
   }
 
-  function onInputPortUp(e: React.MouseEvent, nodeId: string, portIdx: number) {
-    e.stopPropagation();
+  function connectTo(nodeId: string, portIdx: number) {
     if (!connecting || connecting.nodeId === nodeId || readOnly) { setConnecting(null); return; }
     const src = nodes.find((n) => n.nodeId === connecting.nodeId);
     const tgt = nodes.find((n) => n.nodeId === nodeId);
@@ -38,7 +37,24 @@ export function useEdgeConnect({ nodes, setEdges, edgeSeq: edgeSeqRef, readOnly,
     setConnecting(null);
   }
 
+  function onInputPortUp(e: React.PointerEvent, nodeId: string, portIdx: number) {
+    e.stopPropagation();
+    connectTo(nodeId, portIdx);
+  }
+
+  /** pointer released anywhere while wiring: a touch pointer stays captured by the
+   *  element it started on, so look up the input port (or node) under it */
+  function finishAt(clientX: number, clientY: number) {
+    if (!connecting) return;
+    const hit = document.elementFromPoint(clientX, clientY);
+    const port = hit?.closest<HTMLElement | SVGElement>('[data-in-node]');
+    const nodeEl = hit?.closest<HTMLElement>('[data-node-id]');
+    if (port) connectTo(port.dataset.inNode!, Number(port.dataset.inIdx ?? 0));
+    else if (nodeEl) connectTo(nodeEl.dataset.nodeId!, 0);
+    else setConnecting(null);
+  }
+
   function clearConnecting() { setConnecting(null); }
 
-  return { connecting, onOutputPortDown, onInputPortUp, clearConnecting };
+  return { connecting, onOutputPortDown, onInputPortUp, finishAt, clearConnecting };
 }

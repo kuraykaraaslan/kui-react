@@ -9,6 +9,13 @@ export const NODE_HEADER_H   = 36;
 export const PORT_R          = 6;
 export const PORT_STEP       = 24;
 export const PORT_TOP_OFFSET = 18;
+export const GRID_SIZE       = 24;
+export const ZOOM_MIN        = 0.4;
+export const ZOOM_MAX        = 2;
+
+export type Point = { x: number; y: number };
+/** canvas pan (x, y in screen px) and zoom (k) */
+export type View  = { x: number; y: number; k: number };
 
 /* ─── Geometry helpers ────────────────────────────────────────────────────── */
 

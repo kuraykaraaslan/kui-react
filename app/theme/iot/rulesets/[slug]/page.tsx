@@ -55,31 +55,33 @@ export default function RulesetEditorPage({ params }: { params: Promise<{ slug: 
           {/* Debug chain */}
           <button
             onClick={() => editorRef.current?.openRulesetDebug()}
+            aria-label="Debug chain" title="Debug chain"
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary hover:border-primary hover:text-primary transition-colors"
           >
             <FontAwesomeIcon icon={faBug} className="w-3 h-3" aria-hidden="true" />
-            Debug
+            <span className="hidden sm:inline">Debug</span>
           </button>
 
           {/* Toggle active */}
-          <button className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary hover:border-primary hover:text-primary transition-colors">
+          <button aria-label={chain.active ? 'Deactivate' : 'Activate'} title={chain.active ? 'Deactivate' : 'Activate'}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary hover:border-primary hover:text-primary transition-colors">
             <FontAwesomeIcon icon={chain.active ? faStop : faPlay} className="w-3 h-3" aria-hidden="true" />
-            {chain.active ? 'Deactivate' : 'Activate'}
+            <span className="hidden sm:inline">{chain.active ? 'Deactivate' : 'Activate'}</span>
           </button>
 
           {/* Save */}
-          <button className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-fg hover:bg-primary-hover transition-colors">
+          <button aria-label="Save" title="Save" className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-fg hover:bg-primary-hover transition-colors">
             <FontAwesomeIcon icon={faFloppyDisk} className="w-3 h-3" aria-hidden="true" />
-            Save
+            <span className="hidden sm:inline">Save</span>
           </button>
         </div>
       </div>
 
       {/* ── Hint bar ── */}
-      <div className="shrink-0 flex items-center gap-2 border-b border-border bg-surface-raised px-4 py-1.5">
+      <div className="shrink-0 hidden md:flex items-center gap-2 border-b border-border bg-surface-raised px-4 py-1.5">
         <FontAwesomeIcon icon={faCircleInfo} className="w-3 h-3 text-text-secondary shrink-0" aria-hidden="true" />
         <p className="text-[11px] text-text-secondary">
-          Drag nodes from the palette · Click <span className="font-semibold text-primary">●</span> output → <span className="font-semibold">○</span> input to connect · Click a node to edit its script · Click <span className="font-semibold">🐛 Debug</span> to trace execution
+          Drag nodes from the palette · Click <span className="font-semibold text-primary">●</span> output → <span className="font-semibold">○</span> input to connect · Click a node to edit its script · Right-click for more · Click <span className="font-semibold">🐛 Debug</span> to trace execution
         </p>
       </div>
 
