@@ -1,7 +1,7 @@
 'use client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlassMinus, faMagnifyingGlassPlus, faExpand, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { NODE_VISUALS, portColor } from '../node-meta';
+import { nodePorts, portColor } from '../node-meta';
 import { NODE_W, PORT_R, GRID_SIZE, inputPortY, outputPortY, bezier, type View } from '../geometry';
 import { RuleNode, type RuleNodeStatus } from './RuleNode';
 import { RuleEdge } from './RuleEdge';
@@ -83,7 +83,7 @@ export function Canvas({
               stroke="var(--border-strong)" strokeWidth={2} fill="none" strokeDasharray="6 3" />
           )}
           {nodes.map((node) => {
-            const v = NODE_VISUALS[node.type];
+            const v = nodePorts(node);
             return (
               <g key={`ports-${node.nodeId}`}>
                 {v.inputs.map((port, i) => (

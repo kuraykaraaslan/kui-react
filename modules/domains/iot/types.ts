@@ -112,7 +112,21 @@ export const RuleNodeTypeEnum = z.enum([
   'ENRICHMENT', // Fetches external context and merges into message
   'REST_API',   // Outbound HTTP call to external service
   'SAVE_TS',    // Persists telemetry to the time-series database
+  'PLACEHOLDER', // Imported node whose type does not exist here — keeps its wires, does nothing
 ]);
+
+/** What an imported node was before it became a placeholder. */
+export const RuleNodeOriginalSchema = z.object({
+  /** original node type, e.g. `mqtt in` (Node-RED) or `MODBUS_READ` */
+  type: z.string(),
+  /** where it came from: `kui` (another kui-ruleset file) or `node-red` */
+  source: z.enum(['kui', 'node-red']).optional(),
+  /** the original settings, shown read-only */
+  settings: z.unknown().optional(),
+  /** input / output port ids, so the imported wires stay attached */
+  inputs: z.array(z.string()).optional(),
+  outputs: z.array(z.string()).optional(),
+});
 
 export const RuleNodeSchema = z.object({
   nodeId: IdSchema,
@@ -121,6 +135,10 @@ export const RuleNodeSchema = z.object({
   x: z.number(),
   y: z.number(),
   script: z.string().optional(),
+  /** node settings (endpoint, credentials…); keys that look like secrets are left out of exports */
+  config: z.record(z.string(), z.unknown()).optional(),
+  /** only for `PLACEHOLDER` nodes */
+  original: RuleNodeOriginalSchema.optional(),
 });
 
 export const RuleEdgeSchema = z.object({
@@ -165,5 +183,6 @@ export type Alert = z.infer<typeof AlertSchema>;
 
 export type RuleNodeType = z.infer<typeof RuleNodeTypeEnum>;
 export type RuleNode = z.infer<typeof RuleNodeSchema>;
+export type RuleNodeOriginal = z.infer<typeof RuleNodeOriginalSchema>;
 export type RuleEdge = z.infer<typeof RuleEdgeSchema>;
 export type RuleChain = z.infer<typeof RuleChainSchema>;

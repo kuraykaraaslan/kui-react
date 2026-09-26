@@ -63,4 +63,8 @@ return {
   keys: ['temperature', 'humidity', 'pressure'],
   ts: msg.timestamp || Date.now(),
 };`,
+  PLACEHOLDER:
+`// This node type is not available here.
+// It was imported from another system and does nothing;
+// messages that reach it stop here.`,
 };

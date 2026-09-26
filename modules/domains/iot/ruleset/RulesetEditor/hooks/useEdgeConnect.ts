@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { NODE_VISUALS } from '../node-meta';
+import { nodePorts } from '../node-meta';
 import { NODE_W, outputPortY } from '../geometry';
 import type { RuleNode, RuleEdge } from '../../../types';
 
@@ -28,8 +28,8 @@ export function useEdgeConnect({ nodes, setEdges, edgeSeq: edgeSeqRef, readOnly,
     const src = nodes.find((n) => n.nodeId === connecting.nodeId);
     const tgt = nodes.find((n) => n.nodeId === nodeId);
     if (!src || !tgt) { setConnecting(null); return; }
-    const srcPort = NODE_VISUALS[src.type].outputs[connecting.portIdx]?.id;
-    const tgtPort = NODE_VISUALS[tgt.type].inputs[portIdx]?.id;
+    const srcPort = nodePorts(src).outputs[connecting.portIdx]?.id;
+    const tgtPort = nodePorts(tgt).inputs[portIdx]?.id;
     if (!srcPort || !tgtPort) { setConnecting(null); return; }
     edgeSeqRef.current++;
     const newEdge: RuleEdge = { edgeId: `e${edgeSeqRef.current}`, sourceNodeId: connecting.nodeId, sourcePort: srcPort, targetNodeId: nodeId, targetPort: tgtPort };

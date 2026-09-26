@@ -1,6 +1,6 @@
 'use client';
-import type { RuleNode, RuleNodeType } from '../../types';
-import { NODE_VISUALS } from './node-meta';
+import type { RuleNode } from '../../types';
+import { nodePorts } from './node-meta';
 
 /* ─── Geometry constants ──────────────────────────────────────────────────── */
 
@@ -19,12 +19,17 @@ export type View  = { x: number; y: number; k: number };
 
 /* ─── Geometry helpers ────────────────────────────────────────────────────── */
 
-export function inputPortY(node: RuleNode, idx: number)  { return node.y + NODE_HEADER_H + PORT_TOP_OFFSET + idx * PORT_STEP; }
-export function outputPortY(node: RuleNode, idx: number) { return node.y + NODE_HEADER_H + PORT_TOP_OFFSET + idx * PORT_STEP; }
+/** extra body line on a placeholder node: its original type */
+export const PLACEHOLDER_EXTRA_H = 16;
 
-export function nodeHeight(type: RuleNodeType) {
-  const v = NODE_VISUALS[type];
-  return NODE_HEADER_H + PORT_TOP_OFFSET + Math.max(v.inputs.length, v.outputs.length, 1) * PORT_STEP + 8;
+function bodyTop(node: RuleNode) { return node.y + NODE_HEADER_H + (node.type === 'PLACEHOLDER' ? PLACEHOLDER_EXTRA_H : 0); }
+export function inputPortY(node: RuleNode, idx: number)  { return bodyTop(node) + PORT_TOP_OFFSET + idx * PORT_STEP; }
+export function outputPortY(node: RuleNode, idx: number) { return bodyTop(node) + PORT_TOP_OFFSET + idx * PORT_STEP; }
+
+export function nodeHeight(node: Pick<RuleNode, 'type' | 'original'>) {
+  const p = nodePorts(node);
+  const extra = node.type === 'PLACEHOLDER' ? PLACEHOLDER_EXTRA_H : 0;
+  return NODE_HEADER_H + PORT_TOP_OFFSET + Math.max(p.inputs.length, p.outputs.length, 1) * PORT_STEP + 8 + extra;
 }
 
 export function bezier(sx: number, sy: number, tx: number, ty: number) {

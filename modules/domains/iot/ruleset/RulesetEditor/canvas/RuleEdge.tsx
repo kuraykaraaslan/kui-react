@@ -1,5 +1,5 @@
 'use client';
-import { NODE_VISUALS, portColor, portEdgeLabel } from '../node-meta';
+import { nodePorts, portColor, portEdgeLabel } from '../node-meta';
 import { NODE_W, inputPortY, outputPortY, bezier } from '../geometry';
 import type { RuleNode, RuleEdge as RuleEdgeType } from '../../../types';
 
@@ -15,8 +15,8 @@ export function RuleEdge({ edge, nodes, readOnly, selected, onSelect }: {
   const src = nodes.find((n) => n.nodeId === edge.sourceNodeId);
   const tgt = nodes.find((n) => n.nodeId === edge.targetNodeId);
   if (!src || !tgt) return null;
-  const srcIdx = NODE_VISUALS[src.type].outputs.findIndex((p) => p.id === edge.sourcePort);
-  const tgtIdx = NODE_VISUALS[tgt.type].inputs.findIndex((p)  => p.id === edge.targetPort);
+  const srcIdx = nodePorts(src).outputs.findIndex((p) => p.id === edge.sourcePort);
+  const tgtIdx = nodePorts(tgt).inputs.findIndex((p)  => p.id === edge.targetPort);
   if (srcIdx < 0 || tgtIdx < 0) return null;
   const sx = src.x + NODE_W, sy = outputPortY(src, srcIdx);
   const tx = tgt.x,          ty = inputPortY(tgt, tgtIdx);

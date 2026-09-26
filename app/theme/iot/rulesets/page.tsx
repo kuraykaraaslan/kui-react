@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
-import { useState, useId } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDiagramProject,
@@ -10,17 +11,34 @@ import {
   faPlay,
   faStop,
   faCircleInfo,
+  faFileImport,
+  faFileExport,
+  faDownload,
+  faClockRotateLeft,
+  faTrashCanArrowUp,
+  faTriangleExclamation,
+  faCircleCheck,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { DataTable } from '@/modules/ui/DataTable';
 import type { TableColumn } from '@/modules/ui/DataTable';
 import { Modal } from '@/modules/ui/Modal';
 import { Badge } from '@/modules/ui/Badge';
-import { Input } from '@/modules/ui/Input';
-import { Textarea } from '@/modules/ui/Textarea';
 import { Button } from '@/modules/ui/Button';
-import { RULE_CHAINS } from '../iot.data';
+import { cn } from '@/libs/utils/cn';
 import type { RuleChain } from '@/modules/domains/iot/types';
+import {
+  buildExport, recentlyDeleted,
+  type ConflictChoice, type DeletedRuleset, type ExportResult, type ImportPreview, type RulesetVersion,
+} from '@/modules/domains/iot/ruleset/transfer';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { useRulesetStore, rulesetStore } from './rulesets.store';
+import { RULESET_TEMPLATES } from './rulesets.data';
+import { ImportDialog } from './_components/ImportDialog';
+import { VersionsDialog } from './_components/VersionsDialog';
+import { DeletedDialog } from './_components/DeletedDialog';
+import { NewRulesetDialog } from './_components/NewRulesetDialog';
+import { downloadText } from './_components/download';
 
 /* ─── Row type for DataTable ─────────────────────────────────────────────── */
 
@@ -51,60 +69,72 @@ function toRow(c: RuleChain): ChainRow {
   };
 }
 
-function slugify(s: string) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}
-
 /* ─── Component ──────────────────────────────────────────────────────────── */
 
 export default function RulesetsPage() {
-  const [chains, setChains] = useState<RuleChain[]>(RULE_CHAINS);
-  const [modalOpen, setModalOpen] = useState(false);
+  const router = useRouter();
+  const { chains, versions, deleted } = useRulesetStore();
+  const [newOpen, setNewOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [deletedOpen, setDeletedOpen] = useState(false);
+  const [deletedNow, setDeletedNow] = useState(0);
+  const [versionsFor, setVersionsFor] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
-  const [newName, setNewName] = useState('');
-  const [newDesc, setNewDesc] = useState('');
-  const [nameError, setNameError] = useState('');
-  const formId = useId();
+  /** an export waiting for "download anyway" because some text looks like a password */
+  const [pendingExport, setPendingExport] = useState<ExportResult | null>(null);
+  const [notice, setNotice] = useState('');
 
   const rows: ChainRow[] = chains.map(toRow);
+  const recent = deletedOpen ? recentlyDeleted(deleted, new Date(deletedNow)) : [];
 
-  /* ─── CRUD ── */
+  /* ─── Actions ── */
 
-  function handleCreate() {
-    const trimmed = newName.trim();
-    if (!trimmed) { setNameError('Name is required.'); return; }
-    if (chains.some((c) => c.name.toLowerCase() === trimmed.toLowerCase())) {
-      setNameError('A ruleset with this name already exists.');
-      return;
-    }
-    const now = new Date();
-    const newChain: RuleChain = {
-      chainId: `chain-${Date.now()}`,
-      name: trimmed,
-      slug: slugify(trimmed) || `chain-${Date.now()}`,
-      description: newDesc.trim() || undefined,
-      active: false,
-      nodes: [],
-      edges: [],
-      createdAt: now,
-      updatedAt: now,
-    };
-    setChains((p) => [...p, newChain]);
-    setNewName('');
-    setNewDesc('');
-    setNameError('');
-    setModalOpen(false);
+  function finishExport(r: ExportResult) {
+    downloadText(r.fileName, r.json);
+    setPendingExport(null);
+    setNotice(`Downloaded ${r.fileName}${r.omitted.length ? ` — ${r.omitted.length} secret ${r.omitted.length === 1 ? 'field' : 'fields'} left out` : ''}.`);
   }
 
-  function handleToggle(chainId: string) {
-    setChains((p) =>
-      p.map((c) => c.chainId === chainId ? { ...c, active: !c.active, updatedAt: new Date() } : c)
-    );
+  function startExport(list: RuleChain[], opts: { all?: boolean; suffix?: string } = {}) {
+    if (!list.length) return;
+    const r = buildExport(list, opts);    if (r.suspicious.length) setPendingExport(r);
+    else finishExport(r);
+  }
+
+  function downloadVersion(v: RulesetVersion) {
+    const r = buildExport([v.snapshot], { suffix: `v${v.version}` });
+    if (r.suspicious.length) { setVersionsFor(null); setPendingExport(r); }
+    else finishExport(r);
+  }
+
+  function handleCreate(chain: RuleChain, fromTemplate: boolean) {
+    rulesetStore.create(chain, fromTemplate ? 'Created from a template' : 'Created');
+    setNewOpen(false);
+    if (fromTemplate) router.push(`/theme/iot/rulesets/${chain.slug}`);
+    else setNotice(`Created “${chain.name}”.`);
+  }
+
+  function handleImport(preview: ImportPreview, choices: Record<string, ConflictChoice>) {
+    const r = rulesetStore.import(preview.items, choices);
+    setImportOpen(false);
+    const parts = [
+      r.added && `${r.added} added`,
+      r.replaced && `${r.replaced} replaced`,
+      r.skipped && `${r.skipped} skipped`,
+    ].filter(Boolean);
+    setNotice(`Import done: ${parts.join(', ') || 'nothing imported'}. Imported rulesets are inactive.`);
+  }
+
+  function handleRestoreDeleted(entry: DeletedRuleset) {
+    const c = rulesetStore.restoreDeleted(entry);
+    setNotice(`Restored “${c.name}” (inactive).`);
   }
 
   function handleDelete(chainId: string) {
-    setChains((p) => p.filter((c) => c.chainId !== chainId));
+    const c = chains.find((x) => x.chainId === chainId);
+    rulesetStore.remove(chainId);
     setDeleteTarget(null);
+    if (c) setNotice(`Deleted “${c.name}”. You can restore it from Recently deleted for 7 days.`);
   }
 
   /* ─── Columns ── */
@@ -117,7 +147,7 @@ export default function RulesetsPage() {
       render: (row) => (
         <Link
           href={`/theme/iot/rulesets/${row.slug}`}
-          className="inline-flex items-center gap-2 font-medium text-text-primary hover:text-primary transition-colors"
+          className="inline-flex items-center gap-2 rounded font-medium text-text-primary transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
         >
           <FontAwesomeIcon icon={faDiagramProject} className="w-3.5 h-3.5 text-text-secondary shrink-0" aria-hidden="true" />
           {row.name}
@@ -182,7 +212,7 @@ export default function RulesetsPage() {
             variant="ghost"
             size="xs"
             iconOnly
-            aria-label="Edit ruleset"
+            aria-label={`Edit ${row.name}`}
             title="Open editor"
           >
             <FontAwesomeIcon icon={faPenToSquare} className="w-3.5 h-3.5" aria-hidden="true" />
@@ -191,13 +221,13 @@ export default function RulesetsPage() {
             variant="ghost"
             size="xs"
             iconOnly
-            aria-label={row.active ? 'Deactivate' : 'Activate'}
+            aria-label={`${row.active ? 'Deactivate' : 'Activate'} ${row.name}`}
             title={row.active ? 'Deactivate' : 'Activate'}
-            onClick={() => handleToggle(row.chainId)}
+            onClick={() => rulesetStore.toggleActive(row.chainId)}
           >
             <FontAwesomeIcon
               icon={row.active ? faStop : faPlay}
-              className={`w-3.5 h-3.5 ${row.active ? 'text-warning' : 'text-success-fg'}`}
+              className={cn('w-3.5 h-3.5', row.active ? 'text-warning' : 'text-success-fg')}
               aria-hidden="true"
             />
           </Button>
@@ -205,7 +235,30 @@ export default function RulesetsPage() {
             variant="ghost"
             size="xs"
             iconOnly
-            aria-label="Delete ruleset"
+            aria-label={`Export ${row.name}`}
+            title="Export (download JSON)"
+            onClick={() => {
+              const c = chains.find((x) => x.chainId === row.chainId);
+              if (c) startExport([c]);
+            }}
+          >
+            <FontAwesomeIcon icon={faDownload} className="w-3.5 h-3.5" aria-hidden="true" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="xs"
+            iconOnly
+            aria-label={`Versions of ${row.name}`}
+            title="Versions"
+            onClick={() => setVersionsFor(row.chainId)}
+          >
+            <FontAwesomeIcon icon={faClockRotateLeft} className="w-3.5 h-3.5" aria-hidden="true" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="xs"
+            iconOnly
+            aria-label={`Delete ${row.name}`}
             title="Delete"
             onClick={() => setDeleteTarget(row.chainId)}
             className="hover:text-error"
@@ -220,12 +273,13 @@ export default function RulesetsPage() {
   /* ─── Render ── */
 
   const deleteChain = chains.find((c) => c.chainId === deleteTarget);
+  const versionsChain = chains.find((c) => c.chainId === versionsFor) ?? null;
 
   return (
     <>
       <DocumentTitle text="Rulesets — IoT Theme" />
       <div className="h-full overflow-y-auto">
-      <div className="p-6 space-y-6">
+      <div className="p-4 sm:p-6 space-y-6">
 
         {/* Page header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -236,10 +290,21 @@ export default function RulesetsPage() {
               {chains.filter((c) => c.active).length} active
             </p>
           </div>
-          <Button variant="primary" size="sm" onClick={() => setModalOpen(true)}>
-            <FontAwesomeIcon icon={faPlus} className="w-3.5 h-3.5" aria-hidden="true" />
-            New Ruleset
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setImportOpen(true)} aria-label="Import" title="Import">
+              <FontAwesomeIcon icon={faFileImport} className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden sm:inline">Import</span>
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => startExport(chains, { all: true })}
+              disabled={!chains.length} aria-label="Export all" title="Export all">
+              <FontAwesomeIcon icon={faFileExport} className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden sm:inline">Export all</span>
+            </Button>
+            <Button variant="primary" size="sm" onClick={() => setNewOpen(true)} aria-label="New ruleset" title="New ruleset">
+              <FontAwesomeIcon icon={faPlus} className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden sm:inline">New ruleset</span>
+            </Button>
+          </div>
         </div>
 
         {/* Info bar */}
@@ -252,58 +317,103 @@ export default function RulesetsPage() {
           </p>
         </div>
 
-        {/* DataTable */}
-        <DataTable
-          columns={columns}
-          rows={rows}
-          searchPlaceholder="Search rulesets…"
-          pageSize={10}
-          emptyMessage="No rulesets yet. Create one to get started."
-          caption="Rule chains"
-        />
+        {/* Last action */}
+        <div role="status" aria-live="polite">
+          {notice && (
+            <div className="flex items-start gap-2 rounded-xl border border-success/40 bg-success-subtle px-4 py-2.5 text-sm text-text-primary">
+              <FontAwesomeIcon icon={faCircleCheck} className="mt-0.5 h-4 w-4 shrink-0 text-success-fg" aria-hidden="true" />
+              <p className="flex-1">{notice}</p>
+              <button type="button" onClick={() => setNotice('')} aria-label="Dismiss"
+                className="shrink-0 rounded p-0.5 text-text-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
+                <FontAwesomeIcon icon={faXmark} className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Table tools + DataTable */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-end">
+            <Button variant="ghost" size="sm" onClick={() => { setDeletedNow(Date.now()); setDeletedOpen(true); }}>
+              <FontAwesomeIcon icon={faTrashCanArrowUp} className="w-3.5 h-3.5" aria-hidden="true" />
+              Recently deleted
+            </Button>
+          </div>
+          <DataTable
+            columns={columns}
+            rows={rows}
+            searchPlaceholder="Search rulesets…"
+            pageSize={10}
+            emptyMessage="No rulesets yet. Create one to get started."
+            caption="Rule chains"
+          />
+        </div>
       </div>
 
-      {/* ── Create modal ── */}
+      <NewRulesetDialog
+        open={newOpen}
+        chains={chains}
+        templates={RULESET_TEMPLATES}
+        onClose={() => setNewOpen(false)}
+        onCreate={handleCreate}
+      />
+
+      <ImportDialog
+        open={importOpen}
+        chains={chains}
+        onClose={() => setImportOpen(false)}
+        onImport={handleImport}
+      />
+
+      <VersionsDialog
+        chain={versionsChain}
+        versions={versionsFor ? versions[versionsFor] ?? [] : []}
+        onClose={() => setVersionsFor(null)}
+        onRestore={(v) => { if (versionsFor) rulesetStore.restoreVersion(versionsFor, v); }}
+        onDownload={downloadVersion}
+      />
+
+      <DeletedDialog
+        open={deletedOpen}
+        items={recent}
+        now={deletedNow}
+        onClose={() => setDeletedOpen(false)}
+        onRestore={handleRestoreDeleted}
+      />
+
+      {/* ── Export: text that looks like a password ── */}
       <Modal
-        open={modalOpen}
-        onClose={() => { setModalOpen(false); setNewName(''); setNewDesc(''); setNameError(''); }}
-        title="New Ruleset"
-        description="Define a new rule chain. You can add nodes and connections in the editor."
-        size="sm"
+        open={!!pendingExport}
+        onClose={() => setPendingExport(null)}
+        title="Possible passwords in the export"
+        description="Secret fields are already left out, but this free text looks like it contains a password or token."
+        size="md"
+        scrollable
+        className="max-h-[90vh]"
         footer={
           <div className="flex items-center justify-end gap-2">
-            <Button variant="ghost" size="sm" onClick={() => { setModalOpen(false); setNewName(''); setNewDesc(''); setNameError(''); }}>
-              Cancel
-            </Button>
-            <Button variant="primary" size="sm" onClick={handleCreate}>
-              Create Ruleset
+            <Button variant="ghost" size="sm" onClick={() => setPendingExport(null)}>Cancel</Button>
+            <Button variant="primary" size="sm" onClick={() => pendingExport && finishExport(pendingExport)}>
+              <FontAwesomeIcon icon={faDownload} className="w-3.5 h-3.5" aria-hidden="true" />
+              Download anyway
             </Button>
           </div>
         }
       >
-        <form
-          id={formId}
-          className="space-y-4"
-          onSubmit={(e) => { e.preventDefault(); handleCreate(); }}
-        >
-          <Input
-            id={`${formId}-name`}
-            label="Name"
-            placeholder="e.g. Temperature Alert"
-            value={newName}
-            onChange={(e) => { setNewName(e.target.value); setNameError(''); }}
-            error={nameError || undefined}
-            required
-          />
-          <Textarea
-            id={`${formId}-desc`}
-            label="Description"
-            placeholder="Briefly describe what this rule chain does…"
-            value={newDesc}
-            onChange={(e) => setNewDesc(e.target.value)}
-            rows={3}
-          />
-        </form>
+        <div className="space-y-3 text-sm text-text-primary">
+          <p className="flex items-start gap-2">
+            <FontAwesomeIcon icon={faTriangleExclamation} className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
+            <span>Check these before you share the file:</span>
+          </p>
+          <ul className="list-disc space-y-1 pl-6 font-mono text-xs text-text-secondary">
+            {pendingExport?.suspicious.map((p) => <li key={p}>{p}</li>)}
+          </ul>
+          {!!pendingExport?.omitted.length && (
+            <p className="text-xs text-text-secondary">
+              Left out (set to null): {pendingExport.omitted.length} secret {pendingExport.omitted.length === 1 ? 'field' : 'fields'}.
+            </p>
+          )}
+        </div>
       </Modal>
 
       {/* ── Delete confirm modal ── */}
@@ -325,10 +435,9 @@ export default function RulesetsPage() {
         }
       >
         <p className="text-sm text-text-primary">
-          Are you sure you want to delete{' '}
-          <strong>{deleteChain?.name}</strong>? This will remove all{' '}
-          {deleteChain?.nodes.length ?? 0} nodes and {deleteChain?.edges.length ?? 0} connections.
-          This action cannot be undone.
+          Delete <strong>{deleteChain?.name}</strong> with its{' '}
+          {deleteChain?.nodes.length ?? 0} nodes and {deleteChain?.edges.length ?? 0} connections?
+          You can restore it from <strong>Recently deleted</strong> for 7 days.
         </p>
       </Modal>
       </div>

@@ -9,7 +9,7 @@ import { Palette } from './canvas/Palette';
 import { Canvas } from './canvas/Canvas';
 import type { RuleNodeStatus } from './canvas/RuleNode';
 import { ContextMenu, type ContextMenuItem } from './canvas/ContextMenu';
-import { NODE_VISUALS } from './node-meta';
+import { ADDABLE_VISUALS } from './node-meta';
 import { NodeEditorPanel } from './panels/NodeEditorPanel';
 import { NodeDebugModal } from './modals/NodeDebugModal';
 import { RulesetDebugModal } from './modals/RulesetDebugModal';
@@ -23,7 +23,12 @@ export type { RuleNodeStatus };
 
 /* ─── Public ref API ──────────────────────────────────────────────────────── */
 
-export type RulesetEditorRef = { openRulesetDebug: () => void; fit: () => void };
+export type RulesetEditorRef = {
+  openRulesetDebug: () => void;
+  fit: () => void;
+  /** the current graph, e.g. to save it */
+  getGraph: () => { nodes: RuleNode[]; edges: RuleEdge[] };
+};
 
 export type RulesetEditorProps = {
   initialNodes?: RuleNode[];
@@ -87,12 +92,12 @@ export function RulesetEditor({
     const r = containerRef.current?.getBoundingClientRect();
     if (!r || !nodes.length) { setView({ x: 0, y: 0, k: 1 }); return; }
     const x0 = Math.min(...nodes.map((n) => n.x)), y0 = Math.min(...nodes.map((n) => n.y));
-    const x1 = Math.max(...nodes.map((n) => n.x + NODE_W)), y1 = Math.max(...nodes.map((n) => n.y + nodeHeight(n.type)));
+    const x1 = Math.max(...nodes.map((n) => n.x + NODE_W)), y1 = Math.max(...nodes.map((n) => n.y + nodeHeight(n)));
     const k = Math.min(1.2, Math.max(ZOOM_MIN, Math.min((r.width - 80) / (x1 - x0), (r.height - 80) / (y1 - y0))));
     setView({ k, x: (r.width - (x1 - x0) * k) / 2 - x0 * k, y: (r.height - (y1 - y0) * k) / 2 - y0 * k });
   }
 
-  useImperativeHandle(ref, () => ({ openRulesetDebug: () => setRulesetDebugOpen(true), fit }));
+  useImperativeHandle(ref, () => ({ openRulesetDebug: () => setRulesetDebugOpen(true), fit, getGraph: () => ({ nodes, edges }) }));
 
   const edgeConnect  = useEdgeConnect({ nodes, setEdges, edgeSeq, readOnly, setMouse });
   const nodeDrag     = useNodeDrag({ nodes, setNodes, toWorld, readOnly, connecting: edgeConnect.connecting });
@@ -234,7 +239,7 @@ export function RulesetEditor({
     else {
       items = [
         ...(readOnly ? [] : [
-          ...Object.values(NODE_VISUALS).map((v): ContextMenuItem => ({ kind: 'item', label: `Add ${v.displayLabel}`, icon: v.icon,
+          ...ADDABLE_VISUALS.map((v): ContextMenuItem => ({ kind: 'item', label: `Add ${v.displayLabel}`, icon: v.icon,
             onSelect: () => setSelectedId(paletteDrop.addAt(v.type, at)) })),
           { kind: 'separator' },
           { kind: 'item', label: 'Paste', icon: faPaste, disabled: !clip, onSelect: () => clip && duplicate(clip, { x: at.x - NODE_W / 2, y: at.y - 18 }) },

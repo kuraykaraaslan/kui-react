@@ -1,10 +1,10 @@
 'use client';
 import {
   faBolt, faFilter, faCodeBranch, faGears, faBullseye,
-  faClock, faBell, faDatabase, faGlobe, faServer,
+  faClock, faBell, faDatabase, faGlobe, faServer, faPuzzlePiece,
 } from '@fortawesome/free-solid-svg-icons';
 import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import type { RuleNodeType } from '../../types';
+import type { RuleNode, RuleNodeType } from '../../types';
 
 /* ─── Port meta ───────────────────────────────────────────────────────────── */
 
@@ -35,6 +35,8 @@ export type NodeVisual = {
   type: RuleNodeType; group: NodeGroup; displayLabel: string; description: string;
   icon: IconDefinition; iconColor: string; headerBg: string;
   inputs: PortDef[]; outputs: PortDef[];
+  /** not offered in the palette (placeholder) */
+  internal?: boolean;
 };
 
 export const NODE_VISUALS: Record<RuleNodeType, NodeVisual> = {
@@ -48,7 +50,22 @@ export const NODE_VISUALS: Record<RuleNodeType, NodeVisual> = {
   ENRICHMENT: { type:'ENRICHMENT', group:'processing', displayLabel:'Enrichment',      description:'Fetch external context into message',     icon:faDatabase,    iconColor:'text-[#7c3aed]',     headerBg:'bg-[#f5f3ff]',      inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'success',label:'Success'},{id:'failure',label:'Failure'}] },
   REST_API:   { type:'REST_API', group:'output',   displayLabel:'REST API',        description:'Outbound HTTP call to external service',  icon:faGlobe,       iconColor:'text-info',          headerBg:'bg-info-subtle',     inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'success',label:'Success'},{id:'failure',label:'Failure'}] },
   SAVE_TS:    { type:'SAVE_TS', group:'output',    displayLabel:'Save Timeseries', description:'Persist telemetry to time-series DB',     icon:faServer,      iconColor:'text-success-fg',    headerBg:'bg-success-subtle',  inputs:[{id:'in',label:'in'}],                                        outputs:[{id:'success',label:'Success'},{id:'failure',label:'Failure'}] },
+  PLACEHOLDER:{ type:'PLACEHOLDER', group:'processing', displayLabel:'Not available', description:'Imported node whose type does not exist here. It keeps its wires but does nothing.', icon:faPuzzlePiece, iconColor:'text-text-secondary', headerBg:'bg-surface-overlay', inputs:[{id:'in',label:'in'}], outputs:[], internal:true },
 };
+
+/** node types a user can add from the palette / context menu */
+export const ADDABLE_VISUALS: NodeVisual[] = Object.values(NODE_VISUALS).filter((v) => !v.internal);
+
+/** A node's ports: fixed per type, except a placeholder, which keeps the ports its wires use. */
+export function nodePorts(node: Pick<RuleNode, 'type' | 'original'>): { inputs: PortDef[]; outputs: PortDef[] } {
+  const v = NODE_VISUALS[node.type];
+  if (node.type !== 'PLACEHOLDER' || !node.original) return { inputs: v.inputs, outputs: v.outputs };
+  const toDef = (id: string): PortDef => ({ id, label: PORT_META[id]?.label || id });
+  return {
+    inputs: (node.original.inputs ?? ['in']).map(toDef),
+    outputs: (node.original.outputs ?? []).map(toDef),
+  };
+}
 
 /* ─── Palette groups (in display order) ──────────────────────────────────── */
 

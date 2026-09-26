@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBug, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { NODE_VISUALS, NODE_GROUPS, type NodeVisual } from '../node-meta';
+import { ADDABLE_VISUALS, NODE_GROUPS } from '../node-meta';
 import type { RuleNodeType } from '../../../types';
 
 export function Palette({ onDragStart, onDragEnd, onAdd, onDebugChain, sheetOpen = false, onCloseSheet }: {
@@ -18,7 +18,7 @@ export function Palette({ onDragStart, onDragEnd, onAdd, onDebugChain, sheetOpen
 }) {
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();
-  const visible = (Object.values(NODE_VISUALS) as NodeVisual[]).filter((v) =>
+  const visible = ADDABLE_VISUALS.filter((v) =>
     !q || v.displayLabel.toLowerCase().includes(q) || v.description.toLowerCase().includes(q));
 
   return (

@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { use, useRef } from 'react';
+import { use, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faArrowLeft,
@@ -10,19 +10,31 @@ import {
   faStop,
   faCircleInfo,
   faBug,
+  faPuzzlePiece,
 } from '@fortawesome/free-solid-svg-icons';
 import { Badge } from '@/modules/ui/Badge';
 import { RulesetEditor } from '@/modules/domains/iot/ruleset/RulesetEditor';
 import type { RulesetEditorRef } from '@/modules/domains/iot/ruleset/RulesetEditor';
-import { RULE_CHAINS } from '../../iot.data';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
+import { useRulesetStore, rulesetStore } from '../rulesets.store';
 
 export default function RulesetEditorPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  const chain = RULE_CHAINS.find((c) => c.slug === slug);
+  const { chains, versions } = useRulesetStore();
+  const chain = chains.find((c) => c.slug === slug);
+  const editorRef = useRef<RulesetEditorRef>(null);
+  const [saved, setSaved] = useState('');
   if (!chain) notFound();
 
-  const editorRef = useRef<RulesetEditorRef>(null);
+  const placeholders = chain.nodes.filter((n) => n.type === 'PLACEHOLDER').length;
+  const lastVersion = (versions[chain.chainId] ?? []).reduce((m, v) => Math.max(m, v.version), 0);
+
+  function save() {
+    const graph = editorRef.current?.getGraph();
+    if (!graph || !chain) return;
+    rulesetStore.save({ ...chain, nodes: graph.nodes, edges: graph.edges });
+    setSaved(`Saved as version ${lastVersion + 1}.`);
+  }
 
   return (
     <>
@@ -33,61 +45,77 @@ export default function RulesetEditorPage({ params }: { params: Promise<{ slug: 
       <div className="shrink-0 flex items-center gap-3 border-b border-border bg-surface-base px-4 py-2.5">
         <Link
           href="/theme/iot/rulesets"
-          className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors"
+          className="inline-flex items-center gap-1.5 rounded text-sm text-text-secondary hover:text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
         >
           <FontAwesomeIcon icon={faArrowLeft} className="w-3.5 h-3.5" aria-hidden="true" />
-          Rulesets
+          <span className="hidden sm:inline">Rulesets</span>
+          <span className="sr-only sm:hidden">Back to rulesets</span>
         </Link>
 
-        <span className="text-border-strong">·</span>
+        <span className="text-border-strong" aria-hidden="true">·</span>
 
-        <h1 className="text-sm font-semibold text-text-primary">{chain.name}</h1>
+        <h1 className="min-w-0 truncate text-sm font-semibold text-text-primary">{chain.name}</h1>
 
         <Badge variant={chain.active ? 'success' : 'neutral'} size="sm" dot className="hidden sm:inline-flex">
           {chain.active ? 'Active' : 'Inactive'}
         </Badge>
 
         <div className="ml-auto flex items-center gap-2">
+          <span role="status" className="hidden md:block text-xs text-success-fg">{saved}</span>
           <span className="hidden md:block text-xs text-text-secondary">
             {chain.nodes.length} nodes · {chain.edges.length} edges
           </span>
 
           {/* Debug chain */}
           <button
+            type="button"
             onClick={() => editorRef.current?.openRulesetDebug()}
             aria-label="Debug chain" title="Debug chain"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary hover:border-primary hover:text-primary transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary hover:border-primary hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
           >
             <FontAwesomeIcon icon={faBug} className="w-3 h-3" aria-hidden="true" />
             <span className="hidden sm:inline">Debug</span>
           </button>
 
           {/* Toggle active */}
-          <button aria-label={chain.active ? 'Deactivate' : 'Activate'} title={chain.active ? 'Deactivate' : 'Activate'}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary hover:border-primary hover:text-primary transition-colors">
+          <button type="button" onClick={() => rulesetStore.toggleActive(chain.chainId)}
+            aria-label={chain.active ? 'Deactivate' : 'Activate'} title={chain.active ? 'Deactivate' : 'Activate'}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-text-secondary hover:border-primary hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
             <FontAwesomeIcon icon={chain.active ? faStop : faPlay} className="w-3 h-3" aria-hidden="true" />
             <span className="hidden sm:inline">{chain.active ? 'Deactivate' : 'Activate'}</span>
           </button>
 
           {/* Save */}
-          <button aria-label="Save" title="Save" className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-fg hover:bg-primary-hover transition-colors">
+          <button type="button" onClick={save} aria-label="Save" title="Save a new version"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-fg hover:bg-primary-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
             <FontAwesomeIcon icon={faFloppyDisk} className="w-3 h-3" aria-hidden="true" />
             <span className="hidden sm:inline">Save</span>
           </button>
         </div>
       </div>
 
+      {/* ── Placeholder notice ── */}
+      {placeholders > 0 && (
+        <div className="shrink-0 flex items-center gap-2 border-b border-border bg-warning-subtle px-4 py-1.5">
+          <FontAwesomeIcon icon={faPuzzlePiece} className="w-3 h-3 text-warning shrink-0" aria-hidden="true" />
+          <p className="text-xs text-text-primary">
+            {placeholders} {placeholders === 1 ? 'node is' : 'nodes are'} not available here (dashed). Open one to see its original settings.
+          </p>
+        </div>
+      )}
+
       {/* ── Hint bar ── */}
       <div className="shrink-0 hidden md:flex items-center gap-2 border-b border-border bg-surface-raised px-4 py-1.5">
         <FontAwesomeIcon icon={faCircleInfo} className="w-3 h-3 text-text-secondary shrink-0" aria-hidden="true" />
         <p className="text-[11px] text-text-secondary">
-          Drag nodes from the palette · Click <span className="font-semibold text-primary">●</span> output → <span className="font-semibold">○</span> input to connect · Click a node to edit its script · Right-click for more · Click <span className="font-semibold">🐛 Debug</span> to trace execution
+          Drag nodes from the palette · Click <span className="font-semibold text-primary">●</span> output → <span className="font-semibold">○</span> input to connect · Click a node to edit its script · Right-click for more · Click <span className="font-semibold">Debug</span> to trace execution
         </p>
       </div>
 
       {/* ── Editor canvas ── */}
       <div className="flex-1 min-h-0">
         <RulesetEditor
+          key={chain.chainId}
           ref={editorRef}
           initialNodes={chain.nodes}
           initialEdges={chain.edges}

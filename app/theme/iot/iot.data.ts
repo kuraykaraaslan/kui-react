@@ -337,7 +337,8 @@ export const RULE_CHAINS: RuleChain[] = [
     nodes: [
       { nodeId: 'n1', type: 'TRIGGER',   label: 'VPN Connect',     x: 60,  y: 80  },
       { nodeId: 'n2', type: 'FILTER',    label: 'Cert Valid?',      x: 290, y: 80  },
-      { nodeId: 'n3', type: 'ACTION',    label: 'Provision Device', x: 520, y: 30  },
+      { nodeId: 'n3', type: 'ACTION',    label: 'Provision Device', x: 520, y: 30,
+        config: { endpoint: 'https://provisioner:Pr0v1sion!@provision.example.com/api/devices' } },
       { nodeId: 'n4', type: 'ACTION',    label: 'Reject + Log',     x: 520, y: 155 },
     ],
     edges: [
@@ -360,7 +361,8 @@ export const RULE_CHAINS: RuleChain[] = [
       { nodeId: 'n3', type: 'FILTER',     label: 'Status Healthy?',    x: 500, y: 70  },
       { nodeId: 'n4', type: 'ALARM',      label: 'Clear Health Alarm', x: 720, y: 20  },
       { nodeId: 'n5', type: 'ALARM',      label: 'Raise Health Alarm', x: 720, y: 160 },
-      { nodeId: 'n6', type: 'REST_API',   label: 'Notify Webhook',     x: 940, y: 160 },
+      { nodeId: 'n6', type: 'REST_API',   label: 'Notify Webhook',     x: 940, y: 160,
+        config: { url: 'https://hooks.example.com/fleet-health', method: 'POST', authToken: 'whk_live_7Fq2x9LmP0aZ' } },
     ],
     edges: [
       { edgeId: 'e1', sourceNodeId: 'n1', sourcePort: 'out',     targetNodeId: 'n2', targetPort: 'in' },
