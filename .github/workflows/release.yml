@@ -37,7 +37,12 @@ jobs:
           generate_release_notes: true
           files: release/*
       - name: Publish package
-        if: ${{ !contains(github.ref_name, '-') && secrets.NPM_TOKEN != '' }}
-        run: npm publish
+        if: ${{ !contains(github.ref_name, '-') }}
+        run: |
+          if [ -n "${NODE_AUTH_TOKEN:-}" ]; then
+            npm publish
+          else
+            echo "NPM_TOKEN is not configured; skipping npm publish."
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
