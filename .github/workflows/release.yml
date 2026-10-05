@@ -37,7 +37,7 @@ jobs:
           generate_release_notes: true
           files: release/*
       - name: Publish package
-        if: ${{ !contains(github.ref_name, '-') }}
+        if: ${{ !contains(github.ref_name, '-') && secrets.NPM_TOKEN != '' }}
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
