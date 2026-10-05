@@ -24,7 +24,7 @@ jobs:
           cache: npm
       - name: Validate tag
         run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
-      - run: npm ci
+      - run: npm install --no-audit --no-fund
       - run: npm run build:lib
       - run: npm test -- --run
       - name: Create package artifact
