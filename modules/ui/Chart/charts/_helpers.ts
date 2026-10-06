@@ -98,3 +98,33 @@ export function linePath(points: Array<{ x: number; y: number } | null>): string
   }
   return d.trim();
 }
+
+/**
+ * Stacked extent: the largest per-category sum of the non-negative values.
+ * Used by `stacked` on BarChart / AreaChart (M2).
+ */
+export function stackedExtent(series: Series[]): { min: number; max: number } {
+  const n = series.reduce((m, s) => Math.max(m, s.data.length), 0);
+  let max = 0;
+  for (let i = 0; i < n; i++) {
+    let sum = 0;
+    for (const s of series) {
+      const y = s.data[i]?.y;
+      if (typeof y === 'number' && y > 0) sum += y;
+    }
+    if (sum > max) max = sum;
+  }
+  return { min: 0, max: max || 1 };
+}
+
+/** Per-series cumulative tops for stacking: `tops[si][i]` is where series `si` ends at category `i`. */
+export function stackTops(series: Series[]): Array<Array<number | null>> {
+  const n = series.reduce((m, s) => Math.max(m, s.data.length), 0);
+  const running = new Array<number>(n).fill(0);
+  return series.map((s) => Array.from({ length: n }, (_, i) => {
+    const y = s.data[i]?.y;
+    if (typeof y !== 'number') return null;
+    running[i] += Math.max(0, y);
+    return running[i];
+  }));
+}

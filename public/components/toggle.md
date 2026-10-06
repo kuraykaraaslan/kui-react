@@ -9,6 +9,10 @@
 
 role="switch" toggle/switch with three sizes, description slot, and disabled support. Fully accessible via CSS transform without a native input.
 
+## Used by
+
+- `control-tile`
+
 ## Design tokens consumed
 
 - `--border`
@@ -30,6 +34,19 @@ role="switch" toggle/switch with three sizes, description slot, and disabled sup
 
 ```tsx
 <Toggle id="marketing" label="Marketing emails" description="Receive weekly updates." checked={value} onChange={setValue} />
+```
+
+### Pending write (spinner in the thumb, input disabled, aria-busy)
+
+```tsx
+<Toggle id="heater" label="Heater" checked={on} onChange={write} pending={state === 'pending'} />
+```
+
+### Mismatch (the other side reports a different value)
+
+```tsx
+<Toggle id="heater" label="Heater" checked={on} onChange={write} mismatch describedBy="heater-hint" />
+<p id="heater-hint">The device still reports the old value.</p>
 ```
 
 ### Disabled

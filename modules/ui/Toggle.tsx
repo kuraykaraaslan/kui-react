@@ -16,6 +16,9 @@ export function Toggle({
   onChange,
   disabled,
   size = 'md',
+  pending = false,
+  mismatch = false,
+  describedBy,
   className,
 }: {
   id: string;
@@ -28,6 +31,12 @@ export function Toggle({
   onChange: (checked: boolean) => void;
   disabled?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  /** An asynchronous write is in flight: the thumb shows a spinner, the input is disabled and `aria-busy` is set. No layout shift. */
+  pending?: boolean;
+  /** The other side reports a different value than was requested: a warning ring on the track. Pair with `describedBy`. */
+  mismatch?: boolean;
+  /** Id of a consumer-rendered hint element (e.g. the mismatch explanation). */
+  describedBy?: string;
   className?: string;
 }) {
   const { track, thumb, on } = sizeMap[size];
@@ -37,7 +46,7 @@ export function Toggle({
       htmlFor={id}
       className={cn(
         'flex items-start gap-3',
-        disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+        disabled ? 'cursor-not-allowed opacity-50' : pending ? 'cursor-progress' : 'cursor-pointer',
         className
       )}
     >
@@ -48,7 +57,10 @@ export function Toggle({
           role="switch"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
-          disabled={disabled}
+          disabled={disabled || pending}
+          aria-busy={pending || undefined}
+          aria-describedby={describedBy}
+          aria-invalid={mismatch || undefined}
           aria-checked={checked}
           aria-label={!label && ariaLabel ? ariaLabel : undefined}
           data-testid={`toggle-${id}`}
@@ -58,7 +70,8 @@ export function Toggle({
           className={cn(
             'rounded-full transition-colors duration-200',
             track,
-            checked ? 'bg-primary' : 'bg-surface-sunken border border-border'
+            checked ? 'bg-primary' : 'bg-surface-sunken border border-border',
+            mismatch && 'ring-2 ring-warning ring-offset-1 ring-offset-surface-base'
           )}
         />
         <div
@@ -67,7 +80,14 @@ export function Toggle({
             thumb,
             checked ? on : 'translate-x-0'
           )}
-        />
+        >
+          {pending && (
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 m-auto h-[70%] w-[70%] animate-spin rounded-full border border-primary border-t-transparent motion-reduce:animate-none"
+            />
+          )}
+        </div>
       </div>
       <div>
         <span className="text-sm font-medium text-text-primary">{label}</span>

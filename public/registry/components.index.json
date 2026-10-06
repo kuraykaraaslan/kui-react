@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-09-26T20:29:05.188Z",
+  "generatedAt": "2026-10-06T12:35:17.022Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -178,6 +178,7 @@
       "usedBy": [
         "color-picker",
         "comment-thread",
+        "control-tile",
         "form-builder",
         "gantt",
         "onboarding-wizard",
@@ -578,7 +579,10 @@
         "--text-primary",
         "--text-secondary"
       ],
-      "variantCount": 4
+      "usedBy": [
+        "control-tile"
+      ],
+      "variantCount": 6
     },
     {
       "id": "checkbox-group",
@@ -856,7 +860,10 @@
         "slider"
       ],
       "designTokens": [],
-      "variantCount": 2
+      "usedBy": [
+        "control-tile"
+      ],
+      "variantCount": 3
     },
     {
       "id": "popconfirm",
@@ -912,13 +919,85 @@
       "variantCount": 2
     },
     {
+      "id": "control-tile",
+      "name": "ControlTile",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/ControlTile/index.ts",
+      "abbr": "Ct",
+      "description": "Async controls: a frame (`ControlTile`) plus `ControlButton`, `ControlSwitch`, `ControlSlider` and `ControlSetpoint`. Each takes the bound `value` and an `onCommit` that returns a Promise, and shows idle -> pending -> confirmed / mismatch / failed with the previous value restored on failure. The slider writes once on release. State machine: `useAsyncControl` (libs/hooks). No transport knowledge; all text is overridable through `messages`.",
+      "status": "stable",
+      "since": "2026-10",
+      "composes": [
+        "toggle",
+        "range-slider",
+        "button"
+      ],
+      "relatedTo": [
+        "toggle",
+        "range-slider",
+        "button"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "switch",
+          "slider",
+          "status"
+        ],
+        "notes": "The status line is an aria-live region; a failure is role=\"alert\". Pending sets aria-busy and disables the input. A bad set-point is a field error (aria-invalid + described-by) and sends nothing."
+      },
+      "designTokens": [
+        "--surface-raised",
+        "--border",
+        "--primary",
+        "--success",
+        "--warning",
+        "--error",
+        "--text-secondary"
+      ],
+      "variantCount": 7
+    },
+    {
+      "id": "time-window-picker",
+      "name": "TimeWindowPicker",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/TimeWindowPicker.tsx",
+      "abbr": "Tw",
+      "description": "Relative presets (\"1h\", \"7d\"), an absolute UTC range and the interval / aggregation that go with a window. Controlled: the value is a structural `TimeWindowValue`, nothing here knows about dashboards. Every label is overridable through `messages`.",
+      "status": "stable",
+      "since": "2026-10",
+      "relatedTo": [
+        "date-range-picker",
+        "time-picker"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "radiogroup",
+          "group"
+        ],
+        "notes": "Presets form a radiogroup; the date inputs and the selects carry accessible names from `messages`."
+      },
+      "designTokens": [
+        "--primary",
+        "--border",
+        "--surface-base",
+        "--surface-sunken",
+        "--text-secondary",
+        "--border-focus"
+      ],
+      "variantCount": 2
+    },
+    {
       "id": "chart",
       "name": "Chart",
       "layer": "ui",
       "category": "Molecule",
       "filePath": "modules/ui/Chart/index.ts",
       "abbr": "Ch",
-      "description": "Token-aware primitive chart library at @/modules/ui/Chart. M1 ships seven SVG-based charts (Line, Bar, Area, Pie, Donut, Scatter, SparkLine) that consume a unified `Series` data shape. Colors auto-resolve from --primary / --secondary / --success / --warning / --error / --info, so dark mode and theme swaps work without any extra work. Pixel-identical EJS sibling at modules/ui/Chart/Chart.ejs. M3+ stubs (BubbleChart, HeatmapChart, TreemapChart, RadarChart, FunnelChart, SankeyChart, CandlestickChart, GaugeChart) are exported but render null until implemented; see PLANS/38-Charts.md.",
+      "description": "Token-aware primitive chart library at @/modules/ui/Chart. M1 ships seven SVG-based charts (Line, Bar, Area, Pie, Donut, Scatter, SparkLine) that consume a unified `Series` data shape. Colors auto-resolve from --primary / --secondary / --success / --warning / --error / --info, so dark mode and theme swaps work without any extra work. Pixel-identical EJS sibling at modules/ui/Chart/Chart.ejs. GaugeChart (half-donut, threshold bands, role=\"meter\") and HeatmapChart (matrix, token colour) are implemented; Line/Area take `xAxis=\"time\"` for a continuous time axis with drag-to-zoom, and Bar/Area take `stacked`. The remaining M3 stubs (BubbleChart, TreemapChart, RadarChart, FunnelChart, SankeyChart, CandlestickChart) are exported but render null until implemented; see PLANS/38-Charts.md.",
       "status": "beta",
       "since": "2026-05",
       "composes": [],
@@ -941,7 +1020,7 @@
         "--text-primary",
         "--text-secondary"
       ],
-      "variantCount": 6
+      "variantCount": 10
     },
     {
       "id": "card",
@@ -3271,7 +3350,7 @@
       "status": "beta",
       "since": "2025-04",
       "designTokens": [],
-      "variantCount": 3
+      "variantCount": 4
     },
     {
       "id": "api-doc-status-code-badge",

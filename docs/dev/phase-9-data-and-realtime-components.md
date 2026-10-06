@@ -43,6 +43,8 @@ From next-boilerplate `docs/new-iot-platform/README.md` §"Owner decisions (2026
 
 ## 9.1 Charts: a real time axis `[both]` `+native`
 
+> **Status 2026-10-06 (react side):** shipped as `xAxis="time"` (alias `xScale="time"`) on `LineChart` / `AreaChart` (`charts/TimeSeriesChart.tsx`, `charts/_time.ts`: `timeExtent`, `xTime`, `timeTicks`, `formatTick`, `nearestIndex`, tested in `charts/chart-math.test.ts`), with viewer-local drag-to-zoom and a reset button (§9.2 partly: no controlled `xDomain`, no `Brush` overview yet). Not done: `'linear'`, `maxPoints` (LTTB), shared 10 000-point fixture, kui-ejs and KUInative mirrors. `stacked` on `BarChart` / `AreaChart` also landed.
+
 `LineChart`/`AreaChart` place x on a band scale (`xCategories`, `bandCenter` in `charts/_helpers.ts`). Telemetry, prices and logs need a continuous time axis: uneven sample spacing, gaps, thousands of points.
 
 - [ ] `xScale?: 'band' | 'time' | 'linear'` on `BaseChartProps` (default `'band'`, so nothing changes for current users). With `'time'`, `SeriesPoint.x` is an epoch-ms number or ISO string.
@@ -70,6 +72,8 @@ Seen in: `/theme/iot/devices/[slug]/telemetry`.
 
 ## 9.3 Charts: `GaugeChart` `[both]` `+native`
 
+> **Status 2026-10-06 (react side):** `charts/GaugeChart.tsx` implemented with the props below (`bands`, `unit`, `label`, `format`, `needle`, `size`, `ariaLabel`, `stale`, `staleLabel`), `role="meter"`, animated arc. kui-ejs and KUInative still stubs.
+
 Stub in all three repos. The header in `charts/GaugeChart.tsx` already fixes the design: half-donut, threshold bands in `--success`/`--warning`/`--error`, centred value label, optional needle.
 
 - [ ] Props: `value`, `min = 0`, `max = 100`, `bands?: { to: number; tone: 'success' | 'warning' | 'error' | 'info' | 'neutral' }[]`, `unit?`, `label?`, `format?: (v) => string`, `needle?: boolean`, `size?: 'sm' | 'md' | 'lg'`, `ariaLabel?`. Value is clamped; out-of-range shows the clamped arc plus the real value in the label.
@@ -82,6 +86,8 @@ Stub in all three repos. The header in `charts/GaugeChart.tsx` already fixes the
 Seen in: `/theme/iot` dashboard gauge widget (IoT phase 07).
 
 ## 9.4 Charts: `HeatmapChart` `[both]` `+native`
+
+> **Status 2026-10-06 (react side):** matrix mode implemented (`cells`, `min`/`max` domain, `valueFormat`, legend, tooltip, missing cell is empty). Not done: `calendar` mode, diverging scale, hatched empty cells, arrow-key cell focus; kui-ejs and KUInative stubs.
 
 Stub in all three repos.
 
@@ -113,6 +119,8 @@ Seen in: `/theme/iot/devices/[slug]/telemetry` (live mode).
 Seen in: `/theme/iot/alerts` filter bar (IoT phase 03).
 
 ## 9.7 `TimeRangePicker` for dashboards `[react]`
+
+> **Status 2026-10-06:** the simpler inline `TimeWindowPicker` (`modules/ui/TimeWindowPicker.tsx`: presets, absolute UTC range, interval, aggregation) shipped for next-boilerplate's board header. The popover `TimeRangePicker` below (live mode, `resolveTimeWindow`, `DateTimePicker`) is still open.
 
 A new molecule in `modules/ui/DatePicker/TimeRangePicker.tsx`. Monitoring screens think in "last 6 hours, live" rather than calendar days; `DateRangePicker` stays the calendar control and is reused inside this one.
 
@@ -225,6 +233,8 @@ Added for the owner decisions OD-24 (release a device) and OD-1 (revoke a provis
 Seen in: IoT 05 §5.4 `ReleaseDeviceDialog` and IoT 01 §1.4 key revocation.
 
 ## 9.16 Async controls: pending state and commit-on-release `[both]` `+native` (OD-80)
+
+> **Status 2026-10-06 (react side):** `Toggle` `pending` / `mismatch` / `describedBy`, `RangeSlider` `onCommit` / `pending` / `commitIdleMs`, `libs/hooks/useAsyncControl.ts` and `modules/ui/ControlTile/` (`ControlTile` frame plus `ControlButton`, `ControlSwitch`, `ControlSlider`, `ControlSetpoint`) are built and tested, with showcase variants. kui-ejs / KUInative `Toggle` and `RangeSlider` mirrors are open. 9.10 `SchemaForm` / `FieldSchema` is not started (see its section).
 
 Added for the owner decision OD-80 (control widgets in the IoT MVP, IoT 07 §7.3). A control that writes to something slow (a device, a remote service, a setting saved on a server) needs the same states in every domain: idle → pending → confirmed, or failed with the previous value restored, and sometimes "the other side reports a different value". kui-react has the controls (`Button` with `loading`, `Toggle`, `RangeSlider`, number `Input` with steppers, `Popconfirm`) but no pending state on `Toggle`, no commit-on-release on `RangeSlider` and no shared logic for an asynchronous write. A **generic "action widget" fits**: the state machine is generic (smart home, ops toggles, feature flags), only the target is IoT. Checked on 2026-10-04: `Toggle` and `RangeSlider` exist in kui-react, kui-ejs (`Toggle.ejs`, `RangeSlider.ejs`) and KUInative (`Toggle.tsx`, `RangeSlider.tsx`), none of them with a pending state or a commit event.
 

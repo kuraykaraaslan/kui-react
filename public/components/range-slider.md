@@ -9,6 +9,10 @@
 
 Numeric range input built on native `<input type="range">`. Single-handle by default, or `range` for a dual-handle min/max selector. Distinct from the `Slider` carousel component.
 
+## Used by
+
+- `control-tile`
+
 ## Variants
 
 ### Single value
@@ -23,6 +27,12 @@ const [v, setV] = useState(40);
 ```tsx
 const [range, setRange] = useState<[number, number]>([20, 70]);
 <RangeSlider range label="Price range" value={range} onChange={setRange} min={0} max={100} />
+```
+
+### Commit on release + pending
+
+```tsx
+<RangeSlider label="Setpoint" value={v} onChange={setV} onCommit={write} pending={writing} />
 ```
 
 ## Full source

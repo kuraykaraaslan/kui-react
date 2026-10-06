@@ -63,6 +63,8 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'range-slider',      title: 'RangeSlider',     category: 'Molecule', abbr: 'Rs', since: '2026-09' },
       { id: 'popconfirm',        title: 'Popconfirm',      category: 'Molecule', abbr: 'Pc', since: '2026-09' },
       { id: 'time-picker',       title: 'TimePicker',      category: 'Molecule', abbr: 'Tp', since: '2026-09' },
+      { id: 'time-window-picker', title: 'TimeWindowPicker', category: 'Molecule', abbr: 'Tw', since: '2026-10' },
+      { id: 'control-tile',      title: 'ControlTile',     category: 'Molecule', abbr: 'Ct', since: '2026-10' },
     ],
   },
   {

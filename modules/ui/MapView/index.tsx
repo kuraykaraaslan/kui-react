@@ -18,7 +18,11 @@ export type {
   MapBounds,
   MapProviderId,
   MapViewProps,
+  MapTiles,
+  MapTilesConfig,
 } from './types';
+export { MapCanvas } from './MapCanvas';
+export type { MapCanvasProps } from './MapCanvas';
 
 /**
  * MapView — provider-agnostic interactive map.
@@ -39,6 +43,8 @@ export function MapView({
   onMarkerClick,
   height = 480,
   className,
+  tiles,
+  loadingLabel = 'Loading map…',
 }: MapViewProps) {
   const { ref, visible } = useInViewport<HTMLDivElement>();
   const [addMode, setAddMode] = useState(false);
@@ -81,7 +87,7 @@ export function MapView({
         <div style={{ height: cssHeight, isolation: 'isolate' }}>
           {!visible ? (
             <div className="w-full h-full flex items-center justify-center bg-surface-raised">
-              <span className="text-sm text-text-secondary">Harita yükleniyor…</span>
+              <span className="text-sm text-text-secondary">{loadingLabel}</span>
             </div>
           ) : (
             <LeafletCanvas
@@ -96,6 +102,8 @@ export function MapView({
               fitBoundsPadding={fitBoundsPadding}
               onMapClick={onMapClick}
               onMarkerClick={onMarkerClick}
+              tiles={tiles}
+              loadingLabel={loadingLabel}
             />
           )}
         </div>

@@ -66,7 +66,7 @@ export function ChartTooltip({
             />
             <span style={{ color: chartTheme.tooltipMutedText }}>{d.seriesName}</span>
             <span className="ml-auto font-medium tabular-nums">
-              {d.y === null ? '—' : d.y}
+              {d.valueLabel ?? (d.y === null ? '—' : d.y)}
             </span>
           </li>
         ))}

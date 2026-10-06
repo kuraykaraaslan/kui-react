@@ -4,6 +4,18 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- `Chart`: `GaugeChart` (half-donut, threshold bands, `role="meter"`), `HeatmapChart` (matrix), a
+  continuous time axis with viewer-local drag-to-zoom on `LineChart` / `AreaChart`
+  (`xAxis="time"`, alias `xScale`), and `stacked` on `BarChart` / `AreaChart` (phase 9 §9.1, §9.3, §9.4).
+- `MapCanvas` (card-less map, `tiles` prop) and `tiles` / `loadingLabel` on `MapView`; the loading
+  label is now English ("Loading map…").
+- `TimeWindowPicker` (relative presets, absolute UTC range, interval, aggregation).
+- Async controls (phase 9 §9.16): `useAsyncControl`, `ControlTile`, `ControlButton`, `ControlSwitch`,
+  `ControlSlider`, `ControlSetpoint`; `Toggle` gains `pending` / `mismatch` / `describedBy`;
+  `RangeSlider` (single) gains `onCommit` / `pending` / `commitIdleMs`.
+
 ### Changed
 
 - `package.json` gained `license`, `repository`, `homepage`, `bugs`, `engines`, `keywords`. The

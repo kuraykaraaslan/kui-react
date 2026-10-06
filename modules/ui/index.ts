@@ -27,6 +27,16 @@ export { StatCard } from './StatCard';
 export { Statistic } from './Statistic';
 export { Textarea } from './Textarea';
 export { Toggle } from './Toggle';
+export { TimeWindowPicker, DEFAULT_TIME_WINDOW_MESSAGES } from './TimeWindowPicker';
+export type { TimeWindowValue, TimeWindowMessages } from './TimeWindowPicker';
+export {
+  ControlTile, ControlButton, ControlSwitch, ControlSlider, ControlSetpoint,
+  DEFAULT_CONTROL_MESSAGES, asBoolean, toRange, validateSetpoint, snapToStep,
+} from './ControlTile';
+export type {
+  ControlTileProps, ControlMessages, ControlButtonProps, ControlButtonMessages, ControlConfirmation,
+  ControlSwitchProps, ControlSliderProps, ControlSetpointProps, ControlSetpointMessages, NumericRange, SetpointCheck,
+} from './ControlTile';
 
 // Molecules
 export { AdvancedDataTable } from './AdvancedDataTable';
@@ -49,8 +59,8 @@ export { Drawer } from './Drawer';
 export { DropdownMenu } from './DropdownMenu';
 export type { DropdownItem } from './DropdownMenu';
 export { EmptyState } from './EmptyState';
-export { MapView } from './MapView';
-export type { MapVariant, MapTooltipField, MapTooltipData, MapMarker, MapZone, MapRoute } from './MapView';
+export { MapView, MapCanvas } from './MapView';
+export type { MapVariant, MapTooltipField, MapTooltipData, MapMarker, MapZone, MapRoute, MapTiles, MapTilesConfig, MapCanvasProps } from './MapView';
 export { Modal } from './Modal';
 export { MultiSelect } from './MultiSelect';
 export type { MultiSelectOption } from './MultiSelect';

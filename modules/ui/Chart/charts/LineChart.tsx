@@ -18,6 +18,7 @@ import { Grid } from '../primitives/Grid';
 import { Legend } from '../primitives/Legend';
 import { ChartTooltip } from '../primitives/Tooltip';
 import { Crosshair } from '../primitives/Crosshair';
+import { TimeSeriesChart } from './TimeSeriesChart';
 import { paletteColor, animationDuration } from '../theme';
 import type { BaseChartProps, PlotRect, TooltipDatum } from '../types';
 import {
@@ -39,7 +40,7 @@ type LineChartProps = BaseChartProps & {
 
 const PADDING = { top: 12, right: 16, bottom: 28, left: 40 };
 
-export function LineChart({
+function BandLineChart({
   series,
   height = 240,
   showLegend = true,
@@ -171,4 +172,12 @@ export function LineChart({
       {showLegend && <Legend series={series} />}
     </div>
   );
+}
+
+/** Band (category) axis by default; `xAxis="time"` places points by timestamp and enables viewer-local zoom. */
+export function LineChart(props: LineChartProps) {
+  if ((props.xAxis ?? props.xScale) === 'time') {
+    return <TimeSeriesChart variant="line" {...props} />;
+  }
+  return <BandLineChart {...props} />;
 }

@@ -13,12 +13,14 @@ import { Legend } from '../primitives/Legend';
 import { ChartTooltip } from '../primitives/Tooltip';
 import { paletteColor, animationDuration } from '../theme';
 import type { BaseChartProps, PlotRect, TooltipDatum } from '../types';
-import { niceTicks, yExtent, yScale, bandCenter, bandWidth, xCategories } from './_helpers';
+import { niceTicks, yExtent, yScale, bandCenter, bandWidth, xCategories, stackedExtent, stackTops } from './_helpers';
 
 type BarChartProps = BaseChartProps & {
   /** Corner radius in pixels for each bar. Default = 4. */
   radius?: number;
-  // TODO M2: stacked, horizontal, normalize, value-label-on-top.
+  /** Stack the series in one bar per category . */
+  stacked?: boolean;
+  // TODO M2: horizontal, normalize, value-label-on-top.
 };
 
 const PADDING = { top: 12, right: 16, bottom: 28, left: 40 };
@@ -30,13 +32,15 @@ export function BarChart({
   showGrid = true,
   showTooltip = true,
   radius = 4,
+  stacked = false,
   ariaLabel,
   className,
 }: BarChartProps) {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   const categories = useMemo(() => xCategories(series), [series]);
-  const { min, max } = useMemo(() => yExtent(series), [series]);
+  const { min, max } = useMemo(() => (stacked ? stackedExtent(series) : yExtent(series)), [series, stacked]);
+  const tops = useMemo(() => (stacked ? stackTops(series) : []), [series, stacked]);
   const animMs = animationDuration();
 
   return (
@@ -62,7 +66,7 @@ export function BarChart({
           }));
 
           const groupWidth = bandWidth(categories.length, rect, 0.25);
-          const barWidth = series.length > 0 ? groupWidth / series.length : 0;
+          const barWidth = stacked ? groupWidth : series.length > 0 ? groupWidth / series.length : 0;
           const baselineY = yScale(0, min, max, rect);
 
           const tooltipData: TooltipDatum[] =
@@ -113,10 +117,12 @@ export function BarChart({
                         if (p.y === null || p.y === undefined) return null;
                         const center = bandCenter(i, categories.length, rect);
                         const groupLeft = center - groupWidth / 2;
-                        const bx = groupLeft + si * barWidth;
-                        const ty = yScale(p.y, min, max, rect);
-                        const by = Math.min(ty, baselineY);
-                        const bh = Math.abs(ty - baselineY);
+                        const bx = stacked ? groupLeft : groupLeft + si * barWidth;
+                        const top = stacked ? (tops[si]?.[i] ?? 0) : p.y;
+                        const bottom = stacked ? top - Math.max(0, p.y) : 0;
+                        const ty = yScale(top, min, max, rect);
+                        const by = stacked ? ty : Math.min(ty, baselineY);
+                        const bh = stacked ? Math.abs(yScale(bottom, min, max, rect) - ty) : Math.abs(ty - baselineY);
                         return (
                           <rect
                             key={`${s.id}-${i}`}

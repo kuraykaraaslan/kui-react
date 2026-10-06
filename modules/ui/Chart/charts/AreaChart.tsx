@@ -13,6 +13,7 @@ import { Grid } from '../primitives/Grid';
 import { Legend } from '../primitives/Legend';
 import { ChartTooltip } from '../primitives/Tooltip';
 import { Crosshair } from '../primitives/Crosshair';
+import { TimeSeriesChart } from './TimeSeriesChart';
 import { paletteColor, animationDuration } from '../theme';
 import type { BaseChartProps, PlotRect, TooltipDatum } from '../types';
 import {
@@ -21,6 +22,8 @@ import {
   yScale,
   bandCenter,
   xCategories,
+  stackedExtent,
+  stackTops,
   smoothPath,
   linePath,
 } from './_helpers';
@@ -30,11 +33,13 @@ type AreaChartProps = BaseChartProps & {
   smooth?: boolean;
   /** Translucent fill alpha (0..1). Default = 0.2. */
   fillOpacity?: number;
+  /** Stack the areas . Stacked areas use straight segments. */
+  stacked?: boolean;
 };
 
 const PADDING = { top: 12, right: 16, bottom: 28, left: 40 };
 
-export function AreaChart({
+function BandAreaChart({
   series,
   height = 240,
   showLegend = true,
@@ -42,13 +47,15 @@ export function AreaChart({
   showTooltip = true,
   smooth = true,
   fillOpacity = 0.2,
+  stacked = false,
   ariaLabel,
   className,
 }: AreaChartProps) {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   const categories = useMemo(() => xCategories(series), [series]);
-  const { min, max } = useMemo(() => yExtent(series), [series]);
+  const { min, max } = useMemo(() => (stacked ? stackedExtent(series) : yExtent(series)), [series, stacked]);
+  const tops = useMemo(() => (stacked ? stackTops(series) : []), [series, stacked]);
   const animMs = animationDuration();
 
   return (
@@ -79,14 +86,26 @@ export function AreaChart({
             const points = s.data.map((p, i) =>
               p.y === null || p.y === undefined
                 ? null
-                : { x: bandCenter(i, categories.length, rect), y: yScale(p.y, min, max, rect) },
+                : {
+                    x: bandCenter(i, categories.length, rect),
+                    y: yScale(stacked ? (tops[si]?.[i] ?? 0) : p.y, min, max, rect),
+                  },
             );
             const linePoints = points.filter(Boolean) as Array<{ x: number; y: number }>;
-            const path = smooth ? smoothPath(points) : linePath(points);
-            const areaPath =
-              linePoints.length > 1
-                ? `${path} L${linePoints[linePoints.length - 1].x} ${baselineY} L${linePoints[0].x} ${baselineY} Z`
-                : '';
+            const useSmooth = smooth && !stacked;
+            const path = useSmooth ? smoothPath(points) : linePath(points);
+            let areaPath = '';
+            if (linePoints.length > 1) {
+              if (stacked && si > 0) {
+                // Close down along the previous series' top, right to left.
+                const below = (tops[si - 1] ?? [])
+                  .map((v, i) => (points[i] && v !== null ? { x: points[i]!.x, y: yScale(v, min, max, rect) } : null))
+                  .filter(Boolean) as Array<{ x: number; y: number }>;
+                areaPath = `${path} ${below.reverse().map((b) => `L${b.x} ${b.y}`).join(' ')} Z`;
+              } else {
+                areaPath = `${path} L${linePoints[linePoints.length - 1].x} ${baselineY} L${linePoints[0].x} ${baselineY} Z`;
+              }
+            }
             return { id: s.id, name: s.name, color, points, path, areaPath };
           });
 
@@ -179,4 +198,12 @@ export function AreaChart({
       {showLegend && <Legend series={series} />}
     </div>
   );
+}
+
+/** Band (category) axis by default; `xAxis="time"` (not combined with `stacked`) places points by timestamp and enables viewer-local zoom. */
+export function AreaChart(props: AreaChartProps) {
+  if ((props.xAxis ?? props.xScale) === 'time' && !props.stacked) {
+    return <TimeSeriesChart variant="area" {...props} />;
+  }
+  return <BandAreaChart {...props} />;
 }

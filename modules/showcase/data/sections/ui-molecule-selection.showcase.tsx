@@ -49,6 +49,24 @@ function CheckboxIndeterminateDemo() {
   );
 }
 
+function ToggleAsyncDemo({ mode }: { mode: 'pending' | 'mismatch' }) {
+  const [on, setOn] = useState(false);
+  return (
+    <div className="space-y-1">
+      <Toggle
+        id={`sc-toggle-async-${mode}`}
+        label={on ? 'Heater on' : 'Heater off'}
+        checked={on}
+        onChange={setOn}
+        pending={mode === 'pending'}
+        mismatch={mode === 'mismatch'}
+        describedBy={mode === 'mismatch' ? 'sc-toggle-async-hint' : undefined}
+      />
+      {mode === 'mismatch' && <p id="sc-toggle-async-hint" className="text-xs text-warning">The device still reports the old value.</p>}
+    </div>
+  );
+}
+
 export function buildMoleculeSelectionData(): ShowcaseComponent[] {
   return [
     {
@@ -292,6 +310,16 @@ export function Toggle({ id, label, description, checked, onChange, disabled, si
             </div>
           ),
           code: `<Toggle id="marketing" label="Marketing emails" description="Receive weekly updates." checked={value} onChange={setValue} />`,
+        },
+        {
+          title: 'Pending write (spinner in the thumb, input disabled, aria-busy)',
+          preview: <ToggleAsyncDemo mode="pending" />,
+          code: `<Toggle id="heater" label="Heater" checked={on} onChange={write} pending={state === 'pending'} />`,
+        },
+        {
+          title: 'Mismatch (the other side reports a different value)',
+          preview: <ToggleAsyncDemo mode="mismatch" />,
+          code: `<Toggle id="heater" label="Heater" checked={on} onChange={write} mismatch describedBy="heater-hint" />\n<p id="heater-hint">The device still reports the old value.</p>`,
         },
         {
           title: 'Disabled',

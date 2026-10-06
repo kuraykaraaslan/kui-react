@@ -8,7 +8,8 @@
 // Roadmap reference: PLANS/38-Charts.md
 //   M1 (this milestone) — Token + theme + primitives + 7 basic charts.
 //   M2 — Stacked / horizontal bars, animations, empty + skeleton states.
-//   M3 — Heatmap / Treemap / Radar / Funnel / Sankey / Candlestick / Gauge / Bubble.
+//   M3 — Heatmap + Gauge done; Treemap / Radar / Funnel / Sankey / Candlestick / Bubble pending.
+//   Time axis (`xAxis="time"`) + drag-zoom on Line/Area, `stacked` on Bar/Area (phase 9 §9.1-9.4).
 //   M4 — Brush / pan / zoom / synced tooltips / drilldown.
 //   M5 — A11y + i18n + PNG / SVG / CSV export.
 //   M6 — Annotations, forecast, streaming, thresholds, period overlay.
@@ -26,15 +27,20 @@ export { DonutChart } from './charts/DonutChart';
 export { ScatterChart } from './charts/ScatterChart';
 export { SparkLine } from './charts/SparkLine';
 
+// ── Charts (M3 implementations) ────────────────────────────────────
+export { HeatmapChart } from './charts/HeatmapChart';
+export type { HeatmapChartProps } from './charts/HeatmapChart';
+export type { HeatCell } from './charts/_heatmap';
+export { GaugeChart, bandFor, arcPath } from './charts/GaugeChart';
+export type { GaugeChartProps, GaugeBand, GaugeTone } from './charts/GaugeChart';
+
 // ── Charts (M3 stubs — render null today) ──────────────────────────
 export { BubbleChart } from './charts/BubbleChart';
-export { HeatmapChart } from './charts/HeatmapChart';
 export { TreemapChart } from './charts/TreemapChart';
 export { RadarChart } from './charts/RadarChart';
 export { FunnelChart } from './charts/FunnelChart';
 export { SankeyChart } from './charts/SankeyChart';
 export { CandlestickChart } from './charts/CandlestickChart';
-export { GaugeChart } from './charts/GaugeChart';
 
 // ── Primitives (escape-hatch for advanced consumers) ───────────────
 export { XAxis, YAxis } from './primitives/Axis';

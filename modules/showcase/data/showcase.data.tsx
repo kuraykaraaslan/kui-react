@@ -33,6 +33,7 @@ import { buildAccordionData } from './sections/ui-molecule-accordion.showcase';
 import { buildRangeSliderData } from './sections/ui-molecule-range-slider.showcase';
 import { buildPopconfirmData } from './sections/ui-molecule-popconfirm.showcase';
 import { buildTimePickerData } from './sections/ui-molecule-time-picker.showcase';
+import { buildControlTileData } from './sections/ui-molecule-control-tile.showcase';
 import { buildLibKuiViewerData } from './sections/lib-kui-viewer.showcase';
 
 export function buildShowcaseData() {
@@ -44,6 +45,7 @@ export function buildShowcaseData() {
     ...buildRangeSliderData(),
     ...buildPopconfirmData(),
     ...buildTimePickerData(),
+    ...buildControlTileData(),
     ...buildPrimitiveChartsData(),
     ...buildOrganismsData(),
     ...buildAppPatternsData(),

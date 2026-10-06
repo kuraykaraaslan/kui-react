@@ -45,6 +45,12 @@ export type MapBounds = {
 
 export type MapProviderId = 'leaflet' | 'mapbox' | 'google';
 
+/** One raster tile layer. `url` is a Leaflet URL template ({s}/{z}/{x}/{y}/{r}); `attribution` may contain HTML links. */
+export type MapTiles = { url: string; attribution: string };
+
+/** One tile layer for both themes, or a light/dark pair. Default: CARTO Voyager / Dark Matter. */
+export type MapTilesConfig = MapTiles | { light: MapTiles; dark: MapTiles };
+
 export type MapViewProps = {
   /** Map provider implementation. Default: 'leaflet'. */
   provider?: MapProviderId;
@@ -61,6 +67,10 @@ export type MapViewProps = {
   onMarkerClick?: (id: string) => void;
   height?: string | number;
   className?: string;
+  /** Custom tile server (e.g. a self-hosted or keyed provider). Default: CARTO Voyager / Dark Matter. */
+  tiles?: MapTilesConfig;
+  /** Text shown while the map chunk / viewport loads. Default = "Loading map…". */
+  loadingLabel?: string;
   // TODO M2: activeMarkerId, cluster, mode (markers|cluster|heatmap)
   // TODO M3: search, route, reverse geocode
   // TODO M4: drawTools, locate, layerToggle

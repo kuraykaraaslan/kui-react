@@ -12,6 +12,22 @@ function RangeSliderDualDemo() {
   return <RangeSlider range label="Price range" value={v} onChange={setV} min={0} max={100} className="w-full max-w-xs" />;
 }
 
+function RangeSliderCommitDemo() {
+  const [v, setV] = useState(40);
+  const [committed, setCommitted] = useState<number | null>(null);
+  const [pending, setPending] = useState(false);
+  const commit = (next: number) => {
+    setPending(true);
+    setTimeout(() => { setCommitted(next); setPending(false); }, 800);
+  };
+  return (
+    <div className="w-full max-w-xs space-y-1">
+      <RangeSlider label="Setpoint" value={v} onChange={setV} onCommit={commit} pending={pending} />
+      <p className="text-xs text-text-secondary">Committed: {committed ?? 'nothing yet'} (onChange fires per step, onCommit once on release)</p>
+    </div>
+  );
+}
+
 export function buildRangeSliderData(): ShowcaseComponent[] {
   return [
     {
@@ -43,6 +59,12 @@ const [range, setRange] = useState<[number, number]>([20, 70]);
           layout: 'stack' as const,
           preview: <RangeSliderDualDemo />,
           code: `const [range, setRange] = useState<[number, number]>([20, 70]);\n<RangeSlider range label="Price range" value={range} onChange={setRange} min={0} max={100} />`,
+        },
+        {
+          title: 'Commit on release + pending',
+          layout: 'stack' as const,
+          preview: <RangeSliderCommitDemo />,
+          code: `<RangeSlider label="Setpoint" value={v} onChange={setV} onCommit={write} pending={writing} />`,
         },
       ],
     },

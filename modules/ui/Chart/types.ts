@@ -1,6 +1,6 @@
 // modules/ui/Chart/types.ts
 //
-// Shared type definitions for the @/modules/ui/Chart primitive library.
+// Shared type definitions for the kui-react modules/ui/Chart primitive library.
 //
 // All chart primitives below operate on the same `Series<T>` shape so a
 // caller can swap chart types without rewriting data. The companion EJS
@@ -48,6 +48,20 @@ export type BaseChartProps = {
   ariaLabel?: string;
   /** Extra className applied to the outer responsive container. */
   className?: string;
+  /**
+   * `'time'` places points by their timestamp (ISO string or
+   * epoch ms in `x`) instead of by index and enables viewer-local drag-to-zoom (`zoom`, default on).
+   * Line and Area only; ignored with `stacked`. Default = `'band'`.
+   */
+  xAxis?: 'band' | 'time';
+  /** Documented phase-9 §9.1 spelling of `xAxis="time"` (`'band'` | `'time'`); `xAxis` wins when both are set. */
+  xScale?: 'band' | 'time';
+  /** Time axis only: label of the zoom-reset button. Default = "Reset zoom". */
+  resetZoomLabel?: string;
+  /** Time axis only: drag a range to zoom, double-click or "Reset zoom" to leave it. Default = true. */
+  zoom?: boolean;
+  /** Time axis only: format a y tick / tooltip value (e.g. `(v) => v + '%'`). */
+  yFormat?: (value: number) => string;
 };
 
 /**
@@ -60,6 +74,8 @@ export type TooltipDatum = {
   color: string;
   x: string | number;
   y: number | null;
+  /** A ready-made value text that replaces `y` in the tooltip (from `SeriesPoint.label`). */
+  valueLabel?: string;
 };
 
 /** Computed pixel rectangle of the plotting area (inside axes/padding). */

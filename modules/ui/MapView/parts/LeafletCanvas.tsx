@@ -6,7 +6,7 @@ import { useDarkMode } from '../hooks/useDarkMode';
 import { useFitBounds } from '../hooks/useFitBounds';
 import { MarkerPart } from './Marker';
 import { ZoneShape, RouteShape } from './Shapes';
-import type { MapMarker, MapZone, MapRoute } from '../types';
+import type { MapMarker, MapZone, MapRoute, MapTilesConfig } from '../types';
 
 type LeafletCanvasProps = {
   center: [number, number];
@@ -20,6 +20,8 @@ type LeafletCanvasProps = {
   fitBoundsPadding?: number;
   onMapClick: (lat: number, lng: number) => void;
   onMarkerClick?: (id: string) => void;
+  tiles?: MapTilesConfig;
+  loadingLabel?: string;
 };
 
 /**
@@ -42,7 +44,7 @@ export function LeafletCanvas(props: LeafletCanvasProps) {
   if (!bundle) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-surface-raised">
-        <span className="text-sm text-text-secondary">Harita yükleniyor…</span>
+        <span className="text-sm text-text-secondary">{props.loadingLabel ?? 'Loading map…'}</span>
       </div>
     );
   }
@@ -98,11 +100,13 @@ function InnerMap({
   fitBoundsPadding,
   onMapClick,
   onMarkerClick,
+  tiles: tilesProp,
   bundle,
 }: LeafletCanvasProps & { bundle: LeafletBundle }) {
   const { MapContainer, TileLayer, Marker, Tooltip, Polygon, Polyline, L } = bundle;
   const isDark = useDarkMode();
-  const tiles = isDark ? LEAFLET_TILES.dark : LEAFLET_TILES.light;
+  const set = tilesProp ? ('url' in tilesProp ? { light: tilesProp, dark: tilesProp } : tilesProp) : LEAFLET_TILES;
+  const tiles = isDark ? set.dark : set.light;
 
   return (
     <MapContainer
@@ -111,7 +115,7 @@ function InnerMap({
       style={{ width: '100%', height: '100%' }}
       className={addMode ? 'cursor-crosshair' : ''}
     >
-      <TileLayer key={isDark ? 'dark' : 'light'} attribution={tiles.attribution} url={tiles.url} />
+      <TileLayer key={`${isDark ? 'dark' : 'light'}-${tiles.url}`} attribution={tiles.attribution} url={tiles.url} />
 
       <ClickHandler bundle={bundle} addMode={addMode} onMapClick={onMapClick} />
       <FitBounds bundle={bundle} markers={markers} padding={fitBoundsPadding} />

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { MapView } from '@/modules/ui/MapView';
+import { MapView, MapCanvas } from '@/modules/ui/MapView';
 import type { MapMarker, MapZone, MapRoute } from '@/modules/ui/MapView';
 import type { ShowcaseComponent } from '../showcase.types';
 
@@ -197,6 +197,23 @@ function ZonesRoutesDemo() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+function CanvasDemo() {
+  return (
+    <div className="h-72 w-full overflow-hidden rounded-lg border border-border">
+      <MapCanvas
+        center={[41.015, 28.979]}
+        zoom={6}
+        markers={[
+          { id: 'a', position: [41.015, 28.979], variant: 'success', tooltip: { title: 'Gateway 1' } },
+          { id: 'b', position: [39.925, 32.836], variant: 'error', tooltip: { title: 'Gateway 2' } },
+        ]}
+        tiles={{ url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors' }}
+        loadingLabel="Loading map…"
+      />
+    </div>
+  );
+}
+
 export function buildMapData(): ShowcaseComponent[] {
   return [
     {
@@ -275,6 +292,12 @@ import { MapView } from '@/modules/ui/MapView';
   ])}
   height={380}
 />`,
+        },
+        {
+          title: 'MapCanvas: card-less, custom tiles',
+          layout: 'stack' as const,
+          preview: <CanvasDemo />,
+          code: `<div className="h-72">\n  <MapCanvas markers={markers} tiles={{ url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors' }} />\n</div>`,
         },
         {
           title: 'Yalnız zone ve rota',
