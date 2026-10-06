@@ -14,6 +14,11 @@ index.ts
 types.ts
 ```
 
+## Rule chain editor
+
+`ruleset/` holds the rule chain editor, its block catalog, param forms, undo, groups, subflows, validation and the
+import / export formats. See [ruleset/README.md](ruleset/README.md).
+
 ## Parity
 
 NextJS-only, no EJS counterpart.

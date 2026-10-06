@@ -22,9 +22,24 @@ export const PORT_META: Record<string, { color: string; label: string }> = {
   c2:      { color: 'var(--info)',           label: 'Case 2' },
   c3:      { color: 'var(--info)',           label: 'Case 3' },
   def:     { color: 'var(--text-secondary)', label: 'Default' },
+  /* ports of roltek-automation-1 blocks */
+  yes:     { color: 'var(--success)',        label: 'True' },
+  no:      { color: 'var(--error)',          label: 'False' },
+  else:    { color: 'var(--text-secondary)', label: 'Otherwise' },
+  error:   { color: 'var(--error)',          label: 'Error' },
+  ok:      { color: 'var(--success)',        label: 'OK' },
+  dropped: { color: 'var(--warning)',        label: 'Dropped' },
+  start:   { color: 'var(--info)',           label: 'Start' },
+  end:     { color: 'var(--info)',           label: 'End' },
+  reached: { color: 'var(--info)',           label: 'Reached' },
 };
 
-export function portColor(id: string) { return PORT_META[id]?.color ?? 'var(--primary)'; }
+/** generated ports (o0, o1 …) are info coloured */
+const GENERATED_PORT = /^o\d+$/;
+
+export function portColor(id: string) {
+  return PORT_META[id]?.color ?? (GENERATED_PORT.test(id) ? 'var(--info)' : 'var(--primary)');
+}
 export function portEdgeLabel(id: string) { return PORT_META[id]?.label ?? id; }
 
 /* ─── Node visuals ────────────────────────────────────────────────────────── */
@@ -53,12 +68,17 @@ export const NODE_VISUALS: Record<RuleNodeType, NodeVisual> = {
   PLACEHOLDER:{ type:'PLACEHOLDER', group:'processing', displayLabel:'Not available', description:'Imported node whose type does not exist here. It keeps its wires but does nothing.', icon:faPuzzlePiece, iconColor:'text-text-secondary', headerBg:'bg-surface-overlay', inputs:[{id:'in',label:'in'}], outputs:[], internal:true },
 };
 
+/** The look of a node type; a type this table does not know (a block of another catalog) looks like a placeholder. */
+export function visualFor(type: string): NodeVisual {
+  return NODE_VISUALS[type as RuleNodeType] ?? NODE_VISUALS.PLACEHOLDER;
+}
+
 /** node types a user can add from the palette / context menu */
 export const ADDABLE_VISUALS: NodeVisual[] = Object.values(NODE_VISUALS).filter((v) => !v.internal);
 
 /** A node's ports: fixed per type, except a placeholder, which keeps the ports its wires use. */
 export function nodePorts(node: Pick<RuleNode, 'type' | 'original'>): { inputs: PortDef[]; outputs: PortDef[] } {
-  const v = NODE_VISUALS[node.type];
+  const v = visualFor(node.type);
   if (node.type !== 'PLACEHOLDER' || !node.original) return { inputs: v.inputs, outputs: v.outputs };
   const toDef = (id: string): PortDef => ({ id, label: PORT_META[id]?.label || id });
   return {

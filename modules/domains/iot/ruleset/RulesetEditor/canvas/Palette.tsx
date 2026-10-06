@@ -1,25 +1,29 @@
 'use client';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBug, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { ADDABLE_VISUALS, NODE_GROUPS } from '../node-meta';
-import type { RuleNodeType } from '../../../types';
+import { faBug, faLayerGroup, faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { paletteGroups } from '../../catalog/palette';
+import type { Catalog } from '../../catalog/types';
+import { lookOf } from '../block-visual';
 
-export function Palette({ onDragStart, onDragEnd, onAdd, onDebugChain, sheetOpen = false, onCloseSheet }: {
-  onDragStart: (type: RuleNodeType) => void;
+export function Palette({ catalog, onDragStart, onDragEnd, onAdd, onDebugChain, onNewSubflow, addProblem, sheetOpen = false, onCloseSheet }: {
+  catalog: Catalog;
+  onDragStart: (type: string) => void;
   onDragEnd: () => void;
   /** click / Enter on an item: add it in the middle of the visible canvas */
-  onAdd: (type: RuleNodeType) => void;
+  onAdd: (type: string) => void;
   onDebugChain: () => void;
+  /** offer to make a new subflow */
+  onNewSubflow?: () => void;
+  /** why a block cannot be added right now (a second subflow input, a subflow that would hold itself), or null */
+  addProblem?: (type: string) => string | null;
   /** phones: the palette is a bottom sheet over the canvas */
   sheetOpen?: boolean;
   onCloseSheet?: () => void;
 }) {
   const [query, setQuery] = useState('');
-  const q = query.trim().toLowerCase();
-  const visible = ADDABLE_VISUALS.filter((v) =>
-    !q || v.displayLabel.toLowerCase().includes(q) || v.description.toLowerCase().includes(q));
+  const groups = useMemo(() => paletteGroups(catalog, query), [catalog, query]);
 
   return (
     <aside aria-label="Node palette"
@@ -44,32 +48,40 @@ export function Palette({ onDragStart, onDragEnd, onAdd, onDebugChain, sheetOpen
         </label>
       </div>
       <div className="flex-1 overflow-y-auto px-3 pb-3">
-        {NODE_GROUPS.map((g) => {
-          const items = visible.filter((v) => v.group === g.id);
-          if (!items.length) return null;
-          return (
-            <div key={g.id} role="group" aria-label={g.label}>
-              <p className="mb-1.5 mt-3 px-1 text-[10px] font-semibold uppercase tracking-widest text-text-secondary">{g.label}</p>
-              <div className="flex flex-col gap-1">
-                {items.map((v) => (
-                  <div key={v.type} draggable role="button" tabIndex={0}
-                    onDragStart={() => onDragStart(v.type)} onDragEnd={onDragEnd}
-                    onClick={() => onAdd(v.type)}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onAdd(v.type); } }}
-                    title={v.description}
-                    aria-label={`Add ${v.displayLabel} node`}
-                    className="flex cursor-grab select-none items-center gap-2.5 rounded-lg border border-border bg-surface-base px-3 py-2 text-sm font-medium text-text-primary transition-colors hover:border-primary hover:bg-primary-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus active:cursor-grabbing">
-                    <FontAwesomeIcon icon={v.icon} className={cn('h-3.5 w-3.5 shrink-0', v.iconColor)} aria-hidden="true" />
-                    <span className="truncate text-xs">{v.displayLabel}</span>
+        {groups.map((g) => (
+          <div key={g.id} role="group" aria-label={g.label}>
+            <p className="mb-1.5 mt-3 px-1 text-[10px] font-semibold uppercase tracking-widest text-text-secondary">{g.label}</p>
+            <div className="flex flex-col gap-1">
+              {g.blocks.map((block) => {
+                const look = lookOf(block);
+                const problem = addProblem?.(block.type) ?? null;
+                return (
+                  <div key={block.type} draggable={!problem} role="button" tabIndex={0}
+                    aria-disabled={problem ? true : undefined}
+                    onDragStart={() => !problem && onDragStart(block.type)} onDragEnd={onDragEnd}
+                    onClick={() => !problem && onAdd(block.type)}
+                    onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !problem) { e.preventDefault(); onAdd(block.type); } }}
+                    title={problem ?? block.description ?? block.title}
+                    aria-label={`Add ${block.title} node`}
+                    className={cn('flex select-none items-center gap-2.5 rounded-lg border border-border bg-surface-base px-3 py-2 text-sm font-medium text-text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+                      problem ? 'cursor-not-allowed opacity-50' : 'cursor-grab hover:border-primary hover:bg-primary-subtle active:cursor-grabbing')}>
+                    <FontAwesomeIcon icon={look.icon} className={cn('h-3.5 w-3.5 shrink-0', look.iconColor)} aria-hidden="true" />
+                    <span className="truncate text-xs">{block.title}</span>
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
-          );
-        })}
-        {!visible.length && <p className="mt-3 px-1 text-xs text-text-secondary">No node type matches.</p>}
+          </div>
+        ))}
+        {!groups.length && <p className="mt-3 px-1 text-xs text-text-secondary">No node type matches.</p>}
       </div>
       <div className="space-y-2 border-t border-border p-3 max-md:hidden">
+        {onNewSubflow && (
+          <button type="button" onClick={onNewSubflow}
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-border px-2 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
+            <FontAwesomeIcon icon={faLayerGroup} className="h-3 w-3" aria-hidden="true" /> New subflow…
+          </button>
+        )}
         <button type="button" onClick={onDebugChain}
           className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-border px-2 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
           <FontAwesomeIcon icon={faBug} className="w-3 h-3" aria-hidden="true" /> Debug Chain
@@ -77,7 +89,7 @@ export function Palette({ onDragStart, onDragEnd, onAdd, onDebugChain, sheetOpen
         <p className="text-[11px] leading-relaxed text-text-secondary">
           Drag or click a node type to add it.<br />
           Drag from <span className="font-bold text-primary">●</span> output to <span className="font-bold">○</span> input to wire.<br />
-          Click a node to edit it. Select a node or connection and press Delete to remove it.
+          Click a node to edit it. Shift or Ctrl click adds to the selection. Select and press Delete to remove.
         </p>
       </div>
     </aside>

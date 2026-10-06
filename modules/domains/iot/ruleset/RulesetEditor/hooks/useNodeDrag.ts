@@ -1,47 +1,73 @@
 'use client';
 import { useRef, useState } from 'react';
-import type { RuleNode } from '../../../types';
+import { moveNodes, placeNodes } from '../../graph/edit';
+import type { Graph } from '../../graph/types';
 import type { Point } from '../geometry';
 
-export function useNodeDrag({ nodes, setNodes, toWorld, readOnly, connecting }: {
-  nodes: RuleNode[];
-  setNodes: React.Dispatch<React.SetStateAction<RuleNode[]>>;
+/** pixels the pointer must move before a press counts as a drag */
+const DRAG_THRESHOLD = 4;
+
+/**
+ * Dragging nodes: the pressed node and every node selected with it move together. The graph changes while
+ * the pointer moves (no history step); `endDrag` says whether anything moved so the editor can commit once.
+ * With `resolve` (grid snap and guide lines, see useSnapDrag) the positions come from there; without it
+ * they are rounded to 4 px.
+ */
+export function useNodeDrag({ getGraph, setGraph, toWorld, readOnly, connecting, resolve, onEnd }: {
+  getGraph: () => Graph;
+  setGraph: (fn: (graph: Graph) => Graph) => void;
   /** screen (client) coordinates → canvas world coordinates (pan + zoom aware) */
   toWorld: (clientX: number, clientY: number) => Point;
   readOnly: boolean;
   connecting: unknown;
+  /** where the dragged nodes go: their start positions, the distance in world units, and whether Alt is held (free move) */
+  resolve?: (starts: Record<string, Point>, dx: number, dy: number, free: boolean) => Record<string, Point>;
+  /** the drag is over (also when it was cancelled) */
+  onEnd?: () => void;
 }) {
   const [dragNodeId, setDragNodeId] = useState<string | null>(null);
-  const dragOffset    = useRef({ x: 0, y: 0 });
-  const dragMoved     = useRef(false);
-  const dragStartPos  = useRef({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const startWorld = useRef<Point>({ x: 0, y: 0 });
+  const startClient = useRef<Point>({ x: 0, y: 0 });
+  const starts = useRef<Record<string, Point>>({});
+  const dragMoved = useRef(false);
 
-  function onNodePointerDown(e: React.PointerEvent, nodeId: string) {
+  /** press on a node, or on a group tab (`primaryId` null): drag `ids` */
+  function start(e: React.PointerEvent, ids: string[], primaryId: string | null) {
     if (connecting || readOnly) return;
     e.stopPropagation();
-    setDragNodeId(nodeId);
+    const nodes = getGraph().nodes;
+    starts.current = Object.fromEntries(nodes.filter((n) => ids.includes(n.nodeId)).map((n) => [n.nodeId, { x: n.x, y: n.y }]));
+    startWorld.current = toWorld(e.clientX, e.clientY);
+    startClient.current = { x: e.clientX, y: e.clientY };
     dragMoved.current = false;
-    dragStartPos.current = { x: e.clientX, y: e.clientY };
-    const node = nodes.find((n) => n.nodeId === nodeId)!;
-    const p = toWorld(e.clientX, e.clientY);
-    dragOffset.current = { x: p.x - node.x, y: p.y - node.y };
+    setDragNodeId(primaryId);
+    setDragging(true);
   }
 
   function applyPointerMove(e: React.PointerEvent) {
-    if (!dragNodeId) return;
-    const dx = e.clientX - dragStartPos.current.x;
-    const dy = e.clientY - dragStartPos.current.y;
-    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) dragMoved.current = true;
+    if (!dragging) return;
+    if (Math.abs(e.clientX - startClient.current.x) > DRAG_THRESHOLD || Math.abs(e.clientY - startClient.current.y) > DRAG_THRESHOLD) dragMoved.current = true;
     if (!dragMoved.current) return;
     const p = toWorld(e.clientX, e.clientY);
-    setNodes((prev) => prev.map((n) =>
-      n.nodeId === dragNodeId
-        ? { ...n, x: Math.round(p.x - dragOffset.current.x), y: Math.round(p.y - dragOffset.current.y) }
-        : n
-    ));
+    const dx = p.x - startWorld.current.x;
+    const dy = p.y - startWorld.current.y;
+    if (resolve) {
+      const positions = resolve(starts.current, dx, dy, e.altKey);
+      setGraph((g) => placeNodes(g, positions));
+    } else {
+      setGraph((g) => moveNodes(g, starts.current, dx, dy));
+    }
   }
 
-  function endDrag() { setDragNodeId(null); }
+  /** stop dragging; true when the nodes were moved */
+  function endDrag(): boolean {
+    const moved = dragging && dragMoved.current;
+    setDragNodeId(null);
+    setDragging(false);
+    onEnd?.();
+    return moved;
+  }
 
-  return { dragNodeId, dragMoved, onNodePointerDown, applyPointerMove, endDrag };
+  return { dragNodeId, dragging, dragMoved, start, applyPointerMove, endDrag };
 }

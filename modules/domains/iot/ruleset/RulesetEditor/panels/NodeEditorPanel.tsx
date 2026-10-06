@@ -4,11 +4,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTrash, faXmark, faRotateLeft, faCheck, faBug,
 } from '@fortawesome/free-solid-svg-icons';
-import { NODE_VISUALS, nodePorts, portColor } from '../node-meta';
-import { CodeEditor } from '../editors/CodeEditor';
+import { Input } from '@/modules/ui/Input';
+import { lookOf } from '../block-visual';
+import { portColor } from '../node-meta';
+import type { NodeLayout } from '../geometry';
+import { ParamForm } from '../../forms/ParamForm';
+import type { ParamValues } from '../../catalog/params';
+import type { BlockDecl, ParamChoices } from '../../catalog/types';
+import type { GraphIssue } from '../../graph/validate';
 import type { RuleNode } from '../../../types';
 
-const SOURCE_NAME = { kui: 'another ruleset file', 'node-red': 'a Node-RED flow' } as const;
+const SOURCE_NAME = { kui: 'another ruleset file', 'node-red': 'a Node-RED flow', roltek: 'a roltek-automation-1 file' } as const;
+const SOURCE_TITLE = { kui: 'kui ruleset', 'node-red': 'Node-RED', roltek: 'roltek-automation-1' } as const;
 
 /** Why a placeholder exists, and what it was (read-only). */
 function PlaceholderDetails({ node }: { node: RuleNode }) {
@@ -29,7 +36,7 @@ function PlaceholderDetails({ node }: { node: RuleNode }) {
         <dt className="font-semibold text-text-secondary">Original type</dt>
         <dd className="break-all font-mono text-text-primary">{o?.type ?? 'unknown'}</dd>
         <dt className="font-semibold text-text-secondary">Source</dt>
-        <dd className="text-text-primary">{o?.source === 'node-red' ? 'Node-RED' : 'kui ruleset'}</dd>
+        <dd className="text-text-primary">{SOURCE_TITLE[o?.source ?? 'kui']}</dd>
       </dl>
       <div>
         <p id={`ph-settings-${node.nodeId}`} className="mb-1.5 text-xs font-semibold text-text-secondary">Original settings (read-only)</p>
@@ -42,24 +49,41 @@ function PlaceholderDetails({ node }: { node: RuleNode }) {
   );
 }
 
-export function NodeEditorPanel({ node, readOnly, draftLabel, draftScript, onLabelChange, onScriptChange, onApply, onClose, onDelete, onReset, onDebug }: {
-  node: RuleNode; readOnly: boolean;
-  draftLabel: string; draftScript: string;
-  onLabelChange: (v: string) => void; onScriptChange: (v: string) => void;
-  onApply: () => void; onClose: () => void; onDelete: () => void; onReset: () => void;
+export function NodeEditorPanel({
+  node, decl, layout, readOnly, draftLabel, draftValues, choices, issues = [], showRequired = false,
+  onLabelChange, onValueChange, onApply, onClose, onDelete, onResetScript, onDebug,
+}: {
+  node: RuleNode;
+  decl: BlockDecl | undefined;
+  layout: NodeLayout;
+  readOnly: boolean;
+  draftLabel: string;
+  /** the params being edited; a param stored in the script field is among them */
+  draftValues: ParamValues;
+  choices?: ParamChoices;
+  issues?: GraphIssue[];
+  /** show "is required" under empty required fields (after a first Apply) */
+  showRequired?: boolean;
+  onLabelChange: (v: string) => void;
+  onValueChange: (key: string, value: unknown) => void;
+  onApply: () => void; onClose: () => void; onDelete: () => void;
+  /** put the default script back; null when the block has no script param with a default */
+  onResetScript: (() => void) | null;
   onDebug: () => void;
 }) {
-  const visual = NODE_VISUALS[node.type];
-  const ports = nodePorts(node);
-  const placeholder = node.type === 'PLACEHOLDER';
+  const look = lookOf(decl);
+  const placeholder = layout.placeholder;
+  const title = placeholder ? 'Not available' : decl?.title ?? node.type;
+  const hasScript = Object.values(decl?.params ?? {}).some((spec) => spec.store === 'script');
+  const hasParams = Object.keys(decl?.params ?? {}).length > 0;
   return (
-    <aside className="flex w-80 shrink-0 flex-col overflow-hidden border-l border-border bg-surface-raised max-md:absolute max-md:inset-0 max-md:z-50 max-md:w-auto max-md:border-l-0">
+    <aside aria-label={`${node.label} settings`} className="flex w-80 shrink-0 flex-col overflow-hidden border-l border-border bg-surface-raised max-md:absolute max-md:inset-0 max-md:z-50 max-md:w-auto max-md:border-l-0">
       {/* Header */}
       <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">
-        <div className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-lg', visual.headerBg)}>
-          <FontAwesomeIcon icon={visual.icon} className={cn('w-3.5 h-3.5', visual.iconColor)} aria-hidden="true" />
+        <div className={cn('flex h-7 w-7 shrink-0 items-center justify-center rounded-lg', look.headerBg)}>
+          <FontAwesomeIcon icon={look.icon} className={cn('w-3.5 h-3.5', look.iconColor)} aria-hidden="true" />
         </div>
-        <p className="flex-1 min-w-0 text-[11px] font-bold uppercase tracking-widest text-text-secondary">{visual.displayLabel}</p>
+        <p className="flex-1 min-w-0 truncate text-[11px] font-bold uppercase tracking-widest text-text-secondary">{title}</p>
         <button onClick={onDebug} title="Debug node" aria-label="Debug node"
           className="shrink-0 rounded p-1 text-text-secondary transition-colors hover:bg-primary-subtle hover:text-primary">
           <FontAwesomeIcon icon={faBug} className="w-3.5 h-3.5" aria-hidden="true" />
@@ -77,14 +101,19 @@ export function NodeEditorPanel({ node, readOnly, draftLabel, draftScript, onLab
       </div>
       {/* Body */}
       <div className="flex-1 space-y-5 overflow-y-auto p-4">
-        <div>
-          <label className="mb-1.5 block text-xs font-semibold text-text-secondary">Label</label>
-          <input value={draftLabel} onChange={(e) => onLabelChange(e.target.value)} readOnly={readOnly}
-            className={cn('w-full rounded-lg border border-border bg-surface-base px-3 py-1.5 text-sm text-text-primary outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20', readOnly && 'cursor-default opacity-60')} />
-        </div>
-        {!placeholder && <p className="text-xs -mt-2 leading-relaxed text-text-secondary">{visual.description}</p>}
+        <Input id={`node-${node.nodeId}-label`} label="Label" value={draftLabel} readOnly={readOnly} onChange={(e) => onLabelChange(e.target.value)} />
+        {!placeholder && decl?.description && <p className="text-xs -mt-2 leading-relaxed text-text-secondary">{decl.description}</p>}
+        {issues.length > 0 && (
+          <ul aria-label="Problems with this node" className="space-y-1">
+            {issues.map((issue, i) => (
+              <li key={`${issue.code}-${i}`} className={cn('rounded-md border px-2.5 py-1.5 text-xs', issue.severity === 'error' ? 'border-error bg-error-subtle text-error' : 'border-warning bg-warning-subtle text-text-primary')}>
+                {issue.message}
+              </li>
+            ))}
+          </ul>
+        )}
         {placeholder && <PlaceholderDetails node={node} />}
-        {!placeholder && <div>
+        {!placeholder && hasScript && <div>
           <p className="mb-2 text-xs font-semibold text-text-secondary">Available inputs</p>
           <div className="flex flex-wrap gap-1.5">
             {(['msg','metadata','message_type'] as const).map((v) => (
@@ -92,12 +121,12 @@ export function NodeEditorPanel({ node, readOnly, draftLabel, draftScript, onLab
             ))}
           </div>
         </div>}
-        {(ports.inputs.length > 0 || ports.outputs.length > 0) && (
+        {(layout.inputs.length > 0 || layout.outputs.length > 0 || layout.hasError) && (
           <div className="flex gap-6">
-            {ports.inputs.length > 0 && (
+            {layout.inputs.length > 0 && (
               <div>
                 <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-text-secondary">In</p>
-                {ports.inputs.map((p) => (
+                {layout.inputs.map((p) => (
                   <div key={p.id} className="mb-1 flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full border-2 border-border-strong bg-surface-base" />
                     <span className="font-mono text-[11px] text-text-secondary">{p.id}</span>
@@ -105,10 +134,10 @@ export function NodeEditorPanel({ node, readOnly, draftLabel, draftScript, onLab
                 ))}
               </div>
             )}
-            {ports.outputs.length > 0 && (
+            {(layout.outputs.length > 0 || layout.hasError) && (
               <div>
                 <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-text-secondary">Out</p>
-                {ports.outputs.map((p) => (
+                {[...layout.outputs, ...(layout.hasError ? [{ id: 'error', label: 'error' }] : [])].map((p) => (
                   <div key={p.id} className="mb-1 flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full" style={{ background: portColor(p.id) }} />
                     <span className="font-mono text-[11px]" style={{ color: portColor(p.id) }}>{p.id}</span>
@@ -118,17 +147,21 @@ export function NodeEditorPanel({ node, readOnly, draftLabel, draftScript, onLab
             )}
           </div>
         )}
-        {!placeholder && <div>
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-semibold text-text-secondary">JavaScript</p>
-            {!readOnly && (
-              <button onClick={onReset} className="flex items-center gap-1 text-xs text-text-secondary transition-colors hover:text-primary">
-                <FontAwesomeIcon icon={faRotateLeft} className="w-3 h-3" aria-hidden="true" /> Reset
-              </button>
+        {!placeholder && hasParams && decl && (
+          <div>
+            {onResetScript && !readOnly && (
+              <div className="mb-2 flex justify-end">
+                <button type="button" onClick={onResetScript} className="flex items-center gap-1 text-xs text-text-secondary transition-colors hover:text-primary">
+                  <FontAwesomeIcon icon={faRotateLeft} className="w-3 h-3" aria-hidden="true" /> Reset script
+                </button>
+              </div>
             )}
+            <ParamForm
+              schema={decl.params ?? {}} values={draftValues} onChange={onValueChange} readOnly={readOnly}
+              choices={choices} idPrefix={`node-${node.nodeId}`} showRequired={showRequired}
+            />
           </div>
-          <CodeEditor value={draftScript} onChange={onScriptChange} readOnly={readOnly} />
-        </div>}
+        )}
       </div>
       {/* Footer */}
       {!readOnly && (

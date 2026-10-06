@@ -68,3 +68,8 @@ return {
 // It was imported from another system and does nothing;
 // messages that reach it stop here.`,
 };
+
+/** The script a new node of this type starts with; empty for a type without one. */
+export function defaultScript(type: string): string {
+  return DEFAULT_SCRIPTS[type as RuleNodeType] ?? '';
+}

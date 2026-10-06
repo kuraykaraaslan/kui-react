@@ -11,7 +11,11 @@ import { TelemetryTimeSeriesChart } from '@/modules/domains/iot/telemetry/Teleme
 import { LogStreamRow } from '@/modules/domains/iot/telemetry/LogStreamRow';
 import { AlertDetailHeader } from '@/modules/domains/iot/alert/AlertDetailHeader';
 import { AlertEventTimeline } from '@/modules/domains/iot/alert/AlertEventTimeline';
+import { DEMO_CATALOG, DEMO_CHOICES, DEMO_FLOW } from '@/modules/domains/iot/ruleset/demo';
 import type { Device, CloudWorkspace, RuleNode, RuleEdge } from '@/modules/domains/iot/types';
+
+/** the demo flow with its blocks thrown about, to try "Arrange the blocks" */
+const SCRAMBLED_NODES: RuleNode[] = DEMO_FLOW.nodes.map((n, i) => ({ ...n, x: 30 + ((i * 3) % 5) * 150, y: 30 + ((i * 5) % 4) * 90 + (i % 2) * 20 }));
 
 /* ─── demo data ─── */
 
@@ -326,14 +330,18 @@ export function CloudWorkspaceCard({ workspace, className, onClick }) {
       title: 'RulesetEditor',
       category: 'Domain',
       abbr: 'RE',
-      description: 'Drag-and-drop visual rule chain editor — build telemetry pipelines with Trigger, Filter, Switch, Transform, and Action nodes.',
+      description: 'Drag-and-drop visual rule chain editor. The blocks come from a catalog (typed blocks with params), each block has a form built from its schema, and the editor has undo, multi-select, groups, subflows and validation.',
       filePath: 'modules/domains/iot/ruleset/RulesetEditor/index.tsx',
       sourceCode: `'use client';
-// Drag nodes from palette onto the canvas.
-// Click output ports (filled) → input ports (hollow) to wire them.
-// Click an edge to delete it. Select a node to reveal the delete button.
+// Drag blocks from the palette onto the canvas, or right-click for "Add a block here…".
+// Click an output port (filled) and then an input port (hollow) to wire them.
+// Click a connection to select it; Delete removes it. Shift or Ctrl click selects several nodes.
+// Ctrl+Z undoes, Ctrl+Y redoes. Right-click a node to group, skip, copy or make a subflow of the selection.
 
-export function RulesetEditor({ initialNodes, initialEdges, readOnly, className }) {
+export function RulesetEditor({
+  initialNodes, initialEdges, initialGroups, initialSubflows,
+  catalog, choices, active, onChange, readOnly, className,
+}) {
   // ...
 }`,
       variants: [
@@ -352,6 +360,77 @@ export function RulesetEditor({ initialNodes, initialEdges, readOnly, className 
   initialNodes={nodes}
   initialEdges={edges}
 />`,
+        },
+        {
+          title: 'Block catalog, param forms, a group and a subflow',
+          layout: 'stack',
+          preview: (
+            <div className="h-[28rem] w-full rounded-xl overflow-hidden border border-border">
+              <RulesetEditor
+                catalog={DEMO_CATALOG}
+                choices={DEMO_CHOICES}
+                initialNodes={DEMO_FLOW.nodes}
+                initialEdges={DEMO_FLOW.edges}
+                initialGroups={DEMO_FLOW.groups}
+                initialSubflows={DEMO_FLOW.subflows}
+                chainName="Boiler demo"
+              />
+            </div>
+          ),
+          code: `<RulesetEditor
+  catalog={catalog}            // blocks with typed params, from data
+  choices={{ brokers: [...] }} // lists for source fields
+  initialNodes={nodes}
+  initialEdges={edges}
+  initialGroups={groups}
+  initialSubflows={subflows}
+  active={chain.active}        // a missing required param is then an error
+  onChange={(graph) => save(graph)}
+/>`,
+        },
+        {
+          title: 'Arrange, mini map, box select and snap',
+          layout: 'stack',
+          preview: (
+            <div className="h-[28rem] w-full rounded-xl overflow-hidden border border-border">
+              <RulesetEditor
+                catalog={DEMO_CATALOG}
+                choices={DEMO_CHOICES}
+                initialNodes={SCRAMBLED_NODES}
+                initialEdges={DEMO_FLOW.edges}
+                initialSubflows={DEMO_FLOW.subflows}
+                chainName="Scrambled demo"
+              />
+            </div>
+          ),
+          code: `// The blocks are scattered: press "Arrange the blocks" (bottom right) for a layered layout, one undo step.
+// Shift / Ctrl / ⌘ and drag on the empty canvas draws a selection frame; the frame button does it with one finger.
+// Drag a block: it snaps to a 12 px grid and to the edges of other blocks (guide lines); hold Alt to move freely.
+// The mini map shows above 30 blocks or when blocks leave the view; the binoculars button toggles it.
+const ref = useRef<RulesetEditorRef>(null);
+<RulesetEditor ref={ref} catalog={catalog} initialNodes={nodes} initialEdges={edges}
+  onSelectionChange={(ids) => setSelected(ids)}
+  nodeMenuItems={({ nodeIds }) => [{ kind: 'item', label: 'Open live data', onSelect: () => open(nodeIds) }]}
+  toolbarExtra={<MyButton />} bannerSlot={<DraftBanner />} />
+ref.current?.arrange(); ref.current?.select(['n1']); ref.current?.reveal('n4');`,
+        },
+        {
+          title: 'Read only',
+          layout: 'stack',
+          preview: (
+            <div className="h-64 w-full rounded-xl overflow-hidden border border-border">
+              <RulesetEditor
+                readOnly
+                catalog={DEMO_CATALOG}
+                choices={DEMO_CHOICES}
+                initialNodes={DEMO_FLOW.nodes}
+                initialEdges={DEMO_FLOW.edges}
+                initialGroups={DEMO_FLOW.groups}
+                initialSubflows={DEMO_FLOW.subflows}
+              />
+            </div>
+          ),
+          code: `<RulesetEditor readOnly catalog={catalog} initialNodes={nodes} initialEdges={edges} />`,
         },
         {
           title: 'Empty canvas (editable)',

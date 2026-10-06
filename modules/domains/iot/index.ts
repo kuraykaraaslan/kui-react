@@ -5,6 +5,7 @@ export { DeviceCard } from './device/DeviceCard';
 export { DeviceStatusBadge } from './device/DeviceStatusBadge';
 export { DeviceTypeBadge } from './device/DeviceTypeBadge';
 export { RulesetEditor } from './ruleset/RulesetEditor';
+export type { RulesetEditorRef, RulesetEditorProps, RulesetGraph, NodeMenuContext, ContextMenuItem } from './ruleset/RulesetEditor';
 export { CloudWorkspaceCard } from './workspace/CloudWorkspaceCard';
 export { MetricSparklineCard } from './telemetry/MetricSparklineCard';
 export { TelemetryTimeSeriesChart } from './telemetry/TelemetryTimeSeriesChart';

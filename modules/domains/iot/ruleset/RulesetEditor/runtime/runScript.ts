@@ -1,7 +1,8 @@
 'use client';
+import { RuleNodeTypeEnum } from '../../../types';
 import type { RuleNode } from '../../../types';
 import { nodePorts } from '../node-meta';
-import { DEFAULT_SCRIPTS } from '../default-scripts';
+import { defaultScript } from '../default-scripts';
 
 export type RunResult = {
   output: unknown; portTaken?: string;
@@ -9,13 +10,17 @@ export type RunResult = {
 };
 
 export function runScript(node: RuleNode, msg: unknown, metadata: unknown, messageType: string): RunResult {
-  const script = node.script ?? DEFAULT_SCRIPTS[node.type];
+  const script = node.script ?? defaultScript(node.type);
   const v = nodePorts(node);
   const sideEffects: string[] = [];
   const t0 = performance.now();
   if (node.type === 'PLACEHOLDER') {
     return { output: undefined, sideEffects, durationMs: 0,
       error: `Not available here: "${node.original?.type ?? 'unknown'}" nodes cannot run on this system.` };
+  }
+  if (!(RuleNodeTypeEnum.options as readonly string[]).includes(node.type)) {
+    return { output: undefined, sideEffects, durationMs: 0,
+      error: `The browser demo cannot run "${node.type}" blocks: they run on the device or the server.` };
   }
   try {
     const fn = new Function('msg','metadata','message_type','send','getDeviceLabel','getDeviceTags', script);

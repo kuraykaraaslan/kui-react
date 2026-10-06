@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { Modal } from '@/modules/ui/Modal';
-import { NODE_VISUALS } from '../node-meta';
-import { DEFAULT_SCRIPTS } from '../default-scripts';
+import { visualFor } from '../node-meta';
+import { defaultScript } from '../default-scripts';
 import { runScript, type RunResult } from '../runtime/runScript';
 import { CodeEditor } from '../editors/CodeEditor';
 import { JsonEditor } from '../editors/JsonEditor';
@@ -20,7 +20,7 @@ export function NodeDebugModal({ node, msg, onMsgChange, metadata, onMetadataCha
   onClose: () => void;
 }) {
   const [result, setResult] = useState<RunResult | null>(null);
-  const visual = NODE_VISUALS[node.type];
+  const visual = visualFor(node.type);
 
   function run() {
     try {
@@ -52,7 +52,7 @@ export function NodeDebugModal({ node, msg, onMsgChange, metadata, onMetadataCha
           <MsgTypeInput value={messageType} onChange={onMessageTypeChange} />
           <div>
             <p className="mb-1.5 text-xs font-semibold text-text-secondary">Script</p>
-            <CodeEditor value={node.script ?? DEFAULT_SCRIPTS[node.type]} readOnly minHeight={120} />
+            <CodeEditor value={node.script ?? defaultScript(node.type)} readOnly minHeight={120} />
           </div>
         </div>
         <NodeResultPanel result={result} />

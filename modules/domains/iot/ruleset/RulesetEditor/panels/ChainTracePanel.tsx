@@ -1,7 +1,7 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { NODE_VISUALS, portColor, portEdgeLabel } from '../node-meta';
+import { visualFor, portColor, portEdgeLabel } from '../node-meta';
 import type { RuleNode } from '../../../types';
 import type { TraceStep } from '../runtime/traceChain';
 
@@ -19,7 +19,7 @@ export function ChainTracePanel({ steps, nodes }: { steps: TraceStep[] | null; n
   return (
     <div>
       {steps.map((step, i) => {
-        const v    = NODE_VISUALS[step.node.type];
+        const v    = visualFor(step.node.type);
         const next = step.edgeTaken ? nodes.find((n) => n.nodeId === step.edgeTaken!.targetNodeId) : null;
         const isLast = i === steps.length - 1;
         return (

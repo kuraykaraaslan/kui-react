@@ -9,8 +9,11 @@
  * The rulesets theme page wires these to dialogs; everything here is unit-tested
  * in `transfer.test.ts`.
  */
-import { RuleNodeTypeEnum } from '../types';
-import type { RuleChain, RuleEdge, RuleNode, RuleNodeOriginal, RuleNodeType } from '../types';
+import { RuleNodeTypeEnum, RuleGroupSchema, RuleSubflowSchema } from '../types';
+import type { RuleChain, RuleEdge, RuleGroup, RuleNode, RuleNodeOriginal, RuleNodeType, RuleSubflow } from '../types';
+import type { Catalog } from './catalog/types';
+import { chainsToRoltek, roltekToChains, ROLTEK_FORMAT, type RoltekFile } from './format/roltek';
+import { isSecretKey, looksLikeSecret } from './secrets';
 
 /* ─── Shared helpers ─────────────────────────────────────────────────────── */
 
@@ -43,6 +46,8 @@ export function cloneChain(c: RuleChain): RuleChain {
     ...c,
     nodes: c.nodes.map((n) => ({ ...n, config: clone(n.config), original: clone(n.original) })),
     edges: c.edges.map((e) => ({ ...e })),
+    ...(c.groups && { groups: clone(c.groups) }),
+    ...(c.subflows && { subflows: clone(c.subflows) }),
     createdAt: c.createdAt ? new Date(c.createdAt) : undefined,
     updatedAt: c.updatedAt ? new Date(c.updatedAt) : undefined,
   };
@@ -76,7 +81,7 @@ export const TYPE_PORTS: Record<Exclude<RuleNodeType, 'PLACEHOLDER'>, { inputs: 
 
 function portsOf(n: RuleNode) {
   if (n.type === 'PLACEHOLDER') return { inputs: n.original?.inputs ?? ['in'], outputs: n.original?.outputs ?? [] };
-  return TYPE_PORTS[n.type];
+  return TYPE_PORTS[n.type as keyof typeof TYPE_PORTS] ?? { inputs: ['in'], outputs: ['out'] };
 }
 
 const KNOWN_TYPES = new Set<string>(RuleNodeTypeEnum.options);
@@ -103,21 +108,7 @@ export type ExportResult = {
   suspicious: string[];
 };
 
-const SECRET_KEY = /password|passwd|passphrase|secret|token|api[-_]?key|private[-_]?key|credential|authorization|^pwd$|^pin$/i;
-
-/** a settings key whose value must never leave the system */
-export function isSecretKey(key: string) { return SECRET_KEY.test(key); }
-
-const SUSPICIOUS_TEXT: RegExp[] = [
-  /\b(password|passwd|pwd|secret|token|api[-_]?key)\s*[=:]\s*["']?[^\s"',;)}]{3,}/i,
-  /\bBearer\s+[A-Za-z0-9\-._~+/]{8,}/,
-  /\b[a-z][a-z0-9+.-]*:\/\/[^\s/:@]+:[^\s/@]+@/i,
-];
-
-/** free text that looks like it carries a password (`password=…`, `token: …`, `Bearer …`, `user:pw@host`) */
-export function looksLikeSecret(text: string) {
-  return SUSPICIOUS_TEXT.some((re) => re.test(text));
-}
+export { isSecretKey, looksLikeSecret };
 
 /** copy `value`, nulling secret keys (listed in `omitted`) and noting suspicious strings */
 function scrub(value: unknown, path: string, omitted: string[], suspicious: string[]): unknown {
@@ -152,8 +143,8 @@ export function buildExport(chains: RuleChain[], opts: { all?: boolean; now?: Da
   const suspicious: string[] = [];
   const rulesets: ExportedRuleset[] = chains.map((c) => {
     if (c.description && looksLikeSecret(c.description)) suspicious.push(`${c.name} / description`);
-    const nodes = c.nodes.map((n) => {
-      const at = `${c.name} / ${n.label}`;
+    const scrubNodes = (list: RuleNode[], owner: string) => list.map((n) => {
+      const at = `${owner} / ${n.label}`;
       const out: RuleNode = { ...n };
       if (n.config) out.config = scrub(n.config, `${at} / config`, omitted, suspicious) as Record<string, unknown>;
       if (n.original) out.original = { ...n.original, settings: scrub(n.original.settings, `${at} / settings`, omitted, suspicious) };
@@ -161,10 +152,13 @@ export function buildExport(chains: RuleChain[], opts: { all?: boolean; now?: Da
       if (looksLikeSecret(n.label)) suspicious.push(`${at} / label`);
       return out;
     });
+    const nodes = scrubNodes(c.nodes, c.name);
     return {
       ...c,
       nodes,
       edges: c.edges.map((e) => ({ ...e })),
+      ...(c.groups && { groups: clone(c.groups) }),
+      ...(c.subflows && { subflows: c.subflows.map((sf) => ({ ...clone(sf), nodes: scrubNodes(sf.nodes, `${c.name} / subflow ${sf.name}`) })) }),
       createdAt: c.createdAt ? new Date(c.createdAt).toISOString() : undefined,
       updatedAt: c.updatedAt ? new Date(c.updatedAt).toISOString() : undefined,
     };
@@ -183,6 +177,30 @@ export function buildExport(chains: RuleChain[], opts: { all?: boolean; now?: Da
     omitted,
     suspicious,
   };
+}
+
+export type RoltekExportResult = {
+  file: RoltekFile;
+  json: string;
+  fileName: string;
+  /** paths of the secret settings left out of the file */
+  omitted: string[];
+  /** free text that looks like a password / token — ask before downloading */
+  suspicious: string[];
+};
+
+/**
+ * Build a `roltek-automation-1` export of chains. Pass the catalog the chains were made with, so the
+ * scripts of its blocks go back into the params they belong to. Secrets are left out like in `buildExport`.
+ */
+export function buildRoltekExport(
+  chains: RuleChain[], opts: { all?: boolean; now?: Date; suffix?: string; catalog?: Catalog } = {},
+): RoltekExportResult {
+  const now = opts.now ?? new Date();
+  const { file, omitted, suspicious } = chainsToRoltek(chains, { catalog: opts.catalog, now });
+  const base = opts.all || !chains.length ? 'all' : chains[0].name;
+  const label = opts.suffix ? `${base}-${opts.suffix}` : base;
+  return { file, json: JSON.stringify(file, null, 2), fileName: `automation-${slugify(label) || 'all'}-${isoDay(now)}.json`, omitted, suspicious };
 }
 
 /* ─── Import ─────────────────────────────────────────────────────────────── */
@@ -206,7 +224,7 @@ export type ImportItem = {
 /** Node-RED conversion tally, per node */
 export type NodeRedReport = { exact: number; changed: number; placeholders: number; skipped: number };
 
-export type ImportPreview = { ok: true; source: 'kui' | 'node-red'; items: ImportItem[]; report?: NodeRedReport };
+export type ImportPreview = { ok: true; source: 'kui' | 'node-red' | 'roltek'; items: ImportItem[]; report?: NodeRedReport };
 
 export type ConflictChoice = 'copy' | 'replace' | 'skip';
 
@@ -297,6 +315,15 @@ function normalizeKui(raw: unknown, i: number, existing: RuleChain[], now: Date)
     return ok;
   });
 
+  const ids = new Set(nodes.map((n) => n.nodeId));
+  const groups: RuleGroup[] = (Array.isArray(raw.groups) ? raw.groups : [])
+    .map((g) => RuleGroupSchema.safeParse(g))
+    .flatMap((r) => (r.success ? [{ ...r.data, nodeIds: r.data.nodeIds.filter((id) => ids.has(id)) }] : []))
+    .filter((g) => g.nodeIds.length);
+  const subflows: RuleSubflow[] = (Array.isArray(raw.subflows) ? raw.subflows : [])
+    .map((sf) => RuleSubflowSchema.safeParse(sf))
+    .flatMap((r) => (r.success ? [r.data] : []));
+
   const notes: string[] = [];
   if (placeholders) notes.push(`${plural(placeholders, 'node')} not available here (placeholder)`);
   if (dropped) notes.push(`${plural(dropped, 'connection')} dropped`);
@@ -306,7 +333,9 @@ function normalizeKui(raw: unknown, i: number, existing: RuleChain[], now: Date)
     chain: {
       chainId, name, slug: slugify(name) || chainId,
       description: str(raw.description) || undefined,
-      active: false, nodes, edges, createdAt: now, updatedAt: now,
+      active: false, nodes, edges,
+      ...(groups.length && { groups }), ...(subflows.length && { subflows }),
+      createdAt: now, updatedAt: now,
     },
     nodes: nodes.length,
     placeholders,
@@ -319,7 +348,7 @@ function normalizeKui(raw: unknown, i: number, existing: RuleChain[], now: Date)
  * Check an import (file text or pasted JSON) and build the preview.
  * Accepts a `kui-ruleset-1` export or a Node-RED flow export.
  */
-export function parseImport(text: string, existing: RuleChain[], opts: { now?: Date } = {}): ImportPreview | ImportError {
+export function parseImport(text: string, existing: RuleChain[], opts: { now?: Date; catalog?: Catalog } = {}): ImportPreview | ImportError {
   const now = opts.now ?? new Date();
   if (byteLength(text) > IMPORT_MAX_BYTES) return fail('too-big');
   if (!text.trim()) return fail('empty', 'Nothing to check: choose a file or paste JSON.');
@@ -335,12 +364,28 @@ export function parseImport(text: string, existing: RuleChain[], opts: { now?: D
     return { ok: true, source: 'node-red', items, report };
   }
 
+  if (isObject(data) && data.format === ROLTEK_FORMAT) return parseRoltek(data, existing, now, opts.catalog);
+
   if (!isObject(data) || data.format !== EXPORT_FORMAT || !Array.isArray(data.rulesets)) return fail('wrong-format');
   if (!data.rulesets.length) return fail('empty');
   if (data.rulesets.length > IMPORT_MAX_RULESETS) return fail('too-big', `Too many rulesets (over ${IMPORT_MAX_RULESETS}).`);
   const items = data.rulesets.map((r, i) => normalizeKui(r, i, existing, now)).filter((x): x is ImportItem => !!x);
   if (!items.length) return fail('wrong-format', 'None of the rulesets in this file could be read.');
   return { ok: true, source: 'kui', items };
+}
+
+function parseRoltek(data: Record<string, unknown>, existing: RuleChain[], now: Date, catalog?: Catalog): ImportPreview | ImportError {
+  if (!Array.isArray(data.flows) || !data.flows.length) return fail('empty');
+  if (data.flows.length > IMPORT_MAX_RULESETS) return fail('too-big', `Too many flows (over ${IMPORT_MAX_RULESETS}).`);
+  const items: ImportItem[] = roltekToChains(data, catalog, now).map(({ chain, placeholders, notes }, i) => {
+    const clash = existing.find((c) => c.chainId === chain.chainId);
+    return {
+      key: `${i}:${chain.chainId}`, chain, nodes: chain.nodes.length, placeholders, notes,
+      ...(clash && { existing: { chainId: clash.chainId, name: clash.name } }),
+    };
+  });
+  if (!items.length) return fail('wrong-format', 'None of the flows in this file could be read.');
+  return { ok: true, source: 'roltek', items };
 }
 
 export type ApplyImportResult = {

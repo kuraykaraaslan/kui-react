@@ -1,32 +1,27 @@
 'use client';
 import { useState } from 'react';
-import { NODE_VISUALS } from '../node-meta';
+import { newNode } from '../../graph/edit';
+import type { Graph } from '../../graph/types';
+import type { Catalog } from '../../catalog/types';
 import { NODE_W, NODE_HEADER_H, type Point } from '../geometry';
-import { DEFAULT_SCRIPTS } from '../default-scripts';
-import type { RuleNode, RuleNodeType } from '../../../types';
 
-export function usePaletteDrop({ setNodes, nodeSeq: nodeSeqRef, toWorld }: {
-  setNodes: React.Dispatch<React.SetStateAction<RuleNode[]>>;
-  nodeSeq: React.RefObject<number>;
+export function usePaletteDrop({ getGraph, apply, catalog, toWorld }: {
+  getGraph: () => Graph;
+  apply: (fn: (graph: Graph) => Graph, key?: string) => void;
+  catalog: Catalog;
   /** screen (client) coordinates → canvas world coordinates (pan + zoom aware) */
   toWorld: (clientX: number, clientY: number) => Point;
 }) {
-  const [paletteDrag, setPaletteDrag] = useState<RuleNodeType | null>(null);
+  const [paletteDrag, setPaletteDrag] = useState<string | null>(null);
 
-  function onPaletteDragStart(type: RuleNodeType) { setPaletteDrag(type); }
+  function onPaletteDragStart(type: string) { setPaletteDrag(type); }
   function onPaletteDragEnd() { setPaletteDrag(null); }
 
   /** add a node centred on a world point; returns its id */
-  function addAt(type: RuleNodeType, pt: Point) {
-    nodeSeqRef.current++;
-    const nodeId = `n${nodeSeqRef.current}`;
-    setNodes((p) => [...p, {
-      nodeId, type,
-      label: NODE_VISUALS[type].displayLabel,
-      x: Math.round(pt.x - NODE_W / 2), y: Math.round(pt.y - NODE_HEADER_H / 2),
-      script: DEFAULT_SCRIPTS[type],
-    }]);
-    return nodeId;
+  function addAt(type: string, pt: Point): string {
+    const node = newNode(catalog, type, pt, getGraph().nodes, { width: NODE_W, headerHeight: NODE_HEADER_H });
+    apply((g) => ({ ...g, nodes: [...g.nodes, node] }), 'add');
+    return node.nodeId;
   }
 
   function onDrop(e: React.DragEvent) {

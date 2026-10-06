@@ -1,82 +1,207 @@
 'use client';
-import { useState, useRef, useImperativeHandle } from 'react';
+import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare, faBug, faClone, faCopy, faPaste, faTrash, faExpand, faPlus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPenToSquare, faBug, faClone, faCopy, faPaste, faTrash, faExpand, faPlus, faScissors, faObjectGroup, faObjectUngroup,
+  faLayerGroup, faRotateLeft, faRotateRight, faSquareCheck, faEyeSlash, faDiagramProject, faMagnifyingGlassPlus,
+} from '@fortawesome/free-solid-svg-icons';
 import { cn } from '@/libs/utils/cn';
-import type { RuleNode, RuleEdge } from '../../types';
-import { DEFAULT_SCRIPTS } from './default-scripts';
+import type { RuleNode, RuleEdge, RuleGroup, RuleSubflow } from '../../types';
+import { BUILTIN_CATALOG } from '../catalog/builtin';
+import { paletteGroups } from '../catalog/palette';
+import type { Catalog, ParamChoices } from '../catalog/types';
+import { addGroup, groupOf, ungroup, updateGroup } from '../graph/groups';
+import { insertOnEdge, newNode, placeNodes, pruneEdges, removeEdge, removeNodes, toggleDisabled, updateNode, type Point } from '../graph/edit';
+import { autoLayout } from '../graph/layout';
+import { mergeSelection } from '../graph/boxselect';
+import { copySelection, duplicateNodes, parseClip, pasteClip, serializeClip, type ClipPayload } from '../graph/clipboard';
+import { newId } from '../graph/ids';
+import { applySubflowSettings, deleteSubflow, newSubflow, scopeExists, subflowUsers, withCurrentGraph } from '../graph/state';
+import { catalogWithSubflows, DEFAULT_SUBFLOW_DEPTH, fromSelection, nestProblem, placementProblem, subflowMap } from '../graph/subflows';
+import { subflowIdOf } from '../graph/types';
+import { issuesByNode, validateGraph, type ValidationResult } from '../graph/validate';
+import { defaultScriptOf, formValues, setField, splitFormValues } from '../forms/field-utils';
 import { Palette } from './canvas/Palette';
 import { Canvas } from './canvas/Canvas';
+import { IssuesPanel, ScopeBar } from './canvas/Overlays';
 import type { RuleNodeStatus } from './canvas/RuleNode';
 import { ContextMenu, type ContextMenuItem } from './canvas/ContextMenu';
-import { ADDABLE_VISUALS } from './node-meta';
+import { MiniMap } from './canvas/MiniMap';
+import { SelectionFrame } from './canvas/SelectionFrame';
+import { lookOf } from './block-visual';
 import { NodeEditorPanel } from './panels/NodeEditorPanel';
 import { NodeDebugModal } from './modals/NodeDebugModal';
 import { RulesetDebugModal } from './modals/RulesetDebugModal';
+import { BlockPickerDialog } from './dialogs/BlockPickerDialog';
+import { GroupDialog } from './dialogs/GroupDialog';
+import { NameDialog } from './dialogs/NameDialog';
+import { SubflowSettingsDialog } from './dialogs/SubflowSettingsDialog';
+import { useGraphEditor, type RulesetGraph } from './hooks/useGraphEditor';
 import { useNodeDrag } from './hooks/useNodeDrag';
 import { useEdgeConnect } from './hooks/useEdgeConnect';
 import { usePaletteDrop } from './hooks/usePaletteDrop';
-import { NODE_W, ZOOM_MIN, ZOOM_MAX, nodeHeight, type View, type Point } from './geometry';
-import type { RuleNodeType } from '../../types';
+import { useSnapDrag } from './hooks/useSnapDrag';
+import { useBoxSelect } from './hooks/useBoxSelect';
+import { useMiniMap } from './hooks/useMiniMap';
+import { NODE_HEADER_H, NODE_W, ZOOM_MIN, ZOOM_MAX, inputAnchor, layoutOf, outputAnchor, revealView, type NodeLayout, type View, type Point as ViewPoint } from './geometry';
 
-export type { RuleNodeStatus };
+export type { RuleNodeStatus, RulesetGraph, ContextMenuItem };
 
 /* ─── Public ref API ──────────────────────────────────────────────────────── */
 
 export type RulesetEditorRef = {
   openRulesetDebug: () => void;
   fit: () => void;
-  /** the current graph, e.g. to save it */
-  getGraph: () => { nodes: RuleNode[]; edges: RuleEdge[] };
+  /** the current graph, e.g. to save it: nodes and edges of the chain, its groups and the subflows */
+  getGraph: () => RulesetGraph;
+  undo: () => void;
+  redo: () => void;
+  /** the problems found in the graph on the canvas (the chain, or the subflow being edited) */
+  validate: () => ValidationResult;
+  /** auto layout of the blocks on the canvas, one undo step; false when nothing moved (or read only) */
+  arrange: () => boolean;
+  /** select these blocks (ids that are not on the canvas are ignored) */
+  select: (ids: string[]) => void;
+  /** pan (and zoom out if needed) until these blocks are in view; nothing happens when they already are */
+  reveal: (ids: string | string[]) => void;
+  /** replace the whole graph as ONE undo step (a merge, a restored draft); leaves a subflow that is gone */
+  replaceGraph: (graph: RulesetGraph, options?: { key?: string; fit?: boolean }) => void;
+  /** ids of the selected blocks, the last one picked last */
+  getSelection: () => string[];
 };
+
+/** what `nodeMenuItems` is asked */
+export type NodeMenuContext = { nodeIds: string[]; readOnly: boolean };
 
 export type RulesetEditorProps = {
   initialNodes?: RuleNode[];
   initialEdges?: RuleEdge[];
+  initialGroups?: RuleGroup[];
+  initialSubflows?: RuleSubflow[];
+  /** the blocks the editor offers; the ten built-in node types by default */
+  catalog?: Catalog;
+  /** the lists a `source` or `list` field offers (devices, brokers …) */
+  choices?: ParamChoices;
+  /** the chain is switched on: a missing required param is then an error, otherwise a warning */
+  active?: boolean;
+  /** how deep subflows may be nested (default 2) */
+  subflowDepthLimit?: number;
+  /** called after every change that is a step of the undo history, and after undo and redo */
+  onChange?: (graph: RulesetGraph) => void;
   readOnly?: boolean;
   className?: string;
   chainName?: string;
   /** live state per node id, shown under the node (e.g. from a running chain) */
   nodeStatus?: Record<string, RuleNodeStatus>;
+  /** called when the selection of blocks changes, with their ids */
+  onSelectionChange?: (ids: string[]) => void;
+  /** more entries for the menu of a block (right click, long press); `label`s must be unique in the menu */
+  nodeMenuItems?: (context: NodeMenuContext) => ContextMenuItem[];
+  /** extra controls at the start of the zoom bar (bottom right of the canvas) */
+  toolbarExtra?: React.ReactNode;
+  /** a bar above the canvas (e.g. "a draft was kept"), full width of the canvas column */
+  bannerSlot?: React.ReactNode;
   ref?: React.Ref<RulesetEditorRef>;
 };
 
+const CLIP_KEY = 'kui-ruleset-clipboard';
+/** with this many blocks or fewer the canvas menu lists them all; with more it opens a picker */
+const INLINE_ADD_LIMIT = 12;
+
+function storeClip(clip: ClipPayload) {
+  const text = serializeClip(clip);
+  try { window.localStorage.setItem(CLIP_KEY, text); } catch { /* storage may be blocked */ }
+  try { void navigator.clipboard?.writeText(text).catch(() => undefined); } catch { /* no clipboard access */ }
+}
+
+function loadClip(): ClipPayload | null {
+  try { return parseClip(window.localStorage.getItem(CLIP_KEY)); } catch { return null; }
+}
+
+type Picker = { title: string; onPick: (type: string) => void };
+type GroupEdit = { kind: 'new'; ids: string[] } | { kind: 'edit'; groupId: string };
+
 export function RulesetEditor({
-  initialNodes = [], initialEdges = [],
-  readOnly = false, className,
-  chainName = 'Rule Chain', nodeStatus, ref,
+  initialNodes = [], initialEdges = [], initialGroups, initialSubflows,
+  catalog: catalogProp, choices, active = false, subflowDepthLimit = DEFAULT_SUBFLOW_DEPTH, onChange,
+  readOnly = false, className, chainName = 'Rule Chain', nodeStatus, onSelectionChange, nodeMenuItems, toolbarExtra, bannerSlot, ref,
 }: RulesetEditorProps) {
-  const [nodes, setNodes]         = useState<RuleNode[]>(initialNodes);
-  const [edges, setEdges]         = useState<RuleEdge[]>(initialEdges);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const ed = useGraphEditor({ nodes: initialNodes, edges: initialEdges, groups: initialGroups ?? [], subflows: initialSubflows ?? [] }, onChange);
+  const { nodes, edges, groups } = ed.graph;
+
+  /* the catalog: the base one, the subflows as blocks, and inside a subflow its own ports */
+  const baseCatalog = catalogProp ?? BUILTIN_CATALOG;
+  const scopeSubflow = ed.scope ? ed.state.subflows.find((s) => s.subflowId === ed.scope) : undefined;
+  const catalog = useMemo(
+    () => catalogWithSubflows(baseCatalog, ed.state.subflows, scopeSubflow ? { subflowId: scopeSubflow.subflowId, outputs: scopeSubflow.outputs } : undefined),
+    [baseCatalog, ed.state.subflows, scopeSubflow],
+  );
+  const layouts = useMemo(() => new Map<string, NodeLayout>(nodes.map((n) => [n.nodeId, layoutOf(n, catalog)])), [nodes, catalog]);
+
+  /* what is wrong with the graph on the canvas */
+  const validation = useMemo(() => {
+    const subs = subflowMap(ed.state.subflows);
+    return validateGraph(ed.graph, catalog, {
+      active,
+      subflow: scopeSubflow ? { inputs: scopeSubflow.inputs, outputs: scopeSubflow.outputs } : undefined,
+      nest: (id) => (scopeSubflow ? nestProblem(subs, scopeSubflow.subflowId, id, subflowDepthLimit) : placementProblem(subs, id, subflowDepthLimit)),
+    });
+  }, [ed.graph, ed.state.subflows, catalog, active, scopeSubflow, subflowDepthLimit]);
+  const issues = useMemo(() => issuesByNode(validation), [validation]);
+
+  /* selection: nodes in the order they were picked (the last one is the primary), and one connection */
+  const [selectedList, setSelectedList] = useState<string[]>([]);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
+  const nodeIds = useMemo(() => new Set(nodes.map((n) => n.nodeId)), [nodes]);
+  const selection = useMemo(() => selectedList.filter((id) => nodeIds.has(id)), [selectedList, nodeIds]);
+  const selectionSet = useMemo(() => new Set(selection), [selection]);
+  const primaryId = selection.at(-1) ?? null;
+  const onSelectionRef = useRef(onSelectionChange);
+  useEffect(() => { onSelectionRef.current = onSelectionChange; });
+  const lastSelection = useRef('');
+  useEffect(() => {
+    const key = selection.join(' ');
+    if (key === lastSelection.current) return;
+    lastSelection.current = key;
+    onSelectionRef.current?.(selection);
+  }, [selection]);
+
   const [view, setView]           = useState<View>({ x: 0, y: 0, k: 1 });
   const [mouse, setMouse]         = useState({ x: 0, y: 0 });
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
   const [draftLabel, setDraftLabel]       = useState('');
-  const [draftScript, setDraftScript]     = useState('');
+  const [draftValues, setDraftValues]     = useState<Record<string, unknown>>({});
+  const [showRequired, setShowRequired]   = useState(false);
   const [debugNodeId, setDebugNodeId]     = useState<string | null>(null);
   const [rulesetDebugOpen, setRulesetDebugOpen] = useState(false);
   const [dbgMsg,     setDbgMsg]     = useState('{\n  "temperature": 92,\n  "humidity": 65\n}');
   const [dbgMeta,    setDbgMeta]    = useState('{\n  "deviceId": "dev-001",\n  "zone": "A"\n}');
   const [dbgMsgType, setDbgMsgType] = useState('POST_TELEMETRY_REQUEST');
+  const [picker, setPicker]         = useState<Picker | null>(null);
+  const [groupEdit, setGroupEdit]   = useState<GroupEdit | null>(null);
+  const [convertIds, setConvertIds] = useState<string[] | null>(null);
+  const [newSubflowOpen, setNewSubflowOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen]     = useState(false);
 
   const containerRef  = useRef<HTMLDivElement>(null);
-  const nodeSeq       = useRef(initialNodes.length);
-  const edgeSeq       = useRef(initialEdges.length);
   const pan           = useRef<{ cx: number; cy: number; vx: number; vy: number; moved: boolean } | null>(null);
   /* context menu (right click, long press), clipboard, phone palette sheet, pinch */
   const [menu, setMenu] = useState<{ x: number; y: number; items: ContextMenuItem[] } | null>(null);
-  const [clip, setClip] = useState<RuleNode | null>(null);
+  const clipRef = useRef<ClipPayload | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const longPress     = useRef<{ timer: number; x: number; y: number } | null>(null);
-  const pointers      = useRef(new Map<number, Point>());
+  const pointers      = useRef(new Map<number, ViewPoint>());
   const pinch         = useRef<{ d0: number; k0: number; vx: number; vy: number; cx: number; cy: number } | null>(null);
 
   /* screen → world (pan and zoom) */
-  function toWorld(clientX: number, clientY: number) {
+  function toWorld(clientX: number, clientY: number): Point {
     const r = containerRef.current?.getBoundingClientRect();
     return r ? { x: (clientX - r.left - view.x) / view.k, y: (clientY - r.top - view.y) / view.k } : { x: 0, y: 0 };
+  }
+
+  function centerWorld(): Point {
+    const r = containerRef.current?.getBoundingClientRect();
+    return r ? toWorld(r.left + r.width / 2, r.top + r.height / 2) : { x: 0, y: 0 };
   }
 
   function zoomAt(factor: number, cx?: number, cy?: number) {
@@ -92,35 +217,153 @@ export function RulesetEditor({
     const r = containerRef.current?.getBoundingClientRect();
     if (!r || !nodes.length) { setView({ x: 0, y: 0, k: 1 }); return; }
     const x0 = Math.min(...nodes.map((n) => n.x)), y0 = Math.min(...nodes.map((n) => n.y));
-    const x1 = Math.max(...nodes.map((n) => n.x + NODE_W)), y1 = Math.max(...nodes.map((n) => n.y + nodeHeight(n)));
+    const x1 = Math.max(...nodes.map((n) => n.x + NODE_W)), y1 = Math.max(...nodes.map((n) => n.y + (layouts.get(n.nodeId)?.height ?? 0)));
     const k = Math.min(1.2, Math.max(ZOOM_MIN, Math.min((r.width - 80) / (x1 - x0), (r.height - 80) / (y1 - y0))));
     setView({ k, x: (r.width - (x1 - x0) * k) / 2 - x0 * k, y: (r.height - (y1 - y0) * k) / 2 - y0 * k });
   }
 
-  useImperativeHandle(ref, () => ({ openRulesetDebug: () => setRulesetDebugOpen(true), fit, getGraph: () => ({ nodes, edges }) }));
+  /* entering or leaving a subflow shows another graph: bring it into view */
+  const fitRef = useRef(fit);
+  useEffect(() => { fitRef.current = fit; });
+  /* after an auto layout or a replaced graph the new positions are rendered first, then the view fits them */
+  const [fitTick, setFitTick] = useState(0);
+  useEffect(() => { if (fitTick) fitRef.current(); }, [fitTick]);
+  const lastScope = useRef(ed.scope);
+  useEffect(() => {
+    if (lastScope.current === ed.scope) return;
+    lastScope.current = ed.scope;
+    fitRef.current();
+  }, [ed.scope]);
 
-  const edgeConnect  = useEdgeConnect({ nodes, setEdges, edgeSeq, readOnly, setMouse });
-  const nodeDrag     = useNodeDrag({ nodes, setNodes, toWorld, readOnly, connecting: edgeConnect.connecting });
-  const paletteDrop  = usePaletteDrop({ setNodes, nodeSeq, toWorld });
+  /* auto layout (one undo step); the view then fits the result */
+  function arrange(): boolean {
+    if (readOnly || !nodes.length) return false;
+    const pos = autoLayout(nodes, edges, { w: NODE_W, h: (n) => layouts.get(n.nodeId)?.height ?? 0, gx: 72, gy: 28 });
+    if (!nodes.some((n) => pos[n.nodeId] && (pos[n.nodeId].x !== n.x || pos[n.nodeId].y !== n.y))) return false;
+    ed.apply((g) => placeNodes(g, pos));
+    setFitTick((t) => t + 1);
+    return true;
+  }
+
+  function reveal(ids: string | string[]) {
+    const r = containerRef.current?.getBoundingClientRect();
+    const list = Array.isArray(ids) ? ids : [ids];
+    const boxes = nodes.filter((n) => list.includes(n.nodeId)).map((n) => ({ x: n.x, y: n.y, w: NODE_W, h: layouts.get(n.nodeId)?.height ?? 0 }));
+    if (!r || !boxes.length) return;
+    const next = revealView(boxes, view, { w: r.width, h: r.height });
+    if (next) setView(next);
+  }
+
+  /** the mini map: put this world point in the middle of the canvas */
+  function goTo(x: number, y: number) {
+    const r = containerRef.current?.getBoundingClientRect();
+    if (r) setView((v) => ({ ...v, x: r.width / 2 - x * v.k, y: r.height / 2 - y * v.k }));
+  }
+
+  function replaceGraph(graph: RulesetGraph, options?: { key?: string; fit?: boolean }) {
+    ed.applyState(() => graph, options?.key);
+    if (!scopeExists(graph, ed.scope)) ed.enter(null);
+    if (options?.fit) setFitTick((t) => t + 1);
+  }
+
+  useImperativeHandle(ref, () => ({
+    openRulesetDebug: () => setRulesetDebugOpen(true),
+    fit,
+    getGraph: ed.getState,
+    undo: ed.undo,
+    redo: ed.redo,
+    validate: () => validation,
+    arrange,
+    select: (ids) => { setSelectedList(ids.filter((id) => nodeIds.has(id))); setSelectedEdgeId(null); },
+    reveal,
+    replaceGraph,
+    getSelection: () => selection,
+  }));
+
+  const heightOf = (nodeId: string) => layouts.get(nodeId)?.height ?? 0;
+  const snap = useSnapDrag({ getNodes: () => ed.getGraph().nodes, heightOf, nodeWidth: NODE_W, getZoom: () => view.k });
+  const box = useBoxSelect({
+    containerRef, getNodes: () => ed.getGraph().nodes, heightOf, nodeWidth: NODE_W, getView: () => view,
+    onSelect: (ids, add) => { setSelectedList((list) => mergeSelection(list, ids, add)); setSelectedEdgeId(null); },
+  });
+  const miniBoxes = useMemo(() => nodes.map((n) => ({ x: n.x, y: n.y, w: NODE_W, h: layouts.get(n.nodeId)?.height ?? 0 })), [nodes, layouts]);
+  const mini = useMiniMap({ containerRef, boxes: miniBoxes, view });
+
+  const edgeConnect  = useEdgeConnect({ getGraph: ed.getGraph, apply: ed.apply, catalog, readOnly, setMouse });
+  const nodeDrag     = useNodeDrag({ getGraph: ed.getGraph, setGraph: ed.setGraph, toWorld, readOnly, connecting: edgeConnect.connecting, resolve: snap.resolve, onEnd: snap.clear });
+  const paletteDrop  = usePaletteDrop({ getGraph: ed.getGraph, apply: ed.apply, catalog, toWorld });
+
+  /* ── selection ─────────────────────────────────────────────────────────── */
+
+  function selectOnly(id: string | null) {
+    setSelectedList(id ? [id] : []);
+    setSelectedEdgeId(null);
+  }
+
+  function toggleSelect(id: string) {
+    setSelectedList((list) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]));
+    setSelectedEdgeId(null);
+  }
+
+  function selectAll() {
+    setSelectedList(nodes.map((n) => n.nodeId));
+    setSelectedEdgeId(null);
+  }
+
+  /* ── the panel ─────────────────────────────────────────────────────────── */
 
   function openEditor(nodeId: string) {
     const node = nodes.find((n) => n.nodeId === nodeId);
     if (!node) return;
     setEditingNodeId(nodeId);
     setDraftLabel(node.label);
-    setDraftScript(node.script ?? DEFAULT_SCRIPTS[node.type]);
+    setDraftValues(formValues(catalog.blocks[node.type]?.params, node.config, node.script));
+    setShowRequired(false);
   }
 
+  function applyEdit() {
+    if (!editingNodeId) return;
+    const node = nodes.find((n) => n.nodeId === editingNodeId);
+    if (!node) return;
+    const { config, script } = splitFormValues(catalog.blocks[node.type]?.params, draftValues);
+    const hasSchema = !!catalog.blocks[node.type];
+    setShowRequired(true);
+    ed.apply((g) => pruneEdges(updateNode(g, node.nodeId, {
+      label: draftLabel.trim() || node.label,
+      ...(hasSchema ? { config } : {}),
+      ...(script !== undefined ? { script } : {}),
+    }), catalog), `edit:${node.nodeId}`);
+  }
+
+  /* ── pointer handling ──────────────────────────────────────────────────── */
+
   function onNodePointerDown(e: React.PointerEvent, nodeId: string) {
-    setSelectedId(nodeId);
+    if (e.shiftKey || e.ctrlKey || e.metaKey) {
+      e.stopPropagation();
+      toggleSelect(nodeId);
+      return;
+    }
     setSelectedEdgeId(null);
-    nodeDrag.onNodePointerDown(e, nodeId);
+    const inSelection = selectionSet.has(nodeId);
+    if (!inSelection) setSelectedList([nodeId]);
+    nodeDrag.start(e, inSelection ? selection : [nodeId], nodeId);
+  }
+
+  function onGroupTabPointerDown(e: React.PointerEvent, groupId: string) {
+    const group = groups.find((g) => g.groupId === groupId);
+    if (!group) return;
+    e.stopPropagation();
+    setSelectedEdgeId(null);
+    setSelectedList(group.nodeIds);
+    nodeDrag.start(e, group.nodeIds, null);
   }
 
   /* empty canvas: start panning (a click without moving clears the selection) */
   function onPointerDown(e: React.PointerEvent) {
     if (e.button !== 0) return;
     containerRef.current?.focus({ preventScroll: true });
+    // Shift / Ctrl / ⌘ (or the frame mode) on the empty canvas draws a selection frame instead of panning
+    if (box.wants(e)) { box.start(e); return; }
     pan.current = { cx: e.clientX, cy: e.clientY, vx: view.x, vy: view.y, moved: false };
   }
 
@@ -136,9 +379,10 @@ export function RulesetEditor({
       setView({ k, x: pz.cx - (pz.cx - pz.vx) * k / pz.k0, y: pz.cy - (pz.cy - pz.vy) * k / pz.k0 });
       return;
     }
+    if (box.move(e)) return;
     if (edgeConnect.connecting) setMouse(toWorld(e.clientX, e.clientY));
     const p = pan.current;
-    if (p && !nodeDrag.dragNodeId && !edgeConnect.connecting) {
+    if (p && !nodeDrag.dragging && !edgeConnect.connecting) {
       p.moved ||= Math.abs(e.clientX - p.cx) + Math.abs(e.clientY - p.cy) > 3;
       setView((v) => ({ ...v, x: p.vx + e.clientX - p.cx, y: p.vy + e.clientY - p.cy }));
       return;
@@ -153,12 +397,23 @@ export function RulesetEditor({
       if (!pointers.current.size) pinch.current = null;
       return;
     }
-    const dragged = nodeDrag.dragNodeId;
+    if (box.end()) { pan.current = null; return; }
+    const pressed = nodeDrag.dragNodeId;
     if (edgeConnect.connecting) edgeConnect.finishAt(e.clientX, e.clientY);
-    else if (dragged && !nodeDrag.dragMoved.current) openEditor(dragged);
-    else if (!dragged && pan.current && !pan.current.moved) { setSelectedId(null); setSelectedEdgeId(null); }
-    nodeDrag.endDrag();
+    else if (pressed && !nodeDrag.dragMoved.current) {
+      // a click on a node of a larger selection narrows the selection to it
+      if (selection.length > 1) selectOnly(pressed);
+      openEditor(pressed);
+    }
+    else if (!nodeDrag.dragging && pan.current && !pan.current.moved) selectOnly(null);
+    // one history step for a whole drag
+    if (nodeDrag.endDrag()) ed.commit('move');
     pan.current = null;
+  }
+
+  function onPointerCancel(e: React.PointerEvent) {
+    box.cancel();
+    onPointerUp(e);
   }
 
   function cancelLongPress() {
@@ -167,10 +422,13 @@ export function RulesetEditor({
 
   /* every pointer (nodes and ports too): two fingers pinch, a touch held still opens the menu */
   function onPointerDownCapture(e: React.PointerEvent) {
+    // a press inside the menu is a click on one of its items: the menu must still be there for it
+    if ((e.target as Element).closest('[role="menu"]')) return;
     setMenu(null);
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.current.size === 2) {
       cancelLongPress();
+      box.cancel();
       nodeDrag.endDrag();
       edgeConnect.clearConnecting();
       pan.current = null;
@@ -198,52 +456,215 @@ export function RulesetEditor({
     openMenu(e.clientX, e.clientY, e.target as Element);
   }
 
-  function duplicate(n: RuleNode, at: Point) {
-    nodeSeq.current++;
-    const nodeId = `n${nodeSeq.current}`;
-    setNodes((p) => [...p, { ...n, nodeId, x: Math.round(at.x), y: Math.round(at.y) }]);
-    setSelectedId(nodeId);
+  /* ── editing ───────────────────────────────────────────────────────────── */
+
+  function addProblem(type: string): string | null {
+    if (type === 'port.in') {
+      if (scopeSubflow?.inputs === 0) return 'This subflow has no input.';
+      if (nodes.some((n) => n.type === 'port.in')) return 'A subflow has one input only.';
+    }
+    const id = subflowIdOf(type);
+    if (!id) return null;
+    const subs = subflowMap(ed.state.subflows);
+    const problem = scopeSubflow ? nestProblem(subs, scopeSubflow.subflowId, id, subflowDepthLimit) : placementProblem(subs, id, subflowDepthLimit);
+    if (problem === 'cycle') return 'A subflow cannot hold itself, not even through another subflow.';
+    if (problem === 'depth') return `Subflows are nested too deep (${subflowDepthLimit} levels at most).`;
+    return null;
   }
 
-  /* the menu for what is under the pointer: a node, a connection or the canvas */
+  function addAtCenter(type: string) {
+    if (readOnly || addProblem(type)) return;
+    const r = containerRef.current?.getBoundingClientRect();
+    if (!r) return;
+    const off = (nodes.length % 5) * 16;
+    selectOnly(paletteDrop.addAt(type, toWorld(r.left + r.width / 2 + off, r.top + r.height / 2 + off)));
+  }
+
+  function deleteNodes(ids: string[]) {
+    if (readOnly || !ids.length) return;
+    ed.apply((g) => removeNodes(g, ids), 'delete');
+    selectOnly(null);
+    if (editingNodeId && ids.includes(editingNodeId)) setEditingNodeId(null);
+    if (debugNodeId && ids.includes(debugNodeId)) setDebugNodeId(null);
+  }
+
+  function deleteEdge(edgeId: string) {
+    ed.apply((g) => removeEdge(g, edgeId), 'delete-edge');
+    setSelectedEdgeId(null);
+  }
+
+  function copyNodes(ids: string[]) {
+    const clip = copySelection(ed.getGraph(), ids);
+    if (!clip) return;
+    clipRef.current = clip;
+    storeClip(clip);
+  }
+
+  function cutNodes(ids: string[]) {
+    copyNodes(ids);
+    deleteNodes(ids);
+  }
+
+  function paste(at: Point) {
+    const clip = clipRef.current ?? loadClip();
+    if (!clip || readOnly) return;
+    const out = pasteClip(ed.getGraph(), clip, at, NODE_W);
+    ed.apply(() => out.graph, 'paste');
+    setSelectedList(out.ids);
+    setSelectedEdgeId(null);
+  }
+
+  function duplicate(ids: string[]) {
+    const out = duplicateNodes(ed.getGraph(), ids);
+    if (!out.ids.length) return;
+    ed.apply(() => out.graph, 'duplicate');
+    setSelectedList(out.ids);
+  }
+
+  function submitGroup(name: string, color: number) {
+    const edit = groupEdit;
+    setGroupEdit(null);
+    if (!edit) return;
+    if (edit.kind === 'new') ed.apply((g) => ({ ...g, groups: addGroup(g.groups, edit.ids, name, color).groups }), 'group');
+    else ed.apply((g) => ({ ...g, groups: updateGroup(g.groups, edit.groupId, { name, color }) }), 'group');
+  }
+
+  function convertToSubflow(name: string) {
+    const ids = convertIds;
+    setConvertIds(null);
+    if (!ids) return;
+    const subflowId = newId(ed.state.subflows.map((s) => s.subflowId), name, 'subflow');
+    const result = fromSelection(ed.getGraph(), ids, { subflowId, name, nodeWidth: NODE_W });
+    if (!result) return;
+    ed.applyState((s) => withCurrentGraph(
+      { ...s, subflows: [...s.subflows, result.subflow] }, ed.scope, { nodes: result.nodes, edges: result.edges, groups: result.groups },
+    ), 'to-subflow');
+    selectOnly(result.instance);
+    setEditingNodeId(null);
+  }
+
+  function createSubflow(name: string) {
+    setNewSubflowOpen(false);
+    const sf = newSubflow(ed.getState(), [], name);
+    ed.applyState((s) => ({ ...s, subflows: [...s.subflows, sf] }), 'new-subflow');
+    enterSubflow(sf.subflowId);
+  }
+
+  function enterSubflow(id: string | null) {
+    ed.enter(id);
+    selectOnly(null);
+    setEditingNodeId(null);
+    setDebugNodeId(null);
+    setMenu(null);
+  }
+
+  /** put a node of a picked block in the middle of a connection */
+  function insertOnConnection(edgeId: string) {
+    const edge = edges.find((e) => e.edgeId === edgeId);
+    const src = edge && nodes.find((n) => n.nodeId === edge.sourceNodeId);
+    const tgt = edge && nodes.find((n) => n.nodeId === edge.targetNodeId);
+    const sl = src && layouts.get(src.nodeId);
+    const tl = tgt && layouts.get(tgt.nodeId);
+    if (!edge || !src || !tgt || !sl || !tl) return;
+    const from = outputAnchor(src, sl, edge.sourcePort);
+    const to = inputAnchor(tgt, tl, Math.max(0, tl.inputs.findIndex((p) => p.id === edge.targetPort)));
+    const mid = from ? { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 } : { x: to.x - 100, y: to.y };
+    setPicker({
+      title: 'Add a block in between',
+      onPick: (type) => {
+        const node = newNode(catalog, type, mid, ed.getGraph().nodes, { width: NODE_W, headerHeight: NODE_HEADER_H });
+        ed.apply((g) => insertOnEdge(g, catalog, edgeId, node) ?? g, 'insert');
+        selectOnly(node.nodeId);
+      },
+    });
+  }
+
+  /* ── menus ─────────────────────────────────────────────────────────────── */
+
+  function addableTypes(): string[] {
+    return paletteGroups(catalog).flatMap((g) => g.blocks.map((b) => b.type)).filter((t) => !addProblem(t));
+  }
+
+  function hasClip(): boolean {
+    return !!(clipRef.current ?? loadClip());
+  }
+
   function openMenu(clientX: number, clientY: number, target: Element) {
     const r = containerRef.current?.getBoundingClientRect();
     if (!r) return;
     const at = toWorld(clientX, clientY);
+    const tabId = target.closest<HTMLElement>('[data-group-tab]')?.dataset.groupTab;
     const nodeId = target.closest<HTMLElement>('[data-node-id]')?.dataset.nodeId;
     const edgeId = target.closest<SVGElement>('[data-edge-id]')?.dataset.edgeId;
     let items: ContextMenuItem[];
-    if (nodeId) {
+    if (tabId) {
+      const group = groups.find((g) => g.groupId === tabId);
+      if (!group) return;
+      setSelectedList(group.nodeIds);
+      items = [
+        { kind: 'item', label: 'Select the nodes', icon: faSquareCheck, onSelect: () => setSelectedList(group.nodeIds) },
+        ...(readOnly ? [] : [
+          { kind: 'item', label: 'Edit the group…', icon: faPenToSquare, onSelect: () => setGroupEdit({ kind: 'edit', groupId: tabId }) },
+          { kind: 'item', label: 'Ungroup', icon: faObjectUngroup, onSelect: () => ed.apply((g) => ({ ...g, groups: ungroup(g.groups, tabId) }), 'ungroup') },
+        ] as ContextMenuItem[]),
+      ];
+    }
+    else if (nodeId) {
       const n = nodes.find((x) => x.nodeId === nodeId);
       if (!n) return;
-      setSelectedId(nodeId);
-      setSelectedEdgeId(null);
+      const ids = selectionSet.has(nodeId) ? selection : [nodeId];
+      if (!selectionSet.has(nodeId)) selectOnly(nodeId);
+      else setSelectedEdgeId(null);
+      const subId = subflowIdOf(n.type);
+      const hasPorts = ids.some((id) => nodes.find((x) => x.nodeId === id)?.type.startsWith('port.'));
+      const member = groupOf(groups, nodeId);
+      const many = ids.length > 1;
+      const extra = nodeMenuItems?.({ nodeIds: ids, readOnly }) ?? [];
       items = [
         { kind: 'item', label: readOnly ? 'View' : 'Edit', icon: faPenToSquare, onSelect: () => openEditor(nodeId) },
+        ...(subId && ed.state.subflows.some((s) => s.subflowId === subId)
+          ? [{ kind: 'item', label: 'Edit the subflow', icon: faDiagramProject, onSelect: () => enterSubflow(subId) } as ContextMenuItem] : []),
         { kind: 'item', label: 'Debug node', icon: faBug, onSelect: () => setDebugNodeId(nodeId) },
         { kind: 'separator' },
-        { kind: 'item', label: 'Copy', icon: faCopy, onSelect: () => setClip(n) },
+        { kind: 'item', label: many ? `Copy ${ids.length} nodes` : 'Copy', icon: faCopy, onSelect: () => copyNodes(ids) },
         ...(readOnly ? [] : [
-          { kind: 'item', label: 'Duplicate', icon: faClone, onSelect: () => duplicate(n, { x: n.x + 32, y: n.y + 32 }) },
+          { kind: 'item', label: many ? `Cut ${ids.length} nodes` : 'Cut', icon: faScissors, onSelect: () => cutNodes(ids) },
+          { kind: 'item', label: many ? `Duplicate ${ids.length} nodes` : 'Duplicate', icon: faClone, onSelect: () => duplicate(ids) },
+          { kind: 'item', label: ids.every((id) => nodes.find((x) => x.nodeId === id)?.disabled) ? 'Wake up' : 'Skip', icon: faEyeSlash, onSelect: () => ed.apply((g) => toggleDisabled(g, ids), 'skip') },
           { kind: 'separator' },
-          { kind: 'item', label: 'Delete', icon: faTrash, danger: true, onSelect: () => deleteNode(nodeId) },
+          { kind: 'item', label: 'Group…', icon: faObjectGroup, onSelect: () => setGroupEdit({ kind: 'new', ids }) },
+          ...(member ? [{ kind: 'item', label: 'Ungroup', icon: faObjectUngroup, onSelect: () => ed.apply((g) => ({ ...g, groups: ungroup(g.groups, member.groupId) }), 'ungroup') } as ContextMenuItem] : []),
+          ...(hasPorts ? [] : [{ kind: 'item', label: 'Convert to a subflow…', icon: faLayerGroup, onSelect: () => setConvertIds(ids) } as ContextMenuItem]),
+          ...(extra.length ? [{ kind: 'separator' } as ContextMenuItem, ...extra] : []),
+          { kind: 'separator' },
+          { kind: 'item', label: many ? `Delete ${ids.length} nodes` : 'Delete', icon: faTrash, danger: true, onSelect: () => deleteNodes(ids) },
         ] as ContextMenuItem[]),
+        ...(readOnly && extra.length ? [{ kind: 'separator' } as ContextMenuItem, ...extra] : []),
       ];
     }
     else if (edgeId) {
       setSelectedEdgeId(edgeId);
-      setSelectedId(null);
+      setSelectedList([]);
       if (readOnly) return;
-      items = [{ kind: 'item', label: 'Delete connection', icon: faTrash, danger: true, onSelect: () => deleteEdge(edgeId) }];
+      items = [
+        { kind: 'item', label: 'Add a block in between…', icon: faPlus, onSelect: () => insertOnConnection(edgeId) },
+        { kind: 'item', label: 'Delete connection', icon: faTrash, danger: true, onSelect: () => deleteEdge(edgeId) },
+      ];
     }
     else {
+      const types = readOnly ? [] : addableTypes();
       items = [
         ...(readOnly ? [] : [
-          ...ADDABLE_VISUALS.map((v): ContextMenuItem => ({ kind: 'item', label: `Add ${v.displayLabel}`, icon: v.icon,
-            onSelect: () => setSelectedId(paletteDrop.addAt(v.type, at)) })),
+          ...(types.length <= INLINE_ADD_LIMIT
+            ? types.map((t): ContextMenuItem => ({ kind: 'item', label: `Add ${catalog.blocks[t].title}`, icon: undefined, onSelect: () => selectOnly(paletteDrop.addAt(t, at)) }))
+            : [{ kind: 'item', label: 'Add a block here…', icon: faMagnifyingGlassPlus, onSelect: () => setPicker({ title: 'Add a block', onPick: (t) => selectOnly(paletteDrop.addAt(t, at)) }) } as ContextMenuItem]),
           { kind: 'separator' },
-          { kind: 'item', label: 'Paste', icon: faPaste, disabled: !clip, onSelect: () => clip && duplicate(clip, { x: at.x - NODE_W / 2, y: at.y - 18 }) },
+          { kind: 'item', label: 'Paste', icon: faPaste, disabled: !hasClip(), onSelect: () => paste({ x: at.x, y: at.y }) },
+          { kind: 'item', label: 'Undo', icon: faRotateLeft, disabled: !ed.canUndo, onSelect: ed.undo },
+          { kind: 'item', label: 'Redo', icon: faRotateRight, disabled: !ed.canRedo, onSelect: ed.redo },
         ] as ContextMenuItem[]),
+        { kind: 'item', label: 'Select all', icon: faSquareCheck, onSelect: selectAll },
+        ...(readOnly ? [] : [{ kind: 'item', label: 'Arrange the blocks', icon: faDiagramProject, disabled: !nodes.length, onSelect: () => { arrange(); } } as ContextMenuItem]),
         { kind: 'item', label: 'Fit to screen', icon: faExpand, onSelect: fit },
         { kind: 'item', label: 'Debug chain', icon: faBug, onSelect: () => setRulesetDebugOpen(true) },
       ];
@@ -260,19 +681,23 @@ export function RulesetEditor({
 
   function onKeyDown(e: React.KeyboardEvent) {
     if ((e.target as HTMLElement).closest('input,textarea,select')) return;
-    if ((e.key === 'Delete' || e.key === 'Backspace') && !readOnly) {
-      if (selectedEdgeId) { deleteEdge(selectedEdgeId); e.preventDefault(); }
-      else if (selectedId) { deleteNode(selectedId); e.preventDefault(); }
-    }
-    else if (e.key === 'Enter' && selectedId) openEditor(selectedId);
-    else if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectedId) setClip(nodes.find((n) => n.nodeId === selectedId) ?? null);
-    else if ((e.ctrlKey || e.metaKey) && e.key === 'v' && clip && !readOnly) {
-      const r = containerRef.current?.getBoundingClientRect();
-      if (r) duplicate(clip, toWorld(r.left + r.width / 2 - NODE_W / 2, r.top + r.height / 2));
+    const mod = e.ctrlKey || e.metaKey;
+    const key = e.key.toLowerCase();
+    if (mod && !readOnly && (key === 'z' || key === 'y')) {
+      if (key === 'y' || e.shiftKey) ed.redo(); else ed.undo();
       e.preventDefault();
     }
+    else if (mod && key === 'a') { selectAll(); e.preventDefault(); }
+    else if ((e.key === 'Delete' || e.key === 'Backspace') && !readOnly) {
+      if (selectedEdgeId) { deleteEdge(selectedEdgeId); e.preventDefault(); }
+      else if (selection.length) { deleteNodes(selection); e.preventDefault(); }
+    }
+    else if (e.key === 'Enter' && primaryId) openEditor(primaryId);
+    else if (mod && key === 'c' && selection.length) copyNodes(selection);
+    else if (mod && key === 'x' && selection.length && !readOnly) { cutNodes(selection); e.preventDefault(); }
+    else if (mod && key === 'v' && !readOnly) { paste(centerWorld()); e.preventDefault(); }
     else if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) {
-      const el = selectedId ? containerRef.current?.querySelector(`[data-node-id="${selectedId}"]`) : null;
+      const el = primaryId ? containerRef.current?.querySelector(`[data-node-id="${primaryId}"]`) : null;
       const r = (el ?? containerRef.current)?.getBoundingClientRect();
       if (r) openMenu(r.left + 24, r.top + 24, el ?? containerRef.current!);
       e.preventDefault();
@@ -280,56 +705,39 @@ export function RulesetEditor({
     else if (e.key === 'Escape') { edgeConnect.clearConnecting(); setSelectedEdgeId(null); }
   }
 
-  /* palette click: in the middle of what is visible, a little offset per node */
-  function addAtCenter(type: RuleNodeType) {
-    if (readOnly) return;
-    const r = containerRef.current?.getBoundingClientRect();
-    if (!r) return;
-    const off = (nodes.length % 5) * 16;
-    const id = paletteDrop.addAt(type, toWorld(r.left + r.width / 2 + off, r.top + r.height / 2 + off));
-    setSelectedId(id);
-  }
-
-  function deleteNode(nodeId: string) {
-    setNodes((p) => p.filter((n) => n.nodeId !== nodeId));
-    setEdges((p) => p.filter((ed) => ed.sourceNodeId !== nodeId && ed.targetNodeId !== nodeId));
-    setSelectedId(null);
-    if (editingNodeId === nodeId) setEditingNodeId(null);
-    if (debugNodeId === nodeId) setDebugNodeId(null);
-  }
-
-  function deleteEdge(edgeId: string) {
-    setEdges((p) => p.filter((ed) => ed.edgeId !== edgeId));
-    setSelectedEdgeId(null);
-  }
-
-  function applyEdit() {
-    if (!editingNodeId) return;
-    setNodes((p) => p.map((n) => n.nodeId === editingNodeId ? { ...n, label: draftLabel.trim() || n.label, script: draftScript } : n));
-  }
-
   const editingNode = editingNodeId ? nodes.find((n) => n.nodeId === editingNodeId) ?? null : null;
+  const editingLayout = editingNode ? layouts.get(editingNode.nodeId) : undefined;
+  const editingDecl = editingNode ? catalog.blocks[editingNode.type] : undefined;
   const debugNode   = debugNodeId   ? nodes.find((n) => n.nodeId === debugNodeId)   ?? null : null;
+  const settingsUsers = scopeSubflow ? subflowUsers(ed.state, scopeSubflow.subflowId).map((id) => id || chainName) : [];
 
   return (
     <div className={cn('relative flex h-full min-h-0 overflow-hidden', className)}>
       {!readOnly && (
         <Palette
+          catalog={catalog}
           onDragStart={paletteDrop.onPaletteDragStart}
           onDragEnd={paletteDrop.onPaletteDragEnd}
           onAdd={(t) => { addAtCenter(t); setSheetOpen(false); }}
           onDebugChain={() => setRulesetDebugOpen(true)}
+          onNewSubflow={() => setNewSubflowOpen(true)}
+          addProblem={addProblem}
           sheetOpen={sheetOpen}
           onCloseSheet={() => setSheetOpen(false)}
         />
       )}
 
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+      {bannerSlot}
       <Canvas
         containerRef={containerRef}
         nodes={nodes}
         edges={edges}
+        groups={groups}
+        catalog={catalog}
+        layouts={layouts}
         view={view}
-        selectedId={selectedId}
+        selectedIds={selectionSet}
         selectedEdgeId={selectedEdgeId}
         editingNodeId={editingNodeId}
         dragNodeId={nodeDrag.dragNodeId}
@@ -337,6 +745,7 @@ export function RulesetEditor({
         mouse={mouse}
         readOnly={readOnly}
         nodeStatus={nodeStatus}
+        issues={issues}
         onPointerDown={onPointerDown}
         onPointerDownCapture={onPointerDownCapture}
         onContextMenu={onContextMenu}
@@ -349,12 +758,42 @@ export function RulesetEditor({
         onNodePointerDown={onNodePointerDown}
         onOutputPortDown={edgeConnect.onOutputPortDown}
         onInputPortUp={edgeConnect.onInputPortUp}
-        onSelectEdge={(id) => { setSelectedEdgeId(id); setSelectedId(null); }}
+        onSelectEdge={(id) => { setSelectedEdgeId(id); setSelectedList([]); }}
         onDeleteSelectedEdge={() => selectedEdgeId && deleteEdge(selectedEdgeId)}
+        onGroupTabPointerDown={onGroupTabPointerDown}
+        onGroupTabDoubleClick={(id) => setGroupEdit({ kind: 'edit', groupId: id })}
         onZoomIn={() => zoomAt(1.2)}
         onZoomOut={() => zoomAt(1 / 1.2)}
         onFit={fit}
+        canUndo={ed.canUndo}
+        canRedo={ed.canRedo}
+        onUndo={ed.undo}
+        onRedo={ed.redo}
+        guides={snap.guides}
+        onPointerCancel={onPointerCancel}
+        onArrange={arrange}
+        canArrange={nodes.length > 0}
+        boxMode={box.boxMode}
+        onToggleBoxMode={box.toggleBoxMode}
+        miniOn={mini.visible}
+        onToggleMini={mini.toggle}
+        toolbarExtra={toolbarExtra}
       >
+        {scopeSubflow && <ScopeBar chainName={chainName} subflowName={scopeSubflow.name} readOnly={readOnly} onBack={() => enterSubflow(null)} onSettings={() => setSettingsOpen(true)} />}
+        <IssuesPanel
+          result={validation}
+          nodeLabel={(id) => nodes.find((n) => n.nodeId === id)?.label ?? id}
+          onSelect={(id) => selectOnly(id)}
+        />
+        <SelectionFrame frame={box.frame} />
+        {mini.visible && mini.mapping && (
+          <MiniMap mapping={mini.mapping} view={view} size={mini.size} onGo={goTo}
+            items={nodes.map((n) => ({
+              id: n.nodeId, x: n.x, y: n.y, w: NODE_W, h: layouts.get(n.nodeId)?.height ?? 0,
+              error: nodeStatus?.[n.nodeId]?.tone === 'error' || !!issues.get(n.nodeId)?.some((i) => i.severity === 'error'),
+              colorClass: lookOf(catalog.blocks[n.type]).iconColor,
+            }))} />
+        )}
         {menu && <ContextMenu x={menu.x} y={menu.y} items={menu.items} onClose={() => setMenu(null)} />}
         {!readOnly && (
           <button type="button" onClick={() => setSheetOpen((o) => !o)} aria-label="Add a node"
@@ -364,15 +803,20 @@ export function RulesetEditor({
           </button>
         )}
       </Canvas>
+      </div>
 
-      {editingNode && (
+      {editingNode && editingLayout && (
         <NodeEditorPanel
-          node={editingNode} readOnly={readOnly}
-          draftLabel={draftLabel} draftScript={draftScript}
-          onLabelChange={setDraftLabel} onScriptChange={setDraftScript}
+          node={editingNode} decl={editingDecl} layout={editingLayout} readOnly={readOnly}
+          draftLabel={draftLabel} draftValues={draftValues} choices={choices} showRequired={showRequired}
+          issues={issues.get(editingNode.nodeId)}
+          onLabelChange={setDraftLabel}
+          onValueChange={(key, value) => setDraftValues((v) => setField(v, key, value))}
           onApply={applyEdit} onClose={() => setEditingNodeId(null)}
-          onDelete={() => deleteNode(editingNode.nodeId)}
-          onReset={() => setDraftScript(DEFAULT_SCRIPTS[editingNode.type])}
+          onDelete={() => deleteNodes([editingNode.nodeId])}
+          onResetScript={defaultScriptOf(editingDecl?.params) !== undefined
+            ? () => setDraftValues(formValues(editingDecl?.params, { ...splitFormValues(editingDecl?.params, draftValues).config }, undefined))
+            : null}
           onDebug={() => setDebugNodeId(editingNode.nodeId)}
         />
       )}
@@ -386,11 +830,43 @@ export function RulesetEditor({
       )}
 
       {rulesetDebugOpen && (
-        <RulesetDebugModal nodes={nodes} edges={edges} chainName={chainName}
+        <RulesetDebugModal nodes={ed.state.nodes} edges={ed.state.edges} chainName={chainName}
           msg={dbgMsg} onMsgChange={setDbgMsg}
           metadata={dbgMeta} onMetadataChange={setDbgMeta}
           messageType={dbgMsgType} onMessageTypeChange={setDbgMsgType}
           onClose={() => setRulesetDebugOpen(false)} />
+      )}
+
+      {picker && (
+        <BlockPickerDialog title={picker.title} catalog={catalog} addProblem={addProblem}
+          onPick={(type) => { const p = picker; setPicker(null); p.onPick(type); }} onClose={() => setPicker(null)} />
+      )}
+
+      {groupEdit && (
+        <GroupDialog
+          title={groupEdit.kind === 'new' ? 'Group the selected nodes' : 'Edit the group'}
+          confirmLabel={groupEdit.kind === 'new' ? 'Group' : 'Save'}
+          initial={groupEdit.kind === 'edit'
+            ? (() => { const g = groups.find((x) => x.groupId === groupEdit.groupId); return { name: g?.name ?? '', color: g?.color ?? 0 }; })()
+            : { name: '', color: groups.length % 8 }}
+          onSubmit={submitGroup} onClose={() => setGroupEdit(null)} />
+      )}
+
+      {convertIds && (
+        <NameDialog title="Convert to a subflow" description="The selected nodes become one block. Connections that cross the selection become its input and outputs."
+          label="Name of the subflow" confirmLabel="Convert" onSubmit={convertToSubflow} onClose={() => setConvertIds(null)} />
+      )}
+
+      {newSubflowOpen && (
+        <NameDialog title="New subflow" label="Name of the subflow" confirmLabel="Create" onSubmit={createSubflow} onClose={() => setNewSubflowOpen(false)} />
+      )}
+
+      {settingsOpen && scopeSubflow && (
+        <SubflowSettingsDialog
+          subflow={scopeSubflow} usedBy={settingsUsers}
+          onSave={(settings) => { setSettingsOpen(false); ed.applyState((s) => applySubflowSettings(s, scopeSubflow.subflowId, settings), 'subflow-settings'); }}
+          onDelete={() => { setSettingsOpen(false); const id = scopeSubflow.subflowId; enterSubflow(null); ed.applyState((s) => deleteSubflow(s, id), 'delete-subflow'); }}
+          onClose={() => setSettingsOpen(false)} />
       )}
     </div>
   );

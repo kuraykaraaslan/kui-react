@@ -1,33 +1,45 @@
 'use client';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlassMinus, faMagnifyingGlassPlus, faExpand, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { nodePorts, portColor } from '../node-meta';
-import { NODE_W, PORT_R, GRID_SIZE, inputPortY, outputPortY, bezier, type View } from '../geometry';
+import { faMagnifyingGlassMinus, faMagnifyingGlassPlus, faExpand, faTrash, faRotateLeft, faRotateRight, faDiagramProject, faBinoculars, faVectorPolygon } from '@fortawesome/free-solid-svg-icons';
+import { cn } from '@/libs/utils/cn';
+import { portColor } from '../node-meta';
+import { NODE_W, PORT_R, GRID_SIZE, inputAnchor, outputAnchor, edgePath, type NodeLayout, type View } from '../geometry';
 import { RuleNode, type RuleNodeStatus } from './RuleNode';
 import { RuleEdge } from './RuleEdge';
-import type { RuleNode as RuleNodeT, RuleEdge as RuleEdgeT } from '../../../types';
+import { GroupFrame } from './GroupFrame';
+import { GuideLines } from './GuideLines';
+import type { GuideLine } from '../../graph/snap';
+import { groupBounds } from '../../graph/groups';
+import type { Catalog } from '../../catalog/types';
+import type { GraphIssue } from '../../graph/validate';
+import type { RuleGroup, RuleNode as RuleNodeT, RuleEdge as RuleEdgeT } from '../../../types';
 
-const zoomBtn = 'inline-flex h-7 w-7 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-surface-raised hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus';
+const zoomBtn = 'inline-flex h-7 w-7 items-center justify-center rounded-md text-text-secondary transition-colors hover:bg-surface-raised hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-text-secondary';
 
 export function Canvas({
-  containerRef, nodes, edges, view,
-  selectedId, selectedEdgeId, editingNodeId, dragNodeId, connecting, mouse, readOnly, nodeStatus,
+  containerRef, nodes, edges, groups, catalog, layouts, view,
+  selectedIds, selectedEdgeId, editingNodeId, dragNodeId, connecting, mouse, readOnly, nodeStatus, issues,
   onPointerDown, onPointerDownCapture, onPointerMove, onPointerUp, onContextMenu, onWheel, onKeyDown, onDrop, onDragOver, children,
-  onNodePointerDown, onOutputPortDown, onInputPortUp, onSelectEdge, onDeleteSelectedEdge,
-  onZoomIn, onZoomOut, onFit,
+  onNodePointerDown, onOutputPortDown, onInputPortUp, onSelectEdge, onDeleteSelectedEdge, onGroupTabPointerDown, onGroupTabDoubleClick,
+  onZoomIn, onZoomOut, onFit, canUndo, canRedo, onUndo, onRedo,
+  guides = [], onPointerCancel, onArrange, canArrange = true, boxMode = false, onToggleBoxMode, miniOn = false, onToggleMini, toolbarExtra,
 }: {
   containerRef: React.RefObject<HTMLDivElement | null>;
   nodes: RuleNodeT[];
   edges: RuleEdgeT[];
+  groups: RuleGroup[];
+  catalog: Catalog;
+  layouts: Map<string, NodeLayout>;
   view: View;
-  selectedId: string | null;
+  selectedIds: ReadonlySet<string>;
   selectedEdgeId: string | null;
   editingNodeId: string | null;
   dragNodeId: string | null;
-  connecting: { nodeId: string; portIdx: number; x: number; y: number } | null;
+  connecting: { nodeId: string; portId: string; x: number; y: number } | null;
   mouse: { x: number; y: number };
   readOnly: boolean;
   nodeStatus?: Record<string, RuleNodeStatus>;
+  issues: Map<string, GraphIssue[]>;
   onPointerDown: (e: React.PointerEvent) => void;
   onPointerDownCapture: (e: React.PointerEvent) => void;
   onContextMenu: (e: React.MouseEvent) => void;
@@ -40,17 +52,41 @@ export function Canvas({
   onDrop: (e: React.DragEvent) => void;
   onDragOver: (e: React.DragEvent) => void;
   onNodePointerDown: (e: React.PointerEvent, nodeId: string) => void;
-  onOutputPortDown: (e: React.PointerEvent, nodeId: string, portIdx: number) => void;
-  onInputPortUp: (e: React.PointerEvent, nodeId: string, portIdx: number) => void;
+  onOutputPortDown: (e: React.PointerEvent, nodeId: string, portId: string) => void;
+  onInputPortUp: (e: React.PointerEvent, nodeId: string, portId: string) => void;
   onSelectEdge: (edgeId: string) => void;
   onDeleteSelectedEdge: () => void;
+  onGroupTabPointerDown: (e: React.PointerEvent, groupId: string) => void;
+  onGroupTabDoubleClick: (groupId: string) => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onFit: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
+  /** alignment lines shown while a block is dragged */
+  guides?: GuideLine[];
+  /** a cancelled gesture; the pointer-up handler by default */
+  onPointerCancel?: (e: React.PointerEvent) => void;
+  /** auto layout; no button without it */
+  onArrange?: () => void;
+  canArrange?: boolean;
+  /** the frame mode (a one-finger drag draws a selection frame) */
+  boxMode?: boolean;
+  onToggleBoxMode?: () => void;
+  /** is the mini map showing */
+  miniOn?: boolean;
+  onToggleMini?: () => void;
+  /** extra controls at the start of the zoom bar */
+  toolbarExtra?: React.ReactNode;
 }) {
-  const liveStart = connecting
-    ? (() => { const n = nodes.find((x) => x.nodeId === connecting.nodeId); return n ? { x: n.x + NODE_W, y: outputPortY(n, connecting.portIdx) } : null; })()
-    : null;
+  const liveFrom = (() => {
+    if (!connecting) return null;
+    const n = nodes.find((x) => x.nodeId === connecting.nodeId);
+    const l = n && layouts.get(n.nodeId);
+    return n && l ? outputAnchor(n, l, connecting.portId) : null;
+  })();
 
   return (
     <div ref={containerRef}
@@ -64,10 +100,18 @@ export function Canvas({
       }}
       onDrop={onDrop} onDragOver={onDragOver} onWheel={onWheel} onKeyDown={onKeyDown}
       onPointerDown={onPointerDown} onPointerDownCapture={onPointerDownCapture} onPointerMove={onPointerMove} onPointerUp={onPointerUp}
-      onPointerCancel={onPointerUp} onContextMenu={onContextMenu}>
+      onPointerCancel={onPointerCancel ?? onPointerUp} onContextMenu={onContextMenu}>
 
       {/* the world: everything below moves and scales with the view */}
-      <div className="absolute left-0 top-0" style={{ transform:`translate(${view.x}px, ${view.y}px) scale(${view.k})`, transformOrigin:'0 0' }}>
+      <div className="absolute left-0 top-0" data-testid="ruleset-world" style={{ transform:`translate(${view.x}px, ${view.y}px) scale(${view.k})`, transformOrigin:'0 0' }}>
+        {groups.map((group) => {
+          const bounds = groupBounds(nodes, group, NODE_W, (n) => layouts.get(n.nodeId)?.height ?? 0);
+          return bounds && (
+            <GroupFrame key={group.groupId} group={group} bounds={bounds} readOnly={readOnly}
+              onTabPointerDown={onGroupTabPointerDown} onTabDoubleClick={onGroupTabDoubleClick} />
+          );
+        })}
+        <GuideLines guides={guides} zoom={view.k} />
         <svg className="absolute left-0 top-0 h-px w-px overflow-visible" style={{ zIndex:10, pointerEvents:'none' }}>
           <defs>
             <marker id="re-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
@@ -75,51 +119,72 @@ export function Canvas({
             </marker>
           </defs>
           {edges.map((edge) => (
-            <RuleEdge key={edge.edgeId} edge={edge} nodes={nodes} readOnly={readOnly}
+            <RuleEdge key={edge.edgeId} edge={edge} nodes={nodes} layouts={layouts} readOnly={readOnly}
               selected={selectedEdgeId === edge.edgeId} onSelect={onSelectEdge} />
           ))}
-          {liveStart && (
-            <path d={bezier(liveStart.x, liveStart.y, mouse.x, mouse.y)}
+          {liveFrom && (
+            <path d={edgePath(liveFrom, mouse)}
               stroke="var(--border-strong)" strokeWidth={2} fill="none" strokeDasharray="6 3" />
           )}
           {nodes.map((node) => {
-            const v = nodePorts(node);
+            const layout = layouts.get(node.nodeId);
+            if (!layout) return null;
+            const errorAt = layout.hasError ? outputAnchor(node, layout, 'error') : null;
             return (
               <g key={`ports-${node.nodeId}`}>
-                {v.inputs.map((port, i) => (
-                  <circle key={`in-${port.id}`} cx={node.x} cy={inputPortY(node, i)} r={PORT_R}
-                    data-in-node={node.nodeId} data-in-idx={i}
-                    fill="var(--surface-base)" stroke="var(--border-strong)" strokeWidth={2}
-                    style={{ pointerEvents:'auto', cursor:'crosshair' }}
-                    className="transition-colors hover:fill-primary-subtle hover:stroke-primary"
-                    onPointerUp={(e) => onInputPortUp(e, node.nodeId, i)} />
-                ))}
-                {v.outputs.map((port, i) => {
-                  const c = portColor(port.id);
+                {layout.inputs.map((port, i) => {
+                  const at = inputAnchor(node, layout, i);
                   return (
-                    <circle key={`out-${port.id}`} cx={node.x + NODE_W} cy={outputPortY(node, i)} r={PORT_R}
+                    <circle key={`in-${port.id}`} cx={at.x} cy={at.y} r={PORT_R}
+                      data-in-node={node.nodeId} data-in-port={port.id}
+                      fill="var(--surface-base)" stroke="var(--border-strong)" strokeWidth={2}
+                      style={{ pointerEvents:'auto', cursor:'crosshair' }}
+                      className="transition-colors hover:fill-primary-subtle hover:stroke-primary"
+                      onPointerUp={(e) => onInputPortUp(e, node.nodeId, port.id)} />
+                  );
+                })}
+                {layout.outputs.map((port) => {
+                  const at = outputAnchor(node, layout, port.id);
+                  const c = portColor(port.id);
+                  return at && (
+                    <circle key={`out-${port.id}`} cx={at.x} cy={at.y} r={PORT_R}
                       fill={c} stroke={c} strokeWidth={1.5}
                       style={{ pointerEvents:'auto', cursor:'crosshair', opacity:0.9 }}
                       className="transition-opacity hover:opacity-100"
-                      onPointerDown={(e) => { e.stopPropagation(); onOutputPortDown(e, node.nodeId, i); }} />
+                      onPointerDown={(e) => { e.stopPropagation(); onOutputPortDown(e, node.nodeId, port.id); }} />
                   );
                 })}
+                {errorAt && (
+                  <circle key="out-error" cx={errorAt.x} cy={errorAt.y} r={PORT_R - 1}
+                    fill="var(--surface-base)" stroke={portColor('error')} strokeWidth={2}
+                    style={{ pointerEvents:'auto', cursor:'crosshair' }}
+                    className="transition-colors hover:fill-error-subtle"
+                    onPointerDown={(e) => { e.stopPropagation(); onOutputPortDown(e, node.nodeId, 'error'); }}>
+                    <title>Error path: where errors of this node go</title>
+                  </circle>
+                )}
               </g>
             );
           })}
         </svg>
 
-        {nodes.map((node) => (
-          <RuleNode
-            key={node.nodeId}
-            node={node}
-            isEditing={editingNodeId === node.nodeId}
-            isSelected={selectedId === node.nodeId}
-            isDragging={dragNodeId === node.nodeId}
-            status={nodeStatus?.[node.nodeId]}
-            onPointerDown={(e) => onNodePointerDown(e, node.nodeId)}
-          />
-        ))}
+        {nodes.map((node) => {
+          const layout = layouts.get(node.nodeId);
+          return layout && (
+            <RuleNode
+              key={node.nodeId}
+              node={node}
+              decl={catalog.blocks[node.type]}
+              layout={layout}
+              issues={issues.get(node.nodeId)}
+              isEditing={editingNodeId === node.nodeId}
+              isSelected={selectedIds.has(node.nodeId)}
+              isDragging={dragNodeId === node.nodeId}
+              status={nodeStatus?.[node.nodeId]}
+              onPointerDown={(e) => onNodePointerDown(e, node.nodeId)}
+            />
+          );
+        })}
       </div>
 
       {nodes.length === 0 && (
@@ -133,13 +198,36 @@ export function Canvas({
 
       {children}
 
-      {/* zoom and selection controls */}
+      {/* undo, redo, zoom and selection controls */}
       <div className="absolute bottom-3 right-3 z-30 flex items-center gap-1 rounded-lg border border-border bg-surface-base p-1 shadow-sm"
         onPointerDown={(e) => e.stopPropagation()}>
+        {toolbarExtra}
         {!readOnly && selectedEdgeId && (
           <button type="button" onClick={onDeleteSelectedEdge}
             className="mr-1 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-error transition-colors hover:bg-error-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
             <FontAwesomeIcon icon={faTrash} className="h-3 w-3" aria-hidden="true" /> Delete connection
+          </button>
+        )}
+        {!readOnly && (
+          <>
+            <button type="button" onClick={onUndo} disabled={!canUndo} aria-label="Undo" title="Undo (Ctrl+Z)" className={zoomBtn}>
+              <FontAwesomeIcon icon={faRotateLeft} className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
+            <button type="button" onClick={onRedo} disabled={!canRedo} aria-label="Redo" title="Redo (Ctrl+Y)" className={zoomBtn}>
+              <FontAwesomeIcon icon={faRotateRight} className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
+            <span aria-hidden="true" className="mx-0.5 h-4 w-px bg-border" />
+          </>
+        )}
+        {!readOnly && onArrange && (
+          <button type="button" onClick={onArrange} disabled={!canArrange} aria-label="Arrange the blocks" title="Arrange the blocks" className={zoomBtn}>
+            <FontAwesomeIcon icon={faDiagramProject} className="h-3.5 w-3.5" aria-hidden="true" />
+          </button>
+        )}
+        {onToggleBoxMode && (
+          <button type="button" onClick={onToggleBoxMode} aria-label="Select blocks with a frame" aria-pressed={boxMode} title="Select blocks with a frame (or hold Shift and drag)"
+            className={cn(zoomBtn, boxMode && 'border border-primary bg-primary-subtle text-primary')}>
+            <FontAwesomeIcon icon={faVectorPolygon} className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         )}
         <button type="button" onClick={onZoomOut} aria-label="Zoom out" title="Zoom out" className={zoomBtn}>
@@ -152,6 +240,12 @@ export function Canvas({
         <button type="button" onClick={onFit} aria-label="Fit to screen" title="Fit to screen" className={zoomBtn}>
           <FontAwesomeIcon icon={faExpand} className="h-3.5 w-3.5" aria-hidden="true" />
         </button>
+        {onToggleMini && (
+          <button type="button" onClick={onToggleMini} aria-label="Mini map" aria-pressed={miniOn} title="Mini map"
+            className={cn(zoomBtn, 'max-md:hidden', miniOn && 'border border-primary bg-primary-subtle text-primary')}>
+            <FontAwesomeIcon icon={faBinoculars} className="h-3.5 w-3.5" aria-hidden="true" />
+          </button>
+        )}
       </div>
     </div>
   );

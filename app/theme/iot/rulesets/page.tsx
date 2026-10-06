@@ -14,6 +14,7 @@ import {
   faFileImport,
   faFileExport,
   faDownload,
+  faFileCode,
   faClockRotateLeft,
   faTrashCanArrowUp,
   faTriangleExclamation,
@@ -28,7 +29,7 @@ import { Button } from '@/modules/ui/Button';
 import { cn } from '@/libs/utils/cn';
 import type { RuleChain } from '@/modules/domains/iot/types';
 import {
-  buildExport, recentlyDeleted,
+  buildExport, buildRoltekExport, recentlyDeleted,
   type ConflictChoice, type DeletedRuleset, type ExportResult, type ImportPreview, type RulesetVersion,
 } from '@/modules/domains/iot/ruleset/transfer';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
@@ -81,7 +82,7 @@ export default function RulesetsPage() {
   const [versionsFor, setVersionsFor] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   /** an export waiting for "download anyway" because some text looks like a password */
-  const [pendingExport, setPendingExport] = useState<ExportResult | null>(null);
+  const [pendingExport, setPendingExport] = useState<Pick<ExportResult, 'fileName' | 'json' | 'omitted' | 'suspicious'> | null>(null);
   const [notice, setNotice] = useState('');
 
   const rows: ChainRow[] = chains.map(toRow);
@@ -89,15 +90,16 @@ export default function RulesetsPage() {
 
   /* ─── Actions ── */
 
-  function finishExport(r: ExportResult) {
+  function finishExport(r: Pick<ExportResult, 'fileName' | 'json' | 'omitted'>) {
     downloadText(r.fileName, r.json);
     setPendingExport(null);
     setNotice(`Downloaded ${r.fileName}${r.omitted.length ? ` — ${r.omitted.length} secret ${r.omitted.length === 1 ? 'field' : 'fields'} left out` : ''}.`);
   }
 
-  function startExport(list: RuleChain[], opts: { all?: boolean; suffix?: string } = {}) {
+  function startExport(list: RuleChain[], opts: { all?: boolean; suffix?: string; format?: 'kui' | 'roltek' } = {}) {
     if (!list.length) return;
-    const r = buildExport(list, opts);    if (r.suspicious.length) setPendingExport(r);
+    const r = opts.format === 'roltek' ? buildRoltekExport(list, opts) : buildExport(list, opts);
+    if (r.suspicious.length) setPendingExport(r);
     else finishExport(r);
   }
 
@@ -248,6 +250,19 @@ export default function RulesetsPage() {
             variant="ghost"
             size="xs"
             iconOnly
+            aria-label={`Export ${row.name} as roltek-automation-1`}
+            title="Export as roltek-automation-1"
+            onClick={() => {
+              const c = chains.find((x) => x.chainId === row.chainId);
+              if (c) startExport([c], { format: 'roltek' });
+            }}
+          >
+            <FontAwesomeIcon icon={faFileCode} className="w-3.5 h-3.5" aria-hidden="true" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="xs"
+            iconOnly
             aria-label={`Versions of ${row.name}`}
             title="Versions"
             onClick={() => setVersionsFor(row.chainId)}
@@ -300,6 +315,11 @@ export default function RulesetsPage() {
               <FontAwesomeIcon icon={faFileExport} className="w-3.5 h-3.5" aria-hidden="true" />
               <span className="hidden sm:inline">Export all</span>
             </Button>
+            <Button variant="outline" size="sm" onClick={() => startExport(chains, { all: true, format: 'roltek' })}
+              disabled={!chains.length} aria-label="Export all as roltek-automation-1" title="Export all as roltek-automation-1">
+              <FontAwesomeIcon icon={faFileCode} className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="hidden lg:inline">roltek-automation-1</span>
+            </Button>
             <Button variant="primary" size="sm" onClick={() => setNewOpen(true)} aria-label="New ruleset" title="New ruleset">
               <FontAwesomeIcon icon={faPlus} className="w-3.5 h-3.5" aria-hidden="true" />
               <span className="hidden sm:inline">New ruleset</span>
@@ -313,7 +333,11 @@ export default function RulesetsPage() {
           <p className="text-sm text-text-primary">
             Rule chains process device telemetry in real time through a visual pipeline of{' '}
             <strong>Triggers</strong>, <strong>Filters</strong>, <strong>Transforms</strong>, and{' '}
-            <strong>Actions</strong>. Click a name to open the drag-and-drop editor.
+            <strong>Actions</strong>. Click a name to open the drag-and-drop editor, or{' '}
+            <Link href="/theme/iot/rulesets/catalog-demo" className="font-semibold text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus">
+              try the block catalog demo
+            </Link>{' '}
+            (typed blocks, param forms, groups, subflows, undo).
           </p>
         </div>
 

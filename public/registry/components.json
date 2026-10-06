@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-10-06T16:34:19.053Z",
+  "generatedAt": "2026-10-06T16:55:20.128Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -8537,12 +8537,24 @@
       "category": "Domain",
       "filePath": "modules/domains/iot/ruleset/RulesetEditor/index.tsx",
       "abbr": "RE",
-      "description": "Drag-and-drop visual rule chain editor — build telemetry pipelines with Trigger, Filter, Switch, Transform, and Action nodes.",
-      "source": "'use client';\n// Drag nodes from palette onto the canvas.\n// Click output ports (filled) → input ports (hollow) to wire them.\n// Click an edge to delete it. Select a node to reveal the delete button.\n\nexport function RulesetEditor({ initialNodes, initialEdges, readOnly, className }) {\n  // ...\n}",
+      "description": "Drag-and-drop visual rule chain editor. The blocks come from a catalog (typed blocks with params), each block has a form built from its schema, and the editor has undo, multi-select, groups, subflows and validation.",
+      "source": "'use client';\n// Drag blocks from the palette onto the canvas, or right-click for \"Add a block here…\".\n// Click an output port (filled) and then an input port (hollow) to wire them.\n// Click a connection to select it; Delete removes it. Shift or Ctrl click selects several nodes.\n// Ctrl+Z undoes, Ctrl+Y redoes. Right-click a node to group, skip, copy or make a subflow of the selection.\n\nexport function RulesetEditor({\n  initialNodes, initialEdges, initialGroups, initialSubflows,\n  catalog, choices, active, onChange, readOnly, className,\n}) {\n  // ...\n}",
       "variants": [
         {
           "title": "With pre-loaded chain",
           "code": "<RulesetEditor\n  initialNodes={nodes}\n  initialEdges={edges}\n/>"
+        },
+        {
+          "title": "Block catalog, param forms, a group and a subflow",
+          "code": "<RulesetEditor\n  catalog={catalog}            // blocks with typed params, from data\n  choices={{ brokers: [...] }} // lists for source fields\n  initialNodes={nodes}\n  initialEdges={edges}\n  initialGroups={groups}\n  initialSubflows={subflows}\n  active={chain.active}        // a missing required param is then an error\n  onChange={(graph) => save(graph)}\n/>"
+        },
+        {
+          "title": "Arrange, mini map, box select and snap",
+          "code": "// The blocks are scattered: press \"Arrange the blocks\" (bottom right) for a layered layout, one undo step.\n// Shift / Ctrl / ⌘ and drag on the empty canvas draws a selection frame; the frame button does it with one finger.\n// Drag a block: it snaps to a 12 px grid and to the edges of other blocks (guide lines); hold Alt to move freely.\n// The mini map shows above 30 blocks or when blocks leave the view; the binoculars button toggles it.\nconst ref = useRef<RulesetEditorRef>(null);\n<RulesetEditor ref={ref} catalog={catalog} initialNodes={nodes} initialEdges={edges}\n  onSelectionChange={(ids) => setSelected(ids)}\n  nodeMenuItems={({ nodeIds }) => [{ kind: 'item', label: 'Open live data', onSelect: () => open(nodeIds) }]}\n  toolbarExtra={<MyButton />} bannerSlot={<DraftBanner />} />\nref.current?.arrange(); ref.current?.select(['n1']); ref.current?.reveal('n4');"
+        },
+        {
+          "title": "Read only",
+          "code": "<RulesetEditor readOnly catalog={catalog} initialNodes={nodes} initialEdges={edges} />"
         },
         {
           "title": "Empty canvas (editable)",

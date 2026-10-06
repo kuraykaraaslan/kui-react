@@ -1,45 +1,48 @@
 'use client';
 import { useState } from 'react';
-import { nodePorts } from '../node-meta';
-import { NODE_W, outputPortY } from '../geometry';
-import type { RuleNode, RuleEdge } from '../../../types';
+import { connect } from '../../graph/edit';
+import type { Graph } from '../../graph/types';
+import type { Catalog } from '../../catalog/types';
+import { layoutOf, outputAnchor } from '../geometry';
 
-type Connecting = { nodeId: string; portIdx: number; x: number; y: number } | null;
+type Connecting = { nodeId: string; portId: string; x: number; y: number } | null;
 
-export function useEdgeConnect({ nodes, setEdges, edgeSeq: edgeSeqRef, readOnly, setMouse }: {
-  nodes: RuleNode[];
-  setEdges: React.Dispatch<React.SetStateAction<RuleEdge[]>>;
-  edgeSeq: React.RefObject<number>;
+export function useEdgeConnect({ getGraph, apply, catalog, readOnly, setMouse }: {
+  getGraph: () => Graph;
+  apply: (fn: (graph: Graph) => Graph, key?: string) => void;
+  catalog: Catalog;
   readOnly: boolean;
   setMouse: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
 }) {
   const [connecting, setConnecting] = useState<Connecting>(null);
 
-  function onOutputPortDown(e: React.PointerEvent, nodeId: string, portIdx: number) {
+  function onOutputPortDown(e: React.PointerEvent, nodeId: string, portId: string) {
     e.stopPropagation();
     if (readOnly) return;
-    const node = nodes.find((n) => n.nodeId === nodeId)!;
-    setConnecting({ nodeId, portIdx, x: node.x + NODE_W, y: outputPortY(node, portIdx) });
-    setMouse({ x: node.x + NODE_W, y: outputPortY(node, portIdx) });
+    const node = getGraph().nodes.find((n) => n.nodeId === nodeId);
+    const anchor = node ? outputAnchor(node, layoutOf(node, catalog), portId) : null;
+    if (!anchor) return;
+    setConnecting({ nodeId, portId, x: anchor.x, y: anchor.y });
+    setMouse({ x: anchor.x, y: anchor.y });
   }
 
-  function connectTo(nodeId: string, portIdx: number) {
-    if (!connecting || connecting.nodeId === nodeId || readOnly) { setConnecting(null); return; }
-    const src = nodes.find((n) => n.nodeId === connecting.nodeId);
-    const tgt = nodes.find((n) => n.nodeId === nodeId);
-    if (!src || !tgt) { setConnecting(null); return; }
-    const srcPort = nodePorts(src).outputs[connecting.portIdx]?.id;
-    const tgtPort = nodePorts(tgt).inputs[portIdx]?.id;
-    if (!srcPort || !tgtPort) { setConnecting(null); return; }
-    edgeSeqRef.current++;
-    const newEdge: RuleEdge = { edgeId: `e${edgeSeqRef.current}`, sourceNodeId: connecting.nodeId, sourcePort: srcPort, targetNodeId: nodeId, targetPort: tgtPort };
-    setEdges((p) => p.some((ed) => ed.sourceNodeId === newEdge.sourceNodeId && ed.sourcePort === newEdge.sourcePort && ed.targetNodeId === newEdge.targetNodeId) ? p : [...p, newEdge]);
+  function connectTo(nodeId: string, portId?: string) {
+    const from = connecting;
     setConnecting(null);
+    if (!from || readOnly) return;
+    const graph = getGraph();
+    const target = graph.nodes.find((n) => n.nodeId === nodeId);
+    if (!target) return;
+    const toPort = portId ?? layoutOf(target, catalog).inputs[0]?.id;
+    if (!toPort) return;
+    // a refused connection (to itself, to a block without input, a duplicate) simply does nothing
+    if (!connect(graph, catalog, from.nodeId, from.portId, nodeId, toPort)) return;
+    apply((g) => connect(g, catalog, from.nodeId, from.portId, nodeId, toPort) ?? g, 'connect');
   }
 
-  function onInputPortUp(e: React.PointerEvent, nodeId: string, portIdx: number) {
+  function onInputPortUp(e: React.PointerEvent, nodeId: string, portId: string) {
     e.stopPropagation();
-    connectTo(nodeId, portIdx);
+    connectTo(nodeId, portId);
   }
 
   /** pointer released anywhere while wiring: a touch pointer stays captured by the
@@ -49,8 +52,8 @@ export function useEdgeConnect({ nodes, setEdges, edgeSeq: edgeSeqRef, readOnly,
     const hit = document.elementFromPoint(clientX, clientY);
     const port = hit?.closest<HTMLElement | SVGElement>('[data-in-node]');
     const nodeEl = hit?.closest<HTMLElement>('[data-node-id]');
-    if (port) connectTo(port.dataset.inNode!, Number(port.dataset.inIdx ?? 0));
-    else if (nodeEl) connectTo(nodeEl.dataset.nodeId!, 0);
+    if (port) connectTo(port.dataset.inNode!, port.dataset.inPort);
+    else if (nodeEl) connectTo(nodeEl.dataset.nodeId!);
     else setConnecting(null);
   }
 

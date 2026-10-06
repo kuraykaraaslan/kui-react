@@ -14,7 +14,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Badge } from '@/modules/ui/Badge';
 import { RulesetEditor } from '@/modules/domains/iot/ruleset/RulesetEditor';
-import type { RulesetEditorRef } from '@/modules/domains/iot/ruleset/RulesetEditor';
+import type { RulesetEditorRef, RulesetGraph } from '@/modules/domains/iot/ruleset/RulesetEditor';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 import { useRulesetStore, rulesetStore } from '../rulesets.store';
 
@@ -24,6 +24,8 @@ export default function RulesetEditorPage({ params }: { params: Promise<{ slug: 
   const chain = chains.find((c) => c.slug === slug);
   const editorRef = useRef<RulesetEditorRef>(null);
   const [saved, setSaved] = useState('');
+  /** the graph as the editor last reported it; null while nothing changed since the last save */
+  const [unsaved, setUnsaved] = useState<RulesetGraph | null>(null);
   if (!chain) notFound();
 
   const placeholders = chain.nodes.filter((n) => n.type === 'PLACEHOLDER').length;
@@ -32,8 +34,9 @@ export default function RulesetEditorPage({ params }: { params: Promise<{ slug: 
   function save() {
     const graph = editorRef.current?.getGraph();
     if (!graph || !chain) return;
-    rulesetStore.save({ ...chain, nodes: graph.nodes, edges: graph.edges });
+    rulesetStore.save({ ...chain, nodes: graph.nodes, edges: graph.edges, groups: graph.groups, subflows: graph.subflows });
     setSaved(`Saved as version ${lastVersion + 1}.`);
+    setUnsaved(null);
   }
 
   return (
@@ -61,9 +64,9 @@ export default function RulesetEditorPage({ params }: { params: Promise<{ slug: 
         </Badge>
 
         <div className="ml-auto flex items-center gap-2">
-          <span role="status" className="hidden md:block text-xs text-success-fg">{saved}</span>
+          <span role="status" className={unsaved ? 'hidden md:block text-xs text-warning' : 'hidden md:block text-xs text-success-fg'}>{unsaved ? 'Unsaved changes' : saved}</span>
           <span className="hidden md:block text-xs text-text-secondary">
-            {chain.nodes.length} nodes · {chain.edges.length} edges
+            {(unsaved ?? chain).nodes.length} nodes · {(unsaved ?? chain).edges.length} edges
           </span>
 
           {/* Debug chain */}
@@ -108,7 +111,7 @@ export default function RulesetEditorPage({ params }: { params: Promise<{ slug: 
       <div className="shrink-0 hidden md:flex items-center gap-2 border-b border-border bg-surface-raised px-4 py-1.5">
         <FontAwesomeIcon icon={faCircleInfo} className="w-3 h-3 text-text-secondary shrink-0" aria-hidden="true" />
         <p className="text-[11px] text-text-secondary">
-          Drag nodes from the palette · Click <span className="font-semibold text-primary">●</span> output → <span className="font-semibold">○</span> input to connect · Click a node to edit its script · Right-click for more · Click <span className="font-semibold">Debug</span> to trace execution
+          Drag nodes from the palette · Click <span className="font-semibold text-primary">●</span> output → <span className="font-semibold">○</span> input to connect · Click a node to edit it · Shift or Ctrl click to select several · Ctrl+Z undoes · Right-click to group, skip or make a subflow · Click <span className="font-semibold">Debug</span> to trace execution
         </p>
       </div>
 
@@ -119,6 +122,10 @@ export default function RulesetEditorPage({ params }: { params: Promise<{ slug: 
           ref={editorRef}
           initialNodes={chain.nodes}
           initialEdges={chain.edges}
+          initialGroups={chain.groups}
+          initialSubflows={chain.subflows}
+          active={chain.active}
+          onChange={setUnsaved}
           chainName={chain.name}
           className="h-full"
         />

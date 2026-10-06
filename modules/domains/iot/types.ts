@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { IdSchema } from '../common/types';
+import type { ParamSpec } from './ruleset/catalog/types';
 
 /* =========================================================
    ENUMS
@@ -119,8 +120,8 @@ export const RuleNodeTypeEnum = z.enum([
 export const RuleNodeOriginalSchema = z.object({
   /** original node type, e.g. `mqtt in` (Node-RED) or `MODBUS_READ` */
   type: z.string(),
-  /** where it came from: `kui` (another kui-ruleset file) or `node-red` */
-  source: z.enum(['kui', 'node-red']).optional(),
+  /** where it came from: `kui` (another kui-ruleset file), `node-red` or `roltek` (a roltek-automation-1 file) */
+  source: z.enum(['kui', 'node-red', 'roltek']).optional(),
   /** the original settings, shown read-only */
   settings: z.unknown().optional(),
   /** input / output port ids, so the imported wires stay attached */
@@ -130,13 +131,16 @@ export const RuleNodeOriginalSchema = z.object({
 
 export const RuleNodeSchema = z.object({
   nodeId: IdSchema,
-  type: RuleNodeTypeEnum,
+  /** a built-in type (see `RuleNodeTypeEnum`) or any block type of the catalog the editor is given */
+  type: z.string(),
   label: z.string(),
   x: z.number(),
   y: z.number(),
   script: z.string().optional(),
   /** node settings (endpoint, credentials…); keys that look like secrets are left out of exports */
   config: z.record(z.string(), z.unknown()).optional(),
+  /** a disabled node stops messages but keeps its wires */
+  disabled: z.boolean().optional(),
   /** only for `PLACEHOLDER` nodes */
   original: RuleNodeOriginalSchema.optional(),
 });
@@ -149,6 +153,30 @@ export const RuleEdgeSchema = z.object({
   targetPort: z.string(),
 });
 
+/** A named, coloured frame around some nodes of a chain. */
+export const RuleGroupSchema = z.object({
+  groupId: z.string(),
+  name: z.string(),
+  /** index of one of the eight group colours */
+  color: z.number().int().min(0).max(7),
+  nodeIds: z.array(z.string()),
+});
+
+/** A reusable piece of graph with its own ports and params, used as the block `subflow.<subflowId>`. */
+export const RuleSubflowSchema = z.object({
+  subflowId: z.string(),
+  name: z.string(),
+  description: z.string().optional(),
+  inputs: z.union([z.literal(0), z.literal(1)]),
+  /** names of the output ports */
+  outputs: z.array(z.string()),
+  /** param schema of an instance (see `ParamSpec` in ruleset/catalog) */
+  params: z.record(z.string(), z.custom<ParamSpec>()),
+  nodes: z.array(RuleNodeSchema),
+  edges: z.array(RuleEdgeSchema),
+  groups: z.array(RuleGroupSchema),
+});
+
 export const RuleChainSchema = z.object({
   chainId: IdSchema,
   name: z.string(),
@@ -157,6 +185,9 @@ export const RuleChainSchema = z.object({
   active: z.boolean().default(false),
   nodes: z.array(RuleNodeSchema),
   edges: z.array(RuleEdgeSchema),
+  groups: z.array(RuleGroupSchema).optional(),
+  /** subflows this chain uses; they are shared when a host app keeps them elsewhere */
+  subflows: z.array(RuleSubflowSchema).optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -185,4 +216,6 @@ export type RuleNodeType = z.infer<typeof RuleNodeTypeEnum>;
 export type RuleNode = z.infer<typeof RuleNodeSchema>;
 export type RuleNodeOriginal = z.infer<typeof RuleNodeOriginalSchema>;
 export type RuleEdge = z.infer<typeof RuleEdgeSchema>;
+export type RuleGroup = z.infer<typeof RuleGroupSchema>;
+export type RuleSubflow = z.infer<typeof RuleSubflowSchema>;
 export type RuleChain = z.infer<typeof RuleChainSchema>;

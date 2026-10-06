@@ -71,7 +71,7 @@ export function ImportDialog({ open, chains, onClose, onImport }: {
       open={open}
       onClose={close}
       title="Import rulesets"
-      description="A file exported from rulesets, or a Node-RED flow export."
+      description="A file exported from rulesets (kui-ruleset-1 or roltek-automation-1), or a Node-RED flow export."
       size="lg"
       scrollable
       className="max-h-[90vh] sm:max-w-3xl"
@@ -118,7 +118,7 @@ export function ImportDialog({ open, chains, onClose, onImport }: {
             spellCheck={false}
             className="font-mono text-xs"
             onChange={(e) => { setText(e.target.value); setFileName(''); setError(null); }}
-            placeholder={'{ "format": "kui-ruleset-1", "rulesets": [ … ] }'}
+            placeholder={'{ "format": "kui-ruleset-1", "rulesets": [ … ] }  or  { "format": "roltek-automation-1", "flows": [ … ] }'}
           />
           {error && (
             <div role="alert" className="flex items-start gap-2 rounded-lg border border-error/40 bg-error-subtle px-3 py-2 text-sm text-text-primary">
