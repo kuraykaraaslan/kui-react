@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-10-06T16:55:20.128Z",
+  "generatedAt": "2026-10-06T17:01:34.819Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -2501,6 +2501,49 @@
         "--error-subtle"
       ],
       "variantCount": 3
+    },
+    {
+      "id": "schema-form",
+      "name": "SchemaForm",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/SchemaForm/SchemaForm.tsx",
+      "abbr": "ScF",
+      "description": "Schema-driven form on the FieldSchema vocabulary (moved from next-boilerplate, OD-16). Field types: text, url, textarea, number, boolean, select, multi-select, json, color, date, datetime and repeater; showIf hides a field until another value matches, group folds fields into sections, defaults seed values and power the reset button, writes are debounced. App-bound types (media, remote-select, symbol, color-token, icon, background) are plugged in through the fieldOverrides registry and degrade to a plain input when none is given. zodFromSchema / validateSchemaValues validate the result; fromJsonSchema (subset) and fromFormBuilder convert other schemas. React only.",
+      "status": "beta",
+      "since": "2026-10",
+      "composes": [],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "group",
+          "alert"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Tab",
+            "action": "Move between fields; every control has a visible focus ring"
+          },
+          {
+            "keys": "Enter / Space",
+            "action": "Toggle group sections, repeater item panels and checkboxes"
+          }
+        ],
+        "notes": "Each control is bound to its label with htmlFor/id. Validation messages use role=\"alert\" and aria-describedby; invalid controls set aria-invalid."
+      },
+      "designTokens": [
+        "--surface-raised",
+        "--surface-overlay",
+        "--text-primary",
+        "--text-secondary",
+        "--text-disabled",
+        "--border",
+        "--border-strong",
+        "--border-focus",
+        "--primary",
+        "--error"
+      ],
+      "variantCount": 4
     },
     {
       "id": "common-login-form",

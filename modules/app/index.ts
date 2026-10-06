@@ -89,3 +89,25 @@ export type { MentionPickerProps, MentionPickerUser } from './MentionPicker';
 // Onboarding / flows
 export { OnboardingWizard } from './OnboardingWizard';
 export type { OnboardingWizardProps, OnboardingStep } from './OnboardingWizard';
+
+// Schema-driven forms (FieldSchema vocabulary, OD-16)
+export {
+  SchemaForm,
+  SchemaFormProvider,
+  useFieldOverrides,
+  FieldControl,
+  shouldShow,
+  zodFromSchema,
+  validateSchemaValues,
+  fromJsonSchema,
+  fromFormBuilder,
+} from './SchemaForm';
+export type {
+  SchemaFormProps,
+  SchemaFieldOverrideProps,
+  FieldOverrides,
+  FieldSchema,
+  FieldOption as SchemaFieldOption,
+  FieldType as SchemaFieldType,
+  JsonSchemaSubset,
+} from './SchemaForm';

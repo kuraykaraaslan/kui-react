@@ -605,6 +605,12 @@
     "category": "App",
     "file": "form-builder.md"
   },
+  "schema-form": {
+    "name": "SchemaForm",
+    "layer": "app",
+    "category": "App",
+    "file": "schema-form.md"
+  },
   "common-login-form": {
     "name": "LoginForm",
     "layer": "domain",

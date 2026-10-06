@@ -1,0 +1,14 @@
+{
+  "$comment": "Provisional format until phase 4.4 (kui-tooling parity) defines the schema. One record per component deliberately absent from a sibling repo.",
+  "exceptions": [
+    {
+      "id": "schema-form",
+      "name": "SchemaForm",
+      "layer": "app",
+      "path": "modules/app/SchemaForm",
+      "presentIn": ["kui-react"],
+      "absentIn": ["kui-ejs", "KUInative"],
+      "reason": "New in phase 9 (9.10, OD-16), no counterpart. kui-ejs deliberately reverted FormBuilder, so no schema form is added there without a scope decision; KUInative has no form-builder surface. Source of truth for next-boilerplate's FieldSchema, vendored back from here."
+    }
+  ]
+}
