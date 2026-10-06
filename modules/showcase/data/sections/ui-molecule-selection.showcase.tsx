@@ -49,24 +49,6 @@ function CheckboxIndeterminateDemo() {
   );
 }
 
-function ToggleAsyncDemo({ mode }: { mode: 'pending' | 'mismatch' }) {
-  const [on, setOn] = useState(false);
-  return (
-    <div className="space-y-1">
-      <Toggle
-        id={`sc-toggle-async-${mode}`}
-        label={on ? 'Heater on' : 'Heater off'}
-        checked={on}
-        onChange={setOn}
-        pending={mode === 'pending'}
-        mismatch={mode === 'mismatch'}
-        describedBy={mode === 'mismatch' ? 'sc-toggle-async-hint' : undefined}
-      />
-      {mode === 'mismatch' && <p id="sc-toggle-async-hint" className="text-xs text-warning">The device still reports the old value.</p>}
-    </div>
-  );
-}
-
 export function buildMoleculeSelectionData(): ShowcaseComponent[] {
   return [
     {
@@ -291,16 +273,73 @@ export function Toggle({ id, label, description, checked, onChange, disabled, si
       },
       variants: [
         {
-          title: 'Sizes',
+          title: 'Checked',
           preview: (
-            <div className="space-y-3">
-              {(['sm','md','lg'] as const).map((s) => (
-                <Toggle key={s} id={`sc-toggle-${s}`} label={`Toggle ${s.toUpperCase()}`} checked size={s} onChange={() => {}} />
-              ))}
+            <div className="flex justify-center p-4">
+              <Toggle id="sc-toggle-checked" label="Notifications enabled" checked onChange={() => {}} />
             </div>
           ),
-          code: `<Toggle id="notifications" label="Enable notifications" checked={enabled} onChange={setEnabled} size="md" />`,
+          code: `<Toggle id="notif" label="Notifications enabled" checked onChange={setEnabled} />`,
         },
+        {
+          title: 'Unchecked',
+          preview: (
+            <div className="flex justify-center p-4">
+              <Toggle id="sc-toggle-unchecked" label="Dark mode" checked={false} onChange={() => {}} />
+            </div>
+          ),
+          code: `<Toggle id="dark" label="Dark mode" checked={false} onChange={setDark} />`,
+        },
+        {
+          title: 'No visible label',
+          preview: (
+            <div className="flex justify-center p-4">
+              <Toggle id="sc-toggle-nolabel" label="" ariaLabel="Enable notifications" checked onChange={() => {}} />
+            </div>
+          ),
+          code: `<Toggle id="t" label="" ariaLabel="Enable notifications" checked onChange={setEnabled} />`,
+        },
+        {
+          title: 'Disabled',
+          preview: (
+            <div className="flex flex-col items-center gap-2 p-4">
+              <Toggle id="sc-toggle-dis1" label="Enabled (disabled)" checked disabled onChange={() => {}} />
+              <Toggle id="sc-toggle-dis2" label="Disabled option" checked={false} disabled onChange={() => {}} />
+            </div>
+          ),
+          code: `<Toggle id="a" label="Enabled (disabled)" checked disabled onChange={() => {}} />\n<Toggle id="b" label="Disabled option" checked={false} disabled onChange={() => {}} />`,
+        },
+        {
+          title: 'Sizes',
+          preview: (
+            <div className="flex flex-col items-center gap-3 p-4">
+              <Toggle id="sc-toggle-sm" label="Small" checked size="sm" onChange={() => {}} />
+              <Toggle id="sc-toggle-md" label="Medium" checked size="md" onChange={() => {}} />
+              <Toggle id="sc-toggle-lg" label="Large" checked size="lg" onChange={() => {}} />
+            </div>
+          ),
+          code: `<Toggle id="sm" label="Small" size="sm" checked onChange={set} />\n<Toggle id="md" label="Medium" size="md" checked onChange={set} />\n<Toggle id="lg" label="Large" size="lg" checked onChange={set} />`,
+        },
+        {
+          title: 'Pending (a write is in flight)',
+          preview: (
+            <div className="flex justify-center p-4">
+              <Toggle id="sc-toggle-pending" label="Heater" checked pending onChange={() => {}} />
+            </div>
+          ),
+          code: `<Toggle id="heater" label="Heater" checked pending onChange={write} />`,
+        },
+        {
+          title: 'Mismatch (the device reports another value)',
+          preview: (
+            <div className="flex flex-col items-center gap-1 p-4">
+              <Toggle id="sc-toggle-mismatch" label="Heater" checked mismatch describedBy="sc-toggle-mismatch-hint" onChange={() => {}} />
+              <p id="sc-toggle-mismatch-hint" className="text-center text-xs text-text-secondary">The device reports a different value.</p>
+            </div>
+          ),
+          code: `<Toggle id="heater" label="Heater" checked mismatch describedBy="heater-hint" onChange={write} />\n<p id="heater-hint">The device reports a different value.</p>`,
+        },
+        // React-only extras (not in kui-ejs): a description slot and a controlled settings list.
         {
           title: 'With description',
           preview: (
@@ -310,26 +349,6 @@ export function Toggle({ id, label, description, checked, onChange, disabled, si
             </div>
           ),
           code: `<Toggle id="marketing" label="Marketing emails" description="Receive weekly updates." checked={value} onChange={setValue} />`,
-        },
-        {
-          title: 'Pending write (spinner in the thumb, input disabled, aria-busy)',
-          preview: <ToggleAsyncDemo mode="pending" />,
-          code: `<Toggle id="heater" label="Heater" checked={on} onChange={write} pending={state === 'pending'} />`,
-        },
-        {
-          title: 'Mismatch (the other side reports a different value)',
-          preview: <ToggleAsyncDemo mode="mismatch" />,
-          code: `<Toggle id="heater" label="Heater" checked={on} onChange={write} mismatch describedBy="heater-hint" />\n<p id="heater-hint">The device still reports the old value.</p>`,
-        },
-        {
-          title: 'Disabled',
-          preview: (
-            <div className="space-y-2">
-              <Toggle id="sc-toggle-dis1" label="Disabled on" checked disabled onChange={() => {}} />
-              <Toggle id="sc-toggle-dis2" label="Disabled off" checked={false} disabled onChange={() => {}} />
-            </div>
-          ),
-          code: `<Toggle id="toggle" label="Disabled" checked disabled onChange={() => {}} />`,
         },
         {
           title: 'Settings list (controlled)',

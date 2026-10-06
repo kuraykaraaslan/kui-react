@@ -24,35 +24,56 @@ role="switch" toggle/switch with three sizes, description slot, and disabled sup
 
 ## Variants
 
+### Checked
+
+```tsx
+<Toggle id="notif" label="Notifications enabled" checked onChange={setEnabled} />
+```
+
+### Unchecked
+
+```tsx
+<Toggle id="dark" label="Dark mode" checked={false} onChange={setDark} />
+```
+
+### No visible label
+
+```tsx
+<Toggle id="t" label="" ariaLabel="Enable notifications" checked onChange={setEnabled} />
+```
+
+### Disabled
+
+```tsx
+<Toggle id="a" label="Enabled (disabled)" checked disabled onChange={() => {}} />
+<Toggle id="b" label="Disabled option" checked={false} disabled onChange={() => {}} />
+```
+
 ### Sizes
 
 ```tsx
-<Toggle id="notifications" label="Enable notifications" checked={enabled} onChange={setEnabled} size="md" />
+<Toggle id="sm" label="Small" size="sm" checked onChange={set} />
+<Toggle id="md" label="Medium" size="md" checked onChange={set} />
+<Toggle id="lg" label="Large" size="lg" checked onChange={set} />
+```
+
+### Pending (a write is in flight)
+
+```tsx
+<Toggle id="heater" label="Heater" checked pending onChange={write} />
+```
+
+### Mismatch (the device reports another value)
+
+```tsx
+<Toggle id="heater" label="Heater" checked mismatch describedBy="heater-hint" onChange={write} />
+<p id="heater-hint">The device reports a different value.</p>
 ```
 
 ### With description
 
 ```tsx
 <Toggle id="marketing" label="Marketing emails" description="Receive weekly updates." checked={value} onChange={setValue} />
-```
-
-### Pending write (spinner in the thumb, input disabled, aria-busy)
-
-```tsx
-<Toggle id="heater" label="Heater" checked={on} onChange={write} pending={state === 'pending'} />
-```
-
-### Mismatch (the other side reports a different value)
-
-```tsx
-<Toggle id="heater" label="Heater" checked={on} onChange={write} mismatch describedBy="heater-hint" />
-<p id="heater-hint">The device still reports the old value.</p>
-```
-
-### Disabled
-
-```tsx
-<Toggle id="toggle" label="Disabled" checked disabled onChange={() => {}} />
 ```
 
 ### Settings list (controlled)

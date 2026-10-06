@@ -40,14 +40,6 @@ Leaflet-based interactive map. Tooltip-enabled markers, predefined zones (polygo
 />
 ```
 
-### MapCanvas: card-less, custom tiles
-
-```tsx
-<div className="h-72">
-  <MapCanvas markers={markers} tiles={{ url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors' }} />
-</div>
-```
-
 ### Yalnız zone ve rota
 
 ```tsx

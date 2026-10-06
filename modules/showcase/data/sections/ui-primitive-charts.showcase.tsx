@@ -7,8 +7,6 @@ import {
   PieChart,
   DonutChart,
   SparkLine,
-  GaugeChart,
-  HeatmapChart,
   type Series,
 } from '@/modules/ui/Chart';
 import type { ShowcaseComponent } from '../showcase.types';
@@ -42,34 +40,6 @@ const lineSeries: Series[] = [
     ],
   },
 ];
-
-// Telemetry: uneven sampling instants on one time axis (ISO strings).
-const T0 = Date.UTC(2026, 9, 6, 8, 0, 0);
-const tempSeries: Series[] = [
-  {
-    id: 'temp',
-    name: 'Temperature',
-    data: Array.from({ length: 60 }, (_, i) => ({
-      x: new Date(T0 + i * 7 * 60_000 + (i % 3) * 20_000).toISOString(),
-      y: Math.round((21 + Math.sin(i / 6) * 3 + (i % 5) * 0.2) * 10) / 10,
-    })),
-  },
-  {
-    id: 'setpoint',
-    name: 'Setpoint',
-    data: [
-      { x: new Date(T0).toISOString(), y: 22 },
-      { x: new Date(T0 + 3 * 3_600_000).toISOString(), y: 22 },
-      { x: new Date(T0 + 7 * 3_600_000).toISOString(), y: 20 },
-    ],
-  },
-];
-
-const heatCells = Array.from({ length: 7 * 24 }, (_, i) => {
-  const day = Math.floor(i / 24);
-  const hour = i % 24;
-  return { x: String(hour).padStart(2, '0'), y: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][day], value: i % 37 === 0 ? null : Math.round(40 + 35 * Math.sin(hour / 4) + day * 3) };
-});
 
 const barSeries: Series[] = [
   {
@@ -133,7 +103,7 @@ export function buildPrimitiveChartsData(): ShowcaseComponent[] {
       abbr: 'Ch',
       since: '2026-05',
       description:
-        'Token-aware primitive chart library at @/modules/ui/Chart. M1 ships seven SVG-based charts (Line, Bar, Area, Pie, Donut, Scatter, SparkLine) that consume a unified `Series` data shape. Colors auto-resolve from --primary / --secondary / --success / --warning / --error / --info, so dark mode and theme swaps work without any extra work. Pixel-identical EJS sibling at modules/ui/Chart/Chart.ejs. GaugeChart (half-donut, threshold bands, role="meter") and HeatmapChart (matrix, token colour) are implemented; Line/Area take `xAxis="time"` for a continuous time axis with drag-to-zoom, and Bar/Area take `stacked`. The remaining M3 stubs (BubbleChart, TreemapChart, RadarChart, FunnelChart, SankeyChart, CandlestickChart) are exported but render null until implemented; see PLANS/38-Charts.md.',
+        'Token-aware primitive chart library at @/modules/ui/Chart. M1 ships seven SVG-based charts (Line, Bar, Area, Pie, Donut, Scatter, SparkLine) that consume a unified `Series` data shape. Colors auto-resolve from --primary / --secondary / --success / --warning / --error / --info, so dark mode and theme swaps work without any extra work. Pixel-identical EJS sibling at modules/ui/Chart/Chart.ejs. GaugeChart, HeatmapChart and the time axis (`xAxis="time"` with drag-to-zoom on Line/Area) have their own pages (gauge-chart, heatmap-chart, time-series-chart); Bar/Area take `stacked`. The remaining M3 stubs (BubbleChart, TreemapChart, RadarChart, FunnelChart, SankeyChart, CandlestickChart) are exported but render null until implemented; see PLANS/38-Charts.md.',
       filePath: 'modules/ui/Chart/index.ts',
       sourceCode: `'use client';
 import { LineChart, BarChart, AreaChart, PieChart, DonutChart, ScatterChart, SparkLine, type Series } from '@/modules/ui/Chart';
@@ -185,20 +155,6 @@ const series: Series[] = [
 />`,
         },
         {
-          title: 'Time axis + drag-to-zoom (xAxis="time")',
-          layout: 'stack' as const,
-          preview: (
-            <Frame title="Temperature vs setpoint (drag a range to zoom, double-click to reset)">
-              <LineChart series={tempSeries} xAxis="time" height={240} yFormat={(v) => `${v}°C`} />
-            </Frame>
-          ),
-          code: `<LineChart
-  series={[{ id: 'temp', name: 'Temperature', data: [{ x: '2026-10-06T08:00:00Z', y: 21.4 }, /* uneven instants */] }]}
-  xAxis="time"
-  yFormat={(v) => v + '°C'}
-/>`,
-        },
-        {
           title: 'Stacked bars and areas',
           layout: 'stack' as const,
           preview: (
@@ -208,31 +164,6 @@ const series: Series[] = [
             </Frame>
           ),
           code: `<BarChart series={series} stacked />\n<AreaChart series={series} stacked />`,
-        },
-        {
-          title: 'GaugeChart',
-          layout: 'stack' as const,
-          preview: (
-            <Frame title="Gauges with threshold bands">
-              <div className="flex flex-wrap items-end gap-6">
-                <GaugeChart value={34} unit="%" label="CPU" bands={[{ to: 60, tone: 'success' }, { to: 85, tone: 'warning' }, { to: 100, tone: 'error' }]} />
-                <GaugeChart value={91} unit="%" label="Disk" needle bands={[{ to: 60, tone: 'success' }, { to: 85, tone: 'warning' }, { to: 100, tone: 'error' }]} />
-                <GaugeChart value={72} size="sm" label="Stale reading" stale />
-              </div>
-            </Frame>
-          ),
-          code: `<GaugeChart value={91} min={0} max={100} unit="%" label="Disk" needle
-  bands={[{ to: 60, tone: 'success' }, { to: 85, tone: 'warning' }, { to: 100, tone: 'error' }]} />`,
-        },
-        {
-          title: 'HeatmapChart',
-          layout: 'stack' as const,
-          preview: (
-            <Frame title="Messages per hour and weekday (empty cells are missing data, not zero)">
-              <HeatmapChart cells={heatCells} height={220} valueLabel="Messages" />
-            </Frame>
-          ),
-          code: `<HeatmapChart cells={[{ x: '08', y: 'Mon', value: 42 }, { x: '09', y: 'Mon', value: null }, /* … */]} valueLabel="Messages" />`,
         },
         {
           title: 'BarChart',

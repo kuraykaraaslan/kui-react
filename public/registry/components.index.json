@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-10-06T12:35:17.022Z",
+  "generatedAt": "2026-10-06T16:34:19.053Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -582,7 +582,7 @@
       "usedBy": [
         "control-tile"
       ],
-      "variantCount": 6
+      "variantCount": 9
     },
     {
       "id": "checkbox-group",
@@ -863,7 +863,7 @@
       "usedBy": [
         "control-tile"
       ],
-      "variantCount": 3
+      "variantCount": 4
     },
     {
       "id": "popconfirm",
@@ -991,13 +991,31 @@
       "variantCount": 2
     },
     {
+      "id": "use-async-control",
+      "name": "useAsyncControl (hook)",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "libs/hooks/useAsyncControl.ts",
+      "abbr": "Ua",
+      "description": "State machine behind ControlTile: idle -> pending -> confirmed / mismatch / failed. `commit` returns a Promise (a rejection rolls the display back to the bound `value`); an optional `reported` value keeps the write pending until the other side agrees, else it ends as mismatch after `timeoutMs`; `confirm` parks the value until `accept()` / `dismiss()`. No transport knowledge. Lives in libs/hooks/useAsyncControl.ts.",
+      "status": "stable",
+      "since": "2026-10",
+      "relatedTo": [
+        "control-tile",
+        "toggle",
+        "range-slider"
+      ],
+      "designTokens": [],
+      "variantCount": 4
+    },
+    {
       "id": "chart",
       "name": "Chart",
       "layer": "ui",
       "category": "Molecule",
       "filePath": "modules/ui/Chart/index.ts",
       "abbr": "Ch",
-      "description": "Token-aware primitive chart library at @/modules/ui/Chart. M1 ships seven SVG-based charts (Line, Bar, Area, Pie, Donut, Scatter, SparkLine) that consume a unified `Series` data shape. Colors auto-resolve from --primary / --secondary / --success / --warning / --error / --info, so dark mode and theme swaps work without any extra work. Pixel-identical EJS sibling at modules/ui/Chart/Chart.ejs. GaugeChart (half-donut, threshold bands, role=\"meter\") and HeatmapChart (matrix, token colour) are implemented; Line/Area take `xAxis=\"time\"` for a continuous time axis with drag-to-zoom, and Bar/Area take `stacked`. The remaining M3 stubs (BubbleChart, TreemapChart, RadarChart, FunnelChart, SankeyChart, CandlestickChart) are exported but render null until implemented; see PLANS/38-Charts.md.",
+      "description": "Token-aware primitive chart library at @/modules/ui/Chart. M1 ships seven SVG-based charts (Line, Bar, Area, Pie, Donut, Scatter, SparkLine) that consume a unified `Series` data shape. Colors auto-resolve from --primary / --secondary / --success / --warning / --error / --info, so dark mode and theme swaps work without any extra work. Pixel-identical EJS sibling at modules/ui/Chart/Chart.ejs. GaugeChart, HeatmapChart and the time axis (`xAxis=\"time\"` with drag-to-zoom on Line/Area) have their own pages (gauge-chart, heatmap-chart, time-series-chart); Bar/Area take `stacked`. The remaining M3 stubs (BubbleChart, TreemapChart, RadarChart, FunnelChart, SankeyChart, CandlestickChart) are exported but render null until implemented; see PLANS/38-Charts.md.",
       "status": "beta",
       "since": "2026-05",
       "composes": [],
@@ -1020,7 +1038,101 @@
         "--text-primary",
         "--text-secondary"
       ],
-      "variantCount": 10
+      "variantCount": 7
+    },
+    {
+      "id": "gauge-chart",
+      "name": "GaugeChart",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/Chart/charts/GaugeChart.tsx",
+      "abbr": "Gc",
+      "description": "Half-donut gauge (role=\"meter\") with threshold bands, optional needle, three sizes and a stale state for readings that stopped updating. Part of the Chart library (`@/modules/ui/Chart`); the colour comes from semantic tokens through `bands[].tone`.",
+      "status": "beta",
+      "since": "2026-10",
+      "relatedTo": [
+        "chart",
+        "heatmap-chart",
+        "time-series-chart"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "meter"
+        ],
+        "notes": "role=\"meter\" with aria-valuemin / aria-valuemax / aria-valuenow and an aria-label from `label`."
+      },
+      "designTokens": [
+        "--success",
+        "--warning",
+        "--error",
+        "--info",
+        "--surface-sunken",
+        "--text-primary",
+        "--text-secondary"
+      ],
+      "variantCount": 4
+    },
+    {
+      "id": "heatmap-chart",
+      "name": "HeatmapChart",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/Chart/charts/HeatmapChart.tsx",
+      "abbr": "Hm",
+      "description": "Matrix of cells coloured on one token scale. A missing value (`null`) renders as an empty cell, never as 0, so gaps in the data stay visible. Hover shows the value; the scale can be fixed with `min` / `max`.",
+      "status": "beta",
+      "since": "2026-10",
+      "relatedTo": [
+        "chart",
+        "gauge-chart",
+        "time-series-chart"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "img"
+        ],
+        "notes": "role=\"img\" with an aria-label; the hover tooltip repeats the cell value as text."
+      },
+      "designTokens": [
+        "--primary",
+        "--surface-sunken",
+        "--border",
+        "--text-secondary"
+      ],
+      "variantCount": 2
+    },
+    {
+      "id": "time-series-chart",
+      "name": "TimeSeriesChart",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/Chart/charts/TimeSeriesChart.tsx",
+      "abbr": "Ts",
+      "description": "The continuous time axis behind `LineChart` / `AreaChart` with `xAxis=\"time\"`: timestamps (ISO strings or epoch ms) in `x`, uneven sampling, series with different instants on one axis, and drag-to-zoom (double-click or \"Reset zoom\" to leave). Zoom is local to the chart and never reaches the caller.",
+      "status": "beta",
+      "since": "2026-10",
+      "relatedTo": [
+        "chart",
+        "gauge-chart",
+        "heatmap-chart"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "img"
+        ],
+        "notes": "role=\"img\" with an aria-label; the tooltip and crosshair follow the nearest sample."
+      },
+      "designTokens": [
+        "--primary",
+        "--secondary",
+        "--border",
+        "--text-secondary",
+        "--surface-raised"
+      ],
+      "variantCount": 3
     },
     {
       "id": "card",
@@ -3350,7 +3462,34 @@
       "status": "beta",
       "since": "2025-04",
       "designTokens": [],
-      "variantCount": 4
+      "variantCount": 3
+    },
+    {
+      "id": "map-canvas",
+      "name": "MapCanvas",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/MapView/MapCanvas.tsx",
+      "abbr": "Mc",
+      "description": "The card-less Leaflet canvas behind MapView: it fills its parent (give the parent a height), takes markers, zones and routes, and accepts a custom tile configuration (`tiles.url` + `tiles.attribution`). Use it inside a dashboard tile or panel that already has its own frame; use MapView for a standalone map card.",
+      "status": "beta",
+      "since": "2026-10",
+      "relatedTo": [
+        "map-view"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "application"
+        ],
+        "notes": "Leaflet keyboard navigation (arrows, +/-) stays on; the loading label is announced while the map loads."
+      },
+      "designTokens": [
+        "--border",
+        "--surface-raised",
+        "--text-secondary"
+      ],
+      "variantCount": 2
     },
     {
       "id": "api-doc-status-code-badge",

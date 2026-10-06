@@ -34,6 +34,9 @@ import { buildRangeSliderData } from './sections/ui-molecule-range-slider.showca
 import { buildPopconfirmData } from './sections/ui-molecule-popconfirm.showcase';
 import { buildTimePickerData } from './sections/ui-molecule-time-picker.showcase';
 import { buildControlTileData } from './sections/ui-molecule-control-tile.showcase';
+import { buildTimeWindowPickerData } from './sections/ui-molecule-time-window-picker.showcase';
+import { buildUseAsyncControlData } from './sections/ui-molecule-use-async-control.showcase';
+import { buildPrimitiveChartSinglesData } from './sections/ui-primitive-chart-singles.showcase';
 import { buildLibKuiViewerData } from './sections/lib-kui-viewer.showcase';
 
 export function buildShowcaseData() {
@@ -46,7 +49,10 @@ export function buildShowcaseData() {
     ...buildPopconfirmData(),
     ...buildTimePickerData(),
     ...buildControlTileData(),
+    ...buildTimeWindowPickerData(),
+    ...buildUseAsyncControlData(),
     ...buildPrimitiveChartsData(),
+    ...buildPrimitiveChartSinglesData(),
     ...buildOrganismsData(),
     ...buildAppPatternsData(),
     ...buildAppKanbanBoardData(),

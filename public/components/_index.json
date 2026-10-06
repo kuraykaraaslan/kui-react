@@ -215,11 +215,35 @@
     "category": "Molecule",
     "file": "time-window-picker.md"
   },
+  "use-async-control": {
+    "name": "useAsyncControl (hook)",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "use-async-control.md"
+  },
   "chart": {
     "name": "Chart",
     "layer": "ui",
     "category": "Molecule",
     "file": "chart.md"
+  },
+  "gauge-chart": {
+    "name": "GaugeChart",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "gauge-chart.md"
+  },
+  "heatmap-chart": {
+    "name": "HeatmapChart",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "heatmap-chart.md"
+  },
+  "time-series-chart": {
+    "name": "TimeSeriesChart",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "time-series-chart.md"
   },
   "card": {
     "name": "Card",
@@ -1024,6 +1048,12 @@
     "layer": "ui",
     "category": "Molecule",
     "file": "map-view.md"
+  },
+  "map-canvas": {
+    "name": "MapCanvas",
+    "layer": "ui",
+    "category": "Molecule",
+    "file": "map-canvas.md"
   },
   "api-doc-status-code-badge": {
     "name": "StatusCodeBadge",

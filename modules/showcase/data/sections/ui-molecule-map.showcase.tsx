@@ -197,17 +197,19 @@ function ZonesRoutesDemo() {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-function CanvasDemo() {
+const GATEWAYS: MapMarker[] = [
+  { id: 'a', position: [41.015, 28.979], variant: 'success', tooltip: { title: 'Gateway 1' } },
+  { id: 'b', position: [39.925, 32.836], variant: 'error', tooltip: { title: 'Gateway 2' } },
+];
+
+function CanvasDemo({ tiles }: { tiles?: boolean }) {
   return (
     <div className="h-72 w-full overflow-hidden rounded-lg border border-border">
       <MapCanvas
-        center={[41.015, 28.979]}
+        center={[40.5, 30.5]}
         zoom={6}
-        markers={[
-          { id: 'a', position: [41.015, 28.979], variant: 'success', tooltip: { title: 'Gateway 1' } },
-          { id: 'b', position: [39.925, 32.836], variant: 'error', tooltip: { title: 'Gateway 2' } },
-        ]}
-        tiles={{ url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors' }}
+        markers={GATEWAYS}
+        {...(tiles ? { tiles: { url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors' } } : {})}
         loadingLabel="Loading map…"
       />
     </div>
@@ -294,12 +296,6 @@ import { MapView } from '@/modules/ui/MapView';
 />`,
         },
         {
-          title: 'MapCanvas: card-less, custom tiles',
-          layout: 'stack' as const,
-          preview: <CanvasDemo />,
-          code: `<div className="h-72">\n  <MapCanvas markers={markers} tiles={{ url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors' }} />\n</div>`,
-        },
-        {
           title: 'Yalnız zone ve rota',
           layout: 'stack' as const,
           preview: <ZonesRoutesDemo />,
@@ -310,6 +306,45 @@ import { MapView } from '@/modules/ui/MapView';
   routes={ROUTES}
   height={380}
 />`,
+        },
+      ],
+    },
+    {
+      id: 'map-canvas',
+      title: 'MapCanvas',
+      category: 'Molecule',
+      abbr: 'Mc',
+      since: '2026-10',
+      status: 'beta',
+      description:
+        'The card-less Leaflet canvas behind MapView: it fills its parent (give the parent a height), takes markers, zones and routes, and accepts a custom tile configuration (`tiles.url` + `tiles.attribution`). Use it inside a dashboard tile or panel that already has its own frame; use MapView for a standalone map card.',
+      filePath: 'modules/ui/MapView/MapCanvas.tsx',
+      relatedTo: ['map-view'],
+      designTokens: ['--border', '--surface-raised', '--text-secondary'],
+      a11y: { wcagLevel: 'AA', ariaPatterns: ['application'], notes: 'Leaflet keyboard navigation (arrows, +/-) stays on; the loading label is announced while the map loads.' },
+      sourceCode: `'use client';
+import { MapCanvas } from '@/modules/ui/MapView';
+
+<div className="h-72 overflow-hidden rounded-lg border border-border">
+  <MapCanvas
+    center={[40.5, 30.5]}
+    zoom={6}
+    markers={[{ id: 'a', position: [41.015, 28.979], variant: 'success', tooltip: { title: 'Gateway 1' } }]}
+    tiles={{ url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors' }}
+  />
+</div>`,
+      variants: [
+        {
+          title: 'Default tiles',
+          layout: 'stack' as const,
+          preview: <CanvasDemo />,
+          code: `<div className="h-72">\n  <MapCanvas center={[40.5, 30.5]} zoom={6} markers={markers} />\n</div>`,
+        },
+        {
+          title: 'Custom tiles',
+          layout: 'stack' as const,
+          preview: <CanvasDemo tiles />,
+          code: `<div className="h-72">\n  <MapCanvas markers={markers} tiles={{ url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors' }} />\n</div>`,
         },
       ],
     },

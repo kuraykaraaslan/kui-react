@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-10-06T12:35:17.022Z",
+  "generatedAt": "2026-10-06T16:34:19.053Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -942,24 +942,36 @@
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nconst sizeMap = {\n  sm: { track: 'h-4 w-7',  thumb: 'h-3 w-3',     on: 'translate-x-3.5' },\n  md: { track: 'h-5 w-9',  thumb: 'h-3.5 w-3.5', on: 'translate-x-4'   },\n  lg: { track: 'h-6 w-11', thumb: 'h-4 w-4',     on: 'translate-x-5'   },\n};\n\nexport function Toggle({ id, label, description, checked, onChange, disabled, size = 'md', className }) {\n  const { track, thumb, on } = sizeMap[size];\n  return (\n    <label htmlFor={id} className={cn('flex items-start gap-3', disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer', className)}>\n      <div className=\"relative shrink-0 mt-0.5\">\n        <input id={id} type=\"checkbox\" role=\"switch\" checked={checked} onChange={(e) => onChange(e.target.checked)} disabled={disabled} aria-checked={checked} className=\"sr-only\" />\n        <div className={cn('rounded-full transition-colors duration-200', track, checked ? 'bg-primary' : 'bg-surface-sunken border border-border')} />\n        <div className={cn('absolute top-0.5 left-0.5 rounded-full bg-white shadow-sm transition-transform duration-200', thumb, checked ? on : 'translate-x-0')} />\n      </div>\n      <div>\n        <span className=\"text-sm font-medium text-text-primary\">{label}</span>\n        {description && <p className=\"text-xs text-text-secondary mt-0.5\">{description}</p>}\n      </div>\n    </label>\n  );\n}",
       "variants": [
         {
+          "title": "Checked",
+          "code": "<Toggle id=\"notif\" label=\"Notifications enabled\" checked onChange={setEnabled} />"
+        },
+        {
+          "title": "Unchecked",
+          "code": "<Toggle id=\"dark\" label=\"Dark mode\" checked={false} onChange={setDark} />"
+        },
+        {
+          "title": "No visible label",
+          "code": "<Toggle id=\"t\" label=\"\" ariaLabel=\"Enable notifications\" checked onChange={setEnabled} />"
+        },
+        {
+          "title": "Disabled",
+          "code": "<Toggle id=\"a\" label=\"Enabled (disabled)\" checked disabled onChange={() => {}} />\n<Toggle id=\"b\" label=\"Disabled option\" checked={false} disabled onChange={() => {}} />"
+        },
+        {
           "title": "Sizes",
-          "code": "<Toggle id=\"notifications\" label=\"Enable notifications\" checked={enabled} onChange={setEnabled} size=\"md\" />"
+          "code": "<Toggle id=\"sm\" label=\"Small\" size=\"sm\" checked onChange={set} />\n<Toggle id=\"md\" label=\"Medium\" size=\"md\" checked onChange={set} />\n<Toggle id=\"lg\" label=\"Large\" size=\"lg\" checked onChange={set} />"
+        },
+        {
+          "title": "Pending (a write is in flight)",
+          "code": "<Toggle id=\"heater\" label=\"Heater\" checked pending onChange={write} />"
+        },
+        {
+          "title": "Mismatch (the device reports another value)",
+          "code": "<Toggle id=\"heater\" label=\"Heater\" checked mismatch describedBy=\"heater-hint\" onChange={write} />\n<p id=\"heater-hint\">The device reports a different value.</p>"
         },
         {
           "title": "With description",
           "code": "<Toggle id=\"marketing\" label=\"Marketing emails\" description=\"Receive weekly updates.\" checked={value} onChange={setValue} />"
-        },
-        {
-          "title": "Pending write (spinner in the thumb, input disabled, aria-busy)",
-          "code": "<Toggle id=\"heater\" label=\"Heater\" checked={on} onChange={write} pending={state === 'pending'} />"
-        },
-        {
-          "title": "Mismatch (the other side reports a different value)",
-          "code": "<Toggle id=\"heater\" label=\"Heater\" checked={on} onChange={write} mismatch describedBy=\"heater-hint\" />\n<p id=\"heater-hint\">The device still reports the old value.</p>"
-        },
-        {
-          "title": "Disabled",
-          "code": "<Toggle id=\"toggle\" label=\"Disabled\" checked disabled onChange={() => {}} />"
         },
         {
           "title": "Settings list (controlled)",
@@ -1424,19 +1436,23 @@
       "filePath": "modules/ui/RangeSlider.tsx",
       "abbr": "Rs",
       "description": "Numeric range input built on native `<input type=\"range\">`. Single-handle by default, or `range` for a dual-handle min/max selector. Distinct from the `Slider` carousel component.",
-      "source": "'use client';\nimport { RangeSlider } from '@/modules/ui/RangeSlider';\n\nconst [v, setV] = useState(40);\n<RangeSlider label=\"Volume\" value={v} onChange={setV} />\n\nconst [range, setRange] = useState<[number, number]>([20, 70]);\n<RangeSlider range label=\"Price range\" value={range} onChange={setRange} min={0} max={100} />",
+      "source": "'use client';\nimport { RangeSlider } from '@/modules/ui/RangeSlider';\n\nconst [v, setV] = useState(65);\n<RangeSlider label=\"Volume\" value={v} onChange={setV} />\n\nconst [range, setRange] = useState<[number, number]>([20, 80]);\n<RangeSlider range label=\"Price range\" value={range} onChange={setRange} min={0} max={100} />",
       "variants": [
         {
           "title": "Single value",
-          "code": "const [v, setV] = useState(40);\n<RangeSlider label=\"Volume\" value={v} onChange={setV} />"
+          "code": "const [v, setV] = useState(65);\n<RangeSlider label=\"Volume\" value={v} onChange={setV} min={0} max={100} />"
         },
         {
-          "title": "Dual handle (range)",
-          "code": "const [range, setRange] = useState<[number, number]>([20, 70]);\n<RangeSlider range label=\"Price range\" value={range} onChange={setRange} min={0} max={100} />"
+          "title": "Dual-handle range",
+          "code": "const [range, setRange] = useState<[number, number]>([20, 80]);\n<RangeSlider range label=\"Price range\" value={range} onChange={setRange} min={0} max={100} />"
         },
         {
-          "title": "Commit on release + pending",
-          "code": "<RangeSlider label=\"Setpoint\" value={v} onChange={setV} onCommit={write} pending={writing} />"
+          "title": "Commit on release (one write per gesture)",
+          "code": "<RangeSlider label=\"Fan speed\" value={v} onChange={setV} onCommit={(n) => api.setFan(n)} min={0} max={100} step={5} />"
+        },
+        {
+          "title": "Pending (a write is in flight)",
+          "code": "<RangeSlider label=\"Fan speed\" value={40} onChange={setV} min={0} max={100} step={5} pending />"
         }
       ],
       "status": "stable",
@@ -1607,7 +1623,7 @@
           "code": "<TimeWindowPicker value={win} onChange={setWin} />"
         },
         {
-          "title": "Presets only, custom labels",
+          "title": "Presets only",
           "code": "<TimeWindowPicker value={win} onChange={setWin} presets={['1h', '24h', '7d']} allowAbsolute={false} showInterval={false} showAggregation={false} />"
         }
       ],
@@ -1635,13 +1651,49 @@
       ]
     },
     {
+      "id": "use-async-control",
+      "name": "useAsyncControl (hook)",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "libs/hooks/useAsyncControl.ts",
+      "abbr": "Ua",
+      "description": "State machine behind ControlTile: idle -> pending -> confirmed / mismatch / failed. `commit` returns a Promise (a rejection rolls the display back to the bound `value`); an optional `reported` value keeps the write pending until the other side agrees, else it ends as mismatch after `timeoutMs`; `confirm` parks the value until `accept()` / `dismiss()`. No transport knowledge. Lives in libs/hooks/useAsyncControl.ts.",
+      "source": "'use client';\nimport { useAsyncControl } from '@/libs/hooks/useAsyncControl';\n\nconst ctl = useAsyncControl<boolean>({\n  value,                 // bound value\n  reported,              // optional: what the device reports\n  timeoutMs: 1500,       // wait for `reported` to match\n  commit: async (next) => { await api.setHeater(next); setValue(next); },\n});\n\n// ctl.displayValue, ctl.state, ctl.error, ctl.set(next), ctl.retry()\n// with { confirm: true }: ctl.awaiting, ctl.accept(), ctl.dismiss()",
+      "variants": [
+        {
+          "title": "Success: pending then confirmed",
+          "code": "const ctl = useAsyncControl({ value, commit: async (n) => { await api.write(n); setValue(n); } });"
+        },
+        {
+          "title": "Failure: rolls back (with Retry)",
+          "code": "const ctl = useAsyncControl({ value, commit: () => Promise.reject(new Error('Device offline')) });\n// ctl.state === 'failed', ctl.error === 'Device offline', ctl.retry()"
+        },
+        {
+          "title": "Mismatch: the device reports a different value",
+          "code": "const ctl = useAsyncControl({ value, reported: deviceState, timeoutMs: 1500, commit: write });"
+        },
+        {
+          "title": "Confirm before commit",
+          "code": "const ctl = useAsyncControl({ value, confirm: true, commit: write });\n// ctl.set(next) -> ctl.awaiting -> ctl.accept() | ctl.dismiss()"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-10",
+      "relatedTo": [
+        "control-tile",
+        "toggle",
+        "range-slider"
+      ],
+      "designTokens": []
+    },
+    {
       "id": "chart",
       "name": "Chart",
       "layer": "ui",
       "category": "Molecule",
       "filePath": "modules/ui/Chart/index.ts",
       "abbr": "Ch",
-      "description": "Token-aware primitive chart library at @/modules/ui/Chart. M1 ships seven SVG-based charts (Line, Bar, Area, Pie, Donut, Scatter, SparkLine) that consume a unified `Series` data shape. Colors auto-resolve from --primary / --secondary / --success / --warning / --error / --info, so dark mode and theme swaps work without any extra work. Pixel-identical EJS sibling at modules/ui/Chart/Chart.ejs. GaugeChart (half-donut, threshold bands, role=\"meter\") and HeatmapChart (matrix, token colour) are implemented; Line/Area take `xAxis=\"time\"` for a continuous time axis with drag-to-zoom, and Bar/Area take `stacked`. The remaining M3 stubs (BubbleChart, TreemapChart, RadarChart, FunnelChart, SankeyChart, CandlestickChart) are exported but render null until implemented; see PLANS/38-Charts.md.",
+      "description": "Token-aware primitive chart library at @/modules/ui/Chart. M1 ships seven SVG-based charts (Line, Bar, Area, Pie, Donut, Scatter, SparkLine) that consume a unified `Series` data shape. Colors auto-resolve from --primary / --secondary / --success / --warning / --error / --info, so dark mode and theme swaps work without any extra work. Pixel-identical EJS sibling at modules/ui/Chart/Chart.ejs. GaugeChart, HeatmapChart and the time axis (`xAxis=\"time\"` with drag-to-zoom on Line/Area) have their own pages (gauge-chart, heatmap-chart, time-series-chart); Bar/Area take `stacked`. The remaining M3 stubs (BubbleChart, TreemapChart, RadarChart, FunnelChart, SankeyChart, CandlestickChart) are exported but render null until implemented; see PLANS/38-Charts.md.",
       "source": "'use client';\nimport { LineChart, BarChart, AreaChart, PieChart, DonutChart, ScatterChart, SparkLine, type Series } from '@/modules/ui/Chart';\n\nconst series: Series[] = [\n  { id: 'a', name: 'Active', data: [{ x: 'Mon', y: 12 }, { x: 'Tue', y: 19 }] },\n];\n\n<LineChart series={series} height={240} />\n<BarChart series={series} />\n<AreaChart series={series} />\n<PieChart series={series} />\n<DonutChart series={series} innerRadius={0.6} />\n<SparkLine values={[12, 14, 11, 17, 19]} />",
       "variants": [
         {
@@ -1649,20 +1701,8 @@
           "code": "<LineChart\n  series={[\n    { id: 'active',  name: 'Active users', data: [{ x: 'Mon', y: 1200 }, /* … */] },\n    { id: 'signups', name: 'New signups',  data: [{ x: 'Mon', y: 300 },  /* … */] },\n  ]}\n  height={220}\n/>"
         },
         {
-          "title": "Time axis + drag-to-zoom (xAxis=\"time\")",
-          "code": "<LineChart\n  series={[{ id: 'temp', name: 'Temperature', data: [{ x: '2026-10-06T08:00:00Z', y: 21.4 }, /* uneven instants */] }]}\n  xAxis=\"time\"\n  yFormat={(v) => v + '°C'}\n/>"
-        },
-        {
           "title": "Stacked bars and areas",
           "code": "<BarChart series={series} stacked />\n<AreaChart series={series} stacked />"
-        },
-        {
-          "title": "GaugeChart",
-          "code": "<GaugeChart value={91} min={0} max={100} unit=\"%\" label=\"Disk\" needle\n  bands={[{ to: 60, tone: 'success' }, { to: 85, tone: 'warning' }, { to: 100, tone: 'error' }]} />"
-        },
-        {
-          "title": "HeatmapChart",
-          "code": "<HeatmapChart cells={[{ x: '08', y: 'Mon', value: 42 }, { x: '09', y: 'Mon', value: null }, /* … */]} valueLabel=\"Messages\" />"
         },
         {
           "title": "BarChart",
@@ -1706,6 +1746,142 @@
         "--border",
         "--text-primary",
         "--text-secondary"
+      ]
+    },
+    {
+      "id": "gauge-chart",
+      "name": "GaugeChart",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/Chart/charts/GaugeChart.tsx",
+      "abbr": "Gc",
+      "description": "Half-donut gauge (role=\"meter\") with threshold bands, optional needle, three sizes and a stale state for readings that stopped updating. Part of the Chart library (`@/modules/ui/Chart`); the colour comes from semantic tokens through `bands[].tone`.",
+      "source": "'use client';\nimport { GaugeChart } from '@/modules/ui/Chart';\n\n<GaugeChart value={34} unit=\"%\" label=\"CPU\"\n  bands={[{ to: 60, tone: 'success' }, { to: 85, tone: 'warning' }, { to: 100, tone: 'error' }]} />",
+      "variants": [
+        {
+          "title": "Threshold bands",
+          "code": "<GaugeChart value={34} unit=\"%\" label=\"CPU\" bands={bands} />\n<GaugeChart value={91} unit=\"%\" label=\"Disk\" bands={bands} />"
+        },
+        {
+          "title": "Needle",
+          "code": "<GaugeChart value={91} min={0} max={100} unit=\"%\" label=\"Disk\" needle bands={bands} />"
+        },
+        {
+          "title": "Stale reading",
+          "code": "<GaugeChart value={72} size=\"sm\" label=\"Stale reading\" stale />"
+        },
+        {
+          "title": "Sizes",
+          "code": "<GaugeChart value={55} unit=\"%\" label=\"sm\" size=\"sm\" bands={bands} />\n<GaugeChart value={55} unit=\"%\" label=\"md\" size=\"md\" bands={bands} />\n<GaugeChart value={55} unit=\"%\" label=\"lg\" size=\"lg\" bands={bands} />"
+        }
+      ],
+      "status": "beta",
+      "since": "2026-10",
+      "relatedTo": [
+        "chart",
+        "heatmap-chart",
+        "time-series-chart"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "meter"
+        ],
+        "notes": "role=\"meter\" with aria-valuemin / aria-valuemax / aria-valuenow and an aria-label from `label`."
+      },
+      "designTokens": [
+        "--success",
+        "--warning",
+        "--error",
+        "--info",
+        "--surface-sunken",
+        "--text-primary",
+        "--text-secondary"
+      ]
+    },
+    {
+      "id": "heatmap-chart",
+      "name": "HeatmapChart",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/Chart/charts/HeatmapChart.tsx",
+      "abbr": "Hm",
+      "description": "Matrix of cells coloured on one token scale. A missing value (`null`) renders as an empty cell, never as 0, so gaps in the data stay visible. Hover shows the value; the scale can be fixed with `min` / `max`.",
+      "source": "'use client';\nimport { HeatmapChart } from '@/modules/ui/Chart';\n\n<HeatmapChart cells={[{ x: '08', y: 'Mon', value: 42 }, { x: '09', y: 'Mon', value: null }]} valueLabel=\"Messages\" />",
+      "variants": [
+        {
+          "title": "Missing data is empty, not zero",
+          "code": "<HeatmapChart cells={cells} height={220} valueLabel=\"Messages\" />"
+        },
+        {
+          "title": "Fixed scale and value format",
+          "code": "<HeatmapChart cells={cells} min={0} max={100} valueLabel=\"Humidity\" valueFormat={(v) => v + '%'} />"
+        }
+      ],
+      "status": "beta",
+      "since": "2026-10",
+      "relatedTo": [
+        "chart",
+        "gauge-chart",
+        "time-series-chart"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "img"
+        ],
+        "notes": "role=\"img\" with an aria-label; the hover tooltip repeats the cell value as text."
+      },
+      "designTokens": [
+        "--primary",
+        "--surface-sunken",
+        "--border",
+        "--text-secondary"
+      ]
+    },
+    {
+      "id": "time-series-chart",
+      "name": "TimeSeriesChart",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/Chart/charts/TimeSeriesChart.tsx",
+      "abbr": "Ts",
+      "description": "The continuous time axis behind `LineChart` / `AreaChart` with `xAxis=\"time\"`: timestamps (ISO strings or epoch ms) in `x`, uneven sampling, series with different instants on one axis, and drag-to-zoom (double-click or \"Reset zoom\" to leave). Zoom is local to the chart and never reaches the caller.",
+      "source": "'use client';\nimport { LineChart, AreaChart } from '@/modules/ui/Chart';\n\n<LineChart series={series} xAxis=\"time\" yFormat={(v) => v + '°C'} />\n<AreaChart series={series} xAxis=\"time\" />",
+      "variants": [
+        {
+          "title": "Line with drag-to-zoom",
+          "code": "<LineChart series={series} xAxis=\"time\" height={240} yFormat={(v) => v + '°C'} />"
+        },
+        {
+          "title": "Area, series sampled at different instants",
+          "code": "<AreaChart series={[inlet, outlet]} xAxis=\"time\" height={240} />"
+        },
+        {
+          "title": "Zoom disabled",
+          "code": "<LineChart series={series} xAxis=\"time\" zoom={false} />"
+        }
+      ],
+      "status": "beta",
+      "since": "2026-10",
+      "relatedTo": [
+        "chart",
+        "gauge-chart",
+        "heatmap-chart"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "img"
+        ],
+        "notes": "role=\"img\" with an aria-label; the tooltip and crosshair follow the nearest sample."
+      },
+      "designTokens": [
+        "--primary",
+        "--secondary",
+        "--border",
+        "--text-secondary",
+        "--surface-raised"
       ]
     },
     {
@@ -5586,10 +5762,6 @@
           "code": "<MapView\n  center={[39.5, 35.0]}\n  zoom={5}\n  markers={markers}\n  onMarkerAdd={(pos) => setMarkers(prev => [\n    ...prev,\n    { id: String(Date.now()), position: pos, variant: 'warning' },\n  ])}\n  height={380}\n/>"
         },
         {
-          "title": "MapCanvas: card-less, custom tiles",
-          "code": "<div className=\"h-72\">\n  <MapCanvas markers={markers} tiles={{ url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors' }} />\n</div>"
-        },
-        {
           "title": "Yalnız zone ve rota",
           "code": "<MapView\n  center={[39.5, 35.0]}\n  zoom={5}\n  zones={ZONES}\n  routes={ROUTES}\n  height={380}\n/>"
         }
@@ -5597,6 +5769,43 @@
       "status": "beta",
       "since": "2025-04",
       "designTokens": []
+    },
+    {
+      "id": "map-canvas",
+      "name": "MapCanvas",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/MapView/MapCanvas.tsx",
+      "abbr": "Mc",
+      "description": "The card-less Leaflet canvas behind MapView: it fills its parent (give the parent a height), takes markers, zones and routes, and accepts a custom tile configuration (`tiles.url` + `tiles.attribution`). Use it inside a dashboard tile or panel that already has its own frame; use MapView for a standalone map card.",
+      "source": "'use client';\nimport { MapCanvas } from '@/modules/ui/MapView';\n\n<div className=\"h-72 overflow-hidden rounded-lg border border-border\">\n  <MapCanvas\n    center={[40.5, 30.5]}\n    zoom={6}\n    markers={[{ id: 'a', position: [41.015, 28.979], variant: 'success', tooltip: { title: 'Gateway 1' } }]}\n    tiles={{ url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors' }}\n  />\n</div>",
+      "variants": [
+        {
+          "title": "Default tiles",
+          "code": "<div className=\"h-72\">\n  <MapCanvas center={[40.5, 30.5]} zoom={6} markers={markers} />\n</div>"
+        },
+        {
+          "title": "Custom tiles",
+          "code": "<div className=\"h-72\">\n  <MapCanvas markers={markers} tiles={{ url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors' }} />\n</div>"
+        }
+      ],
+      "status": "beta",
+      "since": "2026-10",
+      "relatedTo": [
+        "map-view"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "application"
+        ],
+        "notes": "Leaflet keyboard navigation (arrows, +/-) stays on; the loading label is announced while the map loads."
+      },
+      "designTokens": [
+        "--border",
+        "--surface-raised",
+        "--text-secondary"
+      ]
     },
     {
       "id": "api-doc-status-code-badge",

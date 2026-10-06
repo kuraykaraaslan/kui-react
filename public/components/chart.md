@@ -7,7 +7,7 @@
 - **status:** beta
 - **since:** 2026-05
 
-Token-aware primitive chart library at @/modules/ui/Chart. M1 ships seven SVG-based charts (Line, Bar, Area, Pie, Donut, Scatter, SparkLine) that consume a unified `Series` data shape. Colors auto-resolve from --primary / --secondary / --success / --warning / --error / --info, so dark mode and theme swaps work without any extra work. Pixel-identical EJS sibling at modules/ui/Chart/Chart.ejs. GaugeChart (half-donut, threshold bands, role="meter") and HeatmapChart (matrix, token colour) are implemented; Line/Area take `xAxis="time"` for a continuous time axis with drag-to-zoom, and Bar/Area take `stacked`. The remaining M3 stubs (BubbleChart, TreemapChart, RadarChart, FunnelChart, SankeyChart, CandlestickChart) are exported but render null until implemented; see PLANS/38-Charts.md.
+Token-aware primitive chart library at @/modules/ui/Chart. M1 ships seven SVG-based charts (Line, Bar, Area, Pie, Donut, Scatter, SparkLine) that consume a unified `Series` data shape. Colors auto-resolve from --primary / --secondary / --success / --warning / --error / --info, so dark mode and theme swaps work without any extra work. Pixel-identical EJS sibling at modules/ui/Chart/Chart.ejs. GaugeChart, HeatmapChart and the time axis (`xAxis="time"` with drag-to-zoom on Line/Area) have their own pages (gauge-chart, heatmap-chart, time-series-chart); Bar/Area take `stacked`. The remaining M3 stubs (BubbleChart, TreemapChart, RadarChart, FunnelChart, SankeyChart, CandlestickChart) are exported but render null until implemented; see PLANS/38-Charts.md.
 
 ## Accessibility
 
@@ -43,34 +43,11 @@ Each chart SVG uses role="img" + aria-label. M5 will add a visually hidden data 
 />
 ```
 
-### Time axis + drag-to-zoom (xAxis="time")
-
-```tsx
-<LineChart
-  series={[{ id: 'temp', name: 'Temperature', data: [{ x: '2026-10-06T08:00:00Z', y: 21.4 }, /* uneven instants */] }]}
-  xAxis="time"
-  yFormat={(v) => v + '°C'}
-/>
-```
-
 ### Stacked bars and areas
 
 ```tsx
 <BarChart series={series} stacked />
 <AreaChart series={series} stacked />
-```
-
-### GaugeChart
-
-```tsx
-<GaugeChart value={91} min={0} max={100} unit="%" label="Disk" needle
-  bands={[{ to: 60, tone: 'success' }, { to: 85, tone: 'warning' }, { to: 100, tone: 'error' }]} />
-```
-
-### HeatmapChart
-
-```tsx
-<HeatmapChart cells={[{ x: '08', y: 'Mon', value: 42 }, { x: '09', y: 'Mon', value: null }, /* … */]} valueLabel="Messages" />
 ```
 
 ### BarChart

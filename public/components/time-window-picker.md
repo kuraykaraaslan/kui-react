@@ -33,7 +33,7 @@ Presets form a radiogroup; the date inputs and the selects carry accessible name
 <TimeWindowPicker value={win} onChange={setWin} />
 ```
 
-### Presets only, custom labels
+### Presets only
 
 ```tsx
 <TimeWindowPicker value={win} onChange={setWin} presets={['1h', '24h', '7d']} allowAbsolute={false} showInterval={false} showAggregation={false} />
