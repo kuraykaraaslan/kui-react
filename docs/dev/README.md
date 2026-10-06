@@ -30,6 +30,7 @@ Path keys resolve through `internal-ai-rules/LOCAL_PATHS.json`. Never hardcode a
 | 6 | [phase-6-architecture-refactors.md](phase-6-architecture-refactors.md) | Source-of-truth fixes, browser-free snapshot, form system, standalone-package dedupe, Next.js app-level files, EJS locals contract | L | 1, 2 |
 | 7 | [phase-7-showcase-and-dx.md](phase-7-showcase-and-dx.md) | Props editor, search, URL state, grid view, i18n foundation, sitemap/robots, dependency graph page | M | 4, 6 |
 | 8 | [phase-8-product.md](phase-8-product.md) | `kui` CLI, registry props schema, MCP as a product, scope decisions recorded as ADRs | L | 4, 6, 7 |
+| 9 | [phase-9-data-and-realtime-components.md](phase-9-data-and-realtime-components.md) | Generic data and realtime components: chart time axis, brush/zoom, gauge, heatmap, dashboard time-range picker, live map markers + clustering, key/value editor, schema form, live-data hooks, status indicator, QR, CSV export (first consumer: [docs/iot/](../iot/README.md)) | L | none hard (1, 2 recommended) |
 
 Effort: **S** under a day, **M** a few days, **L** a week or more of focused work.
 
