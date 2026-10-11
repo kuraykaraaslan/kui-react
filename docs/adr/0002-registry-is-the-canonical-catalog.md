@@ -12,9 +12,9 @@ Three things need to agree on "what components exist": the sidebar navigation, A
 
 `modules/showcase/data/showcase.menu.ts` (the sidebar navigation list) plus the per-section showcase data (`modules/showcase/data/sections/*.showcase.tsx`) are the single source of truth for what components exist. `modules/registry/registry.ts` derives `GET /api/registry`, `public/registry/components.json`, `public/components/<id>.md`, and `public/llms.txt` / `llms-full.txt` from that source — never the other way around.
 
-Any prose documentation that lists components (README tables, `AGENTS.md` tables) is a convenience snapshot, not a source of truth, and can go stale. Prefer linking to `/api/registry?index=1` over maintaining a parallel list; where a table stays for readability, phase 4 of `docs/dev/` generates it from the registry instead of hand-editing it.
+Any prose documentation that lists components (README tables, `AGENTS.md` tables) is a convenience snapshot, not a source of truth, and can go stale. Prefer linking to `/api/registry?index=1` over maintaining a parallel list; where a table stays for readability, phase 4 of `docs/phases/` generates it from the registry instead of hand-editing it.
 
-The registry snapshot (`public/registry/**`, `public/components/**`) is committed to git, not generated only at deploy time, so it works offline and so a stale snapshot shows up as a diff in code review. CI enforces freshness (`docs/dev/phase-1-ci-and-gates.md`, section 1.2).
+The registry snapshot (`public/registry/**`, `public/components/**`) is committed to git, not generated only at deploy time, so it works offline and so a stale snapshot shows up as a diff in code review. CI enforces freshness (`docs/phases/phase-1-ci-and-gates.md`, section 1.2).
 
 ## Consequences
 

@@ -1,11 +1,12 @@
-# Developer plan (docs/dev)
+# Developer plan (docs/phases)
 
-Phased improvement plan for the two KUI showcase repositories. It was produced from a code audit on **2026-09-15** and covers both repos, because most gaps are shared and several fixes only make sense if they land in both.
+Phased improvement plan for the KUI showcase repositories. Phases 0-9 were produced from a code audit on **2026-09-15** and cover kui-react and kui-ejs, because most gaps are shared and several fixes only make sense if they land in both. Phase 10 (2026-10-11) also covers KUInative. This folder was `docs/dev/` until 2026-10-11; every KUI repo now keeps its phases in `docs/phases/`.
 
 | Repo | Path key | Stack |
 |---|---|---|
 | kui-react (this repo) | `$KUIREACT_ROOT` | Next.js 16 · React 19 · TypeScript 5 · Tailwind CSS 4 |
 | kui-ejs | `$KUIEJS_ROOT` | Express 4 · EJS 3 · TypeScript 5 · Tailwind CSS 4 |
+| KUInative (from phase 9) | `$KUINATIVE_ROOT` | Expo · React Native · NativeWind |
 
 Path keys resolve through `internal-ai-rules/LOCAL_PATHS.json`. Never hardcode absolute paths in these docs; the audit found five stale absolute paths in the repos already (see phase 0).
 
@@ -31,13 +32,14 @@ Path keys resolve through `internal-ai-rules/LOCAL_PATHS.json`. Never hardcode a
 | 7 | [phase-7-showcase-and-dx.md](phase-7-showcase-and-dx.md) | Props editor, search, URL state, grid view, i18n foundation, sitemap/robots, dependency graph page | M | 4, 6 |
 | 8 | [phase-8-product.md](phase-8-product.md) | `kui` CLI, registry props schema, MCP as a product, scope decisions recorded as ADRs | L | 4, 6, 7 |
 | 9 | [phase-9-data-and-realtime-components.md](phase-9-data-and-realtime-components.md) | Generic data and realtime components: chart time axis, brush/zoom, gauge, heatmap, dashboard time-range picker, live map markers + clustering, key/value editor, schema form, live-data hooks, status indicator, QR, CSV export (first consumer: [docs/iot/](../iot/README.md)) | L | none hard (1, 2 recommended) |
+| 10 | [phase-10-ecosystem-gap-closure.md](phase-10-ecosystem-gap-closure.md) | Gaps found against five reference libraries: palette presets, primitives (carousel, OTP, list, marquee, sortable, kbd, link), landing/commerce blocks, portfolio and agency themes, cross-repo drift (placement per use case, mirrors pixel-perfect, everything in the demo shell) | L | none hard (4.2, 4.4 help) |
 
 Effort: **S** under a day, **M** a few days, **L** a week or more of focused work.
 
 ## Status legend
 
 - `[ ]` not started · `[~]` in progress · `[x]` merged on `main` (add commit hash)
-- Tags: `[react]` only kui-react · `[ejs]` only kui-ejs · `[both]` mirror the change in both repos
+- Tags: `[react]` only kui-react · `[ejs]` only kui-ejs · `[both]` mirror the change in both repos · `+native` after a tag: also mirror in KUInative (`$KUINATIVE_ROOT/docs/phases/`; used from phase 9 on)
 
 ## Priorities if time is short
 

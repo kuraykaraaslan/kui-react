@@ -24,5 +24,5 @@ Split `modules/` into four layers, each building only on the ones above it:
 ## Consequences
 
 - A component's directory tells you its allowed dependencies without reading its imports.
-- `modules/domains/<a>` importing from `modules/domains/<b>` (other than `common`) is a layering violation; phase 1 of `docs/dev/` adds a lint/madge check for this.
+- `modules/domains/<a>` importing from `modules/domains/<b>` (other than `common`) is a layering violation; phase 1 of `docs/phases/` adds a lint/madge check for this.
 - The same layering is mirrored in kui-ejs (`modules/ui`, `modules/app`, `modules/domain`), which is what makes cross-repo parity checking (ADR 0003) meaningful — the same logical layer exists in both repos even though the file format differs.

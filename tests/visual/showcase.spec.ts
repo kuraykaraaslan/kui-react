@@ -1,5 +1,5 @@
 // showcase.spec.ts — visual regression over every showcase component page,
-// per docs/dev/phase-2-testing.md section 2.3. Iterates the committed
+// per docs/phases/phase-2-testing.md section 2.3. Iterates the committed
 // registry snapshot rather than hand-listing components, so a new
 // component is covered the moment its showcase entry ships.
 //
@@ -153,7 +153,7 @@ const ratchetedViolationCounts: Record<string, number> = Object.fromEntries(
 );
 
 // Written only when a page actually fails the strict check below, so CI
-// (docs/dev/phase-2-testing.md 2.5) has the full axe payload — not just
+// (docs/phases/phase-2-testing.md 2.5) has the full axe payload — not just
 // the truncated one-line-per-rule summary in the assertion message — to
 // upload as an artifact. Ratcheted-rule pages that pass every other rule
 // never write anything here.

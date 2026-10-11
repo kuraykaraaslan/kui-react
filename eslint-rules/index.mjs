@@ -2,7 +2,7 @@
 // AGENTS.md's Component Authoring Rules that are mechanically checkable.
 // No publish needed; wired directly into eslint.config.mjs as `plugins.kui`.
 //
-// docs/dev/phase-1-ci-and-gates.md section 1.4 has the full list this was
+// docs/phases/phase-1-ci-and-gates.md section 1.4 has the full list this was
 // scoped from and why `kui/no-raw-hex-in-jsx` isn't here (audit-tokens.mjs
 // already covers it, more completely, at the file level).
 

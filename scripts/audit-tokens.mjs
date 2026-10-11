@@ -4,7 +4,7 @@
 //
 // Node port of kui-ejs's scripts/audit-tokens.sh (same rule, same shape of
 // allowlist) — pure Node, no shell-out to grep, so it runs identically on
-// Windows/mac/Linux and in CI. See docs/dev/audit-2026-09-15.md for how the
+// Windows/mac/Linux and in CI. See docs/phases/audit-2026-09-15.md for how the
 // original count was measured and
 // docs/adr/0004-token-only-styling-and-font-awesome-only-icons.md for why
 // the rule exists.

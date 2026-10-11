@@ -10,7 +10,7 @@ Principle: the registry already enumerates every component, variant, theme and r
 ## 2.1 kui-react unit tests
 
 - [x] `[react]` Installed `vitest`, `@testing-library/react`, `@testing-library/user-event`, `@testing-library/jest-dom`, `jsdom`, `@vitejs/plugin-react`. `vitest.config.mts` (`.mts`, not `.ts` — Vite otherwise warns about loading ESM syntax as CommonJS and about `__dirname`, which doesn't exist in real ESM; use `import.meta.dirname`) with the `@` alias and `environment: jsdom`. Script `npm test`. **Pinned to `vitest@4.1.11`, not the latest 5.x** — vitest 5 requires `@types/node@^22 || >=24`, which conflicts with this repo's `@types/node@^20` (matching its stated `engines.node: ">=20"`); vitest 4.1.11 is the newest release that still accepts `^20.0.0`.
-- [ ] `[react]` Test template for a ui atom, stored as `docs/dev/templates/component.test.tsx` and referenced from CONTRIBUTING.md:
+- [ ] `[react]` Test template for a ui atom, stored as `docs/phases/templates/component.test.tsx` and referenced from CONTRIBUTING.md:
   - renders with children
   - each `variant` applies its class from the `variantClasses` record
   - `disabled` sets the attribute and the `disabled:` classes

@@ -269,7 +269,7 @@ kui-react and kui-ejs are two implementations of the same design system (see `do
 - EJS-only by design: `invoice`, `modem`, `ups` — device/admin-panel demos with no React counterpart.
 - App-layer exceptions: kui-ejs deliberately reverted `Gantt` and `FormBuilder` after shipping them ("moved out of scope" commits) — do not re-add without deciding scope first.
 
-Before adding a component to only one repo, check whether it belongs in the other too. When it is deliberately one-sided, say so in the PR description; `docs/dev/phase-4-shared-tooling-and-parity.md` tracks turning this into a generated, CI-checked matrix instead of a hand-maintained list.
+Before adding a component to only one repo, check whether it belongs in the other too. When it is deliberately one-sided, say so in the PR description; `docs/phases/phase-4-shared-tooling-and-parity.md` tracks turning this into a generated, CI-checked matrix instead of a hand-maintained list.
 
 | Vertical | Directory | Sample components |
 |----------|-----------|-------------------|

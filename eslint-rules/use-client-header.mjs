@@ -2,7 +2,7 @@
 // modules/domains must start with a `'use client';` directive, per
 // AGENTS.md's Component Authoring Rules. Encodes the rule that was, before
 // this, enforced only by prose and by the four files phase 0 of
-// docs/dev/ found violating it.
+// docs/phases/ found violating it.
 //
 // Scoped to .tsx only, matching both the actual (working, building) codebase
 // convention and the original phase-0 audit's own methodology

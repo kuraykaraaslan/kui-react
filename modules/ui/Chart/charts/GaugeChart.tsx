@@ -1,6 +1,6 @@
 'use client';
 // Half-donut gauge with threshold bands, centred value and optional needle
-// (docs/dev/phase-9-data-and-realtime-components.md §9.3). `role="meter"`.
+// (docs/phases/phase-9-data-and-realtime-components.md §9.3). `role="meter"`.
 
 import { useMemo } from 'react';
 import { cn } from '@/libs/utils/cn';

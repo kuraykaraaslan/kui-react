@@ -13,7 +13,7 @@
 // wrong 20% of the time and trains people to reach for eslint-disable
 // instead of actually reading it. Module-scope access is unambiguous and
 // catches the one crash-on-every-request class of bug; see
-// docs/dev/phase-1-ci-and-gates.md section 1.4 for the fuller rule this
+// docs/phases/phase-1-ci-and-gates.md section 1.4 for the fuller rule this
 // was scoped down from, and why.
 
 // context.getAncestors() was removed in ESLint 9's flat-config rule API —

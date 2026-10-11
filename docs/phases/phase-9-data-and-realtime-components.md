@@ -12,7 +12,7 @@
 
 - If the component already exists in kui-ejs and/or KUInative, the change is mirrored there **pixel-perfect** (same DOM/view shape, prop/local names, defaults and tokens). The mirror is a task in the same section, not a follow-up phase.
 - If the component does **not** exist in the other repo, it is **not** created there. The item is tagged `[react]` and gets a line in `parity.exceptions.json` (phase 4.4) with the reason "new in phase 9, no counterpart".
-- Tags: `[react]` only kui-react · `[ejs]` only kui-ejs · `[both]` kui-react + kui-ejs. This phase adds one marker that the legend in [README.md](README.md) does not have: **`+native`** after a tag means "also mirror in KUInative". KUInative has no `docs/dev/` of its own, so its mirror tasks live here.
+- Tags: `[react]` only kui-react · `[ejs]` only kui-ejs · `[both]` kui-react + kui-ejs. This phase adds one marker that the legend in [README.md](README.md) does not have: **`+native`** after a tag means "also mirror in KUInative". KUInative has no `docs/phases/` of its own, so its mirror tasks live here.
 
 Existence was checked on 2026-10-04:
 

@@ -42,7 +42,7 @@ All notable changes to this project will be documented here. Format follows [Kee
 - Fixed stale absolute-path references (`/home/kuray/00_Config_and_AI_Rules`,
   `/home/kuray/02_EJS_Components`, a dead GitHub URL) across `AGENTS.md` and module READMEs.
 - Added `docs/adr/` with the first four architecture decision records, and
-  `docs/dev/` with a phased improvement plan (see `docs/dev/README.md`).
+  `docs/phases/` with a phased improvement plan (see `docs/phases/README.md`).
 - Added standard repo hygiene files: `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/CODEOWNERS`,
   issue templates, a PR template.
 

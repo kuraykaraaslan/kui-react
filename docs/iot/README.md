@@ -10,7 +10,7 @@ The NB split rule (2026-10-04) decides it:
 
 | Kind of work | Planned in |
 |---|---|
-| Generic UI component (any product could use it) | [`docs/dev/phase-9-data-and-realtime-components.md`](../dev/phase-9-data-and-realtime-components.md), referenced below as `9.N` |
+| Generic UI component (any product could use it) | [`docs/phases/phase-9-data-and-realtime-components.md`](../dev/phase-9-data-and-realtime-components.md), referenced below as `9.N` |
 | IoT-only UI component or screen | **this folder** |
 | 3D / digital-twin viewer capabilities | kui-viewer `phases/phase-28-iot-platform-integration.md` |
 | Backend, storage, transport, rules | NB `docs/new-iot-platform/<module>/` |
@@ -36,7 +36,7 @@ The NB split rule (2026-10-04) decides it:
 | 10 | [10-lorawan.md](10-lorawan.md) | LoRaWAN: gateways list/map, gateway detail, device LoRa tab (reception per gateway), live frames, codecs (roltek-lns codec format, OD-83; no mixed mode, OD-86) | `/lorawan/gateways`, `/lorawan/gateways/[eui]`, `/lorawan/frames`, `/lorawan/codecs`, `/devices/[slug]?tab=lorawan` | `iot_lorawan` | 00, 01, 02 | ⬜ (after wk 8) |
 | 11 | [11-snmp-targets.md](11-snmp-targets.md) | SNMP: target list, target editor (v2c/v3 credentials, poll interval, polled by cloud or a Roltek router, OD-59), OID → key mapping editor with type and scale, MIB-free test poll, trap receiver view, v2c plaintext warning (OD-64); cloud v2c off until a tenant admin enables it (OD-78) | `/snmp`, `/snmp/targets/new`, `/snmp/targets/[id]`, `/snmp/profiles/[slug]`, `/snmp/traps`, `/devices/[slug]?tab=snmp` | `iot_gateway` (11 SNMP collector); router layout reference `roltek-openwrt-dev` `07-gateway-mode.md` | 00, 01, 9.9, 9.10, 9.11, 9.12, 9.14 | ⬜ (after wk 8) |
 
-Status legend as in [`docs/dev/README.md`](../dev/README.md): `[ ]` / `[~]` / `[x]` per task (add the commit hash), `⬜` planned · `🟡` in progress · `✅` done per phase.
+Status legend as in [`docs/phases/README.md`](../dev/README.md): `[ ]` / `[~]` / `[x]` per task (add the commit hash), `⬜` planned · `🟡` in progress · `✅` done per phase.
 
 Suggested calendar against NB's 8-week plan: 00 and the needed `9.N` items in NB weeks 0–2 (before NB's live chart in week 3), 01–03 by week 3, 07 for the week-4 simulator demo, 04/08 in week 4, 05–06 in week 5, 09 in week 6. NB's cut order applies here too: if the schedule slips, the map widget and 09 go first.
 
