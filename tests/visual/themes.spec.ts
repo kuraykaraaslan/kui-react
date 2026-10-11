@@ -1,5 +1,5 @@
 // themes.spec.ts — full-page visual regression of every theme landing
-// page, per docs/phases/phase-2-testing.md section 2.3. Iterates the
+// page, per docs/phases/02-testing.md section 2.3. Iterates the
 // committed registry snapshot's themes[], so a new theme is covered the
 // moment it's registered.
 //

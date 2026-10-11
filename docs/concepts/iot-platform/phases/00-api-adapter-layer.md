@@ -6,7 +6,7 @@
 **Demo routes:** every existing `/theme/iot/**` route (same look, now adapter-driven) · new `/theme/iot/settings` · new `/theme/iot/workspaces/[slug]`.
 **NB consumer:** all `iot_*` modules (`docs/new-iot-platform/iot_device/` … `iot_twin/`) implement the NB side of this contract; the live part is NB `docs/new-iot-platform/websocket/` (IoT namespace).
 **Out of scope:** `modules/domains/iot/ruleset/**`, `app/theme/iot/rulesets/**` and the rule-engine types (RulesetEditor, in progress, separate session). The rulesets pages keep their own `rulesets.store.ts`.
-**→ DECISION OD-79 (owner, 2026-10-04):** still out of scope of this phase's code, but no longer "later": the RulesetEditor is vendored into NB **in the MVP** as the editor of NB `iot_automation` (cloud block palette, editable default root flow, OD-88); the contract is listed in [README §Cloud rule engine in the MVP](README.md#cloud-rule-engine-in-the-mvp-od-79-od-87-od-88). If that work wants the IoT adapter (device and key pickers inside block forms), it uses `IotAdapterProvider` from this phase rather than a second data layer.
+**→ DECISION OD-79 (owner, 2026-10-04):** still out of scope of this phase's code, but no longer "later": the RulesetEditor is vendored into NB **in the MVP** as the editor of NB `iot_automation` (cloud block palette, editable default root flow, OD-88); the contract is listed in [README §Cloud rule engine in the MVP](../README.md#cloud-rule-engine-in-the-mvp-od-79-od-87-od-88). If that work wants the IoT adapter (device and key pickers inside block forms), it uses `IotAdapterProvider` from this phase rather than a second data layer.
 
 ## 0.1 Types
 

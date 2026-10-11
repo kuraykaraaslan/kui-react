@@ -1,6 +1,6 @@
 name: visual-and-axe
 
-# Reusable job body (docs/phases/phase-2-testing.md 2.5): the "visual
+# Reusable job body (docs/phases/02-testing.md 2.5): the "visual
 # regression + axe" job needs to run on two different triggers — PRs
 # labelled `visual` (ci.yml) and a nightly schedule (nightly.yml) — so it
 # lives here once and both workflows call it via `uses:` rather than

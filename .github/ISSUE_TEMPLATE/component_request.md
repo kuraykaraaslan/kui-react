@@ -14,7 +14,7 @@ labels: enhancement, component
 
 **Parity expectation**
 <!-- Should this exist in both kui-react and kui-ejs, or is it framework-specific?
-     See docs/phases/phase-4-shared-tooling-and-parity.md for the parity contract. -->
+     See docs/phases/04-shared-tooling-and-parity.md for the parity contract. -->
 
 **Reference / prior art**
 <!-- Link to a similar component elsewhere, a design, or a spec -->

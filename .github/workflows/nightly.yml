@@ -1,6 +1,6 @@
 name: nightly
 
-# docs/phases/phase-2-testing.md 2.5 — the visual regression + axe suite is
+# docs/phases/02-testing.md 2.5 — the visual regression + axe suite is
 # too slow (< 15 min budget, ~330 pages) to run on every PR, so it runs
 # nightly here instead, plus on-demand from ci.yml for PRs labelled
 # `visual`. See visual.yml for the actual job (shared between both

@@ -44,7 +44,7 @@ const eslintConfig = defineConfig([
   },
   // Local rules encoding AGENTS.md's Component Authoring Rules for the
   // modules/ui, modules/app, modules/domains layers. See eslint-rules/index.mjs
-  // and docs/phases/phase-1-ci-and-gates.md section 1.4.
+  // and docs/phases/01-ci-and-gates.md section 1.4.
   {
     files: ["modules/ui/**/*.{ts,tsx}", "modules/app/**/*.{ts,tsx}", "modules/domains/**/*.{ts,tsx}"],
     plugins: { kui: kuiPlugin },

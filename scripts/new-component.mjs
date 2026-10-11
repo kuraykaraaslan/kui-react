@@ -2,7 +2,7 @@
 // npm run new:component <layer> <Name> — scaffolds a new component,
 // registered in the showcase and covered by a test file, replacing the
 // five-step manual procedure in AGENTS.md's "Adding a new component to
-// the showcase" section. Per docs/phases/phase-7-showcase-and-dx.md 7.6.
+// the showcase" section. Per docs/phases/07-showcase-and-dx.md 7.6.
 //
 // <layer> is one of: ui, app, domains/<vertical> (vertical must already
 // have a NAV_GROUPS entry — see VERTICAL_LABELS below).

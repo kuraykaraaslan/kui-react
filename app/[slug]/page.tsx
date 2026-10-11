@@ -15,7 +15,7 @@ export async function generateMetadata({
     // The root layout sets a site-wide canonical (the homepage) as a
     // fallback for pages that don't override it — every one of these
     // ~315 pages needs its own, or search engines see them all as
-    // duplicates of the homepage (docs/phases/phase-7-showcase-and-dx.md 7.4).
+    // duplicates of the homepage (docs/phases/07-showcase-and-dx.md 7.4).
     alternates: { canonical: `${SHOWCASE_LINKS.siteUrl}/${slug}` },
   };
 }

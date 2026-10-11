@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // debt-ratchet.mjs — Freeze the known pre-existing debt counts and only
-// allow them to go down. See docs/phases/phase-1-ci-and-gates.md section 1.6.
+// allow them to go down. See docs/phases/01-ci-and-gates.md section 1.6.
 //
 // Each metric's definition matches the exact command documented in
-// docs/phases/audit-2026-09-15.md's "Commands to reproduce" section, so the
+// docs/audits/2026-09-15-code-audit.md's "Commands to reproduce" section, so the
 // baseline stays reproducible by hand, not just by this script.
 //
 // Usage:

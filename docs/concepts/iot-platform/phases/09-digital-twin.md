@@ -2,7 +2,7 @@
 
 **Goal:** a twin page that embeds kui-viewer for a site or building: live sensor values on the model, alarm colouring, a device ↔ element binding editor, a history scrubber with trend charts, and a site-map mode for outdoor gateways. kui-react owns the page chrome and the side panels; kui-viewer owns the 3D canvas.
 **Effort:** L.
-**Depends on:** 00, 02 (trend chart), 03 (alarm data), 08 (the asset the twin belongs to); **kui-viewer phase 28** (`$KUIVIEWER_ROOT/phases/phase-28-iot-platform-integration.md`), which supplies the host-fed telemetry provider, host alarm feed, binding API, history provider and the React embedding contract.
+**Depends on:** 00, 02 (trend chart), 03 (alarm data), 08 (the asset the twin belongs to); **kui-viewer phase 28** (`$KUIVIEWER_ROOT/docs/phases/28-iot-platform-integration.md`), which supplies the host-fed telemetry provider, host alarm feed, binding API, history provider and the React embedding contract.
 **Demo routes:** `/theme/iot/twin` (sample building) · `/theme/iot/assets/[id]/twin`.
 **NB consumer:** `docs/new-iot-platform/iot_twin/`.
 

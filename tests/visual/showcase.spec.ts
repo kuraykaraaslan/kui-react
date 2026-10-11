@@ -1,5 +1,5 @@
 // showcase.spec.ts — visual regression over every showcase component page,
-// per docs/phases/phase-2-testing.md section 2.3. Iterates the committed
+// per docs/phases/02-testing.md section 2.3. Iterates the committed
 // registry snapshot rather than hand-listing components, so a new
 // component is covered the moment its showcase entry ships.
 //
@@ -27,7 +27,7 @@
 //     synchronously at mount) covers the loading window a bare `img`
 //     selector's mask evaluation can race with.
 //
-// Also runs axe-core on every page (phase-2-testing.md section 2.4, "in
+// Also runs axe-core on every page (02-testing.md section 2.4, "in
 // the same visual spec" so pages aren't visited twice). A full scan across
 // all ~333 pages found and fixed ~25 real, mechanical a11y bugs, several
 // of them shared/high-leverage (one fix, many pages):
@@ -153,7 +153,7 @@ const ratchetedViolationCounts: Record<string, number> = Object.fromEntries(
 );
 
 // Written only when a page actually fails the strict check below, so CI
-// (docs/phases/phase-2-testing.md 2.5) has the full axe payload — not just
+// (docs/phases/02-testing.md 2.5) has the full axe payload — not just
 // the truncated one-line-per-rule summary in the assertion message — to
 // upload as an artifact. Ratcheted-rule pages that pass every other rule
 // never write anything here.

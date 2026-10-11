@@ -60,7 +60,7 @@ The showcase is already the documentation site; it lacks the pages a first-time 
 ## 8.6 Community surface
 
 - [ ] Label the leftover phase 0 and phase 1 tasks `good first issue` and link them from CONTRIBUTING.
-- [ ] `docs/versus/` gets a third comparison against shadcn/ui, since the CLI puts kui-react in that category; be explicit about what it does not do (no Radix, no headless layer).
+- [ ] `docs/research/versus/` gets a third comparison against shadcn/ui, since the CLI puts kui-react in that category; be explicit about what it does not do (no Radix, no headless layer).
 - [ ] A release blog post or README changelog summary per minor version, generated from changesets.
 
 ## Definition of done

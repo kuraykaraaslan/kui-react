@@ -12,7 +12,7 @@ Path keys resolve through `internal-ai-rules/LOCAL_PATHS.json`. Never hardcode a
 
 ## How to use this folder
 
-1. Read [audit-2026-09-15.md](audit-2026-09-15.md) first. It is the baseline: what was measured, how, and the raw numbers every phase refers to.
+1. Read [2026-09-15-code-audit.md](../audits/2026-09-15-code-audit.md) first. It is the baseline: what was measured, how, and the raw numbers every phase refers to.
 2. Work through the phases in order. Each phase lists its dependencies. A later phase never requires an earlier one to be 100 % done, but it assumes the earlier phase's *gates* (CI jobs, scripts) exist.
 3. Tick a checkbox only when the task is merged on `main`. Append the short commit hash after the task text.
 4. When a number quoted in a phase changes, re-run the command from the audit file and update both places. Do not edit numbers from memory.
@@ -22,17 +22,17 @@ Path keys resolve through `internal-ai-rules/LOCAL_PATHS.json`. Never hardcode a
 
 | # | File | Goal | Effort | Depends on |
 |---|---|---|---|---|
-| 0 | [phase-0-hygiene.md](phase-0-hygiene.md) | Zero-risk cleanups: stale paths, package metadata, gitignore, dependency placement, doc drift, repo hygiene files | S | none |
-| 1 | [phase-1-ci-and-gates.md](phase-1-ci-and-gates.md) | CI on both repos, registry snapshot drift check, convention lint rules, debt thresholds, pre-commit hooks | M | 0 |
-| 2 | [phase-2-testing.md](phase-2-testing.md) | Unit tests, route smoke tests, visual regression, automated a11y, registry consistency tests | M–L | 1 |
-| 3 | [phase-3-release-and-package.md](phase-3-release-and-package.md) | Honest npm story: publish or retract, exports map, peer dependencies, build output, release tooling | M | 1 |
-| 4 | [phase-4-shared-tooling-and-parity.md](phase-4-shared-tooling-and-parity.md) | One tooling package, one design-token source, generated parity matrix and editor-rule mirrors, version alignment | L | 1, 3 |
-| 5 | [phase-5-ejs-security-and-runtime.md](phase-5-ejs-security-and-runtime.md) | CSP, CSRF, inline-script extraction, error pages, Express 5, caching, asset pipeline, static deploy for kui-ejs | M–L | 0, 1 |
-| 6 | [phase-6-architecture-refactors.md](phase-6-architecture-refactors.md) | Source-of-truth fixes, browser-free snapshot, form system, standalone-package dedupe, Next.js app-level files, EJS locals contract | L | 1, 2 |
-| 7 | [phase-7-showcase-and-dx.md](phase-7-showcase-and-dx.md) | Props editor, search, URL state, grid view, i18n foundation, sitemap/robots, dependency graph page | M | 4, 6 |
-| 8 | [phase-8-product.md](phase-8-product.md) | `kui` CLI, registry props schema, MCP as a product, scope decisions recorded as ADRs | L | 4, 6, 7 |
-| 9 | [phase-9-data-and-realtime-components.md](phase-9-data-and-realtime-components.md) | Generic data and realtime components: chart time axis, brush/zoom, gauge, heatmap, dashboard time-range picker, live map markers + clustering, key/value editor, schema form, live-data hooks, status indicator, QR, CSV export (first consumer: [docs/iot/](../iot/README.md)) | L | none hard (1, 2 recommended) |
-| 10 | [phase-10-ecosystem-gap-closure.md](phase-10-ecosystem-gap-closure.md) | Gaps found against five reference libraries: palette presets, primitives (carousel, OTP, list, marquee, sortable, kbd, link), landing/commerce blocks, portfolio and agency themes, cross-repo drift (placement per use case, mirrors pixel-perfect, everything in the demo shell) | L | none hard (4.2, 4.4 help) |
+| 0 | [00-hygiene.md](00-hygiene.md) | Zero-risk cleanups: stale paths, package metadata, gitignore, dependency placement, doc drift, repo hygiene files | S | none |
+| 1 | [01-ci-and-gates.md](01-ci-and-gates.md) | CI on both repos, registry snapshot drift check, convention lint rules, debt thresholds, pre-commit hooks | M | 0 |
+| 2 | [02-testing.md](02-testing.md) | Unit tests, route smoke tests, visual regression, automated a11y, registry consistency tests | M–L | 1 |
+| 3 | [03-release-and-package.md](03-release-and-package.md) | Honest npm story: publish or retract, exports map, peer dependencies, build output, release tooling | M | 1 |
+| 4 | [04-shared-tooling-and-parity.md](04-shared-tooling-and-parity.md) | One tooling package, one design-token source, generated parity matrix and editor-rule mirrors, version alignment | L | 1, 3 |
+| 5 | [05-ejs-security-and-runtime.md](05-ejs-security-and-runtime.md) | CSP, CSRF, inline-script extraction, error pages, Express 5, caching, asset pipeline, static deploy for kui-ejs | M–L | 0, 1 |
+| 6 | [06-architecture-refactors.md](06-architecture-refactors.md) | Source-of-truth fixes, browser-free snapshot, form system, standalone-package dedupe, Next.js app-level files, EJS locals contract | L | 1, 2 |
+| 7 | [07-showcase-and-dx.md](07-showcase-and-dx.md) | Props editor, search, URL state, grid view, i18n foundation, sitemap/robots, dependency graph page | M | 4, 6 |
+| 8 | [08-product.md](08-product.md) | `kui` CLI, registry props schema, MCP as a product, scope decisions recorded as ADRs | L | 4, 6, 7 |
+| 9 | [09-data-and-realtime-components.md](09-data-and-realtime-components.md) | Generic data and realtime components: chart time axis, brush/zoom, gauge, heatmap, dashboard time-range picker, live map markers + clustering, key/value editor, schema form, live-data hooks, status indicator, QR, CSV export (first consumer: [docs/concepts/iot-platform/](../concepts/iot-platform/README.md)) | L | none hard (1, 2 recommended) |
+| 10 | [10-ecosystem-gap-closure.md](10-ecosystem-gap-closure.md) | Gaps found against five reference libraries: palette presets, primitives (carousel, OTP, list, marquee, sortable, kbd, link), landing/commerce blocks, portfolio and agency themes, cross-repo drift (placement per use case, mirrors pixel-perfect, everything in the demo shell) | L | none hard (4.2, 4.4 help) |
 
 Effort: **S** under a day, **M** a few days, **L** a week or more of focused work.
 
@@ -54,7 +54,7 @@ The five items below give the most protection per hour. They are all in phases 0
 ## Related documents
 
 - [AGENTS.md](../../AGENTS.md): authoring rules that every task here must still satisfy.
-- [ROADMAP.md](../../ROADMAP.md): the older feature roadmap. Phase 0 refreshes its coverage column; several rows there are marked missing but already shipped.
-- [docs/versus/](../versus/): comparisons with other boilerplates. They currently describe kui-react as an installable npm package; phase 3 makes that true or removes the claim.
+- [docs/reference/feature-roadmap.md](../reference/feature-roadmap.md): the older feature roadmap. Phase 0 refreshes its coverage column; several rows there are marked missing but already shipped.
+- [docs/research/versus/](../research/versus/): comparisons with other boilerplates. They currently describe kui-react as an installable npm package; phase 3 makes that true or removes the claim.
 - `internal-ai-rules/KUI_Package_Rules`: how standalone `@kuraykaraaslan/kui-*` packages are structured. Relevant to phases 3, 4 and 6.
 - `internal-ai-rules/UI_Interface_Rules_EJS`: the EJS rules that phase 5 brings kui-ejs into line with (CSRF, CSP, ModalModule).

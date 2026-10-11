@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// Visual regression + a11y config, per docs/phases/phase-2-testing.md 2.3/2.4.
+// Visual regression + a11y config, per docs/phases/02-testing.md 2.3/2.4.
 //
 // Runs against a production build (`next build && next start`), not
 // `next dev` — dev compiles routes on demand, which would make the first
@@ -19,7 +19,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 2 : undefined,
   // CI gets an HTML report (browsable trace viewer) alongside the
-  // terminal list; local runs stay list-only. See docs/phases/phase-2-testing.md
+  // terminal list; local runs stay list-only. See docs/phases/02-testing.md
   // 2.5 — CI uploads playwright-report/ and test-results/ as artifacts
   // on failure, so a nightly/PR failure is debuggable without rerunning.
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',

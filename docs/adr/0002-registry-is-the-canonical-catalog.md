@@ -14,7 +14,7 @@ Three things need to agree on "what components exist": the sidebar navigation, A
 
 Any prose documentation that lists components (README tables, `AGENTS.md` tables) is a convenience snapshot, not a source of truth, and can go stale. Prefer linking to `/api/registry?index=1` over maintaining a parallel list; where a table stays for readability, phase 4 of `docs/phases/` generates it from the registry instead of hand-editing it.
 
-The registry snapshot (`public/registry/**`, `public/components/**`) is committed to git, not generated only at deploy time, so it works offline and so a stale snapshot shows up as a diff in code review. CI enforces freshness (`docs/phases/phase-1-ci-and-gates.md`, section 1.2).
+The registry snapshot (`public/registry/**`, `public/components/**`) is committed to git, not generated only at deploy time, so it works offline and so a stale snapshot shows up as a diff in code review. CI enforces freshness (`docs/phases/01-ci-and-gates.md`, section 1.2).
 
 ## Consequences
 

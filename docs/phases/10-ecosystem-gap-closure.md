@@ -3,7 +3,7 @@
 **Goal:** close the gaps found by comparing KUI against five reference libraries (shadcnspace, daisyUI, FlyonUI, Preline, Aceternity UI): primitives that most of them ship and KUI does not, a palette-preset mechanism for themes, a small set of marketing and commerce blocks, two missing site themes, and the drift between the three KUI repos found while comparing. Everything is placed per use case, not copied into every repo.
 **Effort:** L. Every numbered section is an independent PR.
 **Depends on:** nothing hard. 4.2 (shared token source) makes 10.1 cleaner; 4.4 (parity matrix) turns the exception records below into CI checks. Independent of phase 9.
-**Repos:** kui-react first; kui-ejs and KUInative only where the placement table says so. Mirror plans: `$KUIEJS_ROOT/docs/phases/phase-10-ecosystem-gap-closure.md` and `$KUINATIVE_ROOT/docs/phases/phase-10-ecosystem-gap-closure.md`.
+**Repos:** kui-react first; kui-ejs and KUInative only where the placement table says so. Mirror plans: `$KUIEJS_ROOT/docs/phases/10-ecosystem-gap-closure.md` and `$KUINATIVE_ROOT/docs/phases/10-ecosystem-gap-closure.md`.
 **Origin:** survey of 2026-10-11. The raw inventories (about 2 200 blocks, 410 components, 35 + 17 + 9 colour palettes, about 100 templates and pages) were collected outside the repos; the evidence each section needs is quoted inline as "Seen in N/M sites".
 
 ## Placement and parity rules for this phase

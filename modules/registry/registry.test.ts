@@ -1,13 +1,13 @@
 // registry.test.ts — consistency checks over the committed registry
 // snapshot. Runs in seconds against public/registry/components.json rather
 // than rebuilding the live registry (which still needs a browser until
-// phase 6.2, docs/phases/phase-6-architecture-refactors.md). Catches the class
+// phase 6.2, docs/phases/06-architecture-refactors.md). Catches the class
 // of AGENTS.md-convention violation that used to only be caught by manually
 // reading the sidebar: a showcase entry with 1 variant, a dead composes[]
 // reference, a filePath that no longer exists, a duplicated id/abbr.
 //
 // If this test fails right after `npm run registry:snapshot`, the snapshot
-// itself is out of date — regenerate it (see docs/phases/phase-1-ci-and-gates.md
+// itself is out of date — regenerate it (see docs/phases/01-ci-and-gates.md
 // section 1.2) before assuming the source data is wrong.
 
 import { describe, it, expect } from 'vitest';
@@ -51,7 +51,7 @@ describe('registry snapshot consistency', () => {
   // AGENTS.md-required 2. Neither is a quick mechanical fix: a new abbr
   // needs picking without creating a fresh collision, and a second variant
   // needs someone to design a meaningfully different demo state, not
-  // generate one. Ratcheted like docs/phases/phase-1-ci-and-gates.md section
+  // generate one. Ratcheted like docs/phases/01-ci-and-gates.md section
   // 1.6's debt-ratchet: ✓ blocks *new* debt of this shape (the baseline
   // can only go down), ✗ doesn't block the PR that adds these tests on
   // fixing 130 pre-existing components in one sitting.

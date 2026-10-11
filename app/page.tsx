@@ -4,7 +4,7 @@ import registry from '@/public/registry/components.index.json';
 
 // JSON-LD ItemList so search engines see the component catalog as a
 // structured list rather than just sidebar links buried in client JS
-// (docs/phases/phase-7-showcase-and-dx.md 7.4). Static import of the committed
+// (docs/phases/07-showcase-and-dx.md 7.4). Static import of the committed
 // registry snapshot — same reasoning as app/sitemap.ts.
 const components: { id: string; name: string; description: string }[] = registry.components;
 

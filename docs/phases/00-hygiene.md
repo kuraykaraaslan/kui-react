@@ -31,13 +31,13 @@ None of these tasks changes runtime behaviour for end users. All of them change 
 
 - [ ] `[ejs]` Fix `.gitignore`: the entry `public/css/app.css` points at a path that does not exist. The compiled output is `public/assets/css/app.css` and it is tracked in git together with `public/assets/css/main.css`. Steps: confirm `main.css` is unreferenced (`grep -rn 'main.css' views src`), delete it, `git rm --cached public/assets/css/app.css`, add the correct ignore line, and make sure the deploy build runs `npm run build:css` before start.
 - [ ] `[react]` Remove the stray manual entry `"app/theme/common/layout.tsx"` from the `include` array in `tsconfig.json`. The `**/*.tsx` glob already covers it.
-- [ ] `[react]` Move `.junk/` (83 MB of cloned reference repos) outside the project directory, for example to `~/reference-repos/`. It is git-ignored but still slows `find`, editor indexing and any agent that walks the tree. Update the two `docs/versus/*.md` files that reference `.junk/<name>`.
+- [ ] `[react]` Move `.junk/` (83 MB of cloned reference repos) outside the project directory, for example to `~/reference-repos/`. It is git-ignored but still slows `find`, editor indexing and any agent that walks the tree. Update the two `docs/research/versus/*.md` files that reference `.junk/<name>`.
 - [ ] `[react]` Add `'use client';` to the four files that violate the AGENTS.md rule: `modules/ui/FileInput.tsx`, `modules/app/EmptyErrorState.tsx`, `modules/app/FileUploadSection.tsx`, `modules/app/LoadingState.tsx`. Phase 1 adds a lint rule so this stays fixed.
 
 ## 0.4 Documentation drift
 
 - [ ] `[react]` `AGENTS.md`: add `nft` and `reviews` to the domain verticals table, `nft` and `promozone` to the existing-themes table, and the 18 missing components to the atoms/molecules table (list in the audit file). Alternative that avoids recurring drift: delete the component tables and keep only the sentence "the registry is the canonical list", since AGENTS.md already says so. Phase 4 decides which; do the quick fix now either way.
-- [ ] `[react]` `ROADMAP.md`: update the coverage column for rows #11, #13, #14, #16, #17 and #20; all six are marked missing but exist. Recompute the summary table. Pick one language for the coverage column (it currently mixes Turkish and English).
+- [ ] `[react]` `docs/reference/feature-roadmap.md`: update the coverage column for rows #11, #13, #14, #16, #17 and #20; all six are marked missing but exist. Recompute the summary table. Pick one language for the coverage column (it currently mixes Turkish and English).
 - [ ] `[react]` `README.md` module-layer block says 47 ui components, 25 app patterns, 16 verticals, 16 themes. The registry says 316 components and 18 themes. Replace hardcoded counts with a sentence that points at `/api/registry?index=1`, or generate the block (phase 4).
 - [ ] `[react]` `CHANGELOG.md` stops at `[0.1.0]` while `package.json` is `1.0.1`. Add `[1.0.0]` and `[1.0.1]` sections from `git log` (the tsup library build commit `08ddf39` and the version bump `9f868a3`). Phase 3 introduces tooling so this does not recur.
 - [ ] `[ejs]` `README.md` screenshot gallery shows four themes; add `ups`. Check `public/assets/img/screenshot-ups.png` exists or regenerate with `npm run screenshots`.
@@ -68,5 +68,5 @@ Create `docs/adr/` in kui-react and write the first four records. Keep them shor
 - `npm pkg get license repository engines` prints non-empty values in kui-react; `npm pkg get engines` in kui-ejs.
 - `git ls-files public/assets/css` in kui-ejs lists only `input.css`.
 - The `'use client'` loop from the audit prints no files.
-- `ROADMAP.md` summary counts match the table rows.
+- `docs/reference/feature-roadmap.md` summary counts match the table rows.
 - `docs/adr/` has four files.

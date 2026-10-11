@@ -1,13 +1,13 @@
 # Phase 3: Release and package
 
-**Goal:** the npm story becomes true. `README.md`, `docs/versus/*.md` and the tsup build all describe `@kuraykaraaslan/kui-react` as an installable package; the registry returns 404 for it. Either publish it properly or remove the claim. This phase assumes **publish**, because the copy-paste path keeps working for everyone else and the build already exists.
+**Goal:** the npm story becomes true. `README.md`, `docs/research/versus/*.md` and the tsup build all describe `@kuraykaraaslan/kui-react` as an installable package; the registry returns 404 for it. Either publish it properly or remove the claim. This phase assumes **publish**, because the copy-paste path keeps working for everyone else and the build already exists.
 **Effort:** M.
 **Depends on:** phase 1 (CI to run the package checks and the release workflow).
 **Repos:** mostly kui-react; a small versioning task for kui-ejs.
 
 ## 3.1 Decision: publish or retract
 
-- [ ] `[react]` Decide and record as `docs/adr/0005-npm-distribution.md`. If **retract**: delete `build:lib`, `tsup.config.ts`, `dist` from `files`, the `exports` map, and the npm sentences in README and `docs/versus`. If **publish**: everything below.
+- [ ] `[react]` Decide and record as `docs/adr/0005-npm-distribution.md`. If **retract**: delete `build:lib`, `tsup.config.ts`, `dist` from `files`, the `exports` map, and the npm sentences in README and `docs/research/versus`. If **publish**: everything below.
 
 ## 3.2 package.json for publishing
 

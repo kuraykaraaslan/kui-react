@@ -1,10 +1,10 @@
 # Phase 9: Data and realtime components
 
-**Goal:** finish the generic data-display and realtime building blocks that a monitoring product needs and that are stubs or missing today: a real time axis and zoom on charts, a gauge and a heatmap, dashboard time ranges with a live mode, live map markers with clustering, a key/value editor, a schema-driven form, a transport-agnostic live-data hook and a status indicator. Every item is generic; nothing here knows about devices. The IoT plan in [`docs/iot/`](../iot/README.md) is the first consumer, but every item must make sense to any domain (fintech prices, logistics fleets, ops dashboards).
+**Goal:** finish the generic data-display and realtime building blocks that a monitoring product needs and that are stubs or missing today: a real time axis and zoom on charts, a gauge and a heatmap, dashboard time ranges with a live mode, live map markers with clustering, a key/value editor, a schema-driven form, a transport-agnostic live-data hook and a status indicator. Every item is generic; nothing here knows about devices. The IoT plan in [`docs/concepts/iot-platform/`](../concepts/iot-platform/README.md) is the first consumer, but every item must make sense to any domain (fintech prices, logistics fleets, ops dashboards).
 **Effort:** L. Every numbered section is an independent PR.
 **Depends on:** nothing hard. Phase 1 (CI) and phase 2 (tests) protect the work if they land first; phase 4.4 (parity matrix) turns the exception records below into CI checks.
 **Repos:** kui-react first; kui-ejs and KUInative where the component already exists there (see the parity rule below).
-**Origin:** the IoT platform plan in next-boilerplate (`docs/new-iot-platform/README.md`, section "How this tree is split": generic UI components are planned here, IoT-only ones in `docs/iot/`). Written 2026-10-04.
+**Origin:** the IoT platform plan in next-boilerplate (`docs/concepts/iot-platform/README.md`, section "How this tree is split": generic UI components are planned here, IoT-only ones in `docs/concepts/iot-platform/`). Written 2026-10-04.
 
 ## Parity rule for this phase
 
@@ -31,7 +31,7 @@ Every new component or prop gets a showcase entry (at least two variants) and a 
 
 ## Owner decisions (2026-10-04)
 
-From next-boilerplate `docs/new-iot-platform/README.md` §"Owner decisions (2026-10-04)":
+From next-boilerplate `docs/concepts/iot-platform/README.md` §"Owner decisions (2026-10-04)":
 
 - **→ DECISION OD-15 (owner, 2026-10-04):** the chart engine is the kui-react **native SVG `Chart`** (`modules/ui/Chart/`) with a time axis (9.1), zoom (9.2), `GaugeChart` (9.3) and `HeatmapChart` (9.4), at parity with kui-ejs (`Chart.ejs`) and KUInative (`modules/ui/Chart/`); **not chart.js**. 9.1–9.4 are therefore committed work, not one option among two. chart.js remains only in existing non-IoT domain components (fintech, media, `domains/common/charts`), outside this phase; no new chart.js consumer is added anywhere.
 - **→ DECISION OD-16 (owner, 2026-10-04):** NB `common/ui/schema-form` `FieldSchema` moves into kui-react as the single form-schema vocabulary (9.10); OpenWrt `blocks.d` field types map onto it.
@@ -132,7 +132,7 @@ A new molecule in `modules/ui/DatePicker/TimeRangePicker.tsx`. Monitoring screen
 - [ ] Prerequisite: `DateTimePicker` (TODO M4 in `DateRangePicker.tsx`). KUInative already ships a `DateTimePicker`; port its behaviour and prop names so the two stay aligned rather than inventing a second API.
 - [ ] Exception record: new component, absent in kui-ejs and KUInative.
 
-Seen in: `/theme/iot/devices/[slug]/telemetry` and the board time window on `/theme/iot` (IoT phases 02 and 07). Also the shape next-boilerplate's generic "board-wide time window" (`phases/dashboard`) should vendor.
+Seen in: `/theme/iot/devices/[slug]/telemetry` and the board time window on `/theme/iot` (IoT phases 02 and 07). Also the shape next-boilerplate's generic "board-wide time window" (`docs/concepts/dashboard`) should vendor.
 
 ## 9.8 MapView: live markers, clustering, `onTelemetry` `[both]` `+native`
 

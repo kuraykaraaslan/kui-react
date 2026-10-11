@@ -35,7 +35,7 @@ All notable changes to this project will be documented here. Format follows [Kee
 - `AGENTS.md`: filled in the domain-vertical table (`nft`, `reviews` were shipped but
   undocumented), the theme table (`nft`, `promozone`), and the ui atoms/molecules tables (17
   components that existed but had no row).
-- `ROADMAP.md`: six rows (#11, #13, #14, #16, #17, #20) were marked "not implemented" for
+- `docs/reference/feature-roadmap.md`: six rows (#11, #13, #14, #16, #17, #20) were marked "not implemented" for
   features that had already shipped (`useA11yCheck`, `announce()`, `useBreakpoint`,
   `modules/ui/index.ts`, `lazy.tsx`, `isBrowser`); coverage and the summary table are
   recomputed.

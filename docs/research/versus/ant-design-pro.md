@@ -33,16 +33,16 @@ antd'nin (ant-design-pro'nun kullandığı v6, `ant-design/ant-design` GitHub re
 
 | Bileşen | kui-react karşılığı | Not |
 |---|---|---|
-| Collapse / Accordion | [`Accordion`](../../modules/ui/Accordion.tsx) | Tek-açık veya `allowMultiple`, native `<button>` disclosure |
-| Popconfirm | [`Popconfirm`](../../modules/ui/Popconfirm.tsx) | Popover primitiflerinin üstüne kurulu "emin misin?" onayı |
-| Progress (bar + circle) | [`Progress`](../../modules/ui/Progress.tsx) | Daha önce sadece VideoPlayer/Toast/FileInput içine gömülüydü, artık bağımsız |
-| Statistic | [`Statistic`](../../modules/ui/Statistic.tsx) | `StatCard`'ın kart-çerçevesiz hali; prefix/suffix/trend destekli |
-| Slider (numeric range) | [`RangeSlider`](../../modules/ui/RangeSlider.tsx) | kui-react'teki mevcut `Slider` aslında bir **carousel** — isim çakışması nedeniyle ayrı isimlendirildi. Tekli veya çift-tutamaç (range) modu var |
-| TimePicker | [`TimePicker`](../../modules/ui/DateRangePicker.tsx) | Zaten koddaydı (M1, native `type="time"`) ama kendi showcase/registry girişi yoktu — sadece DateRangePicker'ın bir varyantı olarak gömülüydü. Artık `time-picker` id'siyle kendi başına kataloglı |
+| Collapse / Accordion | [`Accordion`](../../../modules/ui/Accordion.tsx) | Tek-açık veya `allowMultiple`, native `<button>` disclosure |
+| Popconfirm | [`Popconfirm`](../../../modules/ui/Popconfirm.tsx) | Popover primitiflerinin üstüne kurulu "emin misin?" onayı |
+| Progress (bar + circle) | [`Progress`](../../../modules/ui/Progress.tsx) | Daha önce sadece VideoPlayer/Toast/FileInput içine gömülüydü, artık bağımsız |
+| Statistic | [`Statistic`](../../../modules/ui/Statistic.tsx) | `StatCard`'ın kart-çerçevesiz hali; prefix/suffix/trend destekli |
+| Slider (numeric range) | [`RangeSlider`](../../../modules/ui/RangeSlider.tsx) | kui-react'teki mevcut `Slider` aslında bir **carousel** — isim çakışması nedeniyle ayrı isimlendirildi. Tekli veya çift-tutamaç (range) modu var |
+| TimePicker | [`TimePicker`](../../../modules/ui/DateRangePicker.tsx) | Zaten koddaydı (M1, native `type="time"`) ama kendi showcase/registry girişi yoktu — sadece DateRangePicker'ın bir varyantı olarak gömülüydü. Artık `time-picker` id'siyle kendi başına kataloglı |
 
 > **İki düzeltme, ilk taramanın hatalı çıktığı yerler:**
-> 1. "Divider" eksik sanılmıştı — meğer zaten [`Separator`](../../modules/ui/Separator.tsx) adıyla (yatay/dikey + etiketli varyant) mevcutmuş, sadece isim farklıydı.
-> 2. "InputNumber" için önce ayrı bir bileşen yazıldı, ama sonra fark edildi ki [`Input`](../../modules/ui/Input.tsx) zaten `type="number"` ile artır/azalt (stepper) butonlarını destekliyor (`Input.tsx:170-191`) — antd'nin `InputNumber`'ıyla işlevsel olarak eşdeğer. Yazılan `InputNumber.tsx` bu yüzden **geri alındı**; iki bileşenli bir API yerine tek, zaten var olan `Input` tercih edildi.
+> 1. "Divider" eksik sanılmıştı — meğer zaten [`Separator`](../../../modules/ui/Separator.tsx) adıyla (yatay/dikey + etiketli varyant) mevcutmuş, sadece isim farklıydı.
+> 2. "InputNumber" için önce ayrı bir bileşen yazıldı, ama sonra fark edildi ki [`Input`](../../../modules/ui/Input.tsx) zaten `type="number"` ile artır/azalt (stepper) butonlarını destekliyor (`Input.tsx:170-191`) — antd'nin `InputNumber`'ıyla işlevsel olarak eşdeğer. Yazılan `InputNumber.tsx` bu yüzden **geri alındı**; iki bileşenli bir API yerine tek, zaten var olan `Input` tercih edildi.
 >
 > Bu, registry'yi ada göre tarayan bir AI ajanının gözden kaçırabileceği türden bir örtüşme — isim veya dosya yoksa "eksik" sanmak yerine, ilgili bileşenin mevcut prop yüzeyini de kontrol etmek gerekiyor.
 
