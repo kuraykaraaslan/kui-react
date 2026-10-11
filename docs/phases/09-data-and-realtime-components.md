@@ -132,7 +132,7 @@ A new molecule in `modules/ui/DatePicker/TimeRangePicker.tsx`. Monitoring screen
 - [ ] Prerequisite: `DateTimePicker` (TODO M4 in `DateRangePicker.tsx`). KUInative already ships a `DateTimePicker`; port its behaviour and prop names so the two stay aligned rather than inventing a second API.
 - [ ] Exception record: new component, absent in kui-ejs and KUInative.
 
-Seen in: `/theme/iot/devices/[slug]/telemetry` and the board time window on `/theme/iot` (IoT phases 02 and 07). Also the shape next-boilerplate's generic "board-wide time window" (`docs/concepts/dashboard`) should vendor.
+Seen in: `/theme/iot/devices/[slug]/telemetry` and the board time window on `/theme/iot` (IoT phases 02 and 07). Also the shape next-boilerplate's generic "board-wide time window" (`docs/phases/07-dashboard`) should vendor.
 
 ## 9.8 MapView: live markers, clustering, `onTelemetry` `[both]` `+native`
 
