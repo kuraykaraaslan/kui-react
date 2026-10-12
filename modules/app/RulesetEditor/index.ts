@@ -7,6 +7,7 @@ export { InsightPanel } from './RulesetEditor/insight/InsightPanel';
 export type { InsightPanelProps } from './RulesetEditor/insight/InsightPanel';
 export { DEFAULT_MESSAGES } from './RulesetEditor/messages';
 export type { EditorMessages } from './RulesetEditor/messages';
+export { ParamForm } from './forms/ParamForm';
 export { BUILTIN_CATALOG, catalogFromBlocks } from './catalog';
 export type { Catalog, BlockDecl, ParamSpec } from './catalog/types';
 export * from './types';
