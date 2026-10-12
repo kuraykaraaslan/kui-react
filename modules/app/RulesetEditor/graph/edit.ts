@@ -26,6 +26,7 @@ export function newNode(catalog: Catalog, type: string, at: Point, existing: Pic
     nodeId: newNodeId(existing),
     type,
     label: decl?.title ?? type,
+    ...(decl?.version !== undefined ? { v: decl.version } : {}),
     x: snapPos(at.x - size.width / 2),
     y: snapPos(at.y - size.headerHeight / 2),
     ...(decl ? { config: defaultParams(decl) } : {}),

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { RuleChain, RuleSubflow } from './types';
 import { catalogFromBlocks } from './catalog';
-import { ROLTEK_FORMAT } from './format/roltek';
+import { chainsToRoltek, ROLTEK_FORMAT, roltekToChains } from './format/roltek';
+import { newNode } from './graph/edit';
 import { applyImport, buildExport, buildRoltekExport, cloneChain, parseImport, type ImportPreview } from './transfer';
 
 const NOW = new Date('2026-10-04T10:00:00Z');
@@ -166,5 +167,31 @@ describe('cloneChain', () => {
     const copy = cloneChain(plain);
     expect(copy).not.toHaveProperty('groups');
     expect(copy).not.toHaveProperty('subflows');
+  });
+});
+
+describe('the block version of a node (v)', () => {
+  const versioned = catalogFromBlocks([[{ type: 'trigger.quota', version: 2 }, { type: 'action.notify', version: 3 }]]);
+  const file = { format: ROLTEK_FORMAT, flows: [{ id: 'f', name: 'F', enabled: true, nodes: [{ id: 'n1', type: 'trigger.quota', params: {}, x: 0, y: 0, v: 2 }, { id: 'n2', type: 'action.notify', params: {}, x: 200, y: 0 }], edges: [] }], subflows: [], configs: [] };
+
+  it('is read on import, kept untouched when a node has none, and written back on export', () => {
+    const [c] = roltekToChains(file, versioned, NOW);
+    expect(c.chain.nodes[0].v).toBe(2);
+    expect(c.chain.nodes[1].v).toBeUndefined();
+    const out = chainsToRoltek([c.chain], { catalog: versioned, now: NOW }).file;
+    expect(out.flows[0].nodes[0].v).toBe(2);
+    expect(out.flows[0].nodes[1]).not.toHaveProperty('v');
+  });
+
+  it('ignores a version that is not a whole number of at least 1', () => {
+    const bad = { ...file, flows: [{ ...file.flows[0], nodes: [{ ...file.flows[0].nodes[0], v: 0 }, { ...file.flows[0].nodes[1], v: 1.5 }] }] };
+    const [c] = roltekToChains(bad, versioned, NOW);
+    expect(c.chain.nodes.map((n) => n.v)).toEqual([undefined, undefined]);
+  });
+
+  it('is stamped on a node made from a block that declares a version', () => {
+    const n = newNode(versioned, 'action.notify', { x: 0, y: 0 }, [], { width: 100, headerHeight: 20 });
+    expect(n.v).toBe(3);
+    expect(newNode(catalog, 'action.notify', { x: 0, y: 0 }, [], { width: 100, headerHeight: 20 })).not.toHaveProperty('v');
   });
 });

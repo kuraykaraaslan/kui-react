@@ -28,6 +28,8 @@ export const FLOW_ID_RE = /^[a-z0-9_-]{1,32}$/;
 
 export type RoltekNode = {
   id: string; type: string; params: Record<string, unknown>; x: number; y: number; name?: string; disabled?: boolean;
+  /** the block version the params were made for; a host that migrates old nodes reads it */
+  v?: number;
 };
 export type RoltekEdge = { from: string; from_port: string; to: string };
 export type RoltekGroup = { id: string; name: string; color: number; nodes: string[] };
@@ -109,7 +111,7 @@ function nodeIdMap(nodes: { nodeId: string }[]): Map<string, string> {
 
 function nodeToRoltek(node: RuleNode, id: string, catalog: Catalog, at: string, state: ExportState): RoltekNode {
   const place = { x: Math.round(node.x), y: Math.round(node.y) };
-  const flags = node.disabled ? { disabled: true } : {};
+  const flags = { ...(node.disabled ? { disabled: true } : {}), ...(Number.isInteger(node.v) && (node.v as number) >= 1 ? { v: node.v } : {}) };
   /* the router contract (O1) has no node description yet: it stays out of the file and is reported */
   if (node.description) state.descriptions.push(`${at}.description`);
   if (UNSUPPORTED.has(node.type)) {
@@ -230,7 +232,7 @@ function graphFromRoltek(raw: Record<string, unknown>, catalog: Catalog): GraphR
     seen.add(nodeId);
     const type = str(n.type);
     const params = isObject(n.params) ? n.params : {};
-    const base = { nodeId, x: Math.round(num(n.x, 60 + j * 220)), y: Math.round(num(n.y, 80)), ...(n.disabled === true ? { disabled: true } : {}) };
+    const base = { nodeId, x: Math.round(num(n.x, 60 + j * 220)), y: Math.round(num(n.y, 80)), ...(n.disabled === true ? { disabled: true } : {}), ...(Number.isInteger(n.v) && (n.v as number) >= 1 ? { v: n.v as number } : {}) };
     const decl = UNSUPPORTED.has(type) ? undefined : catalog.blocks[type];
     if (!decl) {
       placeholders++;

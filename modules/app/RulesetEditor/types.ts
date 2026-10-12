@@ -47,6 +47,8 @@ export const RuleNodeSchema = z.object({
   script: z.string().optional(),
   /** node settings (endpoint, credentials…); keys that look like secrets are left out of exports */
   config: z.record(z.string(), z.unknown()).optional(),
+  /** the version of its block the node's settings were made for (`BlockDecl.version`); carried unchanged so a host can migrate an older node */
+  v: z.number().int().min(1).optional(),
   /** a disabled node stops messages but keeps its wires */
   disabled: z.boolean().optional(),
   /** only for `PLACEHOLDER` nodes */

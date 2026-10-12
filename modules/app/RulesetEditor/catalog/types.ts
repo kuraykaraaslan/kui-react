@@ -80,6 +80,8 @@ export type BlockDecl = {
   type: string;
   title: string;
   description?: string;
+  /** the version of this block (the router contract's `v`); a node made from it records it, and a save carries it back */
+  version?: number;
   /** palette group id, see `Catalog.groups` */
   group?: string;
   /** `trigger` | `cond` | `logic` | `action` | `subflow` … (taken from the type prefix when missing) */
