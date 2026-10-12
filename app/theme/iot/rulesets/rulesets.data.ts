@@ -1,7 +1,7 @@
 /* Sample data for the rulesets pages: templates for "New ruleset", recently
    deleted rulesets and the user that saves versions. No backend. */
 import type { RuleChain } from '@/modules/domains/iot/types';
-import type { DeletedRuleset, RulesetTemplate } from '@/modules/domains/iot/ruleset/transfer';
+import type { DeletedRuleset, RulesetTemplate } from '@/modules/app/RulesetEditor/transfer';
 
 /** who saves versions in this demo */
 export const CURRENT_USER = 'jane.k';

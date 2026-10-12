@@ -31,7 +31,7 @@ import type { RuleChain } from '@/modules/domains/iot/types';
 import {
   buildExport, buildRoltekExport, recentlyDeleted,
   type ConflictChoice, type DeletedRuleset, type ExportResult, type ImportPreview, type RulesetVersion,
-} from '@/modules/domains/iot/ruleset/transfer';
+} from '@/modules/app/RulesetEditor/transfer';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 import { useRulesetStore, rulesetStore } from './rulesets.store';
 import { RULESET_TEMPLATES } from './rulesets.data';

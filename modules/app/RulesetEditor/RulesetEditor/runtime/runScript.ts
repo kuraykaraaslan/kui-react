@@ -1,0 +1,47 @@
+'use client';
+import { RuleNodeTypeEnum } from '../../types';
+import type { RuleNode } from '../../types';
+import { nodePorts } from '../node-meta';
+import { defaultScript } from '../default-scripts';
+
+export type RunResult = {
+  output: unknown; portTaken?: string;
+  sideEffects: string[]; error?: string; durationMs: number;
+};
+
+export function runScript(node: RuleNode, msg: unknown, metadata: unknown, messageType: string): RunResult {
+  const script = node.script ?? defaultScript(node.type);
+  const v = nodePorts(node);
+  const sideEffects: string[] = [];
+  const t0 = performance.now();
+  if (node.type === 'PLACEHOLDER') {
+    return { output: undefined, sideEffects, durationMs: 0,
+      error: `Not available here: "${node.original?.type ?? 'unknown'}" nodes cannot run on this system.` };
+  }
+  if (!(RuleNodeTypeEnum.options as readonly string[]).includes(node.type)) {
+    return { output: undefined, sideEffects, durationMs: 0,
+      error: `The browser demo cannot run "${node.type}" blocks: they run on the device or the server.` };
+  }
+  try {
+    const fn = new Function('msg','metadata','message_type','send','getDeviceLabel','getDeviceTags', script);
+    const output = fn(
+      JSON.parse(JSON.stringify(msg ?? {})),
+      JSON.parse(JSON.stringify(metadata ?? {})),
+      messageType,
+      (p: unknown) => sideEffects.push(JSON.stringify(p, null, 2)),
+      (id: string) => `Label-${id}`,
+      () => ['sensor','iot'],
+    );
+    const durationMs = performance.now() - t0;
+    let portTaken: string | undefined;
+    if (v.outputs.length === 1) portTaken = v.outputs[0].id;
+    else if (v.outputs.length > 1) {
+      portTaken = node.type === 'FILTER'
+        ? (output ? 'true' : 'false')
+        : (v.outputs.find((p) => p.id === String(output))?.id ?? v.outputs.at(-1)?.id);
+    }
+    return { output, portTaken, sideEffects, durationMs };
+  } catch (e) {
+    return { output: undefined, sideEffects, error: String(e), durationMs: performance.now() - t0 };
+  }
+}

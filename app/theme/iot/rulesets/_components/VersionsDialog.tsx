@@ -6,7 +6,7 @@ import { Modal } from '@/modules/ui/Modal';
 import { Button } from '@/modules/ui/Button';
 import { Badge } from '@/modules/ui/Badge';
 import type { RuleChain } from '@/modules/domains/iot/types';
-import type { RulesetVersion } from '@/modules/domains/iot/ruleset/transfer';
+import type { RulesetVersion } from '@/modules/app/RulesetEditor/transfer';
 import { formatDateTime } from './download';
 
 export function VersionsDialog({ chain, versions, onClose, onRestore, onDownload }: {

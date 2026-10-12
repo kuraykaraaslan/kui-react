@@ -29,6 +29,7 @@ import { buildAppCalendarData } from './sections/app-calendar.showcase';
 import { buildAppGanttData } from './sections/app-gantt.showcase';
 import { buildAppFormBuilderData } from './sections/app-form-builder.showcase';
 import { buildAppSchemaFormData } from './sections/app-schema-form.showcase';
+import { buildAppRulesetEditorData } from './sections/app-ruleset-editor.showcase';
 import { buildMoleculeDiffViewerData } from './sections/ui-molecule-diff-viewer.showcase';
 import { buildAccordionData } from './sections/ui-molecule-accordion.showcase';
 import { buildRangeSliderData } from './sections/ui-molecule-range-slider.showcase';
@@ -61,6 +62,7 @@ export function buildShowcaseData() {
     ...buildAppGanttData(),
     ...buildAppFormBuilderData(),
     ...buildAppSchemaFormData(),
+    ...buildAppRulesetEditorData(),
     ...buildCommonDomainData(),
     ...buildBlogDomainData(),
     ...buildEventDomainData(),

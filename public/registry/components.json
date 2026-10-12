@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-10-06T17:01:34.819Z",
+  "generatedAt": "2026-10-12T09:22:37.186Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -4140,6 +4140,65 @@
         "--primary",
         "--error"
       ]
+    },
+    {
+      "id": "ruleset-editor",
+      "name": "RulesetEditor",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/RulesetEditor/RulesetEditor/index.tsx",
+      "abbr": "RE",
+      "description": "A visual flow editor for the blocks of any catalog: typed blocks with params (each block gets a form from its schema), connections, groups, subflows, undo, search, a shortcuts sheet, comments and a help tab per block. It is not tied to a domain: this entry uses a business catalog (a schedule, a webhook in, a comparison, a notification, a webhook out); the IoT demos use device blocks.",
+      "source": "'use client';\n// The blocks come from a catalog (data); a block's form is built from its params. Right-click for the menu,\n// Ctrl+F finds a block, ? lists the shortcuts, Alt+N adds a comment.\nimport { RulesetEditor, catalogFromBlocks } from '@/modules/app/RulesetEditor';\n\nconst catalog = catalogFromBlocks([[\n  { type: 'trigger.schedule', title: 'Schedule', params: { time: { type: 'time', default: '08:00' } } },\n  { type: 'action.notify', title: 'Send a notification', outputs: [], params: { to: { type: 'source', source: 'teams', required: true } } },\n]]);\n\n<RulesetEditor\n  catalog={catalog}\n  choices={{ teams: [{ value: 'finance', label: 'Finance team' }] }}\n  initialNodes={nodes}\n  initialEdges={edges}\n  onChange={(graph) => save(graph)}\n  messages={{ /* the words of the editor, to translate it */ }}\n/>",
+      "variants": [
+        {
+          "title": "A business flow (no devices)",
+          "code": "<RulesetEditor\n  catalog={catalog}            // schedule, webhook in, compare, notification, webhook out\n  choices={{ teams: [...] }}   // lists for source fields\n  initialNodes={nodes}\n  initialEdges={edges}\n/>"
+        },
+        {
+          "title": "Read only",
+          "code": "<RulesetEditor readOnly catalog={catalog} initialNodes={nodes} initialEdges={edges} />"
+        },
+        {
+          "title": "In another language",
+          "code": "<RulesetEditor\n  catalog={catalog}\n  messages={{ paletteTitle: 'Blocktypen', toolUndo: 'Rückgängig', menuPaste: 'Einfügen' /* … */ }}\n/>\n// Any part of the bundle can be given; the rest stays English. See EditorMessages."
+        }
+      ],
+      "status": "beta",
+      "since": "2026-10",
+      "whenToUse": "A user builds \"when X happens, do Y\" flows from a set of blocks your product defines.",
+      "whenNotToUse": "A fixed form or a linear wizard: use SchemaForm or OnboardingWizard.",
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "application",
+          "tablist",
+          "dialog"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Ctrl+Z / Ctrl+Y",
+            "action": "Undo and redo"
+          },
+          {
+            "keys": "Ctrl+F",
+            "action": "Find a block by name, type, description or id"
+          },
+          {
+            "keys": "Ctrl+D",
+            "action": "Duplicate the selection"
+          },
+          {
+            "keys": "Alt+N",
+            "action": "Add a comment"
+          },
+          {
+            "keys": "?",
+            "action": "List the keyboard shortcuts"
+          }
+        ]
+      },
+      "designTokens": []
     },
     {
       "id": "common-login-form",
@@ -8594,9 +8653,9 @@
     {
       "id": "iot-ruleset-editor",
       "name": "RulesetEditor",
-      "layer": "domain",
+      "layer": "app",
       "category": "Domain",
-      "filePath": "modules/domains/iot/ruleset/RulesetEditor/index.tsx",
+      "filePath": "modules/app/RulesetEditor/RulesetEditor/index.tsx",
       "abbr": "RE",
       "description": "Drag-and-drop visual rule chain editor. The blocks come from a catalog (typed blocks with params), each block has a form built from its schema, and the editor has undo, multi-select, groups, subflows and validation.",
       "source": "'use client';\n// Drag blocks from the palette onto the canvas, or right-click for \"Add a block here…\".\n// Click an output port (filled) and then an input port (hollow) to wire them.\n// Click a connection to select it; Delete removes it. Shift or Ctrl click selects several nodes.\n// Ctrl+Z undoes, Ctrl+Y redoes. Right-click a node to group, skip, copy or make a subflow of the selection.\n\nexport function RulesetEditor({\n  initialNodes, initialEdges, initialGroups, initialSubflows,\n  catalog, choices, active, onChange, readOnly, className,\n}) {\n  // ...\n}",

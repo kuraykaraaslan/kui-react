@@ -611,6 +611,12 @@
     "category": "App",
     "file": "schema-form.md"
   },
+  "ruleset-editor": {
+    "name": "RulesetEditor",
+    "layer": "app",
+    "category": "App",
+    "file": "ruleset-editor.md"
+  },
   "common-login-form": {
     "name": "LoginForm",
     "layer": "domain",
@@ -1777,7 +1783,7 @@
   },
   "iot-ruleset-editor": {
     "name": "RulesetEditor",
-    "layer": "domain",
+    "layer": "app",
     "category": "Domain",
     "file": "iot-ruleset-editor.md"
   },

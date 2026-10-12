@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRotateLeft, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { Modal } from '@/modules/ui/Modal';
 import { Button } from '@/modules/ui/Button';
-import { DELETED_KEEP_DAYS, type DeletedRuleset } from '@/modules/domains/iot/ruleset/transfer';
+import { DELETED_KEEP_DAYS, type DeletedRuleset } from '@/modules/app/RulesetEditor/transfer';
 import { formatDateTime } from './download';
 
 function ago(iso: string, now: number) {

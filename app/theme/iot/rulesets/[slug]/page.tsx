@@ -13,8 +13,8 @@ import {
   faPuzzlePiece,
 } from '@fortawesome/free-solid-svg-icons';
 import { Badge } from '@/modules/ui/Badge';
-import { RulesetEditor } from '@/modules/domains/iot/ruleset/RulesetEditor';
-import type { RulesetEditorRef, RulesetGraph } from '@/modules/domains/iot/ruleset/RulesetEditor';
+import { RulesetEditor } from '@/modules/app/RulesetEditor/RulesetEditor';
+import type { RulesetEditorRef, RulesetGraph } from '@/modules/app/RulesetEditor/RulesetEditor';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 import { useRulesetStore, rulesetStore } from '../rulesets.store';
 

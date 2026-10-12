@@ -4,10 +4,10 @@ import { useMemo, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { Button } from '@/modules/ui/Button';
-import { FlowWorkspace, type FlowWorkspaceRef } from '@/modules/domains/iot/ruleset/RulesetEditor/workspace/FlowWorkspace';
-import type { ConflictInfo, FlowKind, WorkspaceTab } from '@/modules/domains/iot/ruleset/RulesetEditor/workspace/types';
-import type { RulesetGraph } from '@/modules/domains/iot/ruleset/RulesetEditor';
-import { catalogFromBlocks } from '@/modules/domains/iot/ruleset/catalog';
+import { FlowWorkspace, type FlowWorkspaceRef } from '@/modules/app/RulesetEditor/RulesetEditor/workspace/FlowWorkspace';
+import type { ConflictInfo, FlowKind, WorkspaceTab } from '@/modules/app/RulesetEditor/RulesetEditor/workspace/types';
+import type { RulesetGraph } from '@/modules/app/RulesetEditor/RulesetEditor';
+import { catalogFromBlocks } from '@/modules/app/RulesetEditor/catalog';
 import type { RuleNode } from '@/modules/domains/iot/types';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 

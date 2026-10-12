@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { InsightPanel } from '@/modules/domains/iot/ruleset/RulesetEditor/insight/InsightPanel';
-import type { DebugMessage, NodeStats, RunRecord } from '@/modules/domains/iot/ruleset/RulesetEditor/insight/types';
+import { InsightPanel } from '@/modules/app/RulesetEditor/RulesetEditor/insight/InsightPanel';
+import type { DebugMessage, NodeStats, RunRecord } from '@/modules/app/RulesetEditor/RulesetEditor/insight/types';
 import { DocumentTitle } from '@/libs/utils/DocumentTitle';
 
 const NAMES: Record<string, string> = { n1: 'Sensor in', n2: 'Too hot?', n3: 'Tell the operator', s1: 'Hold 2 min', c1: 'Catch all' };

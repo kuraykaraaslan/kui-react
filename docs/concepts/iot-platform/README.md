@@ -15,7 +15,7 @@ The NB split rule (2026-10-04) decides it:
 | 3D / digital-twin viewer capabilities | kui-viewer `docs/phases/28-iot-platform-integration.md` |
 | Backend, storage, transport, rules | NB `docs/new-iot-platform/<module>/` |
 
-**Not in this plan:** the RulesetEditor (typed blocks, schema forms, groups, subflows, undo, `roltek-automation-1` format) is being upgraded **in a separate session**. Nothing here touches `modules/domains/iot/ruleset/**`, `app/theme/iot/rulesets/**` or the rule-engine types in `modules/domains/iot/types.ts` (`RuleNode*`, `RuleEdge*`, `RuleChain*`). Where a phase needs the editor it says "RulesetEditor (in progress, separate session)".
+**Not in this plan:** the RulesetEditor (typed blocks, schema forms, groups, subflows, undo, `roltek-automation-1` format) is being upgraded **in a separate session**. Nothing here touches `modules/app/RulesetEditor/**`, `app/theme/iot/rulesets/**` or the rule-engine types in `modules/domains/iot/types.ts` (`RuleNode*`, `RuleEdge*`, `RuleChain*`). Where a phase needs the editor it says "RulesetEditor (in progress, separate session)".
 
 **→ DECISION OD-79 (owner, 2026-10-04):** the cloud rule engine is **in the NB MVP**: the kui-react RulesetEditor (typed blocks, format `roltek-automation-1`) is vendored into NB **within the MVP** and is the editor of NB's new module `iot_automation` (cloud executor; NB plan: `$NEXT_BOILERPLATE_ROOT/docs/concepts/iot-automation/README.md`), with the full set of cloud-runnable blocks and no hard-coded automatic actions (supersedes OD-29 / NB P6). The editor code still belongs to the separate RulesetEditor session; what this plan needs from it is listed in [Cloud rule engine in the MVP](#cloud-rule-engine-in-the-mvp-od-79-od-87-od-88) below.
 

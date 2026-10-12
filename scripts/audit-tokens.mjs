@@ -101,7 +101,7 @@ const ALLOWLIST = [
       'Bronze/silver/gold medal-tier colors represent real materials, not design-system semantics — same category as the brand-color exceptions above.',
   },
   {
-    path: 'modules/domains/iot/ruleset/RulesetEditor/editors/CodeEditor.tsx',
+    path: 'modules/app/RulesetEditor/RulesetEditor/editors/CodeEditor.tsx',
     reason:
       "A code-editor mockup's syntax-highlighting palette (GitHub-dark-style) is conventionally fixed regardless of the app's light/dark mode, the same way a real editor's dark gutter/background does not follow the host app's theme.",
   },

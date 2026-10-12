@@ -1,9 +1,9 @@
 # RulesetEditor
 
 - **id:** `iot-ruleset-editor`
-- **layer:** domain
+- **layer:** app
 - **category:** Domain
-- **filePath:** `modules/domains/iot/ruleset/RulesetEditor/index.tsx`
+- **filePath:** `modules/app/RulesetEditor/RulesetEditor/index.tsx`
 - **status:** stable
 - **since:** 2026-05
 

@@ -12,7 +12,7 @@ import type { RuleChain } from '@/modules/domains/iot/types';
 import {
   WEEKDAYS, fillTemplate, formatDuration, templateDefaults, validateTemplateValues,
   type RulesetTemplate, type TemplateInput, type TemplateValue,
-} from '@/modules/domains/iot/ruleset/transfer';
+} from '@/modules/app/RulesetEditor/transfer';
 
 const cardCls = cn(
   'flex h-full w-full flex-col items-start gap-1 rounded-xl border border-border bg-surface-base p-3 text-left transition-colors',

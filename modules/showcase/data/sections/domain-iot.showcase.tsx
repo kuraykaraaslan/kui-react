@@ -5,13 +5,13 @@ import { DeviceTypeBadge } from '@/modules/domains/iot/device/DeviceTypeBadge';
 import { AlertSeverityBadge } from '@/modules/domains/iot/alert/AlertSeverityBadge';
 import { DeviceCard } from '@/modules/domains/iot/device/DeviceCard';
 import { CloudWorkspaceCard } from '@/modules/domains/iot/workspace/CloudWorkspaceCard';
-import { RulesetEditor } from '@/modules/domains/iot/ruleset/RulesetEditor';
+import { RulesetEditor } from '@/modules/app/RulesetEditor/RulesetEditor';
 import { MetricSparklineCard } from '@/modules/domains/iot/telemetry/MetricSparklineCard';
 import { TelemetryTimeSeriesChart } from '@/modules/domains/iot/telemetry/TelemetryTimeSeriesChart';
 import { LogStreamRow } from '@/modules/domains/iot/telemetry/LogStreamRow';
 import { AlertDetailHeader } from '@/modules/domains/iot/alert/AlertDetailHeader';
 import { AlertEventTimeline } from '@/modules/domains/iot/alert/AlertEventTimeline';
-import { DEMO_CATALOG, DEMO_CHOICES, DEMO_FLOW } from '@/modules/domains/iot/ruleset/demo';
+import { DEMO_CATALOG, DEMO_CHOICES, DEMO_FLOW } from '@/modules/app/RulesetEditor/demo';
 import type { Device, CloudWorkspace, RuleNode, RuleEdge } from '@/modules/domains/iot/types';
 
 /** the demo flow with its blocks thrown about, to try "Arrange the blocks" */
@@ -331,7 +331,7 @@ export function CloudWorkspaceCard({ workspace, className, onClick }) {
       category: 'Domain',
       abbr: 'RE',
       description: 'Drag-and-drop visual rule chain editor. The blocks come from a catalog (typed blocks with params), each block has a form built from its schema, and the editor has undo, multi-select, groups, subflows and validation.',
-      filePath: 'modules/domains/iot/ruleset/RulesetEditor/index.tsx',
+      filePath: 'modules/app/RulesetEditor/RulesetEditor/index.tsx',
       sourceCode: `'use client';
 // Drag blocks from the palette onto the canvas, or right-click for "Add a block here…".
 // Click an output port (filled) and then an input port (hollow) to wire them.

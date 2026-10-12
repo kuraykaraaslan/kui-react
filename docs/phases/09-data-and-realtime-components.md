@@ -169,7 +169,7 @@ Seen in: `/theme/iot/devices/[slug]?tab=attributes` (IoT phase 01).
 kui-react has three form vocabularies and no generic schema-driven renderer:
 
 1. `modules/app/FormBuilder` (`FormSchema`/`Field`): a survey builder with its own renderer.
-2. `modules/domains/iot/ruleset/catalog/params.ts` (`ParamSpec`, `when`): the block parameter schema of the RulesetEditor upgrade that is **in progress in a separate session**. Do not touch it here.
+2. `modules/app/RulesetEditor/catalog/params.ts` (`ParamSpec`, `when`): the block parameter schema of the RulesetEditor upgrade that is **in progress in a separate session**. Do not touch it here.
 3. next-boilerplate already ships `modules/common/ui/schema-form/` (`FieldSchema`, `showIf`, `group`, `zod-from-schema.ts`), extracted from `dynamic_page` and used by its page builder, module settings and dashboard widgets. It is not in kui-react, so the design source of truth is behind the app.
 
 - [x] Build `modules/app/SchemaForm/` in kui-react on the **next-boilerplate `FieldSchema` vocabulary** (~~recommended;~~ **→ DECISION OD-16 (owner, 2026-10-04):** decided; three live consumers use it). Upstream the field set that is not app-specific: text, url, textarea, number, boolean, select, multi-select, json, color, date, datetime, repeater, group, `showIf`. App-bound fields (media library, remote-select, symbol, color-token) stay as an injectable `fieldOverrides` registry so next-boilerplate plugs its own back in.

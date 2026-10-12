@@ -7,7 +7,7 @@ import type { RuleChain } from '@/modules/domains/iot/types';
 import {
   addVersion, applyImport, cloneChain, restoreDeleted, restoreVersion, summarizeChange,
   type ApplyImportResult, type ConflictChoice, type DeletedRuleset, type ImportItem, type RulesetVersion,
-} from '@/modules/domains/iot/ruleset/transfer';
+} from '@/modules/app/RulesetEditor/transfer';
 import { RULE_CHAINS } from '../iot.data';
 import { CURRENT_USER, initialDeletedRulesets } from './rulesets.data';
 

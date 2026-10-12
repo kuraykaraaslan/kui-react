@@ -11,7 +11,7 @@ import type { RuleChain } from '@/modules/domains/iot/types';
 import {
   CONFLICT_LABELS, IMPORT_MAX_BYTES, parseImport,
   type ConflictChoice, type ImportError, type ImportPreview,
-} from '@/modules/domains/iot/ruleset/transfer';
+} from '@/modules/app/RulesetEditor/transfer';
 
 const CHOICES: ConflictChoice[] = ['copy', 'replace', 'skip'];
 
