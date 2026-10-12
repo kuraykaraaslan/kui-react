@@ -22,6 +22,7 @@ RulesetEditor/      the React editor
   canvas/             Canvas, RuleNode, RuleEdge, GroupFrame, Palette, ContextMenu, overlays,
                       MiniMap, GuideLines, SelectionFrame
   panels/             NodeEditorPanel (a ParamForm), result and trace panels
+  insight/            InsightPanel (Debug, Errors, Data, Busiest) and RunsPanel (the run history and a step-by-step player; `runs.ts` is its pure part)
   dialogs/            group, name, block picker, subflow settings
   hooks/              useGraphEditor (state + history), useNodeDrag, useEdgeConnect, usePaletteDrop,
                       useSnapDrag, useBoxSelect, useMiniMap
