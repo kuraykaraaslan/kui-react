@@ -5,7 +5,7 @@
 // (`builtin:<type>`). Pure TypeScript, no React: next-boilerplate's server validates and migrates
 // with the same code its browser renders with.
 
-import type { FieldSchema } from '../../SchemaForm/types';
+import type { FieldSchema, FontValue } from '../../SchemaForm/types';
 
 export type TemplateId =
   | 'core:card' | 'core:format' | 'core:board'
@@ -99,4 +99,39 @@ export type SettingsStamp = Partial<Record<TemplateId, number>>;
 export interface Issue {
   path: string;
   message: string;
+}
+
+/** Effective `core:card` values (defaults already layered in). */
+export interface CardSettings {
+  showTitle?: boolean;
+  titleFont?: FontValue;
+  titleColor?: string;
+  subtitle?: string;
+  subtitleColor?: string;
+  titleIcon?: string;
+  titleIconColor?: string;
+  titleIconSize?: number;
+  titleTooltip?: string;
+  variant?: 'raised' | 'flat' | 'outline' | 'plain';
+  padding?: number;
+  radius?: number;
+  borderWidth?: number;
+  borderColor?: string;
+  shadow?: 'none' | 'sm' | 'md' | 'lg';
+  textColor?: string;
+  background?: 'default' | 'color' | 'image' | 'none';
+  backgroundColor?: string;
+  backgroundImage?: string;
+  backgroundSize?: 'cover' | 'contain' | 'fill' | 'auto';
+  overlayColor?: string;
+  overlayBlur?: number;
+  buttons?: Array<'fullscreen' | 'export' | 'refresh'>;
+  noDataText?: string;
+  showUpdated?: 'off' | 'relative' | 'time' | 'date' | 'datetime';
+  staleAfterSeconds?: number;
+  staleDisplay?: 'badge' | 'dim' | 'hide';
+  hideOnMobile?: boolean;
+  hideOnDesktop?: boolean;
+  mobileOrder?: number;
+  mobileHeight?: number;
 }

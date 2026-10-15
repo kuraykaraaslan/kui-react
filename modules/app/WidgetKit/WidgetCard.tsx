@@ -4,44 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExpand, faDownload, faRotateRight, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { cn } from '@/libs/utils/cn';
 import { Tooltip } from '@/modules/ui/Tooltip';
-import type { FontValue } from '../SchemaForm/types';
 import { cssColor, fontStyle } from './settings/style';
+import type { CardSettings } from './settings/types';
 import { SettingIcon } from './WidgetKitContext';
 
-/** Effective `core:card` values (defaults already layered in). */
-export interface CardSettings {
-  showTitle?: boolean;
-  titleFont?: FontValue;
-  titleColor?: string;
-  subtitle?: string;
-  subtitleColor?: string;
-  titleIcon?: string;
-  titleIconColor?: string;
-  titleIconSize?: number;
-  titleTooltip?: string;
-  variant?: 'raised' | 'flat' | 'outline' | 'plain';
-  padding?: number;
-  radius?: number;
-  borderWidth?: number;
-  borderColor?: string;
-  shadow?: 'none' | 'sm' | 'md' | 'lg';
-  textColor?: string;
-  background?: 'default' | 'color' | 'image' | 'none';
-  backgroundColor?: string;
-  backgroundImage?: string;
-  backgroundSize?: 'cover' | 'contain' | 'fill' | 'auto';
-  overlayColor?: string;
-  overlayBlur?: number;
-  buttons?: Array<'fullscreen' | 'export' | 'refresh'>;
-  noDataText?: string;
-  showUpdated?: 'off' | 'relative' | 'time' | 'date' | 'datetime';
-  staleAfterSeconds?: number;
-  staleDisplay?: 'badge' | 'dim' | 'hide';
-  hideOnMobile?: boolean;
-  hideOnDesktop?: boolean;
-  mobileOrder?: number;
-  mobileHeight?: number;
-}
+export type { CardSettings };
 
 /** What the card body is showing. */
 export type WidgetCardState = 'ready' | 'loading' | 'empty' | 'unconfigured' | 'error';

@@ -2,9 +2,8 @@
 
 import { CORE_CARD, CORE_FORMAT, boardCardLayer, platformCardDefaults } from './core';
 import { effective, readSettings } from './engine';
-import type { SettingsTemplate, Sparse, TemplateId, WidgetCaps } from './types';
+import type { CardSettings, SettingsTemplate, Sparse, TemplateId, WidgetCaps } from './types';
 import type { ValueFormat } from './style';
-import type { CardSettings } from '../WidgetCard';
 
 export interface ResolvedPlacement {
   caps: WidgetCaps;
