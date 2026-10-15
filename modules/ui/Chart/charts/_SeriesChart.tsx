@@ -20,16 +20,17 @@ import { ChartFrame } from '../primitives/ChartFrame';
 import { Thresholds } from '../primitives/Thresholds';
 import { AxisTitles } from '../primitives/AxisTitles';
 import { animationDuration, chartTheme } from '../theme';
-import type { BaseChartProps, CurveType, PlotRect, TooltipDatum } from '../types';
+import type { BaseChartProps, CurveType, PlotRect, PointShape, TooltipDatum } from '../types';
 import {
-  niceTicks, yExtent, yScale, bandCenter, xCategories, stackedExtent, stackTops, curvePath, continuePath,
-  dashArray, resolveDomain, defaultNumber,
+  niceTicks, yScale, bandCenter, xCategories, curvePath, continuePath, thinLabels,
+  dashArray, resolveDomain, defaultNumber, alignedDomain, stackKeys, groupedStackTops, topsExtent, labelWidth,
 } from './_helpers';
 import {
   timeExtent, timePoints, visibleYExtent, xTime, invTime, timeTicks, formatTick, formatFull,
   brushDomain, nearestIndex, type TimeDomain, type TimePoint,
 } from './_time';
 import { chartLegend, plotPadding, useSeriesVisibility, valueText } from './_cartesian';
+import { PointMark, useEntrance, valueLabelProps } from './_marks';
 
 export type SeriesChartProps = BaseChartProps & {
   variant: 'line' | 'area';
@@ -42,10 +43,18 @@ export type SeriesChartProps = BaseChartProps & {
   strokeWidth?: number;
   /** Area fill alpha (0..1) for series without their own. Default = 0.2. */
   fillOpacity?: number;
-  /** Band mode only: stack the series. */
+  /** Band mode only: stack the series (see `Series.stack` for several stacks). */
   stacked?: boolean;
   /** Locale for time tick labels; default = the runtime's. */
   locale?: string;
+  /** Point mark for series without their own. Default = 'circle'. */
+  pointShape?: PointShape;
+  /** Point radius (px) for series without their own. Default = stroke width + 1.5. */
+  pointSize?: number;
+  /** Print each point's value (thinned so labels never collide). Default = false. */
+  showValues?: boolean;
+  /** Value labels above (default) or below their point. */
+  valueLabelPosition?: 'top' | 'bottom';
 };
 
 type Row = TimePoint;
@@ -55,23 +64,30 @@ export function SeriesChart({
   smooth = true, curve: curveProp, strokeWidth = 2, fillOpacity = 0.2, stacked = false,
   zoom = true, resetZoomLabel = 'Reset zoom', yFormat, locale, timeZone, ariaLabel, className,
   legendPosition = 'bottom', legendValues, legendStyle, legendToggle, yMin, yMax, yLabel, xLabel,
-  thresholds, tooltipMode, gridColor, tickStyle,
+  thresholds, tooltipMode, gridColor, tickStyle, fill, yTickCount = 4, showXAxis = true, showYAxis = true,
+  gridStyle, y2Min, y2Max, y2Label, y2Format, tooltipHeader = true, tooltipValueFormat, tooltipTotal = false,
+  animate = true, valueLabelStyle, pointShape, pointSize, showValues = false, valueLabelPosition = 'top',
+  yIncludeZero = true,
 }: SeriesChartProps) {
   const isTime = mode === 'time';
-  const isStacked = stacked && !isTime;
-  const curve: CurveType = curveProp ?? (smooth && !isStacked ? 'smooth' : 'linear');
   const tipMode = showTooltip ? (tooltipMode ?? 'axis') : 'none';
   const zoomable = isTime && zoom;
 
   const vis = useSeriesVisibility(series);
   const visible = vis.visible;
+  const keys = useMemo(() => (isTime ? visible.map(() => null) : stackKeys(visible, stacked)), [isTime, visible, stacked]);
+  const isStacked = keys.some((k) => k !== null);
+  const curve: CurveType = curveProp ?? (smooth && !isStacked ? 'smooth' : 'linear');
   const [zoomDomain, setZoomDomain] = useState<TimeDomain | null>(null);
   const [hover, setHover] = useState<{ key: number; y: number } | null>(null);
   const [brush, setBrush] = useState<{ from: number; to: number } | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const clipId = `sc-clip-${useId().replace(/:/g, '')}`;
+  const uid = useId().replace(/:/g, '');
+  const clipId = `sc-clip-${uid}`;
   const animMs = animationDuration();
+  const enter = useEntrance('reveal-x', animate);
   const fmt = yFormat ?? defaultNumber;
+  const fmt2 = y2Format ?? fmt;
 
   const categories = useMemo(() => xCategories(vis.colored), [vis.colored]);
   const rows: Row[][] = useMemo(
@@ -82,12 +98,33 @@ export function SeriesChart({
   const domain: TimeDomain = zoomDomain && zoomDomain[1] > full[0] && zoomDomain[0] < full[1] ? zoomDomain : full;
   const zoomed = isTime && domain !== full;
   const span = domain[1] - domain[0];
-  const tops = useMemo(() => (isStacked ? stackTops(visible) : []), [isStacked, visible]);
-  const base = useMemo(
-    () => (isTime ? visibleYExtent(rows, domain) : isStacked ? stackedExtent(visible) : yExtent(visible)),
-    [isTime, isStacked, rows, domain, visible],
-  );
-  const { min, max } = resolveDomain(base, { min: yMin, max: yMax, thresholds });
+  const stack = useMemo(() => (isTime ? null : groupedStackTops(visible, keys)), [isTime, visible, keys]);
+
+  // Two value axes: series on the right get their own domain, aligned to the left one's grid lines.
+  const onRight = visible.map((s) => s.yAxis === 'right');
+  const hasRight = onRight.some(Boolean);
+  const hasLeft = onRight.some((r) => !r) || !hasRight;
+  const extentOf = (right: boolean) => {
+    const idx = visible.map((_, i) => i).filter((i) => onRight[i] === right);
+    // A stack always starts at zero; otherwise the author decides.
+    const zero = yIncludeZero || isStacked;
+    if (isTime) return visibleYExtent(idx.map((i) => rows[i]), domain, zero);
+    return topsExtent(idx.map((i) => stack!.tops[i]), zero);
+  };
+  const thrL = thresholds?.filter((t) => t.yAxis !== 'right');
+  const thrR = thresholds?.filter((t) => t.yAxis === 'right');
+  const L = hasLeft
+    ? resolveDomain(extentOf(false), { min: yMin, max: yMax, thresholds: thrL, count: yTickCount })
+    : resolveDomain(extentOf(true), { min: y2Min, max: y2Max, thresholds: thrR, count: yTickCount });
+  const leftTicks = niceTicks(L.min, L.max, yTickCount);
+  let R: { min: number; max: number; ticks: number[] } | null = null;
+  if (hasRight && hasLeft) {
+    const e = extentOf(true);
+    for (const t of thrR ?? []) { if (t.value < e.min) e.min = t.value; if (t.value > e.max) e.max = t.value; }
+    R = alignedDomain(e, leftTicks.length - 1, { min: y2Min, max: y2Max });
+  } else if (hasRight) {
+    R = { min: L.min, max: L.max, ticks: leftTicks };
+  }
 
   const legend = chartLegend({
     show: showLegend, series: vis.colored, hidden: vis.hidden, toggle: vis.toggle, position: legendPosition,
@@ -95,52 +132,68 @@ export function SeriesChart({
   });
 
   return (
-    <ChartFrame legend={legend} position={legendPosition} className={className}>
-      <ResponsiveContainer height={height}>
-        {({ width }) => {
-          const yTickValues = niceTicks(min, max, 4);
-          const yTickLabels = yTickValues.map(fmt);
-          const pad = plotPadding({ yTickLabels, xLabel, yLabel, tickStyle, minLeft: isTime ? 44 : 40 });
+    <ChartFrame legend={legend} position={legendPosition} className={className} fill={fill}>
+      <ResponsiveContainer height={height} fill={fill}>
+        {({ width, height }) => {
+          const yTickLabels = hasLeft ? leftTicks.map(fmt) : [];
+          const y2TickLabels = R ? R.ticks.map(fmt2) : undefined;
+          const pad = plotPadding({ yTickLabels, y2TickLabels, xLabel, yLabel, y2Label: R ? y2Label : undefined, tickStyle, showXAxis, showYAxis, minLeft: hasLeft ? 28 : 8 });
           const rect: PlotRect = {
             x: pad.left, y: pad.top,
             width: Math.max(0, width - pad.left - pad.right),
             height: Math.max(0, height - pad.top - pad.bottom),
           };
-          const yPx = (v: number) => yScale(v, min, max, rect);
+          const yPxL = (v: number) => yScale(v, L.min, L.max, rect);
+          const yPxR = R ? (v: number) => yScale(v, R!.min, R!.max, rect) : yPxL;
+          const scaleOf = (si: number) => (onRight[si] && hasLeft ? yPxR : yPxL);
           const xPx = (k: number) => (isTime ? xTime(k, domain, rect) : bandCenter(k, categories.length, rect));
-          const yPixels = yTickValues.map(yPx);
-          const yTicks = yTickValues.map((_, i) => ({ position: yPixels[i], label: yTickLabels[i] }));
+          const yPixels = leftTicks.map(yPxL);
+          const yTicks = hasLeft ? leftTicks.map((_, i) => ({ position: yPixels[i], label: yTickLabels[i] })) : [];
+          const y2Ticks = R ? R.ticks.map((v, i) => ({ position: yPxR(v), label: y2TickLabels![i] })) : [];
           const xTicks = isTime
             ? timeTicks(domain, Math.max(2, Math.floor(rect.width / 90)), timeZone)
               .map((t) => ({ position: xTime(t, domain, rect), label: formatTick(t, span, locale, timeZone) }))
-            : categories.map((label, i) => ({ position: bandCenter(i, categories.length, rect), label }));
-          const baselineY = yPx(Math.min(max, Math.max(min, 0)));
+            : thinLabels(categories.map((label, i) => ({ position: bandCenter(i, categories.length, rect), label })), rect.width);
 
-          const plotY = (si: number, j: number, y: number) => yPx(isStacked ? (tops[si]?.[j] ?? 0) : y);
+          const plotY = (si: number, j: number, y: number) => scaleOf(si)(isStacked && stack ? (stack.tops[si]?.[j] ?? 0) : y);
           const projected = visible.map((s, si) => {
             const color = s.color as string;
             const w = s.strokeWidth ?? strokeWidth;
-            const pts = rows[si].map((p, j) => (p.y === null || p.y === undefined ? null : { x: xPx(p.t), y: plotY(si, j, p.y) }));
-            const solid = pts.filter(Boolean) as Array<{ x: number; y: number }>;
+            const scale = scaleOf(si);
+            const pts = rows[si].map((p, j) => (p.y === null || p.y === undefined ? null : { x: xPx(p.t), y: plotY(si, j, p.y), v: p.y, j }));
+            const solid = pts.filter(Boolean) as Array<{ x: number; y: number; v: number; j: number }>;
             const opacity = variant === 'area' ? (s.fillOpacity ?? fillOpacity) : (s.fillOpacity ?? 0);
+            const baselineY = scale(Math.min(onRight[si] && R ? R.max : L.max, Math.max(onRight[si] && R ? R.min : L.min, 0)));
             let areaPath = '';
             if (opacity > 0 && solid.length > 1) {
               const top = curvePath(solid, curve);
-              if (isStacked && si > 0) {
-                const below = rows[si]
-                  .map((p, j) => (p.y !== null && p.y !== undefined && tops[si - 1]?.[j] != null ? { x: xPx(p.t), y: yPx(tops[si - 1][j] as number) } : null))
+              const under = stack ? stack.below[si] : -1;
+              if (isStacked && stack && under >= 0) {
+                const lower = rows[si]
+                  .map((p, j) => (p.y !== null && p.y !== undefined && stack.tops[under]?.[j] != null ? { x: xPx(p.t), y: scale(stack.tops[under][j] as number) } : null))
                   .filter(Boolean) as Array<{ x: number; y: number }>;
-                areaPath = `${top} ${continuePath(below.reverse(), curve, 'before')} Z`;
+                areaPath = `${top} ${continuePath(lower.reverse(), curve, 'before')} Z`;
               } else {
                 areaPath = `${top} L${solid[solid.length - 1].x} ${baselineY} L${solid[0].x} ${baselineY} Z`;
               }
             }
             return {
-              s, color, w, pts, solid, opacity, areaPath,
+              s, si, color, w, pts, solid, opacity, areaPath,
+              gradientId: s.fillGradient ? `sc-grad-${uid}-${si}` : null,
               path: curvePath(pts, curve),
               solo: solid.length === 1 ? solid[0] : null,
+              shape: s.pointShape ?? pointShape ?? 'circle',
+              r: s.pointSize ?? pointSize ?? w + 1.5,
             };
           });
+
+          // Value labels: every k-th point so neighbouring labels never collide.
+          const labelTexts = showValues ? projected.map((p) => p.solid.map((q) => valueText(p.s, q.v, rows[p.si][q.j], yFormat))) : [];
+          const labelEvery = showValues ? projected.map((p, i) => {
+            if (p.solid.length < 2) return 1;
+            const room = Math.abs(p.solid[p.solid.length - 1].x - p.solid[0].x) / (p.solid.length - 1);
+            return Math.max(1, Math.ceil((labelWidth(labelTexts[i]) + 8) / Math.max(1, room)));
+          }) : [];
 
           // Hover: band = the hovered index; time = the nearest sampled instant across the visible series.
           let anchor: number | null = null;
@@ -165,7 +218,7 @@ export function SeriesChart({
                 const y = p?.y ?? null;
                 return [{
                   seriesId: s.id, seriesName: s.name, color: s.color as string, x: isTime ? at : header, y,
-                  valueLabel: y === null ? undefined : valueText(s, y, p, yFormat),
+                  valueLabel: y === null ? undefined : (tooltipValueFormat ? tooltipValueFormat(y, s) : valueText(s, y, p, yFormat)),
                   py: y === null ? Number.NaN : plotY(si, j, y),
                 }];
               });
@@ -177,6 +230,9 @@ export function SeriesChart({
             }
           }
           const hoverX = anchor === null ? null : xPx(anchor);
+          const total = tooltipTotal && isStacked && tip.length > 1
+            ? { label: 'Total', value: fmt(tip.reduce((a, d) => a + (d.y ?? 0), 0)) }
+            : undefined;
 
           const local = (e: React.MouseEvent) => {
             const b = svgRef.current?.getBoundingClientRect();
@@ -192,7 +248,7 @@ export function SeriesChart({
                 height={height}
                 role="img"
                 aria-label={ariaLabel ?? (variant === 'area' ? 'Area chart' : 'Line chart')}
-                style={isTime ? { touchAction: 'pan-y', cursor: zoomable ? 'crosshair' : undefined, userSelect: 'none' } : undefined}
+                style={{ display: 'block', overflow: 'visible', ...(isTime ? { touchAction: 'pan-y', cursor: zoomable ? 'crosshair' : undefined, userSelect: 'none' } : {}) }}
                 onMouseDown={(e) => {
                   if (!zoomable || e.button !== 0) return;
                   const { px } = local(e);
@@ -220,30 +276,55 @@ export function SeriesChart({
               >
                 <defs>
                   <clipPath id={clipId}><rect x={rect.x - 4} y={rect.y - 4} width={rect.width + 8} height={rect.height + 8} /></clipPath>
+                  {projected.map((p) => p.gradientId && (
+                    <linearGradient key={p.gradientId} id={p.gradientId} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={p.color} stopOpacity={Math.min(1, p.opacity * 1.6)} />
+                      <stop offset="100%" stopColor={p.color} stopOpacity={0} />
+                    </linearGradient>
+                  ))}
                 </defs>
-                {showGrid && <Grid rect={rect} yTicks={yPixels} color={gridColor} />}
-                <YAxis ticks={yTicks} x={rect.x} yStart={rect.y} yEnd={rect.y + rect.height} textStyle={tickStyle} />
-                <XAxis ticks={xTicks} y={rect.y + rect.height} xStart={rect.x} xEnd={rect.x + rect.width} textStyle={tickStyle} />
-                <AxisTitles rect={rect} height={height} xLabel={xLabel} yLabel={yLabel} style={tickStyle} />
+                {showGrid && <Grid rect={rect} yTicks={yPixels} color={gridColor} lineStyle={gridStyle} />}
+                {hasLeft && <YAxis ticks={yTicks} x={rect.x} yStart={rect.y} yEnd={rect.y + rect.height} textStyle={tickStyle} hideLine tickMarks={false} showLabels={showYAxis} />}
+                {R && <YAxis side="right" ticks={y2Ticks} x={rect.x + rect.width} yStart={rect.y} yEnd={rect.y + rect.height} textStyle={tickStyle} hideLine tickMarks={false} showLabels={showYAxis} />}
+                <XAxis ticks={xTicks} y={rect.y + rect.height} xStart={rect.x} xEnd={rect.x + rect.width} textStyle={tickStyle} tickMarks={false} showLabels={showXAxis} />
+                <AxisTitles rect={rect} height={height} width={width} xLabel={xLabel} yLabel={yLabel} y2Label={R ? y2Label : undefined} style={tickStyle} />
                 <Crosshair rect={rect} x={tipMode === 'none' || brush ? null : hoverX} />
-                <g clipPath={`url(#${clipId})`}>
-                  {projected.map((p) => (
-                    <g key={p.s.id} data-series={p.s.id}>
-                      {p.areaPath && (
-                        <path d={p.areaPath} fill={p.color} opacity={p.opacity} data-area=""
-                          style={{ transition: animMs ? `opacity ${animMs}ms` : undefined }} />
-                      )}
-                      <path d={p.path} fill="none" stroke={p.color} strokeWidth={p.w} data-line=""
-                        strokeDasharray={dashArray(p.s.lineStyle, p.w)} strokeLinecap="round" strokeLinejoin="round" />
-                      {p.s.showPoints
-                        ? p.solid.map((q, i) => <circle key={i} cx={q.x} cy={q.y} r={p.w + 1.5} fill={p.color} data-point="" />)
-                        : p.solo && <circle cx={p.solo.x} cy={p.solo.y} r={3} fill={p.color} />}
+                <g ref={enter}>
+                  <g clipPath={`url(#${clipId})`}>
+                    {projected.map((p) => (
+                      <g key={p.s.id} data-series={p.s.id}>
+                        {p.areaPath && (
+                          <path d={p.areaPath} fill={p.gradientId ? `url(#${p.gradientId})` : p.color} opacity={p.gradientId ? undefined : p.opacity} data-area=""
+                            data-fill={p.gradientId ? 'gradient' : 'opacity'}
+                            style={{ transition: animMs ? `opacity ${animMs}ms` : undefined }} />
+                        )}
+                        <path d={p.path} fill="none" stroke={p.color} strokeWidth={p.w} data-line=""
+                          strokeDasharray={dashArray(p.s.lineStyle, p.w)} strokeLinecap="round" strokeLinejoin="round" />
+                        {p.s.showPoints
+                          ? p.solid.map((q, i) => (
+                            <PointMark key={i} shape={p.shape} x={q.x} y={q.y} r={p.r} fill={p.color} data-point=""
+                              stroke="var(--surface-raised)" strokeWidth={1} />
+                          ))
+                          : p.solo && <PointMark shape={p.shape} x={p.solo.x} y={p.solo.y} r={Math.max(3, p.r)} fill={p.color} />}
+                      </g>
+                    ))}
+                    {hasLeft && <Thresholds lines={thrL} rect={rect} scale={yPxL} />}
+                    {R && <Thresholds lines={hasLeft ? thrR : thresholds} rect={rect} scale={hasLeft ? yPxR : yPxL} />}
+                  </g>
+                  {showValues && projected.map((p, pi) => (
+                    <g key={`v-${p.s.id}`} data-value-labels={p.s.id}>
+                      {p.solid.map((q, i) => ((i % labelEvery[pi] === 0 || i === p.solid.length - 1) && (i === p.solid.length - 1 || p.solid.length - 1 - i >= labelEvery[pi]) ? (
+                        <text key={i} data-value-label="" x={q.x} y={valueLabelPosition === 'bottom' ? q.y + p.r + 13 : q.y - p.r - 5}
+                          textAnchor={i === 0 && q.x - rect.x < 16 ? 'start' : i === p.solid.length - 1 && rect.x + rect.width - q.x < 16 ? 'end' : 'middle'}
+                          {...valueLabelProps(valueLabelStyle)}>
+                          {labelTexts[pi][i]}
+                        </text>
+                      ) : null))}
                     </g>
                   ))}
-                  <Thresholds lines={thresholds} rect={rect} scale={yPx} />
                 </g>
                 {hoverX !== null && tip.map((d) => (Number.isFinite(d.py) ? (
-                  <circle key={d.seriesId} cx={hoverX} cy={d.py} r={4} fill="var(--surface-base)" stroke={d.color} strokeWidth={2} />
+                  <circle key={d.seriesId} cx={hoverX} cy={d.py} r={4} fill="var(--surface-raised)" stroke={d.color} strokeWidth={2} />
                 ) : null))}
                 {brush && Math.abs(brush.to - brush.from) > 0 && (
                   <rect x={Math.min(brush.from, brush.to)} y={rect.y} width={Math.abs(brush.to - brush.from)} height={rect.height}
@@ -251,7 +332,7 @@ export function SeriesChart({
                 )}
               </svg>
               {hoverX !== null && tip.length > 0 && (
-                <ChartTooltip label={header} data={tip} x={hoverX} y={rect.y + rect.height / 2} containerWidth={width} visible />
+                <ChartTooltip label={tooltipHeader ? header : ''} data={tip} x={hoverX} y={rect.y + rect.height / 2} containerWidth={width} visible footer={total} />
               )}
             </>
           );
@@ -261,7 +342,7 @@ export function SeriesChart({
         <button
           type="button"
           onClick={() => setZoomDomain(null)}
-          className="mt-1 rounded-sm text-xs text-primary underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+          className="mt-1 self-start rounded-sm text-xs text-primary underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
         >
           {resetZoomLabel}
         </button>

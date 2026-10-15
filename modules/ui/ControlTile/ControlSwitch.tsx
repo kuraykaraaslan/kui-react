@@ -11,7 +11,24 @@ export type ControlSwitchColors = {
   on?: string;
   off?: string;
   disabled?: string;
+  /** The knob in every state, unless a per-state colour below is set. */
   thumb?: string;
+  thumbOn?: string;
+  thumbOff?: string;
+  thumbDisabled?: string;
+};
+
+/** The pieces a host arranges itself with `renderLayout`. */
+export type ControlSwitchParts = {
+  /** The switch itself (the labelled checkbox and its track). */
+  control: ReactNode;
+  state: 'on' | 'off' | 'unknown';
+  /** The on / off / unknown text for the shown state. */
+  stateText: string;
+  /** Put this id on the element showing the state: the switch is described by it. */
+  stateId: string;
+  pending: boolean;
+  locked: boolean;
 };
 
 export type ControlSwitchProps = {
@@ -44,6 +61,11 @@ export type ControlSwitchProps = {
   stateStyles?: { on?: CSSProperties; off?: CSSProperties; unknown?: CSSProperties };
   colors?: ControlSwitchColors;
   size?: 'sm' | 'md' | 'lg';
+  /**
+   * Arrange the parts yourself (label, state, icon, switch) instead of `layout`. The status line,
+   * the confirmation step and the disabled tooltip stay the control's.
+   */
+  renderLayout?: (parts: ControlSwitchParts) => ReactNode;
   /** The user may not use the control. */
   readOnly?: boolean;
   disabled?: boolean;
@@ -65,7 +87,7 @@ const SIZES = {
 /** ControlSwitch — a bound boolean written on toggle; shows the requested value while pending, rolls back on failure. */
 export function ControlSwitch({
   title, value, reported, onCommit, onLabel = 'On', offLabel = 'Off', unknownLabel = 'State unknown',
-  label, labelStyle, icon, layout = 'left', showStateText = true, stateStyles, colors, size,
+  label, labelStyle, icon, layout = 'left', showStateText = true, stateStyles, colors, size, renderLayout,
   readOnly = false, disabled = false, disabledReason, framed = true, timeoutMs, messages, className,
   confirm = 'none', confirmText,
 }: ControlSwitchProps) {
@@ -85,7 +107,8 @@ export function ControlSwitch({
   const trackColor = locked ? colors?.disabled : shown ? colors?.on : colors?.off;
   const stateText = !known ? unknownLabel : shown ? onLabel : offLabel;
   const stateStyle = !known ? stateStyles?.unknown : shown ? stateStyles?.on : stateStyles?.off;
-  const showState = showStateText || !known;
+  const showState = showStateText || !known || !!renderLayout;
+  const thumbColor = (locked ? colors?.thumbDisabled : shown ? colors?.thumbOn : colors?.thumbOff) ?? colors?.thumb;
 
   const control = (
     <span className="relative inline-flex shrink-0 items-center">
@@ -119,11 +142,11 @@ export function ControlSwitch({
         aria-hidden="true"
         className={cn(
           'absolute left-0.5 top-1/2 -translate-y-1/2 rounded-full shadow-sm transition-transform duration-200',
-          !colors?.thumb && 'bg-primary-fg',
+          !thumbColor && 'bg-primary-fg',
           sz.thumb,
           shown && sz.on,
         )}
-        style={colors?.thumb ? { background: colors.thumb } : undefined}
+        style={thumbColor ? { background: thumbColor } : undefined}
       >
         {pending && (
           <span
@@ -165,6 +188,18 @@ export function ControlSwitch({
       disabledReason={disabledReason}
       className={className}
     >
+      {renderLayout ? renderLayout({
+        control: (
+          <label htmlFor={id} className={cn('inline-flex', locked ? 'cursor-not-allowed' : pending ? 'cursor-progress' : 'cursor-pointer')}>
+            {control}
+          </label>
+        ),
+        state: !known ? 'unknown' : shown ? 'on' : 'off',
+        stateText,
+        stateId: hintId,
+        pending,
+        locked,
+      }) : (
       <label
         htmlFor={id}
         className={cn(
@@ -178,6 +213,7 @@ export function ControlSwitch({
           : layout === 'centered' ? <>{iconEl}{labelEl}{control}{stateEl}</>
             : <>{control}{text}</>}
       </label>
+      )}
       {ask.asking && confirm !== 'none' && (
         <ControlConfirmPrompt mode={confirm} confirmText={confirmText} onConfirm={(typed) => write(ask.accept(typed))} onCancel={ask.cancel} messages={messages} />
       )}

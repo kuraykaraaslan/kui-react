@@ -5,7 +5,7 @@
 // stroke color; rendered as a single <g> for cheap toggling.
 
 import { chartTheme } from '../theme';
-import type { PlotRect } from '../types';
+import type { LineStyle, PlotRect } from '../types';
 
 type GridProps = {
   rect: PlotRect;
@@ -15,11 +15,16 @@ type GridProps = {
   xTicks?: number[];
   /** Line colour. Default = the theme's grid token. */
   color?: string;
+  /** Line pattern. Default = 'dashed'. */
+  lineStyle?: LineStyle;
 };
 
-export function Grid({ rect, yTicks, xTicks = [], color = chartTheme.gridStroke }: GridProps) {
+const GRID_DASH: Record<LineStyle, string | undefined> = { dashed: '3 4', dotted: '1 3', solid: undefined };
+
+export function Grid({ rect, yTicks, xTicks = [], color = chartTheme.gridStroke, lineStyle = 'dashed' }: GridProps) {
+  const dash = GRID_DASH[lineStyle];
   return (
-    <g aria-hidden="true" opacity={0.5}>
+    <g aria-hidden="true" data-grid={lineStyle}>
       {yTicks.map((y, i) => (
         <line
           key={`gy-${i}`}
@@ -28,7 +33,7 @@ export function Grid({ rect, yTicks, xTicks = [], color = chartTheme.gridStroke 
           y1={y}
           y2={y}
           stroke={color}
-          strokeDasharray="2 4"
+          strokeDasharray={dash}
           strokeWidth={1}
         />
       ))}
@@ -40,7 +45,7 @@ export function Grid({ rect, yTicks, xTicks = [], color = chartTheme.gridStroke 
           y1={rect.y}
           y2={rect.y + rect.height}
           stroke={color}
-          strokeDasharray="2 4"
+          strokeDasharray={dash}
           strokeWidth={1}
         />
       ))}

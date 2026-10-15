@@ -59,6 +59,7 @@ type ChartLegendOptions = {
   /** Undefined = on when any series starts hidden. */
   toggleable?: boolean;
   yFormat?: (v: number) => string;
+  layout?: 'wrap' | 'grid';
 };
 
 /** The legend element for a chart, or null. */
@@ -73,19 +74,37 @@ export function chartLegend(o: ChartLegendOptions) {
       onToggle={toggleable ? o.toggle : undefined}
       values={legendValueTexts(o.series, o.values, o.yFormat)}
       style={o.style}
+      layout={o.layout}
     />
   );
 }
 
 const fontPx = (style?: AxisTextStyle) => (typeof style?.fontSize === 'number' ? style.fontSize : 11);
 
-/** Plot padding: room for the longest y tick label and the axis titles. */
-export function plotPadding(o: { yTickLabels: string[]; xLabel?: string; yLabel?: string; tickStyle?: AxisTextStyle; minLeft?: number }) {
+/**
+ * Plot padding: room for the longest y tick label (left, and right for a second axis), the x tick
+ * labels and the axis titles. A hidden axis keeps only a small margin.
+ */
+export function plotPadding(o: {
+  yTickLabels: string[];
+  y2TickLabels?: string[];
+  xLabel?: string;
+  yLabel?: string;
+  y2Label?: string;
+  tickStyle?: AxisTextStyle;
+  minLeft?: number;
+  showXAxis?: boolean;
+  showYAxis?: boolean;
+}) {
   const fs = fontPx(o.tickStyle);
+  const showY = o.showYAxis !== false;
+  const right = o.y2TickLabels?.length
+    ? (showY ? labelWidth(o.y2TickLabels, fs) + 12 : 8) + (o.y2Label ? 18 : 0)
+    : 12;
   return {
-    top: 12,
-    right: 16,
-    bottom: 28 + (fs > 11 ? fs - 11 : 0) + (o.xLabel ? 16 : 0),
-    left: Math.max(o.minLeft ?? 40, labelWidth(o.yTickLabels, fs) + 14) + (o.yLabel ? 18 : 0),
+    top: 10,
+    right,
+    bottom: (o.showXAxis === false ? 6 : 24 + (fs > 11 ? fs - 11 : 0)) + (o.xLabel ? 16 : 0),
+    left: (showY ? Math.max(o.minLeft ?? 28, labelWidth(o.yTickLabels, fs) + 12) : 8) + (o.yLabel ? 18 : 0),
   };
 }

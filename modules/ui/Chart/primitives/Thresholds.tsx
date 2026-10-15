@@ -33,20 +33,29 @@ export function Thresholds({ lines, rect, scale, orientation = 'horizontal' }: T
         return (
           <g key={i} data-threshold={t.value}>
             <line {...line} stroke={color} strokeWidth={width} strokeDasharray={dashArray(t.style ?? 'dashed', width)} strokeLinecap="round" />
-            {t.label && (
-              <text
-                x={orientation === 'horizontal' ? rect.x + rect.width - 2 : p + 4}
-                y={orientation === 'horizontal' ? p - 4 : rect.y + 10}
-                textAnchor={orientation === 'horizontal' ? 'end' : 'start'}
-                fontSize={chartTheme.fontSize.axis}
-                fill={color}
-                stroke="var(--surface-base)"
-                strokeWidth={3}
-                paintOrder="stroke"
-              >
-                {t.label}
-              </text>
-            )}
+            {t.label && (() => {
+              // A small tinted pill, opaque so it reads over bars and lines; above the line, or below near the top.
+              const w = Math.ceil(t.label.length * 6.2) + 12;
+              const h = 16;
+              const px = orientation === 'horizontal' ? rect.x + rect.width - w : p + 4;
+              const py = orientation === 'horizontal' ? (p - h - 3 < rect.y ? p + 3 : p - h - 3) : rect.y;
+              return (
+                <g data-threshold-label="">
+                  <rect x={px} y={py} width={w} height={h} rx={4} fill={`color-mix(in srgb, ${color} 14%, var(--surface-raised))`} />
+                  <text
+                    x={px + w / 2}
+                    y={py + h / 2}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontSize={chartTheme.fontSize.axis}
+                    fontWeight={500}
+                    fill={color}
+                  >
+                    {t.label}
+                  </text>
+                </g>
+              );
+            })()}
           </g>
         );
       })}

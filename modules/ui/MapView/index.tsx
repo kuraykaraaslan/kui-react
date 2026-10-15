@@ -30,7 +30,7 @@ export type { MapCanvasProps } from './MapCanvas';
 /**
  * MapView — provider-agnostic interactive map.
  *
- * M1: leaflet provider with token-aware tiles (CartoDB Voyager / Dark Matter),
+ * M1: leaflet provider with token-aware tiles (Esri Light Gray / Dark Gray Canvas),
  * fit-to-bounds, and IntersectionObserver-driven lazy loading. mapbox / google
  * adapters are stubbed — switching providers throws until M1+.
  */
@@ -54,8 +54,13 @@ export function MapView({
   showLabels,
   tooltipTrigger,
   renderLink,
+  clusterRadius,
+  scrollWheelZoom,
+  zoomControl,
+  controlsPosition,
+  fitMaxZoom,
 }: MapViewProps) {
-  const display = { minZoom, maxZoom, cluster, showLabels, tooltipTrigger, renderLink };
+  const display = { minZoom, maxZoom, cluster, showLabels, tooltipTrigger, renderLink, clusterRadius, scrollWheelZoom, zoomControl, controlsPosition, fitMaxZoom };
   const { ref, visible } = useInViewport<HTMLDivElement>();
   const [addMode, setAddMode] = useState(false);
   const [showZones, setShowZones] = useState(true);

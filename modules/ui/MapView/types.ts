@@ -15,10 +15,12 @@ export type MapTooltipData = {
   href?: string;
   /** Text of that link. Default = "Open". */
   linkLabel?: string;
+  /** A status colour shown as a dot before the title (any CSS colour or `var(--token)`; unsafe values are ignored). */
+  color?: string;
 };
 
-/** How a marker is drawn: the pin (default), a round dot, or a Font Awesome icon. */
-export type MapMarkerShape = 'pin' | 'dot' | 'icon';
+/** How a marker is drawn: the pin (default), a solid dot, a tinted ring (circle), or a Font Awesome icon. */
+export type MapMarkerShape = 'pin' | 'dot' | 'circle' | 'icon';
 
 export type MapMarker = {
   id: string;
@@ -65,10 +67,13 @@ export type MapBounds = {
 
 export type MapProviderId = 'leaflet' | 'mapbox' | 'google';
 
-/** One raster tile layer. `url` is a Leaflet URL template ({s}/{z}/{x}/{y}/{r}); `attribution` may contain HTML links. */
-export type MapTiles = { url: string; attribution: string };
+/**
+ * One raster tile layer. `url` is a Leaflet URL template ({s}/{z}/{x}/{y}/{r}); `attribution` may
+ * contain HTML links. `labels` is an optional transparent overlay (place names) drawn above it.
+ */
+export type MapTiles = { url: string; attribution: string; labels?: string };
 
-/** One tile layer for both themes, or a light/dark pair. Default: CARTO Voyager / Dark Matter. */
+/** One tile layer for both themes, or a light/dark pair. Default: Esri Light Gray / Dark Gray Canvas. */
 export type MapTilesConfig = MapTiles | { light: MapTiles; dark: MapTiles };
 
 export type MapViewProps = {
@@ -87,7 +92,7 @@ export type MapViewProps = {
   onMarkerClick?: (id: string) => void;
   height?: string | number;
   className?: string;
-  /** Custom tile server (e.g. a self-hosted or keyed provider). Default: CARTO Voyager / Dark Matter. */
+  /** Custom tile server (e.g. a self-hosted or keyed provider). Default: Esri Light Gray / Dark Gray Canvas. */
   tiles?: MapTilesConfig;
   /** Text shown while the map chunk / viewport loads. Default = "Loading map…". */
   loadingLabel?: string;
@@ -102,8 +107,18 @@ export type MapDisplayOptions = {
   cluster?: boolean;
   /** Show each marker's `label` permanently next to it. Default = false (label on hover). */
   showLabels?: boolean;
-  /** Open marker tooltips on hover (default) or on click (they then stay open and links in them can be used). */
-  tooltipTrigger?: 'hover' | 'click';
+  /** Open marker tooltips on hover (default) or on click (they then stay open and links in them can be used); 'none' = no tooltips. */
+  tooltipTrigger?: 'hover' | 'click' | 'none';
+  /** Pixel distance within which `cluster` groups markers. Default = 40. */
+  clusterRadius?: number;
+  /** Zoom with the mouse wheel. Default = true. */
+  scrollWheelZoom?: boolean;
+  /** Show the + / − zoom buttons. Default = true. */
+  zoomControl?: boolean;
+  /** Corner of the zoom buttons. Default = 'topleft'. */
+  controlsPosition?: 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
+  /** The closest zoom a fit to the markers may reach (one marker would otherwise zoom all the way in). Default = 15. */
+  fitMaxZoom?: number;
   /** Build a link for a tooltip `href` (host routing); default = a plain anchor. */
   renderLink?: (href: string, children: ReactNode, className?: string) => ReactNode;
   // TODO M2: activeMarkerId, mode (markers|cluster|heatmap)

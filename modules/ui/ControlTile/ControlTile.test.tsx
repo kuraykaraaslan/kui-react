@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ControlButton, ControlSetpoint, ControlSwitch } from './index';
+import { ControlButton, ControlSetpoint, ControlSlider, ControlSwitch, ControlTile } from './index';
 import { asBoolean, snapToStep, toRange, validateSetpoint } from './control-logic';
 
 describe('control-logic', () => {
@@ -89,5 +89,58 @@ describe('ControlButton', () => {
     await user.type(screen.getByRole('textbox'), 'wipe-dev');
     await user.click(confirm);
     expect(onCommit).toHaveBeenCalledWith({ confirmed: true, typed: 'wipe-dev' });
+  });
+});
+
+describe('layouts and parts', () => {
+  it('ControlButton: a round icon button is named by its label; a pill puts the icon after the text', () => {
+    const { rerender } = render(<ControlButton label="Power" layout="icon" icon={<span data-testid="ic" />} onCommit={vi.fn()} />);
+    const round = screen.getByRole('button', { name: 'Power' });
+    expect(round.className).toContain('rounded-full');
+    expect(round).toContainElement(screen.getByTestId('ic'));
+    rerender(<ControlButton label="Go" layout="fab" iconPosition="end" icon={<span data-testid="ic" />} onCommit={vi.fn()} />);
+    const pill = screen.getByRole('button', { name: 'Go' });
+    expect(pill.lastElementChild).toBe(screen.getByTestId('ic').parentElement ?? screen.getByTestId('ic'));
+  });
+  it('ControlSwitch: renderLayout receives the parts; the state element describes the switch', () => {
+    render(
+      <ControlSwitch value onCommit={vi.fn()} label="Pump" colors={{ thumbOn: '#ff0000' }}
+        renderLayout={(p) => <div>{p.control}<span id={p.stateId}>{p.state}:{p.stateText}</span></div>} />,
+    );
+    expect(screen.getByText('on:On')).toBeInTheDocument();
+    expect(screen.getByRole('switch')).toHaveAccessibleDescription('on:On');
+  });
+  it('ControlSlider: vertical, tick labels, sizes and renderLayout parts', () => {
+    render(
+      <ControlSlider value={50} min={0} max={100} tickMarks={3} tickLabels orientation="vertical" thickness={8} thumbSize={20}
+        ariaLabel="Speed" onCommit={vi.fn()}
+        renderLayout={(p) => <div>{p.slider}<span>{p.minText}|{p.valueText}|{p.maxText}</span></div>} />,
+    );
+    const input = screen.getByRole('slider', { name: 'Speed' });
+    expect(input).toHaveAttribute('aria-orientation', 'vertical');
+    expect(input.style.width).toBe('8px');
+    expect(input.style.getPropertyValue('--kui-slider-thumb-size')).toBe('20px');
+    expect(screen.getByText('0|50|100')).toBeInTheDocument();
+    expect(screen.getAllByText('50')).toHaveLength(1);
+  });
+  it('ControlSetpoint: the dial steps and renders its value through renderValue', async () => {
+    const onCommit = vi.fn().mockResolvedValue(undefined);
+    const { container } = render(
+      <ControlSetpoint value={20} min={0} max={40} step={2} layout="dial" ariaLabel="Target" buttonTextColor="#00ff00"
+        renderValue={(text) => <b>{text}!</b>} onCommit={onCommit} />,
+    );
+    expect(container.querySelectorAll('svg circle')).toHaveLength(2);
+    expect(screen.getByText('20!')).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Target' })).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Increase' }));
+    expect(onCommit).toHaveBeenCalledWith(22);
+  });
+  it('ControlTile: a host failure text leads and keeps the reason; unframed can put the control at the bottom', () => {
+    const { container, rerender } = render(<ControlTile state="failed" error="Offline" messages={{ failed: 'Could not switch' }}>x</ControlTile>);
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not switch (Offline)');
+    rerender(<ControlTile state="failed" error="Offline">x</ControlTile>);
+    expect(screen.getByRole('alert')).toHaveTextContent(/^Offline$/);
+    rerender(<ControlTile state="idle" framed={false} bodyAlign="end">x</ControlTile>);
+    expect(container.querySelector('.justify-end')).not.toBeNull();
   });
 });

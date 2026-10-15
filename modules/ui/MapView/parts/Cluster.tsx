@@ -4,7 +4,7 @@ import type * as LeafletLib from 'leaflet';
 import type { Map as LeafletMap } from 'leaflet';
 import type { LeafletBundle } from '../providers/leaflet';
 import { MarkerPart } from './Marker';
-import type { MapMarker } from '../types';
+import { VARIANT_HEX, safeMarkerColor, type MapMarker } from '../types';
 
 export type MarkerGroup = { id: string; markers: MapMarker[]; position: [number, number] };
 
@@ -34,11 +34,17 @@ export function clusterMarkers(
   }));
 }
 
-function clusterIcon(L: typeof LeafletLib, count: number) {
+/** A group's colour: the one its markers share, else the primary colour. Always a safe colour. */
+export function clusterColor(markers: MapMarker[]): string {
+  const colors = new Set(markers.map((m) => safeMarkerColor(m.color) ?? VARIANT_HEX[m.variant ?? 'primary']));
+  return colors.size === 1 ? [...colors][0] : 'var(--primary, #3b82f6)';
+}
+
+function clusterIcon(L: typeof LeafletLib, count: number, color: string) {
   const size = count < 10 ? 30 : count < 100 ? 36 : 42;
   return L.divIcon({
     className: '',
-    html: `<span style="display:flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:9999px;background:var(--primary, #3b82f6);color:var(--primary-fg, #ffffff);font:600 12px/1 system-ui,sans-serif;border:3px solid rgba(255,255,255,0.85);box-shadow:0 1px 4px rgba(0,0,0,0.35);box-sizing:border-box">${count}</span>`,
+    html: `<span style="display:flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:9999px;background:${color};color:#ffffff;font:600 12px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;border:2px solid rgba(255,255,255,0.9);box-shadow:0 0 0 4px color-mix(in srgb, ${color} 22%, transparent),0 1px 3px rgba(0,0,0,0.3);box-sizing:border-box">${count}</span>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
   });
@@ -49,17 +55,19 @@ type ClusteredMarkersProps = {
   markers: MapMarker[];
   onMarkerClick?: (id: string) => void;
   showLabels?: boolean;
-  tooltipTrigger?: 'hover' | 'click';
+  tooltipTrigger?: 'hover' | 'click' | 'none';
   renderLink?: (href: string, children: ReactNode, className?: string) => ReactNode;
+  /** Pixel distance within which markers group. Default = 40. */
+  radius?: number;
 };
 
 /** Markers grouped by overlap at the current zoom; a group is a count bubble that zooms in on click. */
-export function ClusteredMarkers({ bundle, markers, onMarkerClick, showLabels, tooltipTrigger, renderLink }: ClusteredMarkersProps) {
+export function ClusteredMarkers({ bundle, markers, onMarkerClick, showLabels, tooltipTrigger, renderLink, radius = 40 }: ClusteredMarkersProps) {
   const { useMap, useMapEvents, Marker, Tooltip, Popup, L } = bundle;
   const map = useMap() as LeafletMap;
   const [zoom, setZoom] = useState(() => map.getZoom());
   useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
-  const groups = clusterMarkers(markers, (pos) => map.project(pos, zoom));
+  const groups = clusterMarkers(markers, (pos) => map.project(pos, zoom), Math.min(200, Math.max(10, radius)));
 
   return (
     <>
@@ -78,9 +86,9 @@ export function ClusteredMarkers({ bundle, markers, onMarkerClick, showLabels, t
         />
       ) : (
         <Marker
-          key={`cluster-${g.id}-${g.markers.length}`}
+          key={`cluster-${g.id}-${g.markers.length}-${clusterColor(g.markers)}`}
           position={g.position}
-          icon={clusterIcon(L, g.markers.length)}
+          icon={clusterIcon(L, g.markers.length, clusterColor(g.markers))}
           alt={`${g.markers.length} markers, zoom in`}
           eventHandlers={{
             click: () => map.fitBounds(L.latLngBounds(g.markers.map((m) => m.position)), { padding: [32, 32] }),

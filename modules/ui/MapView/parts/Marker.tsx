@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import type * as LeafletLib from 'leaflet';
 import type * as ReactLeaflet from 'react-leaflet';
 import { Popup } from './Popup';
+import { LABEL_CLASS, POPUP_CLASS, TIP_CLASS } from './styles';
 import { VARIANT_HEX, markerSvg, safeMarkerColor, safeMarkerIcon, type MapMarker } from '../types';
 
 type MarkerProps = {
@@ -13,7 +14,7 @@ type MarkerProps = {
   RLPopup?: typeof ReactLeaflet.Popup;
   onMarkerClick?: (id: string) => void;
   showLabel?: boolean;
-  tooltipTrigger?: 'hover' | 'click';
+  tooltipTrigger?: 'hover' | 'click' | 'none';
   renderLink?: (href: string, children: ReactNode, className?: string) => ReactNode;
 };
 
@@ -43,6 +44,12 @@ export function markerIcon(marker: MapMarker): MarkerIconSpec {
       iconSize: [size, size], iconAnchor: [size / 2, size / 2], tooltipAnchor: [0, -size / 2 - 2],
     };
   }
+  if (shape === 'circle') {
+    return {
+      html: `<span style="display:block;width:${size}px;height:${size}px;border-radius:9999px;background:color-mix(in srgb, ${color} 28%, transparent);border:2px solid ${color};box-shadow:0 1px 2px rgba(0,0,0,0.25);box-sizing:border-box"></span>`,
+      iconSize: [size, size], iconAnchor: [size / 2, size / 2], tooltipAnchor: [0, -size / 2 - 2],
+    };
+  }
   return {
     html: `<span style="display:block;width:${size}px;height:${size}px;border-radius:9999px;background:${color};border:2px solid #ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.4);box-sizing:border-box"></span>`,
     iconSize: [size, size], iconAnchor: [size / 2, size / 2], tooltipAnchor: [0, -size / 2 - 2],
@@ -67,9 +74,9 @@ export function MarkerPart({
   const label = showLabel && marker.label ? marker.label : undefined;
   // A Leaflet marker holds one tooltip: with a permanent label, the details move to a click popup.
   const click = !!RLPopup && (tooltipTrigger === 'click' || !!label);
-  const body = marker.tooltip
+  const body = tooltipTrigger === 'none' ? null : marker.tooltip
     ? <Popup tooltip={marker.tooltip} renderLink={renderLink} />
-    : !label && marker.label ? <span style={{ fontSize: 12, fontWeight: 600 }}>{marker.label}</span> : null;
+    : !label && marker.label ? <span className="text-xs font-semibold">{marker.label}</span> : null;
 
   return (
     <RLMarker
@@ -79,12 +86,12 @@ export function MarkerPart({
       eventHandlers={{ click: () => onMarkerClick?.(marker.id) }}
     >
       {label && (
-        <RLTooltip permanent direction="right" offset={[6, 0]}>
-          <span style={{ fontSize: 11, fontWeight: 600 }}>{label}</span>
+        <RLTooltip permanent direction="right" offset={[6, 0]} className={LABEL_CLASS}>
+          {label}
         </RLTooltip>
       )}
-      {body && click && RLPopup && <RLPopup>{body}</RLPopup>}
-      {body && !click && <RLTooltip>{body}</RLTooltip>}
+      {body && click && RLPopup && <RLPopup className={POPUP_CLASS} closeButton={false}>{body}</RLPopup>}
+      {body && !click && <RLTooltip className={TIP_CLASS} direction="top" opacity={1}>{body}</RLTooltip>}
     </RLMarker>
   );
 }

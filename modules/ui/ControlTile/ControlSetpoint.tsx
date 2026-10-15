@@ -1,5 +1,5 @@
 'use client';
-import { useId, useState, type CSSProperties } from 'react';
+import { useId, useState, type CSSProperties, type ReactNode } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { Button } from '../Button';
 import { useAsyncControl } from '@/libs/hooks/useAsyncControl';
@@ -21,6 +21,8 @@ export type ControlSetpointMessages = {
 
 export type ControlSetpointProps = {
   title?: string;
+  /** The control's accessible name when there is no `title` (a host card names it). */
+  ariaLabel?: string;
   value: unknown;
   reported?: unknown;
   /** Written when the user presses Apply (or Enter) with a valid number, or presses a stepper button. */
@@ -37,8 +39,18 @@ export type ControlSetpointProps = {
   decimals?: number;
   /** Formats the numbers shown (current value, stepper value). Overrides `unit` / `decimals`. */
   format?: (value: number) => string;
-  /** `input` (default): type a number and apply. `stepper`: minus / plus buttons, each press is written. */
-  layout?: 'input' | 'stepper';
+  /**
+   * `input` (default): type a number and apply. `stepper`: minus / plus buttons, each press is written.
+   * `dial`: the stepper around an arc showing where the value sits between min and max.
+   */
+  layout?: 'input' | 'stepper' | 'dial';
+  /** Renders the stepper / dial number (default: the formatted text in `valueStyle`). */
+  renderValue?: (text: string, value: number | null) => ReactNode;
+  /** Text colour of the Apply / stepper buttons. */
+  buttonTextColor?: string;
+  /** Arc colours of the `dial` (default: `buttonColor`, then the theme). */
+  dialColor?: string;
+  dialTrackColor?: string;
   /** Show the current (bound) value. Default `true`. */
   showValue?: boolean;
   /** Inline style (font, colour) of the value text (the input, or the stepper's number). */
@@ -58,6 +70,27 @@ export type ControlSetpointProps = {
   className?: string;
 };
 
+/** A 270° arc with the value's share of the range filled, and the value in its middle. Decorative. */
+function Dial({ fraction, color, track, children }: { fraction: number | null; color?: string; track?: string; children: ReactNode }) {
+  const r = 42;
+  const len = 2 * Math.PI * r * 0.75;
+  const f = fraction === null ? 0 : Math.min(1, Math.max(0, fraction));
+  return (
+    <div className="relative aspect-square h-full max-h-32 min-h-14 w-auto">
+      <svg viewBox="0 0 100 100" aria-hidden="true" className="h-full w-full rotate-[135deg]">
+        <circle cx="50" cy="50" r={r} fill="none" strokeWidth="8" strokeLinecap="round"
+          strokeDasharray={`${len} 999`} style={{ stroke: track ?? 'var(--surface-sunken)' }} />
+        {fraction !== null && (
+          <circle cx="50" cy="50" r={r} fill="none" strokeWidth="8" strokeLinecap="round"
+            strokeDasharray={`${len * f} 999`} style={{ stroke: color ?? 'var(--primary)', transition: 'stroke-dasharray 200ms' }} />
+        )}
+      </svg>
+      {/* A size container, so the value can scale with the dial (`cqi` units). */}
+      <div className="absolute inset-0 flex items-center justify-center [container-type:size]">{children}</div>
+    </div>
+  );
+}
+
 const DEFAULTS: ControlSetpointMessages = {
   apply: 'Apply',
   enterNumber: 'Enter a number.',
@@ -69,8 +102,8 @@ const DEFAULTS: ControlSetpointMessages = {
 
 /** ControlSetpoint — type a number, press Apply or Enter (or step it). A bad entry is a field error and sends nothing. */
 export function ControlSetpoint({
-  title, value, reported, onCommit, min, max, step, unit, decimals = 0, format, layout = 'input', showValue = true,
-  valueStyle, buttonColor, borderColor, readOnly = false, disabled = false, disabledReason, framed = true, timeoutMs, messages, className,
+  title, ariaLabel, value, reported, onCommit, min, max, step, unit, decimals = 0, format, layout = 'input', showValue = true,
+  valueStyle, buttonColor, buttonTextColor, borderColor, renderValue, dialColor, dialTrackColor, readOnly = false, disabled = false, disabledReason, framed = true, timeoutMs, messages, className,
   confirm = 'none', confirmText,
 }: ControlSetpointProps) {
   const id = useId();
@@ -93,7 +126,9 @@ export function ControlSetpoint({
   const errId = `${id}-error`;
   const pending = ctl.state === 'pending';
   const locked = disabled || readOnly || !!disabledReason || pending || !!ask.asking;
-  const buttonStyle: CSSProperties | undefined = buttonColor ? { background: buttonColor, borderColor: buttonColor } : undefined;
+  const buttonStyle: CSSProperties | undefined = buttonColor || buttonTextColor
+    ? { ...(buttonColor ? { background: buttonColor, borderColor: buttonColor } : {}), ...(buttonTextColor ? { color: buttonTextColor } : {}) }
+    : undefined;
   const boxStyle: CSSProperties | undefined = borderColor ? { borderColor } : undefined;
 
   const apply = () => {
@@ -130,9 +165,9 @@ export function ControlSetpoint({
       disabledReason={disabledReason}
       className={className}
     >
-      {layout === 'stepper' ? (
-        <div className="space-y-1">
-          <div className="flex items-center gap-2" role="group" aria-label={title || 'Set point'}>
+      {layout === 'stepper' || layout === 'dial' ? (
+        <div className={cn('space-y-1', layout === 'dial' && 'flex min-h-0 flex-1 flex-col')}>
+          <div className={cn('flex items-center gap-2', layout === 'dial' && 'min-h-0 flex-1 justify-center gap-3')} role="group" aria-label={ariaLabel || title || 'Set point'}>
             <Button
               iconOnly
               aria-label={m.decrease}
@@ -143,13 +178,25 @@ export function ControlSetpoint({
             >
               −
             </Button>
-            <output
-              aria-live="polite"
-              className="flex h-9 min-w-0 flex-1 items-center justify-center rounded-md border border-border bg-surface-base px-2 text-base font-semibold tabular-nums text-text-primary"
-              style={{ ...boxStyle, ...valueStyle }}
-            >
-              {current !== null ? fmt(current) : '—'}
-            </output>
+            {layout === 'stepper' ? (
+              <output
+                aria-live="polite"
+                className="flex h-9 min-w-0 flex-1 items-center justify-center rounded-md border border-border bg-surface-base px-2 text-base font-semibold tabular-nums text-text-primary"
+                style={{ ...boxStyle, ...valueStyle }}
+              >
+                {renderValue ? renderValue(current !== null ? fmt(current) : '—', current) : current !== null ? fmt(current) : '—'}
+              </output>
+            ) : (
+              <Dial
+                fraction={current === null ? null : (current - range.min) / (range.max - range.min)}
+                color={dialColor ?? buttonColor}
+                track={dialTrackColor}
+              >
+                <output aria-live="polite" className="font-semibold tabular-nums text-text-primary" style={valueStyle}>
+                  {renderValue ? renderValue(current !== null ? fmt(current) : '—', current) : current !== null ? fmt(current) : '—'}
+                </output>
+              </Dial>
+            )}
             <Button
               iconOnly
               aria-label={m.increase}
@@ -168,7 +215,7 @@ export function ControlSetpoint({
           <div className="flex items-center gap-2">
             <input
               inputMode="decimal"
-              aria-label={title || 'Set point'}
+              aria-label={ariaLabel || title || 'Set point'}
               aria-invalid={!!fieldError}
               aria-describedby={fieldError ? errId : undefined}
               value={text}
@@ -176,12 +223,12 @@ export function ControlSetpoint({
               onChange={(e) => { setText(e.target.value); setFieldError(null); }}
               style={{ ...boxStyle, ...valueStyle }}
               className={cn(
-                'h-9 w-28 min-w-0 rounded-md border border-border bg-surface-base px-2 text-sm tabular-nums text-text-primary',
+                'h-9 w-28 min-w-0 flex-1 rounded-md border border-border bg-surface-base px-2 text-sm tabular-nums text-text-primary',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus disabled:cursor-not-allowed disabled:opacity-50',
               )}
             />
             {unit && <span className="text-sm text-text-secondary">{unit}</span>}
-            <Button type="submit" disabled={locked} loading={pending} style={buttonStyle}>{m.apply}</Button>
+            <Button type="submit" disabled={locked} loading={pending} style={buttonStyle} className="h-9 shrink-0">{m.apply}</Button>
           </div>
           {currentLine}
           {fieldError && <p id={errId} role="alert" className="text-xs text-error">{fieldError}</p>}

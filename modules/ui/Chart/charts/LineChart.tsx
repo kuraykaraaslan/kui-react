@@ -7,7 +7,7 @@
 // by timestamp and enables viewer-local zoom. Rendered by ./_SeriesChart.tsx. No external
 // chart library.
 
-import { SeriesChart } from './_SeriesChart';
+import { SeriesChart, type SeriesChartProps } from './_SeriesChart';
 import type { BaseChartProps, CurveType } from '../types';
 
 export type LineChartProps = BaseChartProps & {
@@ -19,7 +19,7 @@ export type LineChartProps = BaseChartProps & {
   strokeWidth?: number;
   /** Time axis only: locale for tick labels. */
   locale?: string;
-};
+} & Pick<SeriesChartProps, 'pointShape' | 'pointSize' | 'showValues' | 'valueLabelPosition'>;
 
 export function LineChart(props: LineChartProps) {
   const mode = (props.xAxis ?? props.xScale) === 'time' ? 'time' : 'band';

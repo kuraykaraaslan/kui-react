@@ -9,7 +9,7 @@ export type MapCanvasProps = {
   routes?: MapRoute[];
   center?: [number, number];
   zoom?: number;
-  /** One tile layer for both themes, or a light/dark pair. Default: CARTO Voyager / Dark Matter. */
+  /** One tile layer for both themes, or a light/dark pair. Default: Esri Light Gray / Dark Gray Canvas. */
   tiles?: MapTilesConfig;
   /** Fit the view to the markers with this padding (px). Default = 32. */
   fitBoundsPadding?: number;

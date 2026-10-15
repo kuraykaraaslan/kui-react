@@ -6,7 +6,7 @@
 // LineChart plus `fillOpacity` and `stacked`. `xAxis="time"` (not combined with `stacked`)
 // places points by timestamp and enables viewer-local zoom. Rendered by ./_SeriesChart.tsx.
 
-import { SeriesChart } from './_SeriesChart';
+import { SeriesChart, type SeriesChartProps } from './_SeriesChart';
 import type { BaseChartProps, CurveType } from '../types';
 
 export type AreaChartProps = BaseChartProps & {
@@ -22,7 +22,7 @@ export type AreaChartProps = BaseChartProps & {
   strokeWidth?: number;
   /** Time axis only: locale for tick labels. */
   locale?: string;
-};
+} & Pick<SeriesChartProps, 'pointShape' | 'pointSize' | 'showValues' | 'valueLabelPosition'>;
 
 export function AreaChart(props: AreaChartProps) {
   const mode = (props.xAxis ?? props.xScale) === 'time' && !props.stacked ? 'time' : 'band';

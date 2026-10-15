@@ -1,9 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { markerIcon } from './parts/Marker';
-import { clusterMarkers } from './parts/Cluster';
+import { clusterColor, clusterMarkers } from './parts/Cluster';
 import { Popup, isInternalHref } from './parts/Popup';
 import { safeMarkerColor, safeMarkerIcon } from './types';
+import { LEAFLET_TILES } from './providers/leaflet';
 
 describe('marker drawing', () => {
   it('accepts plain colours and tokens, refuses anything that could break out of the HTML', () => {
@@ -48,5 +49,34 @@ describe('marker drawing', () => {
     expect(screen.getByRole('link', { name: 'Details' })).toHaveAttribute('href', '/devices/1');
     rerender(<Popup tooltip={{ title: 'A', href: 'javascript:alert(1)' }} />);
     expect(screen.queryByRole('link')).toBeNull();
+  });
+
+  it('draws a circle as a tinted ring in the marker colour', () => {
+    const circle = markerIcon({ id: '1', position: [0, 0], shape: 'circle', color: 'var(--warning)', size: 20 });
+    expect(circle.iconSize).toEqual([20, 20]);
+    expect(circle.html).toContain('border:2px solid var(--warning)');
+    expect(circle.html).toContain('color-mix(in srgb, var(--warning) 28%, transparent)');
+  });
+
+  it('a cluster takes the colour its markers share, else the primary colour', () => {
+    const a = { id: 'a', position: [0, 0] as [number, number], color: 'var(--error)' };
+    expect(clusterColor([a, { ...a, id: 'b' }])).toBe('var(--error)');
+    expect(clusterColor([a, { id: 'c', position: [0, 0] as [number, number], color: 'var(--success)' }])).toMatch(/var\(--primary/);
+    expect(clusterColor([{ id: 'x', position: [0, 0] as [number, number], color: '"><x' }])).toBe('#3b82f6');
+  });
+
+  it('tooltip body: a status dot, the description and label / value rows', () => {
+    render(<Popup tooltip={{ title: 'Konya', color: 'var(--error)', description: 'Offline', fields: [{ label: 'Devices', value: '10' }] }} />);
+    expect(screen.getByText('Konya').previousSibling).toHaveStyle({ background: 'var(--error)' });
+    expect(screen.getByText('Offline')).toBeInTheDocument();
+    expect(screen.getByText('Devices').tagName).toBe('DT');
+    expect(screen.getByText('10').tagName).toBe('DD');
+  });
+
+  it('the default tiles need no API key and come with a place-name layer', () => {
+    for (const t of [LEAFLET_TILES.light, LEAFLET_TILES.dark]) {
+      expect(t.url).not.toMatch(/cartocdn/);
+      expect(t.labels).toMatch(/Reference/);
+    }
   });
 });

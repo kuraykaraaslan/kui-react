@@ -69,11 +69,14 @@ export type {
   TooltipMode,
   ThresholdLine,
   AxisTextStyle,
+  PointShape,
+  CategoryMarker,
 } from './types';
 export type { LineChartProps } from './charts/LineChart';
 export type { AreaChartProps } from './charts/AreaChart';
 export type { BarChartProps } from './charts/BarChart';
 export type { PieChartProps } from './charts/PieChart';
 export type { ScatterChartProps } from './charts/ScatterChart';
-export { seriesStats, resolveDomain } from './charts/_helpers';
+export { seriesStats, resolveDomain, niceTicks, niceStep, linearRegression } from './charts/_helpers';
+export { dayMonthText, clockText } from './charts/_time';
 export type { AxisTick } from './primitives/Axis';

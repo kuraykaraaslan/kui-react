@@ -63,7 +63,7 @@ export function inDomain(points: TimePoint[], [lo, hi]: TimeDomain): TimePoint[]
 }
 
 /** y extent over the visible points; always includes zero, like the band charts. */
-export function visibleYExtent(all: TimePoint[][], domain: TimeDomain): { min: number; max: number } {
+export function visibleYExtent(all: TimePoint[][], domain: TimeDomain, includeZero = true): { min: number; max: number } {
   let min = Infinity;
   let max = -Infinity;
   for (const pts of all) {
@@ -75,8 +75,10 @@ export function visibleYExtent(all: TimePoint[][], domain: TimeDomain): { min: n
   }
   if (!Number.isFinite(min)) min = 0;
   if (!Number.isFinite(max)) max = 1;
-  if (min > 0) min = 0;
-  if (max < 0) max = 0;
+  if (includeZero) {
+    if (min > 0) min = 0;
+    if (max < 0) max = 0;
+  }
   return { min, max };
 }
 
@@ -136,24 +138,41 @@ export function timeTicks(domain: TimeDomain, target = 6, timeZone?: string): nu
   return out.length ? out : [lo, hi];
 }
 
-/** Compact tick label for the visible span, in `timeZone` when given. */
+/** `HH:mm` (24 h), with seconds when asked. */
+export function clockText(ms: number, locale?: string, timeZone?: string, seconds = false): string {
+  return new Date(ms).toLocaleTimeString(locale, {
+    hour: '2-digit', minute: '2-digit', ...(seconds ? { second: '2-digit' } : {}), hourCycle: 'h23', ...(timeZone ? { timeZone } : {}),
+  });
+}
+
+/** `d MMM` (6 Oct), with the year (`d MMM yyyy`) when asked; the month name follows the locale. */
+export function dayMonthText(ms: number, locale?: string, timeZone?: string, year = false): string {
+  try {
+    const parts = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', ...(year ? { year: 'numeric' } : {}), ...(timeZone ? { timeZone } : {}) })
+      .formatToParts(new Date(ms));
+    const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
+    return [get('day'), get('month').replace(/\.$/, ''), year ? get('year') : ''].filter(Boolean).join(' ');
+  } catch {
+    return new Date(ms).toDateString();
+  }
+}
+
+/** Compact tick label for the visible span (`HH:mm`, `d MMM`, `MMM yy`), in `timeZone` when given. */
 export function formatTick(ms: number, span: number, locale?: string, timeZone?: string): string {
   const d = new Date(ms);
   const z = timeZone ? { timeZone } : {};
-  if (span <= 10 * MINUTE) return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', ...z });
-  if (span <= 2 * DAY) return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', ...z });
-  if (span <= 7 * DAY) return d.toLocaleString(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', ...z });
-  if (span <= 400 * DAY) return d.toLocaleDateString(locale, { month: 'short', day: 'numeric', ...z });
+  if (span <= 10 * MINUTE) return clockText(ms, locale, timeZone, true);
+  if (span <= 2 * DAY) return clockText(ms, locale, timeZone);
+  if (span <= 7 * DAY) return `${dayMonthText(ms, locale, timeZone)} ${clockText(ms, locale, timeZone)}`;
+  if (span <= 400 * DAY) return dayMonthText(ms, locale, timeZone);
   return d.toLocaleDateString(locale, { year: '2-digit', month: 'short', ...z });
 }
 
-/** Full label for the tooltip header, in `timeZone` when given. */
+/** Full label for the tooltip header (`d MMM yyyy`, or `d MMM HH:mm`), in `timeZone` when given. */
 export function formatFull(ms: number, span: number, locale?: string, timeZone?: string): string {
-  const d = new Date(ms);
-  const z = timeZone ? { timeZone } : {};
   return span > 2 * DAY
-    ? d.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric', ...z })
-    : d.toLocaleString(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', ...z });
+    ? dayMonthText(ms, locale, timeZone, true)
+    : `${dayMonthText(ms, locale, timeZone)} ${clockText(ms, locale, timeZone, span <= 10 * MINUTE)}`;
 }
 
 /** Smallest zoom window: a brush narrower than this (ms) is ignored. */

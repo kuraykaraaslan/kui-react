@@ -17,13 +17,14 @@ export function useFitBounds(
   L: typeof LeafletLib | null,
   markers: MapMarker[],
   padding: number | undefined,
+  maxZoom = 15,
 ) {
   useEffect(() => {
     if (!map || !L || padding === undefined) return;
     if (!markers.length) return;
     const bounds = L.latLngBounds(markers.map((m) => m.position));
     if (!bounds.isValid()) return;
-    map.fitBounds(bounds, { padding: [padding, padding] });
+    map.fitBounds(bounds, { padding: [padding, padding], maxZoom });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, L, padding, markers.length]);
+  }, [map, L, padding, maxZoom, markers.length]);
 }

@@ -3,7 +3,7 @@
 // timestamps in `x`, uneven sampling, gaps, drag-to-zoom). Kept as its own entry point for
 // callers that import it directly; the drawing is ./_SeriesChart.tsx in `mode="time"`.
 
-import { SeriesChart } from './_SeriesChart';
+import { SeriesChart, type SeriesChartProps } from './_SeriesChart';
 import type { BaseChartProps, CurveType } from '../types';
 
 export type TimeSeriesChartProps = BaseChartProps & {
@@ -14,7 +14,7 @@ export type TimeSeriesChartProps = BaseChartProps & {
   fillOpacity?: number;
   /** Locale for tick labels; default = the runtime's. */
   locale?: string;
-};
+} & Pick<SeriesChartProps, 'pointShape' | 'pointSize' | 'showValues' | 'valueLabelPosition' | 'stacked'>;
 
 export function TimeSeriesChart(props: TimeSeriesChartProps) {
   return <SeriesChart mode="time" {...props} />;

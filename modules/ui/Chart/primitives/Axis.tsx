@@ -43,9 +43,13 @@ type XAxisProps = {
   hideLine?: boolean;
   /** Tick label style. Default = the theme's axis text. */
   textStyle?: AxisTextStyle;
+  /** Short tick marks under the line. Default = true. */
+  tickMarks?: boolean;
+  /** Tick labels. Default = true. */
+  showLabels?: boolean;
 };
 
-export function XAxis({ ticks, y, xStart, xEnd, hideLine, textStyle }: XAxisProps) {
+export function XAxis({ ticks, y, xStart, xEnd, hideLine, textStyle, tickMarks = true, showLabels = true }: XAxisProps) {
   const text = axisTextProps(textStyle);
   return (
     <g aria-hidden="true">
@@ -61,22 +65,26 @@ export function XAxis({ ticks, y, xStart, xEnd, hideLine, textStyle }: XAxisProp
       )}
       {ticks.map((t, i) => (
         <g key={`x-${i}`}>
-          <line
-            x1={t.position}
-            x2={t.position}
-            y1={y}
-            y2={y + 4}
-            stroke={chartTheme.axisStroke}
-            strokeWidth={1}
-          />
-          <text
-            x={t.position}
-            y={y + 16}
-            textAnchor="middle"
-            {...text}
-          >
-            {t.label}
-          </text>
+          {tickMarks && (
+            <line
+              x1={t.position}
+              x2={t.position}
+              y1={y}
+              y2={y + 4}
+              stroke={chartTheme.axisStroke}
+              strokeWidth={1}
+            />
+          )}
+          {showLabels && t.label && (
+            <text
+              x={t.position}
+              y={y + 16}
+              textAnchor="middle"
+              {...text}
+            >
+              {t.label}
+            </text>
+          )}
         </g>
       ))}
     </g>
@@ -93,10 +101,17 @@ type YAxisProps = {
   hideLine?: boolean;
   /** Tick label style. Default = the theme's axis text. */
   textStyle?: AxisTextStyle;
+  /** Short tick marks beside the line. Default = true. */
+  tickMarks?: boolean;
+  /** Tick labels. Default = true. */
+  showLabels?: boolean;
+  /** 'right' puts the labels to the right of `x` (a second value axis). Default = 'left'. */
+  side?: 'left' | 'right';
 };
 
-export function YAxis({ ticks, x, yStart, yEnd, hideLine, textStyle }: YAxisProps) {
+export function YAxis({ ticks, x, yStart, yEnd, hideLine, textStyle, tickMarks = true, showLabels = true, side = 'left' }: YAxisProps) {
   const text = axisTextProps(textStyle);
+  const dir = side === 'right' ? 1 : -1;
   return (
     <g aria-hidden="true">
       {!hideLine && (
@@ -111,22 +126,26 @@ export function YAxis({ ticks, x, yStart, yEnd, hideLine, textStyle }: YAxisProp
       )}
       {ticks.map((t, i) => (
         <g key={`y-${i}`}>
-          <line
-            x1={x - 4}
-            x2={x}
-            y1={t.position}
-            y2={t.position}
-            stroke={chartTheme.axisStroke}
-            strokeWidth={1}
-          />
-          <text
-            x={x - 8}
-            y={t.position + 4}
-            textAnchor="end"
-            {...text}
-          >
-            {t.label}
-          </text>
+          {tickMarks && (
+            <line
+              x1={x + dir * 4}
+              x2={x}
+              y1={t.position}
+              y2={t.position}
+              stroke={chartTheme.axisStroke}
+              strokeWidth={1}
+            />
+          )}
+          {showLabels && t.label && (
+            <text
+              x={x + dir * 8}
+              y={t.position + 4}
+              textAnchor={side === 'right' ? 'start' : 'end'}
+              {...text}
+            >
+              {t.label}
+            </text>
+          )}
         </g>
       ))}
     </g>

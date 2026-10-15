@@ -39,12 +39,37 @@ export type Series = {
   fillOpacity?: number;
   /** Starts toggled off; the viewer shows it from the legend (which then becomes interactive). */
   hidden?: boolean;
+  /** Line / Area / Bar (vertical): the value axis this series is drawn against. Default = 'left'. */
+  yAxis?: 'left' | 'right';
+  /** Line / Area / Scatter: the point mark. Default = 'circle'. */
+  pointShape?: PointShape;
+  /** Line / Area / Scatter: the point mark's radius in px. Default = stroke width + 1.5 (line), the chart's (scatter). */
+  pointSize?: number;
+  /** Area (and a filled line): fade the fill from `fillOpacity` at the line to clear at the baseline. */
+  fillGradient?: boolean;
+  /**
+   * Bar / Area (band axis): series with the same stack key stack on each other; different keys stand
+   * side by side (bars) or overlap (areas). With the chart's `stacked`, series without a key share one stack.
+   */
+  stack?: string;
   /** Value text for this series' tooltip rows, legend values and value labels (else the chart's `yFormat`). */
   format?: (value: number) => string;
 };
 
 /** A stroke pattern. */
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
+
+/** A point mark. */
+export type PointShape = 'circle' | 'square' | 'diamond' | 'triangle';
+
+/** A vertical reference line on a category axis (a histogram's mean). `at` is a fractional band index: 0 = start of the first band, n = end of the last. */
+export type CategoryMarker = {
+  at: number;
+  label?: string;
+  color?: string;
+  style?: LineStyle;
+  width?: number;
+};
 
 /** How Line / Area connect points: curved, straight, or held until the next point (step-after). */
 export type CurveType = 'smooth' | 'linear' | 'step';
@@ -67,6 +92,8 @@ export type ThresholdLine = {
   style?: LineStyle;
   /** Stroke width in px. Default = 1. */
   width?: number;
+  /** The value axis the line belongs to. Default = 'left'. */
+  yAxis?: 'left' | 'right';
 };
 
 /** Text style for axis tick labels and axis titles (SVG text). */
@@ -136,6 +163,33 @@ export type BaseChartProps = {
   gridColor?: string;
   /** Axis tick label / title style. Default = the theme's axis text. */
   tickStyle?: AxisTextStyle;
+  /** Take the parent's height (the parent must have a definite height); `height` is then the first-paint fallback. */
+  fill?: boolean;
+  /** The value axis always reaches zero (bars and areas need it; a line may span only its data). Default = true. */
+  yIncludeZero?: boolean;
+  /** About how many value-axis intervals to draw (the step stays a round number). Default = 4. */
+  yTickCount?: number;
+  /** Category / time / x axis tick labels. Default = true. */
+  showXAxis?: boolean;
+  /** Value axis tick labels. Default = true. */
+  showYAxis?: boolean;
+  /** Grid line pattern. Default = 'dashed'. */
+  gridStyle?: LineStyle;
+  /** Right value axis (series with `yAxis: 'right'`): fixed bounds, title and tick text. */
+  y2Min?: number;
+  y2Max?: number;
+  y2Label?: string;
+  y2Format?: (value: number) => string;
+  /** The tooltip's heading (the time or category). Default = true. */
+  tooltipHeader?: boolean;
+  /** Tooltip value text, overriding the series' own format. */
+  tooltipValueFormat?: (value: number, series: Series) => string;
+  /** Stacked charts: a "Total" row in the tooltip. Default = false. */
+  tooltipTotal?: boolean;
+  /** Entrance animation (skipped when the OS asks for reduced motion). Default = true. */
+  animate?: boolean;
+  /** Text style of value labels (bars, points). */
+  valueLabelStyle?: AxisTextStyle;
 };
 
 /**

@@ -22,6 +22,8 @@ type TooltipProps = {
   containerWidth: number;
   visible: boolean;
   className?: string;
+  /** A last row under a divider, e.g. a stack's total. */
+  footer?: { label: string; value: string };
 };
 
 export function ChartTooltip({
@@ -32,6 +34,7 @@ export function ChartTooltip({
   containerWidth,
   visible,
   className,
+  footer,
 }: TooltipProps) {
   if (!visible || !data.length) return null;
   // Naive overflow flip — keeps the tooltip on-screen on the right edge.
@@ -41,7 +44,7 @@ export function ChartTooltip({
   return (
     <div
       className={cn(
-        'pointer-events-none absolute z-10 min-w-[140px] rounded-md border px-3 py-2 shadow-md',
+        'pointer-events-none absolute z-10 min-w-[140px] max-w-[260px] rounded-lg border px-3 py-2 shadow-md',
         className,
       )}
       role="tooltip"
@@ -55,22 +58,28 @@ export function ChartTooltip({
         fontSize: chartTheme.fontSize.tooltip,
       }}
     >
-      <div className="mb-1 text-xs font-semibold">{label}</div>
-      <ul className="space-y-0.5">
+      {label && <div className="mb-1.5 text-[11px] font-medium" style={{ color: chartTheme.tooltipMutedText }}>{label}</div>}
+      <ul className="space-y-1">
         {data.map((d) => (
           <li key={d.seriesId} className="flex items-center gap-2">
             <span
               aria-hidden="true"
-              className="inline-block size-2 rounded-sm"
+              className="inline-block size-2 shrink-0 rounded-full"
               style={{ backgroundColor: d.color }}
             />
-            <span style={{ color: chartTheme.tooltipMutedText }}>{d.seriesName}</span>
-            <span className="ml-auto font-medium tabular-nums">
+            <span className="min-w-0 truncate" style={{ color: chartTheme.tooltipMutedText }}>{d.seriesName}</span>
+            <span className="ml-auto pl-3 font-semibold tabular-nums">
               {d.valueLabel ?? (d.y === null ? '—' : d.y)}
             </span>
           </li>
         ))}
       </ul>
+      {footer && (
+        <div className="mt-1.5 flex items-center gap-2 border-t pt-1.5" style={{ borderColor: chartTheme.tooltipBorder }} data-tooltip-total="">
+          <span style={{ color: chartTheme.tooltipMutedText }}>{footer.label}</span>
+          <span className="ml-auto pl-3 font-semibold tabular-nums">{footer.value}</span>
+        </div>
+      )}
     </div>
   );
 }

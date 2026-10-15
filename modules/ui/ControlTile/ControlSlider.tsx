@@ -14,8 +14,23 @@ export type ControlSliderColors = {
   disabledTrack?: string;
 };
 
+/** The pieces a host arranges itself with `renderLayout`. */
+export type ControlSliderParts = {
+  /** The track with its marks (and mark labels), already oriented. */
+  slider: ReactNode;
+  /** The shown value (the drag value while dragging), formatted. */
+  valueText: string;
+  value: number;
+  minText: string;
+  maxText: string;
+  /** A drag (or keyboard change) not yet written. */
+  dragging: boolean;
+};
+
 export type ControlSliderProps = {
   title?: string;
+  /** The control's accessible name when there is no `title` (a host card names it). */
+  ariaLabel?: string;
   /** The bound number. */
   value: unknown;
   reported?: unknown;
@@ -45,6 +60,16 @@ export type ControlSliderProps = {
   showTicks?: boolean;
   /** Draw this many evenly spaced marks under the track (2–21). */
   tickMarks?: number;
+  /** Print the value under each mark. */
+  tickLabels?: boolean;
+  /** `vertical` puts the minimum at the bottom; give the slider a height. Default `horizontal`. */
+  orientation?: 'horizontal' | 'vertical';
+  /** Track thickness in px (2–16). Default 6. */
+  thickness?: number;
+  /** Thumb diameter in px (8–32). Default 18. */
+  thumbSize?: number;
+  /** Arrange the parts yourself (value, min/max, icons) instead of `layout`. */
+  renderLayout?: (parts: ControlSliderParts) => ReactNode;
   colors?: ControlSliderColors;
   /** Icons at the start and end of the track (layout `extended`). */
   startIcon?: ReactNode;
@@ -62,6 +87,9 @@ export type ControlSliderProps = {
   messages?: Partial<ControlMessages & ControlConfirmMessages>;
   className?: string;
 };
+
+const clampPx = (v: number | undefined, lo: number, hi: number, dflt: number) =>
+  typeof v === 'number' && Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : dflt;
 
 const COMMIT_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown']);
 const KEY_IDLE_MS = 400;
@@ -87,8 +115,9 @@ function useGestureCommit(onCommit: (v: number) => void) {
 
 /** ControlSlider — drag moves only the local value; the write happens on release; failure restores the bound value. */
 export function ControlSlider({
-  title, value, reported, onCommit, min, max, step, unit, decimals = 0, format, reportedLabel = (v) => `Reported: ${v}`,
-  layout = 'default', showValue = true, valueStyle, showTicks = true, tickMarks, colors, startIcon, endIcon,
+  title, ariaLabel, value, reported, onCommit, min, max, step, unit, decimals = 0, format, reportedLabel = (v) => `Reported: ${v}`,
+  layout = 'default', showValue = true, valueStyle, showTicks = true, tickMarks, tickLabels = false, colors, startIcon, endIcon,
+  orientation = 'horizontal', thickness, thumbSize, renderLayout,
   commitMode = 'release', debounceMs = 500,
   readOnly = false, disabled = false, disabledReason, framed = true, timeoutMs, messages, className,
   confirm = 'none', confirmText,
@@ -112,50 +141,80 @@ export function ControlSlider({
   const gesture = useGestureCommit((v) => write(ask.request(v)));
 
   const pct = ((shown - range.min) / (range.max - range.min)) * 100;
+  const vertical = orientation === 'vertical';
   const main = (locked ? colors?.disabledMain : undefined) ?? colors?.main ?? 'var(--primary)';
   const track = (locked ? colors?.disabledTrack : undefined) ?? colors?.track ?? 'var(--surface-sunken)';
+  const thick = clampPx(thickness, 2, 16, 6);
+  const thumb = clampPx(thumbSize, 8, 32, 18);
   const inputStyle = {
-    backgroundImage: `linear-gradient(to right, ${main} ${pct}%, ${track} ${pct}%)`,
+    backgroundImage: `linear-gradient(to ${vertical ? 'top' : 'right'}, ${main} ${pct}%, ${track} ${pct}%)`,
     '--kui-slider-thumb': main,
-  } as CSSProperties;
+    '--kui-slider-thumb-size': `${thumb}px`,
+    ...(vertical
+      ? { writingMode: 'vertical-lr', direction: 'rtl', width: thick, height: '100%' }
+      : { height: thick, width: '100%' }),
+  } as Record<string, string | number> as CSSProperties;
   const marks = typeof tickMarks === 'number' && tickMarks >= 2 ? Math.min(21, Math.floor(tickMarks)) : 0;
+  const markValue = (i: number) => snapToStep(range.min + ((range.max - range.min) * i) / (marks - 1), { ...range, step: range.step / 100 });
 
-  const slider = (
-    <div className="min-w-0 flex-1">
-      <input
-        type="range"
-        aria-label={title || 'Value'}
-        aria-valuetext={text}
-        aria-busy={pending || undefined}
-        min={range.min}
-        max={range.max}
-        step={range.step}
-        value={shown}
-        disabled={locked || pending || !!ask.asking}
-        onChange={(e) => {
-          const v = snapToStep(Number(e.target.value), range);
-          setDraft({ v, base: bound });
-          gesture.track(v);
-          if (commitMode === 'debounced') gesture.later(Math.max(100, debounceMs));
-        }}
-        onPointerUp={gesture.flush}
-        onKeyUp={(e) => { if (COMMIT_KEYS.has(e.key)) gesture.later(commitMode === 'debounced' ? Math.max(100, debounceMs) : KEY_IDLE_MS); }}
-        onBlur={gesture.flush}
-        style={inputStyle}
-        className={cn(
-          'h-1.5 w-full cursor-pointer appearance-none rounded-full',
-          '[&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-surface-base [&::-webkit-slider-thumb]:bg-[var(--kui-slider-thumb)] [&::-webkit-slider-thumb]:shadow',
-          '[&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-surface-base [&::-moz-range-thumb]:bg-[var(--kui-slider-thumb)]',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
-          'disabled:cursor-not-allowed',
-          locked && !colors?.disabledMain && 'disabled:opacity-50',
-        )}
-      />
-      {marks > 0 && (
-        <div aria-hidden="true" className="mt-1 flex justify-between px-1.5">
-          {Array.from({ length: marks }, (_, i) => <span key={i} className="h-1.5 w-px bg-border-strong" />)}
-        </div>
+  const input = (
+    <input
+      type="range"
+      aria-label={ariaLabel || title || 'Value'}
+      aria-valuetext={text}
+      aria-orientation={vertical ? 'vertical' : undefined}
+      aria-busy={pending || undefined}
+      min={range.min}
+      max={range.max}
+      step={range.step}
+      value={shown}
+      disabled={locked || pending || !!ask.asking}
+      onChange={(e) => {
+        const v = snapToStep(Number(e.target.value), range);
+        setDraft({ v, base: bound });
+        gesture.track(v);
+        if (commitMode === 'debounced') gesture.later(Math.max(100, debounceMs));
+      }}
+      onPointerUp={gesture.flush}
+      onKeyUp={(e) => { if (COMMIT_KEYS.has(e.key)) gesture.later(commitMode === 'debounced' ? Math.max(100, debounceMs) : KEY_IDLE_MS); }}
+      onBlur={gesture.flush}
+      style={inputStyle}
+      className={cn(
+        'm-0 cursor-pointer appearance-none rounded-full',
+        '[&::-webkit-slider-thumb]:h-[var(--kui-slider-thumb-size)] [&::-webkit-slider-thumb]:w-[var(--kui-slider-thumb-size)] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-surface-base [&::-webkit-slider-thumb]:bg-[var(--kui-slider-thumb)] [&::-webkit-slider-thumb]:shadow',
+        '[&::-moz-range-thumb]:h-[var(--kui-slider-thumb-size)] [&::-moz-range-thumb]:w-[var(--kui-slider-thumb-size)] [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-surface-base [&::-moz-range-thumb]:bg-[var(--kui-slider-thumb)]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base',
+        'disabled:cursor-not-allowed',
+        locked && !colors?.disabledMain && 'disabled:opacity-50',
       )}
+    />
+  );
+  // Marks sit under the thumb centres: the travel is inset by half a thumb at both ends.
+  const inset = thumb / 2;
+  const markRow = marks > 0 ? (
+    <div aria-hidden="true" className={cn('relative shrink-0', vertical ? 'h-full' : 'w-full', tickLabels ? (vertical ? 'w-10' : 'h-5') : (vertical ? 'w-2' : 'h-2'))}
+      style={vertical ? { marginBlock: 0 } : undefined}>
+      {Array.from({ length: marks }, (_, i) => {
+        const at = `calc(${inset}px + (100% - ${thumb}px) * ${i / (marks - 1)})`;
+        return (
+          <span key={i} className={cn('absolute flex items-center gap-1', vertical ? 'left-0 translate-y-1/2 flex-row' : 'top-0 -translate-x-1/2 flex-col')}
+            style={vertical ? { bottom: at } : { left: at }}>
+            <span className={cn('bg-border-strong', vertical ? 'h-px w-1.5' : 'h-1.5 w-px')} />
+            {tickLabels && <span className="whitespace-nowrap text-[11px] leading-none tabular-nums text-text-secondary">{fmt(markValue(i))}</span>}
+          </span>
+        );
+      })}
+    </div>
+  ) : null;
+  const slider = vertical ? (
+    <div className="flex h-full min-h-0 items-stretch justify-center gap-1.5">
+      <div className="flex h-full w-9 items-center justify-center">{input}</div>
+      {markRow}
+    </div>
+  ) : (
+    <div className="min-w-0 flex-1">
+      <div className="flex h-9 items-center">{input}</div>
+      {markRow}
     </div>
   );
   const valueEl = showValue ? (
@@ -175,7 +234,9 @@ export function ControlSlider({
       reportedText={bound !== null && draft !== null && draft !== bound ? reportedLabel(fmt(bound)) : undefined}
       className={className}
     >
-      {layout === 'compact' ? (
+      {renderLayout ? renderLayout({
+        slider, valueText: text, value: shown, minText: fmt(range.min), maxText: fmt(range.max), dragging: draft !== null,
+      }) : layout === 'compact' ? (
         <div className="flex items-center gap-3">
           {slider}
           {valueEl && <span className="shrink-0 text-sm">{valueEl}</span>}

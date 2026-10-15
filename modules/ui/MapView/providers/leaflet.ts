@@ -16,21 +16,29 @@ export type LeafletBundle = {
   Popup:        typeof ReactLeaflet.Popup;
   Polygon:      typeof ReactLeaflet.Polygon;
   Polyline:     typeof ReactLeaflet.Polyline;
+  ZoomControl:  typeof ReactLeaflet.ZoomControl;
   useMap:       typeof ReactLeaflet.useMap;
   useMapEvents: typeof ReactLeaflet.useMapEvents;
   L:            typeof LeafletLib;
 };
 
-// CartoDB raster tiles — free, no API key, dark+light variants that respect
-// the design-token surfaces in app/globals.css.
+// Keyless raster basemaps that follow the theme: Esri's Light Gray and Dark Gray Canvas, with their
+// place-name layers on top. (CARTO's basemaps, the previous default, now answer every keyless
+// request with an "API key required" tile.) A host with its own tile server passes `tiles`.
+const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services';
+export const ESRI_ATTRIBUTION = 'Tiles &copy; <a href="https://www.esri.com">Esri</a> &mdash; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+export const esriTiles = (service: string) => `${ESRI}/${service}/MapServer/tile/{z}/{y}/{x}`;
+
 export const LEAFLET_TILES = {
   light: {
-    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    url: esriTiles('Canvas/World_Light_Gray_Base'),
+    labels: esriTiles('Canvas/World_Light_Gray_Reference'),
+    attribution: ESRI_ATTRIBUTION,
   },
   dark: {
-    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    url: esriTiles('Canvas/World_Dark_Gray_Base'),
+    labels: esriTiles('Canvas/World_Dark_Gray_Reference'),
+    attribution: ESRI_ATTRIBUTION,
   },
 } as const;
 
@@ -53,6 +61,7 @@ export function loadLeaflet(): Promise<LeafletBundle> {
       Popup:        rl.Popup,
       Polygon:      rl.Polygon,
       Polyline:     rl.Polyline,
+      ZoomControl:  rl.ZoomControl,
       useMap:       rl.useMap,
       useMapEvents: rl.useMapEvents,
       L:            leaflet as unknown as typeof LeafletLib,

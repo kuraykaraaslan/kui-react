@@ -44,6 +44,8 @@ export type ControlTileProps = {
    * the control (its text stays in the accessibility tree). The control itself must also be disabled.
    */
   disabledReason?: string;
+  /** Unframed only: centre the control in the space (default) or put it at the bottom. */
+  bodyAlign?: 'center' | 'end';
   children: ReactNode;
   className?: string;
 };
@@ -54,23 +56,25 @@ export type ControlTileProps = {
  * the controls cannot drift on what "pending" or "failed" looks like.
  */
 export function ControlTile({
-  title, state, error, readOnly, reportedText, onRetry, messages, framed = true, disabledReason, children, className,
+  title, state, error, readOnly, reportedText, onRetry, messages, framed = true, disabledReason, bodyAlign = 'center', children, className,
 }: ControlTileProps) {
   const m = { ...DEFAULT_CONTROL_MESSAGES, ...messages };
+  // A host-written failure text leads; the reason the write failed follows it.
+  const failText = messages?.failed ? (error ? `${messages.failed} (${error})` : messages.failed) : error || m.failed;
   return (
     <div
       className={cn(framed ? 'rounded-lg border border-border bg-surface-raised p-3' : 'flex h-full min-h-0 flex-col', className)}
       data-disabled-reason={disabledReason || undefined}
     >
       {title && <h3 className="mb-2 text-sm font-semibold text-text-primary">{title}</h3>}
-      <div className={cn('space-y-2', !framed && 'flex min-h-0 flex-1 flex-col justify-center')}>
+      <div className={cn(framed ? 'space-y-2' : 'space-y-1.5', !framed && 'flex min-h-0 flex-1 flex-col', !framed && (bodyAlign === 'end' ? 'justify-end' : 'justify-center'))}>
         {disabledReason ? (
           <Tooltip content={disabledReason} className="flex w-full [&>span:first-child]:min-w-0 [&>span:first-child]:flex-1">
             {children}
           </Tooltip>
         ) : children}
         {reportedText && <p className="text-xs text-text-secondary">{reportedText}</p>}
-        <div className="flex min-h-5 items-center gap-2 text-xs" aria-live="polite">
+        <div className={cn('flex items-center gap-2', framed ? 'min-h-5 text-xs' : 'min-h-4 text-[11px] leading-4')} aria-live="polite">
           {state === 'pending' && (
             <>
               <span aria-hidden="true" className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-border border-t-primary motion-reduce:animate-none" />
@@ -79,7 +83,7 @@ export function ControlTile({
           )}
           {state === 'confirmed' && <span className="text-success">{m.confirmed}</span>}
           {state === 'mismatch' && <span className="text-warning">{m.mismatch}</span>}
-          {state === 'failed' && <span role="alert" className="text-error">{error || m.failed}</span>}
+          {state === 'failed' && <span role="alert" className="text-error">{failText}</span>}
           {(state === 'failed' || state === 'mismatch') && onRetry && (
             <button
               type="button"
