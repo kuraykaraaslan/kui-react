@@ -15,6 +15,7 @@ import {
   faArrowRightFromBracket,
   faChevronDown,
   faDiagramProject,
+  faTableCells,
 } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 
@@ -22,6 +23,7 @@ const NAV_GROUPS: AppSidebarNavGroup[] = [
   {
     items: [
       { id: 'dashboard',  label: 'Dashboard',   icon: <FontAwesomeIcon icon={faServer}    className="w-4 h-4" aria-hidden="true" />, href: '/theme/iot' },
+      { id: 'widgets',    label: 'Widget gallery', icon: <FontAwesomeIcon icon={faTableCells} className="w-4 h-4" aria-hidden="true" />, href: '/theme/iot/widgets' },
       { id: 'devices',    label: 'Devices',      icon: <FontAwesomeIcon icon={faMicrochip}       className="w-4 h-4" aria-hidden="true" />, href: '/theme/iot/devices',   badge: 7 },
       { id: 'alerts',     label: 'Alerts',       icon: <FontAwesomeIcon icon={faBell}           className="w-4 h-4" aria-hidden="true" />, href: '/theme/iot/alerts',    badge: 3 },
       { id: 'workspaces', label: 'Workspaces',   icon: <FontAwesomeIcon icon={faCloud}          className="w-4 h-4" aria-hidden="true" />, href: '/theme/iot/workspaces' },

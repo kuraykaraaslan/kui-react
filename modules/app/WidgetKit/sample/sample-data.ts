@@ -1,0 +1,221 @@
+// Sample data for every widget shape (pure). A board can be built and judged before real data exists:
+// kui-react's widget gallery binds every builtin to these, and next-boilerplate serves them as the
+// "Sample data" source. Deterministic per call time (a seeded generator), so screenshots are stable
+// in shape while the timestamps follow "now".
+
+import type { SlotData } from '../kind';
+import type { BoardDocument, BoardPlacement } from '../settings/board';
+
+export interface SampleSource {
+  key: string;
+  label: string;
+  data: SlotData;
+}
+
+/** A small seeded generator (mulberry32): the same seed gives the same sequence. */
+function rng(seed: number) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const round = (n: number, d = 1) => Math.round(n * 10 ** d) / 10 ** d;
+
+/** `points` evenly spaced up to `now`, `stepMin` minutes apart, from a smooth walk. */
+function walk(seed: number, now: number, points: number, stepMin: number, base: number, swing: number, d = 1) {
+  const r = rng(seed);
+  let v = base;
+  const out: Array<{ t: string; v: number }> = [];
+  for (let i = points - 1; i >= 0; i--) {
+    v += (r() - 0.5) * swing + Math.sin((points - i) / 4) * swing * 0.15;
+    out.push({ t: new Date(now - i * stepMin * 60_000).toISOString(), v: round(v, d) });
+  }
+  return out;
+}
+
+const SITES = [
+  { name: 'Istanbul Plant', lat: 41.0082, lng: 28.9784 },
+  { name: 'Ankara Warehouse', lat: 39.9334, lng: 32.8597 },
+  { name: 'Izmir Port', lat: 38.4237, lng: 27.1428 },
+  { name: 'Bursa Line 2', lat: 40.1885, lng: 29.061 },
+  { name: 'Antalya Depot', lat: 36.8969, lng: 30.7133 },
+  { name: 'Konya Hub', lat: 37.8746, lng: 32.4932 },
+  { name: 'Kayseri Workshop', lat: 38.7205, lng: 35.4826 },
+];
+
+/** Every sample source, its data computed for `now`. */
+export function sampleSources(now = Date.now()): SampleSource[] {
+  const at = (minAgo: number) => new Date(now - minAgo * 60_000).toISOString();
+  const r = rng(42);
+  const temperature = walk(1, now, 48, 15, 21, 1.6);
+  const humidity = walk(2, now, 48, 15, 48, 3);
+  const power = walk(3, now, 48, 15, 320, 40, 0);
+  const revenue = walk(4, now, 30, 24 * 60, 12000, 2400, 0).map((p) => ({ ...p, v: Math.max(4000, p.v) }));
+  const lastT = temperature[temperature.length - 1].v;
+  const statuses = ['Online', 'Online', 'Online', 'Warning', 'Online', 'Offline', 'Online'];
+  const tones = ['success', 'success', 'success', 'warning', 'success', 'error', 'success'];
+
+  return [
+    // ── scalars
+    { key: 'sample.temperature', label: 'Sample · Temperature now (°C)', data: { shape: 'scalar', value: lastT, fetchedAt: at(0) } },
+    { key: 'sample.temperature.yesterday', label: 'Sample · Temperature yesterday (°C)', data: { shape: 'scalar', value: round(lastT - 1.4), fetchedAt: at(0) } },
+    { key: 'sample.orders', label: 'Sample · Orders today', data: { shape: 'scalar', value: 1284, fetchedAt: at(1) } },
+    { key: 'sample.orders.yesterday', label: 'Sample · Orders yesterday', data: { shape: 'scalar', value: 1147, fetchedAt: at(1) } },
+    { key: 'sample.cpu', label: 'Sample · CPU load (%)', data: { shape: 'scalar', value: 67, fetchedAt: at(0) } },
+    { key: 'sample.goal.done', label: 'Sample · Sales this month', data: { shape: 'scalar', value: 74250, fetchedAt: at(2) } },
+    { key: 'sample.goal.target', label: 'Sample · Sales target', data: { shape: 'scalar', value: 100000, fetchedAt: at(2) } },
+    { key: 'sample.state', label: 'Sample · Line status', data: { shape: 'scalar', value: 'RUNNING', fetchedAt: at(0) } },
+    { key: 'sample.pump', label: 'Sample · Pump on', data: { shape: 'scalar', value: true, fetchedAt: at(0) } },
+    { key: 'sample.setpoint', label: 'Sample · Thermostat set point (°C)', data: { shape: 'scalar', value: 22, fetchedAt: at(0) } },
+    // ── series
+    { key: 'sample.climate', label: 'Sample · Temperature and humidity (12 h)', data: { shape: 'series', series: [{ name: 'Temperature', points: temperature }, { name: 'Humidity', points: humidity }], fetchedAt: at(0) } },
+    { key: 'sample.temperature.series', label: 'Sample · Temperature (12 h)', data: { shape: 'series', series: [{ name: 'Temperature', points: temperature }], fetchedAt: at(0) } },
+    { key: 'sample.power', label: 'Sample · Power draw (kW, 12 h)', data: { shape: 'series', series: [{ name: 'Line 1', points: power }, { name: 'Line 2', points: walk(5, now, 48, 15, 260, 35, 0) }], fetchedAt: at(0) } },
+    { key: 'sample.revenue', label: 'Sample · Daily revenue (30 d)', data: { shape: 'series', series: [{ name: 'Revenue', points: revenue }], fetchedAt: at(5) } },
+    // ── tables
+    {
+      key: 'sample.devices', label: 'Sample · Devices',
+      data: {
+        shape: 'table', fetchedAt: at(1),
+        columns: [
+          { key: 'name', label: 'Device', type: 'text' }, { key: 'site', label: 'Site', type: 'text' },
+          { key: 'status', label: 'Status', type: 'text' }, { key: 'temperature', label: 'Temp (°C)', type: 'number' },
+          { key: 'battery', label: 'Battery (%)', type: 'number' }, { key: 'lastSeen', label: 'Last seen', type: 'date' },
+        ],
+        rows: SITES.map((s, i) => ({
+          id: `dev-${i + 1}`, name: `Sensor ${String.fromCharCode(65 + i)}${i + 1}`, site: s.name, status: statuses[i],
+          temperature: round(18 + r() * 9), battery: Math.round(20 + r() * 80), lastSeen: at(Math.round(r() * 240)),
+        })),
+      },
+    },
+    {
+      key: 'sample.sites', label: 'Sample · Sites on the map',
+      data: {
+        shape: 'table', fetchedAt: at(1),
+        columns: [
+          { key: 'lat', label: 'Latitude', type: 'number' }, { key: 'lng', label: 'Longitude', type: 'number' },
+          { key: 'label', label: 'Site', type: 'text' }, { key: 'color', label: 'Status', type: 'badge' }, { key: 'id', label: 'Id', type: 'text' },
+          { key: 'devices', label: 'Devices', type: 'number' },
+        ],
+        rows: SITES.map((s, i) => ({ lat: s.lat, lng: s.lng, label: s.name, color: tones[i], id: `site-${i + 1}`, devices: 4 + Math.round(r() * 30) })),
+      },
+    },
+    {
+      key: 'sample.events', label: 'Sample · Recent events',
+      data: {
+        shape: 'table', fetchedAt: at(1),
+        columns: [
+          { key: 'time', label: 'Time', type: 'date' }, { key: 'title', label: 'Event', type: 'text' },
+          { key: 'description', label: 'Where', type: 'text' }, { key: 'color', label: 'Severity', type: 'badge' },
+        ],
+        rows: [
+          { time: at(4), title: 'Temperature above 26 °C', description: 'Sensor D4 · Bursa Line 2', color: 'warning' },
+          { time: at(18), title: 'Device went offline', description: 'Sensor F6 · Konya Hub', color: 'error' },
+          { time: at(52), title: 'Firmware updated to 2.4.1', description: '12 devices · Istanbul Plant', color: 'info' },
+          { time: at(95), title: 'Maintenance finished', description: 'Line 2 · Bursa', color: 'success' },
+          { time: at(240), title: 'New site registered', description: 'Kayseri Workshop', color: 'info' },
+          { time: at(60 * 26), title: 'Battery low', description: 'Sensor B2 · Ankara Warehouse', color: 'warning' },
+        ],
+      },
+    },
+    {
+      key: 'sample.channels', label: 'Sample · Orders by channel',
+      data: {
+        shape: 'table', fetchedAt: at(3),
+        columns: [{ key: 'label', label: 'Channel', type: 'text' }, { key: 'value', label: 'Orders', type: 'number' }],
+        rows: [{ label: 'Web', value: 512 }, { label: 'Mobile app', value: 389 }, { label: 'Marketplace', value: 214 }, { label: 'Phone', value: 98 }, { label: 'Store', value: 71 }],
+      },
+    },
+    {
+      key: 'sample.scatter', label: 'Sample · Load vs. temperature',
+      data: {
+        shape: 'table', fetchedAt: at(3),
+        columns: [{ key: 'x', label: 'Load (%)', type: 'number' }, { key: 'y', label: 'Temperature (°C)', type: 'number' }, { key: 'group', label: 'Line', type: 'text' }],
+        rows: Array.from({ length: 60 }, (_, i) => {
+          const x = round(20 + r() * 75);
+          return { x, y: round(18 + x * 0.12 + (r() - 0.5) * 4), group: i % 2 ? 'Line 1' : 'Line 2' };
+        }),
+      },
+    },
+    {
+      key: 'sample.response', label: 'Sample · Response times (ms)',
+      data: {
+        shape: 'table', fetchedAt: at(3),
+        columns: [{ key: 'value', label: 'Response (ms)', type: 'number' }],
+        rows: Array.from({ length: 300 }, () => ({ value: Math.round(80 + (r() + r() + r()) * 140) })),
+      },
+    },
+    {
+      key: 'sample.traffic', label: 'Sample · Visits by weekday and hour',
+      data: {
+        shape: 'table', fetchedAt: at(3),
+        columns: [{ key: 'x', label: 'Hour', type: 'text' }, { key: 'y', label: 'Day', type: 'text' }, { key: 'value', label: 'Visits', type: 'number' }],
+        rows: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].flatMap((day, di) =>
+          Array.from({ length: 12 }, (_, hi) => {
+            const hour = hi * 2;
+            const busy = Math.sin(((hour - 6) / 24) * Math.PI * 2) * 0.5 + 0.5;
+            return { x: `${String(hour).padStart(2, '0')}:00`, y: day, value: Math.round((di >= 5 ? 40 : 90) * busy + r() * 25) };
+          })),
+      },
+    },
+    // ── record
+    {
+      key: 'sample.device', label: 'Sample · Device details',
+      data: {
+        shape: 'record', fetchedAt: at(1),
+        record: { model: 'Nexus S200', firmware: '2.4.1', serialNumber: 'NX-200-04817', site: 'Istanbul Plant', temperature: lastT, uptimeHours: 1284, battery: 87 },
+      },
+    },
+  ];
+}
+
+export const sampleData = (key: unknown, now?: number): SlotData | undefined =>
+  sampleSources(now).find((s) => s.key === key)?.data;
+
+const P = (id: string, type: string, title: string, x: number, y: number, w: number, h: number, binding: Record<string, string>, settings: Record<string, unknown> = {}): BoardPlacement =>
+  ({ id, type, title, x, y, w, h, settings, binding });
+
+/** A board with every builtin widget type, each bound to sample data (the widget gallery). */
+export const SAMPLE_GALLERY_BOARD: BoardDocument = {
+  format: 'widgetkit.board',
+  version: 1,
+  templates: {},
+  board: { title: 'Widget gallery', settings: {} },
+  placements: [
+    P('stat', 'stat.value', 'Orders today', 0, 0, 3, 3, { value: 'sample.orders', compare: 'sample.orders.yesterday' },
+      { label: 'vs. yesterday', icon: 'fas fa-cart-shopping', increaseIs: 'good' }),
+    P('spark', 'stat.sparkline', 'Temperature', 3, 0, 3, 3, { series: 'sample.temperature.series' }, { $format: { unit: '°C', decimals: 1 } }),
+    P('progress', 'progress', 'Sales target', 6, 0, 3, 3, { value: 'sample.goal.done', target: 'sample.goal.target' }, { $format: { unit: '₺', unitPosition: 'before', notation: 'compact' } }),
+    P('state', 'state', 'Line status', 9, 0, 3, 3, { value: 'sample.state' },
+      { states: [{ match: 'RUNNING', label: 'Running', color: 'var(--success)', icon: 'fas fa-circle-check' }, { match: 'STOPPED', label: 'Stopped', color: 'var(--error)' }] }),
+    P('line', 'chart.line', 'Climate', 0, 3, 6, 7, { series: 'sample.climate' }),
+    P('area', 'chart.area', 'Power draw', 6, 3, 6, 7, { series: 'sample.power' }, { $format: { unit: 'kW' } }),
+    P('bar', 'chart.bar', 'Daily revenue', 0, 10, 6, 7, { series: 'sample.revenue' }, { $format: { unit: '₺', unitPosition: 'before', notation: 'compact' } }),
+    P('gauge', 'gauge', 'CPU load', 6, 10, 3, 7, { value: 'sample.cpu' },
+      { $format: { unit: '%' }, ranges: [{ to: 60, color: 'var(--success)' }, { from: 60, to: 85, color: 'var(--warning)' }, { from: 85, color: 'var(--error)' }] }),
+    P('pie', 'chart.pie', 'Orders by channel', 9, 10, 3, 7, { slices: 'sample.channels' }),
+    P('table', 'data.table', 'Devices', 0, 17, 8, 8, { rows: 'sample.devices' }),
+    P('feed', 'data.feed', 'Recent events', 8, 17, 4, 8, { events: 'sample.events' }),
+    P('map', 'map', 'Sites', 0, 25, 6, 8, { points: 'sample.sites' }),
+    P('heatmap', 'heatmap', 'Visits by weekday and hour', 6, 25, 6, 8, { cells: 'sample.traffic' }),
+    P('scatter', 'chart.scatter', 'Load vs. temperature', 0, 33, 6, 7, { points: 'sample.scatter' }),
+    P('histogram', 'chart.histogram', 'Response times', 6, 33, 6, 7, { values: 'sample.response' }, { $format: { unit: 'ms' } }),
+    P('attributes', 'stat.attributes', 'Device details', 0, 40, 4, 6, { record: 'sample.device' }),
+    P('markdown', 'content.markdown', 'About this board', 4, 40, 4, 6, { record: 'sample.device' },
+      { content: '### Line 2 overview\n\nThe **{{model}}** at *{{site}}* runs firmware `{{firmware}}`.\n\n- Temperature: {{temperature}}\n- Uptime: {{uptimeHours}} h\n\n[Open the device list](/devices)' }),
+    P('links', 'content.links', 'Shortcuts', 8, 40, 4, 6, {},
+      { links: [{ label: 'Devices', href: '/devices', description: 'Every registered device', icon: 'fas fa-microchip' }, { label: 'Alerts', href: '/alerts', description: 'Open alerts', icon: 'fas fa-bell' }, { label: 'Documentation', href: 'https://example.com/docs', description: 'How the platform works', icon: 'fas fa-book' }] }),
+    P('image', 'content.image', 'Plant floor', 0, 46, 4, 6, {},
+      { src: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=1200', alt: 'A factory floor with machines', caption: 'Bursa Line 2' }),
+    P('embed', 'content.embed', 'Status page', 4, 46, 4, 6, {}, { url: 'https://example.com' }),
+    P('button', 'control.button', 'Restart line', 8, 46, 4, 3, {}, { label: 'Restart', icon: 'fas fa-rotate-right' }),
+    P('switch', 'control.switch', 'Coolant pump', 8, 49, 4, 3, { value: 'sample.pump' }, { label: 'Pump power' }),
+    P('slider', 'control.slider', 'Fan speed', 0, 52, 6, 3, { value: 'sample.cpu' }, { $format: { unit: '%' } }),
+    P('setpoint', 'control.setpoint', 'Thermostat', 6, 52, 6, 3, { value: 'sample.setpoint' }, { $format: { unit: '°C' }, min: 10, max: 30, step: 0.5 }),
+  ],
+};

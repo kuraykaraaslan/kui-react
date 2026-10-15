@@ -24,3 +24,5 @@ export { WidgetBoard } from './WidgetBoard';
 export type { WidgetBoardProps } from './WidgetBoard';
 export { useLocalSetting } from './useLocalSetting';
 export { useNow } from './useNow';
+export { sampleSources, sampleData, SAMPLE_GALLERY_BOARD } from './sample/sample-data';
+export type { SampleSource } from './sample/sample-data';
