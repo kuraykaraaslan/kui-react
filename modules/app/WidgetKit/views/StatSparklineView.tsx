@@ -97,7 +97,7 @@ export function StatSparklineView({ settings, format, data, locale }: WidgetView
 
   const autoScale = s.autoScale !== false;
   const valueStyle: CSSProperties = {
-    ...(autoScale ? { fontSize: layout === 'value-left' ? 'clamp(1.25rem, 12cqi, 3rem)' : 'clamp(1.25rem, 12cqi, 2.75rem)' } : {}),
+    ...(autoScale ? { fontSize: layout === 'value-left' ? 'clamp(1.25rem, min(12cqi, 40cqb), 3rem)' : 'clamp(1.25rem, min(12cqi, 30cqb), 2.75rem)' } : {}),
     ...fontStyle(autoScale ? undefined : s.valueFont, s.valueColor),
     ...(rangeColor ? { color: rangeColor } : {}),
   };

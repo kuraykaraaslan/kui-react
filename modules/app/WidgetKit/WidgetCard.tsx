@@ -204,7 +204,9 @@ export function WidgetCard({
         </header>
       )}
 
-      <div className="relative @container min-h-0 flex-1 overflow-auto" style={{ padding: pad }}>
+      {/* A container for the views' auto-sizing: width only on small screens (cards size to their content
+          there), width AND height from lg up, where every grid cell has a fixed height. */}
+      <div className="relative @container min-h-0 flex-1 overflow-auto lg:[container-type:size]" style={{ padding: pad }}>
         {bodyState === 'loading' ? (
           <div className="flex h-full min-h-16 flex-col gap-2" role="status" aria-label="Loading">
             <div className="h-4 w-1/3 animate-pulse rounded bg-surface-sunken" />

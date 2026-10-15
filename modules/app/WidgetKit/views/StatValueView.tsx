@@ -61,7 +61,7 @@ export function StatValueView({ settings, format, data, locale }: WidgetViewProp
   const cmp = comparison(value, num(data.compare?.value), s, format, locale);
 
   const valueStyle: CSSProperties = {
-    ...(s.autoScale !== false ? { fontSize: 'clamp(1.25rem, 16cqi, 3.5rem)' } : {}),
+    ...(s.autoScale !== false ? { fontSize: 'clamp(1.25rem, min(16cqi, 42cqb), 3.5rem)' } : {}),
     ...fontStyle(s.autoScale !== false ? undefined : s.valueFont, s.valueColor),
     ...(rangeColor && target === 'value' ? { color: rangeColor } : {}),
   };
