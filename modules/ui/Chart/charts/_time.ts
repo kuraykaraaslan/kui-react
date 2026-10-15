@@ -107,33 +107,53 @@ export function tickStep(span: number, target: number): number {
   return STEPS.find((s) => span / s <= want) ?? STEPS[STEPS.length - 1];
 }
 
-/** Ticks aligned to the step in LOCAL time (so day ticks land on midnight, not 02:00). */
-export function timeTicks(domain: TimeDomain, target = 6): number[] {
+/**
+ * The offset of `timeZone` from UTC at an instant, in ms (east is positive). `undefined` or an unknown zone
+ * is the browser's own.
+ */
+export function zoneOffsetMs(ms: number, timeZone?: string): number {
+  if (!timeZone) return -new Date(ms).getTimezoneOffset() * MINUTE;
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
+    }).formatToParts(new Date(ms));
+    const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+    const asUtc = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'));
+    return asUtc - Math.floor(ms / 1000) * 1000;
+  } catch {
+    return -new Date(ms).getTimezoneOffset() * MINUTE;
+  }
+}
+
+/** Ticks aligned to the step in the axis zone (the browser's, or `timeZone`), so day ticks land on midnight, not 02:00. */
+export function timeTicks(domain: TimeDomain, target = 6, timeZone?: string): number[] {
   const [lo, hi] = domain;
   if (!(hi > lo)) return [lo];
   const step = tickStep(hi - lo, target);
-  const off = new Date(lo).getTimezoneOffset() * MINUTE;
+  const off = -zoneOffsetMs(lo, timeZone);
   const out: number[] = [];
   for (let t = Math.ceil((lo - off) / step) * step + off; t <= hi; t += step) out.push(t);
   return out.length ? out : [lo, hi];
 }
 
-/** Compact tick label for the visible span. */
-export function formatTick(ms: number, span: number, locale?: string): string {
+/** Compact tick label for the visible span, in `timeZone` when given. */
+export function formatTick(ms: number, span: number, locale?: string, timeZone?: string): string {
   const d = new Date(ms);
-  if (span <= 10 * MINUTE) return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  if (span <= 2 * DAY) return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
-  if (span <= 7 * DAY) return d.toLocaleString(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-  if (span <= 400 * DAY) return d.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
-  return d.toLocaleDateString(locale, { year: '2-digit', month: 'short' });
+  const z = timeZone ? { timeZone } : {};
+  if (span <= 10 * MINUTE) return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', ...z });
+  if (span <= 2 * DAY) return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', ...z });
+  if (span <= 7 * DAY) return d.toLocaleString(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', ...z });
+  if (span <= 400 * DAY) return d.toLocaleDateString(locale, { month: 'short', day: 'numeric', ...z });
+  return d.toLocaleDateString(locale, { year: '2-digit', month: 'short', ...z });
 }
 
-/** Full label for the tooltip header. */
-export function formatFull(ms: number, span: number, locale?: string): string {
+/** Full label for the tooltip header, in `timeZone` when given. */
+export function formatFull(ms: number, span: number, locale?: string, timeZone?: string): string {
   const d = new Date(ms);
+  const z = timeZone ? { timeZone } : {};
   return span > 2 * DAY
-    ? d.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' })
-    : d.toLocaleString(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    ? d.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric', ...z })
+    : d.toLocaleString(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', ...z });
 }
 
 /** Smallest zoom window: a brush narrower than this (ms) is ignored. */

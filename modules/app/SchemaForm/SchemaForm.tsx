@@ -21,6 +21,10 @@ export interface SchemaFormProps {
   errors?: Record<string, string | undefined>;
   emptyMessage?: string;
   className?: string;
+  /** Keep only the fields this returns true for (e.g. a "Basic" mode hiding `advanced` fields). */
+  fieldFilter?: (key: string, field: FieldSchema, value: unknown, defaultValue: unknown) => boolean;
+  /** Show the values but accept no edits (e.g. settings written by a newer version). */
+  readOnly?: boolean;
 }
 
 function seedFromSchema(schema: Record<string, FieldSchema>): Record<string, unknown> {
@@ -35,7 +39,7 @@ function seedFromSchema(schema: Record<string, FieldSchema>): Record<string, unk
  */
 export function SchemaForm({
   schema, values, defaults = {}, onChange, searchable = false, debounceMs = 200,
-  fieldOverrides, errors = {}, emptyMessage = 'No settings.', className,
+  fieldOverrides, errors = {}, emptyMessage = 'No settings.', className, fieldFilter, readOnly = false,
 }: SchemaFormProps) {
   const baseId = useId();
   const ctxOverrides = useFieldOverrides();
@@ -61,6 +65,7 @@ export function SchemaForm({
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
 
   const update = (key: string, value: unknown) => {
+    if (readOnly) return;
     const next = { ...localRef.current, [key]: value };
     localRef.current = next;
     setLocal(next);
@@ -72,6 +77,7 @@ export function SchemaForm({
   const q = search.trim().toLowerCase();
   const visible = Object.entries(schema)
     .filter(([, f]) => shouldShow(f, local))
+    .filter(([k, f]) => !fieldFilter || fieldFilter(k, f, local[k], defaults[k] ?? f.value))
     .filter(([k, f]) => !q || f.label.toLowerCase().includes(q) || k.toLowerCase().includes(q));
   const ungrouped = visible.filter(([, f]) => !f.group);
   const groups = visible.filter(([, f]) => f.group).reduce<Record<string, [string, FieldSchema][]>>((acc, e) => {
@@ -112,7 +118,7 @@ export function SchemaForm({
   if (Object.keys(schema).length === 0) return <p className="text-xs text-text-secondary">{emptyMessage}</p>;
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <fieldset disabled={readOnly} className={cn('min-w-0 space-y-4', className)}>
       {searchable && Object.keys(schema).length > 6 && (
         <input type="search" aria-label="Search settings" value={search} onChange={(e) => setSearch(e.target.value)}
           placeholder="Search settings..." className={controlCls} />
@@ -124,6 +130,6 @@ export function SchemaForm({
           <div className="p-3 space-y-4 border-t border-border">{entries.map(renderField)}</div>
         </details>
       ))}
-    </div>
+    </fieldset>
   );
 }

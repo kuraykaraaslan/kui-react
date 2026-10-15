@@ -1,18 +1,15 @@
 'use client';
-import { useId, useState } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
+import { cn } from '@/libs/utils/cn';
 import { Button } from '../Button';
 import { useAsyncControl } from '@/libs/hooks/useAsyncControl';
 import { ControlTile, type ControlMessages } from './ControlTile';
+import { ControlConfirmPrompt, DEFAULT_CONFIRM_MESSAGES, type ControlConfirmation, type ControlConfirmMessages } from './ControlConfirm';
 
-export type ControlConfirmation = { confirmed: true; typed?: string };
+export type { ControlConfirmation } from './ControlConfirm';
 
-export type ControlButtonMessages = {
+export type ControlButtonMessages = ControlConfirmMessages & {
   run: string;
-  confirmPrompt: string;
-  confirm: string;
-  cancel: string;
-  /** `{text}` is replaced. */
-  typeToConfirm: string;
 };
 
 export type ControlButtonProps = {
@@ -27,26 +24,35 @@ export type ControlButtonProps = {
   confirmText?: string;
   readOnly?: boolean;
   disabled?: boolean;
+  /** Why it is disabled; shown in a tooltip. Implies `disabled`. */
+  disabledReason?: string;
+  /** `button` (default): a button. `tile`: a large pressable area with the icon above the label. */
+  layout?: 'button' | 'tile';
+  /** An icon before the label (above it in a tile). */
+  icon?: ReactNode;
+  /** Button style. Default `primary`. */
+  variant?: 'primary' | 'secondary' | 'ghost' | 'outline' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  fullWidth?: boolean;
+  /** Inline style of the main button (colours from settings data, radius, font). */
+  buttonStyle?: CSSProperties;
+  buttonClassName?: string;
+  /** Draw the tile frame. Default `true`. */
+  framed?: boolean;
   messages?: Partial<ControlMessages & ControlButtonMessages>;
   className?: string;
 };
 
-const DEFAULTS: ControlButtonMessages = {
-  run: 'Run',
-  confirmPrompt: 'Are you sure?',
-  confirm: 'Confirm',
-  cancel: 'Cancel',
-  typeToConfirm: 'Type "{text}" to confirm',
-};
+const DEFAULTS: ControlButtonMessages = { ...DEFAULT_CONFIRM_MESSAGES, run: 'Run' };
 
 /** ControlButton — one press fires `onCommit`; an optional confirm / typed-confirm step comes first. */
 export function ControlButton({
-  title, label, onCommit, confirm = 'none', confirmText = '', readOnly = false, disabled = false, messages, className,
+  title, label, onCommit, confirm = 'none', confirmText = '', readOnly = false, disabled = false, disabledReason,
+  layout = 'button', icon, variant = 'primary', size = 'md', fullWidth = false, buttonStyle, buttonClassName, framed = true,
+  messages, className,
 }: ControlButtonProps) {
-  const id = useId();
   const m = { ...DEFAULTS, ...messages };
   const [asking, setAsking] = useState(false);
-  const [typed, setTyped] = useState('');
   const ctl = useAsyncControl<ControlConfirmation | undefined>({
     value: undefined,
     commit: (c) => onCommit(c),
@@ -54,35 +60,47 @@ export function ControlButton({
   });
   const pending = ctl.state === 'pending';
 
-  const fire = () => {
+  const fire = (typed?: string) => {
     ctl.set(confirm === 'none' ? undefined : { confirmed: true, ...(confirm === 'typed' ? { typed } : {}) });
     setAsking(false);
-    setTyped('');
   };
 
   return (
-    <ControlTile title={title} state={ctl.state} error={ctl.error} readOnly={readOnly} onRetry={ctl.retry} messages={messages} className={className}>
+    <ControlTile
+      title={title}
+      state={ctl.state}
+      error={ctl.error}
+      readOnly={readOnly}
+      onRetry={ctl.retry}
+      messages={messages}
+      framed={framed}
+      disabledReason={disabledReason}
+      className={className}
+    >
       {!asking ? (
-        <Button onClick={() => (confirm === 'none' ? fire() : setAsking(true))} disabled={disabled || readOnly || pending} loading={pending}>
+        <Button
+          variant={variant}
+          size={layout === 'tile' ? 'lg' : size}
+          fullWidth={fullWidth || layout === 'tile'}
+          onClick={() => (confirm === 'none' ? fire() : setAsking(true))}
+          disabled={disabled || readOnly || !!disabledReason || pending}
+          loading={pending && layout !== 'tile'}
+          aria-busy={pending || undefined}
+          iconLeft={layout === 'button' ? icon : undefined}
+          style={buttonStyle}
+          className={cn(layout === 'tile' && 'min-h-24 flex-col gap-2 py-4', buttonClassName)}
+        >
+          {layout === 'tile' && icon && <span aria-hidden="true" className="inline-flex items-center">{icon}</span>}
           {label || m.run}
         </Button>
       ) : (
-        <div className="space-y-2" role="group" aria-labelledby={`${id}-prompt`}>
-          <p id={`${id}-prompt`} className="text-sm text-text-primary">{m.confirmPrompt}</p>
-          {confirm === 'typed' && (
-            <input
-              aria-label={m.typeToConfirm.replace('{text}', confirmText)}
-              placeholder={confirmText}
-              value={typed}
-              onChange={(e) => setTyped(e.target.value)}
-              className="h-9 w-full rounded-md border border-border bg-surface-base px-2 text-sm text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
-            />
-          )}
-          <div className="flex gap-2">
-            <Button onClick={fire} disabled={confirm === 'typed' && typed.trim() !== confirmText}>{m.confirm}</Button>
-            <Button variant="secondary" onClick={() => { setAsking(false); setTyped(''); }}>{m.cancel}</Button>
-          </div>
-        </div>
+        <ControlConfirmPrompt
+          mode={confirm === 'typed' ? 'typed' : 'confirm'}
+          confirmText={confirmText}
+          onConfirm={fire}
+          onCancel={() => setAsking(false)}
+          messages={m}
+        />
       )}
     </ControlTile>
   );

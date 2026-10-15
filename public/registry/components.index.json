@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-10-12T09:22:37.186Z",
+  "generatedAt": "2026-10-15T17:14:07.557Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -956,6 +956,9 @@
         "--error",
         "--text-secondary"
       ],
+      "usedBy": [
+        "widget-kit"
+      ],
       "variantCount": 7
     },
     {
@@ -1037,6 +1040,9 @@
         "--border",
         "--text-primary",
         "--text-secondary"
+      ],
+      "usedBy": [
+        "widget-kit"
       ],
       "variantCount": 7
     },
@@ -1298,6 +1304,9 @@
         "--text-primary",
         "--text-secondary"
       ],
+      "usedBy": [
+        "widget-kit"
+      ],
       "variantCount": 3
     },
     {
@@ -1394,7 +1403,8 @@
       "usedBy": [
         "onboarding-wizard",
         "rich-text-editor",
-        "share-dialog"
+        "share-dialog",
+        "widget-kit"
       ],
       "variantCount": 5
     },
@@ -1416,6 +1426,9 @@
         "--text-disabled",
         "--text-primary"
       ],
+      "usedBy": [
+        "widget-kit"
+      ],
       "variantCount": 3
     },
     {
@@ -1433,6 +1446,9 @@
         "--primary",
         "--surface-overlay",
         "--text-primary"
+      ],
+      "usedBy": [
+        "widget-kit"
       ],
       "variantCount": 3
     },
@@ -2543,7 +2559,63 @@
         "--primary",
         "--error"
       ],
+      "usedBy": [
+        "widget-kit"
+      ],
       "variantCount": 4
+    },
+    {
+      "id": "widget-kit",
+      "name": "WidgetKit",
+      "layer": "app",
+      "category": "App",
+      "filePath": "modules/app/WidgetKit/index.ts",
+      "abbr": "WK",
+      "description": "Dashboard widget kit (next-boilerplate dashboard phase 21). WidgetCard frames every widget (title row with icon, subtitle and help, card buttons for full screen, CSV and refresh, loading/empty/unconfigured/error/stale states, \"Updated\" footer). Versioned settings templates (core:card, core:format, core:board and one per widget type) give ThingsBoard-depth editing with free colours (any CSS colour or a theme token); stored settings carry $v and migrate with append-only steps. WidgetSettingsEditor edits a placement in tabs with Basic/Advanced; WidgetBoard lays out a whole board with edit mode and JSON export/import that carries every card.",
+      "status": "beta",
+      "since": "2026-10",
+      "composes": [
+        "schema-form",
+        "tab-group",
+        "drawer",
+        "modal",
+        "tooltip",
+        "chart",
+        "map-view",
+        "control-tile"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "region",
+          "tablist",
+          "dialog",
+          "radiogroup"
+        ],
+        "keyboardInteractions": [
+          {
+            "keys": "Tab",
+            "action": "Reach the card buttons (shown on focus), the editor tabs and every field"
+          },
+          {
+            "keys": "Escape",
+            "action": "Close the full-screen view and the settings drawers"
+          }
+        ],
+        "notes": "Each card is a labelled section; card buttons have aria-labels; loading sets aria-busy; errors use role=\"alert\"."
+      },
+      "designTokens": [
+        "--surface-raised",
+        "--surface-base",
+        "--border",
+        "--text-primary",
+        "--text-secondary",
+        "--primary",
+        "--warning-subtle",
+        "--warning-fg",
+        "--canvas-bg"
+      ],
+      "variantCount": 3
     },
     {
       "id": "ruleset-editor",
@@ -3550,6 +3622,9 @@
       "status": "beta",
       "since": "2025-04",
       "designTokens": [],
+      "usedBy": [
+        "widget-kit"
+      ],
       "variantCount": 3
     },
     {

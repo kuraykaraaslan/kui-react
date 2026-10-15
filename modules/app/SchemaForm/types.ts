@@ -33,8 +33,30 @@ export type FieldType =
   // ("all") option and a "Dynamic — from URL" option that stores ':slug'
   // (resolved at render by useDynamicValue). Reusable — not commerce-specific.
   | 'remote-select'
+  // A text style: `FontValue` ({ size, unit, weight, style, family, lineHeight? }). Colour is a
+  // sibling `color` field, as in ThingsBoard, so a font and its colour can be reset independently.
+  | 'font'
+  // A key of bound data (a declared column of a table/record slot, or a series name), named by
+  // `slot`. kui-react renders a text input (comma separated when `multiple`); a host that knows the
+  // bound result plugs a picker in through `fieldOverrides`.
+  | 'data-key'
 
-export type FieldOption = string | { label: string; value: string }
+export type FieldOption = string | {
+  label: string
+  value: string
+  /** A thumbnail id for `display: 'cards'`; the host maps it to a drawing. */
+  preview?: string
+}
+
+/** The value of a `font` field. `size` is in `unit`; an absent key inherits from the theme. */
+export interface FontValue {
+  size?: number
+  unit?: 'px' | 'rem' | 'em'
+  weight?: 300 | 400 | 500 | 600 | 700 | 800
+  style?: 'normal' | 'italic'
+  family?: 'inherit' | 'sans' | 'serif' | 'mono'
+  lineHeight?: number
+}
 
 // Breakpoint-aware responsive prop: scalar OR per-device object
 export type ResponsiveValue<T = unknown> = T | { mobile?: T; tablet?: T; desktop?: T }
@@ -77,6 +99,19 @@ export interface FieldSchema {
   emptyLabel?: string
   /** When true, offers a "Dynamic — from URL" option that stores ':slug'. */
   allowDynamic?: boolean
+  // ── Presentation and extra constraints (widget settings, phase 21) ──────────
+  /** Hidden in a "Basic" editor unless its value differs from the default. Presentation only. */
+  advanced?: boolean
+  /** Renderer hint. select: 'dropdown' (default) | 'segmented' | 'cards'; number: 'input' never shows a slider. */
+  display?: 'dropdown' | 'segmented' | 'cards' | 'input'
+  /** number: an empty input is a valid value (absent = automatic / inherit). */
+  nullable?: boolean
+  /** text / textarea: the longest accepted value. */
+  maxLength?: number
+  /** 'data-key': the data slot whose keys are offered. */
+  slot?: string
+  /** 'data-key': store several keys (string[]); `max` caps the count. */
+  multiple?: boolean
 }
 
 /**

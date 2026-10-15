@@ -9,6 +9,10 @@
 
 Accessible tab navigation following the role="tablist" / role="tab" / role="tabpanel" ARIA pattern. Arrow-key navigation; tabIndex=-1 on inactive tabs.
 
+## Used by
+
+- `widget-kit`
+
 ## Design tokens consumed
 
 - `--border`

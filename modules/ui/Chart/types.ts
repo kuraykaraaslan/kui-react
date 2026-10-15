@@ -7,6 +7,8 @@
 // renderer at modules/ui/Chart/Chart.ejs accepts a JSON-equivalent of
 // these structures for pixel-identical output.
 
+import type { CSSProperties } from 'react';
+
 export type SeriesPoint = {
   /** Categorical or numeric x value. Strings are placed on a band scale. */
   x: string | number;
@@ -27,6 +29,53 @@ export type Series = {
   data: SeriesPoint[];
   /** Optional override color. Falls back to defaultPalette[seriesIndex]. */
   color?: string;
+  /** Line / Area / time axis: stroke pattern. Default = 'solid'. */
+  lineStyle?: LineStyle;
+  /** Line / Area / time axis: stroke width in px. Default = the chart's `strokeWidth` (2). */
+  strokeWidth?: number;
+  /** Line / Area / time axis: draw a dot on every point. Default = false. */
+  showPoints?: boolean;
+  /** Area: this series' fill alpha (0..1), else the chart's. Line: a value above 0 fills under the line. */
+  fillOpacity?: number;
+  /** Starts toggled off; the viewer shows it from the legend (which then becomes interactive). */
+  hidden?: boolean;
+  /** Value text for this series' tooltip rows, legend values and value labels (else the chart's `yFormat`). */
+  format?: (value: number) => string;
+};
+
+/** A stroke pattern. */
+export type LineStyle = 'solid' | 'dashed' | 'dotted';
+
+/** How Line / Area connect points: curved, straight, or held until the next point (step-after). */
+export type CurveType = 'smooth' | 'linear' | 'step';
+
+/** Where the legend sits relative to the plot. */
+export type LegendPosition = 'top' | 'bottom' | 'left' | 'right';
+
+/** Per-series statistics a legend can print next to each name. */
+export type LegendValue = 'latest' | 'min' | 'max' | 'avg' | 'total';
+
+/** 'axis' = every series at the hovered x; 'point' = the series nearest the pointer; 'none' = off. */
+export type TooltipMode = 'axis' | 'point' | 'none';
+
+/** A fixed reference line (a limit, a target) across the plot at a value. */
+export type ThresholdLine = {
+  value: number;
+  label?: string;
+  /** Any CSS colour or token. Default = `var(--warning)`. */
+  color?: string;
+  style?: LineStyle;
+  /** Stroke width in px. Default = 1. */
+  width?: number;
+};
+
+/** Text style for axis tick labels and axis titles (SVG text). */
+export type AxisTextStyle = {
+  color?: string;
+  fontSize?: number | string;
+  fontWeight?: number | string;
+  fontFamily?: string;
+  fontStyle?: string;
 };
 
 /**
@@ -60,8 +109,33 @@ export type BaseChartProps = {
   resetZoomLabel?: string;
   /** Time axis only: drag a range to zoom, double-click or "Reset zoom" to leave it. Default = true. */
   zoom?: boolean;
-  /** Time axis only: format a y tick / tooltip value (e.g. `(v) => v + '%'`). */
+  /** Format a y tick / tooltip value (e.g. `(v) => v + '%'`). Band and time axes. */
   yFormat?: (value: number) => string;
+  /** Time axis only: an IANA zone the axis and tooltip are drawn in (e.g. `Europe/Istanbul`). Default = the browser's. */
+  timeZone?: string;
+  /** Legend placement. Default = 'bottom'. */
+  legendPosition?: LegendPosition;
+  /** Statistics printed after each legend name. Default = none. */
+  legendValues?: LegendValue[];
+  /** Inline style for the legend text (font, colour). */
+  legendStyle?: CSSProperties;
+  /** Legend entries are buttons that show/hide their series. Default = on when any series starts `hidden`. */
+  legendToggle?: boolean;
+  /** Fixed value-axis bounds; default = from the data (and thresholds). */
+  yMin?: number;
+  yMax?: number;
+  /** Value-axis title. */
+  yLabel?: string;
+  /** Category / time / x axis title. */
+  xLabel?: string;
+  /** Reference lines across the plot. */
+  thresholds?: ThresholdLine[];
+  /** Tooltip behaviour. Default = 'axis' ('none' when `showTooltip` is false). */
+  tooltipMode?: TooltipMode;
+  /** Grid line colour. Default = the theme's grid token. */
+  gridColor?: string;
+  /** Axis tick label / title style. Default = the theme's axis text. */
+  tickStyle?: AxisTextStyle;
 };
 
 /**
@@ -74,7 +148,7 @@ export type TooltipDatum = {
   color: string;
   x: string | number;
   y: number | null;
-  /** A ready-made value text that replaces `y` in the tooltip (from `SeriesPoint.label`). */
+  /** A ready-made value text that replaces `y` in the tooltip (`SeriesPoint.label` or the series' `format`). */
   valueLabel?: string;
 };
 

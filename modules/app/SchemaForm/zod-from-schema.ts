@@ -40,10 +40,22 @@ function fieldValidator(field: FieldSchema): z.ZodTypeAny {
     }
     case 'multi-select':
       return z.array(z.string())
+    case 'font':
+      return z.object({
+        size: z.number().min(1).max(400).optional(),
+        unit: z.enum(['px', 'rem', 'em']).optional(),
+        weight: z.union([z.literal(300), z.literal(400), z.literal(500), z.literal(600), z.literal(700), z.literal(800)]).optional(),
+        style: z.enum(['normal', 'italic']).optional(),
+        family: z.enum(['inherit', 'sans', 'serif', 'mono']).optional(),
+        lineHeight: z.number().min(0.5).max(4).optional(),
+      }).strip()
+    case 'data-key':
+      return field.multiple ? z.array(z.string().max(128)) : z.string().max(128)
     case 'repeater':
       return z.array(z.unknown())
     case 'text':
     case 'textarea':
+      return field.maxLength ? z.string().max(field.maxLength) : z.string()
     case 'rich-text':
     case 'url':
     case 'color':

@@ -1,6 +1,8 @@
 // Public types for MapView. Kept framework-agnostic so providers
 // (leaflet / mapbox / google) can share a single contract.
 
+import type { ReactNode } from 'react';
+
 export type MapVariant = 'primary' | 'success' | 'warning' | 'error' | 'info' | 'neutral';
 
 export type MapTooltipField = { label: string; value: string };
@@ -9,7 +11,14 @@ export type MapTooltipData = {
   title: string;
   description?: string;
   fields?: MapTooltipField[];
+  /** An internal path (`/…`) shown as a link at the bottom of the tooltip. Anything else is ignored. */
+  href?: string;
+  /** Text of that link. Default = "Open". */
+  linkLabel?: string;
 };
+
+/** How a marker is drawn: the pin (default), a round dot, or a Font Awesome icon. */
+export type MapMarkerShape = 'pin' | 'dot' | 'icon';
 
 export type MapMarker = {
   id: string;
@@ -17,6 +26,17 @@ export type MapMarker = {
   variant?: MapVariant;
   tooltip?: MapTooltipData;
   label?: string;
+  /**
+   * Any CSS colour (`#hex`, `rgb()`, `hsl()`, `var(--token)`); wins over `variant`. A value that
+   * is not a plain colour is ignored (it is written into the marker's HTML).
+   */
+  color?: string;
+  /** Default = 'pin'. */
+  shape?: MapMarkerShape;
+  /** Font Awesome class (`fas fa-truck`) for `shape: 'icon'`. Anything else falls back to a dot. */
+  icon?: string;
+  /** Width of the marker in px (a pin is 1.5× as tall). Default = 24; clamped to 8..64. */
+  size?: number;
 };
 
 export type MapZone = {
@@ -71,7 +91,22 @@ export type MapViewProps = {
   tiles?: MapTilesConfig;
   /** Text shown while the map chunk / viewport loads. Default = "Loading map…". */
   loadingLabel?: string;
-  // TODO M2: activeMarkerId, cluster, mode (markers|cluster|heatmap)
+} & MapDisplayOptions;
+
+/** Display options shared by `MapView` and `MapCanvas` (all optional, defaults = the previous behaviour). */
+export type MapDisplayOptions = {
+  /** Lowest / highest zoom the viewer may reach. */
+  minZoom?: number;
+  maxZoom?: number;
+  /** Group markers that overlap at the current zoom into a count bubble; clicking one zooms in. Default = false. */
+  cluster?: boolean;
+  /** Show each marker's `label` permanently next to it. Default = false (label on hover). */
+  showLabels?: boolean;
+  /** Open marker tooltips on hover (default) or on click (they then stay open and links in them can be used). */
+  tooltipTrigger?: 'hover' | 'click';
+  /** Build a link for a tooltip `href` (host routing); default = a plain anchor. */
+  renderLink?: (href: string, children: ReactNode, className?: string) => ReactNode;
+  // TODO M2: activeMarkerId, mode (markers|cluster|heatmap)
   // TODO M3: search, route, reverse geocode
   // TODO M4: drawTools, locate, layerToggle
   // TODO M5: reducedMotion, messages (i18n), onTelemetry
@@ -97,10 +132,34 @@ export const VARIANT_FILL: Record<MapVariant, string> = {
   neutral: '#6b728020',
 };
 
-export function markerSvg(color: string): string {
+/**
+ * A marker colour that is safe to write into marker HTML: #hex, rgb()/rgba(), hsl()/hsla(),
+ * var(--token) or `transparent`. Anything else (quotes, `;`, url()) returns `undefined`.
+ */
+const SAFE_COLOR_RE = new RegExp(
+  '^(?:#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})' +
+  '|rgba?\\([0-9.,%\\s/]{5,40}\\)' +
+  '|hsla?\\([0-9.,%\\s/deg]{5,40}\\)' +
+  '|var\\(--[a-z][a-z0-9-]{0,63}\\)' +
+  '|transparent)$',
+);
+export function safeMarkerColor(value: unknown): string | undefined {
+  return typeof value === 'string' && value.length <= 80 && SAFE_COLOR_RE.test(value.trim()) ? value.trim() : undefined;
+}
+
+/** A Font Awesome class list (`fas fa-truck`, `fa-solid fa-truck`) that is safe to write into marker HTML. */
+const SAFE_ICON_RE = /^(?:fa[srbldt]?|fa-(?:solid|regular|brands|light|duotone|thin))(?: fa-[a-z0-9-]+){1,3}$/;
+export function safeMarkerIcon(value: unknown): string | undefined {
+  return typeof value === 'string' && value.length <= 80 && SAFE_ICON_RE.test(value.trim()) ? value.trim() : undefined;
+}
+
+/** The pin drawing. `color` must already be safe (a VARIANT_HEX value or `safeMarkerColor`'s result). */
+export function markerSvg(color: string, size = 24): string {
+  const w = Math.round(size);
+  const h = Math.round(size * 1.5);
   return `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="24" height="36" style="filter:drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
-      <path d="M12 0C5.373 0 0 5.373 0 12c0 3.143 1.204 5.997 3.17 8.126L12 36l8.83-15.874A11.945 11.945 0 0 0 24 12C24 5.373 18.627 0 12 0z" fill="${color}"/>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="${w}" height="${h}" style="filter:drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
+      <path d="M12 0C5.373 0 0 5.373 0 12c0 3.143 1.204 5.997 3.17 8.126L12 36l8.83-15.874A11.945 11.945 0 0 0 24 12C24 5.373 18.627 0 12 0z" fill="${color}" style="fill:${color}"/>
       <circle cx="12" cy="12" r="4.5" fill="white" opacity="0.9"/>
     </svg>`;
 }

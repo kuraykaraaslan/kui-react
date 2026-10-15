@@ -13,6 +13,7 @@ export type LeafletBundle = {
   TileLayer:    typeof ReactLeaflet.TileLayer;
   Marker:       typeof ReactLeaflet.Marker;
   Tooltip:      typeof ReactLeaflet.Tooltip;
+  Popup:        typeof ReactLeaflet.Popup;
   Polygon:      typeof ReactLeaflet.Polygon;
   Polyline:     typeof ReactLeaflet.Polyline;
   useMap:       typeof ReactLeaflet.useMap;
@@ -49,6 +50,7 @@ export function loadLeaflet(): Promise<LeafletBundle> {
       TileLayer:    rl.TileLayer,
       Marker:       rl.Marker,
       Tooltip:      rl.Tooltip,
+      Popup:        rl.Popup,
       Polygon:      rl.Polygon,
       Polyline:     rl.Polyline,
       useMap:       rl.useMap,

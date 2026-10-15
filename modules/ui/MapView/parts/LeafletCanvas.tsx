@@ -5,8 +5,9 @@ import { loadLeaflet, LEAFLET_TILES, type LeafletBundle } from '../providers/lea
 import { useDarkMode } from '../hooks/useDarkMode';
 import { useFitBounds } from '../hooks/useFitBounds';
 import { MarkerPart } from './Marker';
+import { ClusteredMarkers } from './Cluster';
 import { ZoneShape, RouteShape } from './Shapes';
-import type { MapMarker, MapZone, MapRoute, MapTilesConfig } from '../types';
+import type { MapDisplayOptions, MapMarker, MapZone, MapRoute, MapTilesConfig } from '../types';
 
 type LeafletCanvasProps = {
   center: [number, number];
@@ -22,7 +23,7 @@ type LeafletCanvasProps = {
   onMarkerClick?: (id: string) => void;
   tiles?: MapTilesConfig;
   loadingLabel?: string;
-};
+} & MapDisplayOptions;
 
 /**
  * The actual Leaflet renderer. Owns the leaflet bundle lifecycle: imports the
@@ -101,9 +102,15 @@ function InnerMap({
   onMapClick,
   onMarkerClick,
   tiles: tilesProp,
+  minZoom,
+  maxZoom,
+  cluster = false,
+  showLabels = false,
+  tooltipTrigger = 'hover',
+  renderLink,
   bundle,
 }: LeafletCanvasProps & { bundle: LeafletBundle }) {
-  const { MapContainer, TileLayer, Marker, Tooltip, Polygon, Polyline, L } = bundle;
+  const { MapContainer, TileLayer, Marker, Tooltip, Popup, Polygon, Polyline, L } = bundle;
   const isDark = useDarkMode();
   const set = tilesProp ? ('url' in tilesProp ? { light: tilesProp, dark: tilesProp } : tilesProp) : LEAFLET_TILES;
   const tiles = isDark ? set.dark : set.light;
@@ -112,6 +119,8 @@ function InnerMap({
     <MapContainer
       center={center}
       zoom={zoom}
+      {...(minZoom !== undefined ? { minZoom } : {})}
+      {...(maxZoom !== undefined ? { maxZoom } : {})}
       style={{ width: '100%', height: '100%' }}
       className={addMode ? 'cursor-crosshair' : ''}
     >
@@ -128,14 +137,27 @@ function InnerMap({
         <RouteShape key={route.id} route={route} Polyline={Polyline} Tooltip={Tooltip} />
       ))}
 
-      {markers.map((marker) => (
+      {cluster ? (
+        <ClusteredMarkers
+          bundle={bundle}
+          markers={markers}
+          onMarkerClick={onMarkerClick}
+          showLabels={showLabels}
+          tooltipTrigger={tooltipTrigger}
+          renderLink={renderLink}
+        />
+      ) : markers.map((marker) => (
         <MarkerPart
           key={marker.id}
           marker={marker}
           L={L}
           RLMarker={Marker}
           RLTooltip={Tooltip}
+          RLPopup={Popup}
           onMarkerClick={onMarkerClick}
+          showLabel={showLabels}
+          tooltipTrigger={tooltipTrigger}
+          renderLink={renderLink}
         />
       ))}
     </MapContainer>

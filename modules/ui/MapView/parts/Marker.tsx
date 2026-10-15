@@ -1,41 +1,75 @@
 'use client';
+import type { ReactNode } from 'react';
 import type * as LeafletLib from 'leaflet';
 import type * as ReactLeaflet from 'react-leaflet';
 import { Popup } from './Popup';
-import { VARIANT_HEX, markerSvg, type MapMarker } from '../types';
+import { VARIANT_HEX, markerSvg, safeMarkerColor, safeMarkerIcon, type MapMarker } from '../types';
 
 type MarkerProps = {
   marker: MapMarker;
   L: typeof LeafletLib;
   RLMarker: typeof ReactLeaflet.Marker;
   RLTooltip: typeof ReactLeaflet.Tooltip;
+  RLPopup?: typeof ReactLeaflet.Popup;
   onMarkerClick?: (id: string) => void;
+  showLabel?: boolean;
+  tooltipTrigger?: 'hover' | 'click';
+  renderLink?: (href: string, children: ReactNode, className?: string) => ReactNode;
+};
+
+export type MarkerIconSpec = {
+  html: string;
+  iconSize: [number, number];
+  iconAnchor: [number, number];
+  tooltipAnchor: [number, number];
 };
 
 /**
- * Renders a single Leaflet marker with the project's pin SVG + optional
- * tooltip. Variant colors come from VARIANT_HEX so design tokens stay the
- * single source of truth.
+ * The marker's HTML and geometry. Pure, so it is testable without Leaflet. Only a colour that
+ * passes `safeMarkerColor` and an icon that passes `safeMarkerIcon` reach the HTML string.
  */
-export function MarkerPart({ marker, L, RLMarker, RLTooltip, onMarkerClick }: MarkerProps) {
-  const variant = marker.variant ?? 'primary';
-  const color = VARIANT_HEX[variant];
-  const icon = L.divIcon({
-    html: markerSvg(color),
-    className: '',
-    iconSize: [24, 36],
-    iconAnchor: [12, 36],
-    tooltipAnchor: [0, -38],
-  });
+export function markerIcon(marker: MapMarker): MarkerIconSpec {
+  const color = safeMarkerColor(marker.color) ?? VARIANT_HEX[marker.variant ?? 'primary'];
+  const size = Math.min(64, Math.max(8, Number.isFinite(marker.size) ? (marker.size as number) : 24));
+  const icon = marker.shape === 'icon' ? safeMarkerIcon(marker.icon) : undefined;
+  const shape = marker.shape === 'icon' && !icon ? 'dot' : marker.shape ?? 'pin';
+  if (shape === 'pin') {
+    const h = Math.round(size * 1.5);
+    return { html: markerSvg(color, size), iconSize: [size, h], iconAnchor: [size / 2, h], tooltipAnchor: [0, -h - 2] };
+  }
+  if (shape === 'icon') {
+    return {
+      html: `<span style="display:flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;color:${color};font-size:${Math.round(size * 0.9)}px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.4))"><i class="${icon}" aria-hidden="true"></i></span>`,
+      iconSize: [size, size], iconAnchor: [size / 2, size / 2], tooltipAnchor: [0, -size / 2 - 2],
+    };
+  }
+  return {
+    html: `<span style="display:block;width:${size}px;height:${size}px;border-radius:9999px;background:${color};border:2px solid #ffffff;box-shadow:0 1px 3px rgba(0,0,0,0.4);box-sizing:border-box"></span>`,
+    iconSize: [size, size], iconAnchor: [size / 2, size / 2], tooltipAnchor: [0, -size / 2 - 2],
+  };
+}
 
-  // TODO M2: hover popup auto-open
+/**
+ * Renders a single Leaflet marker (pin, dot or icon) with an optional tooltip, a permanent label
+ * and a click-opened popup. Variant colours come from VARIANT_HEX; `marker.color` overrides them.
+ */
+export function MarkerPart({
+  marker, L, RLMarker, RLTooltip, RLPopup, onMarkerClick, showLabel = false, tooltipTrigger = 'hover', renderLink,
+}: MarkerProps) {
+  const icon = L.divIcon({ className: '', ...markerIcon(marker) });
+
   // TODO M2: activeMarkerId visual state (scale + ring)
-  // TODO M2: custom marker.icon (ReactNode | FontAwesome)
 
   // Leaflet's marker element is a keyboard-focusable role="button" div, but
   // has no accessible name unless one is set explicitly (axe:
   // aria-command-name). `alt` is react-leaflet's pass-through for it.
   const accessibleName = marker.tooltip?.title ?? marker.label ?? 'Map marker';
+  const label = showLabel && marker.label ? marker.label : undefined;
+  // A Leaflet marker holds one tooltip: with a permanent label, the details move to a click popup.
+  const click = !!RLPopup && (tooltipTrigger === 'click' || !!label);
+  const body = marker.tooltip
+    ? <Popup tooltip={marker.tooltip} renderLink={renderLink} />
+    : !label && marker.label ? <span style={{ fontSize: 12, fontWeight: 600 }}>{marker.label}</span> : null;
 
   return (
     <RLMarker
@@ -44,16 +78,13 @@ export function MarkerPart({ marker, L, RLMarker, RLTooltip, onMarkerClick }: Ma
       alt={accessibleName}
       eventHandlers={{ click: () => onMarkerClick?.(marker.id) }}
     >
-      {marker.tooltip && (
-        <RLTooltip>
-          <Popup tooltip={marker.tooltip} />
+      {label && (
+        <RLTooltip permanent direction="right" offset={[6, 0]}>
+          <span style={{ fontSize: 11, fontWeight: 600 }}>{label}</span>
         </RLTooltip>
       )}
-      {!marker.tooltip && marker.label && (
-        <RLTooltip>
-          <span style={{ fontSize: 12, fontWeight: 600 }}>{marker.label}</span>
-        </RLTooltip>
-      )}
+      {body && click && RLPopup && <RLPopup>{body}</RLPopup>}
+      {body && !click && <RLTooltip>{body}</RLTooltip>}
     </RLMarker>
   );
 }

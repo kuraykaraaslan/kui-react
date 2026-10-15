@@ -50,6 +50,9 @@ export { ChartTooltip } from './primitives/Tooltip';
 export { Crosshair } from './primitives/Crosshair';
 export { Brush } from './primitives/Brush';
 export { ResponsiveContainer } from './primitives/ResponsiveContainer';
+export { ChartFrame } from './primitives/ChartFrame';
+export { Thresholds } from './primitives/Thresholds';
+export { AxisTitles } from './primitives/AxisTitles';
 
 // ── Theme + types ──────────────────────────────────────────────────
 export { defaultPalette, paletteColor, chartTheme, animationDuration } from './theme';
@@ -59,5 +62,18 @@ export type {
   BaseChartProps,
   TooltipDatum,
   PlotRect,
+  LineStyle,
+  CurveType,
+  LegendPosition,
+  LegendValue,
+  TooltipMode,
+  ThresholdLine,
+  AxisTextStyle,
 } from './types';
+export type { LineChartProps } from './charts/LineChart';
+export type { AreaChartProps } from './charts/AreaChart';
+export type { BarChartProps } from './charts/BarChart';
+export type { PieChartProps } from './charts/PieChart';
+export type { ScatterChartProps } from './charts/ScatterChart';
+export { seriesStats, resolveDomain } from './charts/_helpers';
 export type { AxisTick } from './primitives/Axis';

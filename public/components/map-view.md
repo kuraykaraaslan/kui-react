@@ -9,6 +9,10 @@
 
 Leaflet-based interactive map. Tooltip-enabled markers, predefined zones (polygon), route lines (polyline), and click-to-add marker mode.
 
+## Used by
+
+- `widget-kit`
+
 ## Variants
 
 ### Tam özellik — işaretçi + zone + rota

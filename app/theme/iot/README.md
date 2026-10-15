@@ -1,10 +1,16 @@
 # app/theme/iot
 
-IoT platform theme demo — workspaces, devices, rulesets, and alerts pages. Wires `modules/domains/iot/`.
+IoT platform theme demo — dashboard, workspaces, devices, rulesets, and alerts pages. Wires `modules/domains/iot/`.
+
+The dashboard (`page.tsx` → `_components/IotDashboard.tsx`) is a `WidgetBoard` from `modules/app/WidgetKit`: every card is a
+settings-template widget editable ThingsBoard-style (Edit → gear), each data slot is bound to a demo source from
+`_components/iot-dashboard.data.ts` (built from `iot.data.ts`), and the whole board (every card, its settings and binding)
+exports to and imports from one JSON file. Edits are kept in this browser (`localStorage`); "Reset demo" restores the layout.
 
 ## Files
 
 ```
+_components/        IotDashboard.tsx, iot-dashboard.data.ts
 alerts/
 devices/
 iot.data.ts

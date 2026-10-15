@@ -5,13 +5,9 @@
 // radius. Re-exported separately so callers can stay semantically
 // clear: `<DonutChart …/>` vs `<PieChart innerRadius={0.6} …/>`.
 
-import { PieChart } from './PieChart';
-import type { BaseChartProps } from '../types';
+import { PieChart, type PieChartProps } from './PieChart';
 
-type DonutChartProps = BaseChartProps & {
-  /** Inner-to-outer radius ratio. Default = 0.6. */
-  innerRadius?: number;
-};
+type DonutChartProps = PieChartProps;
 
 export function DonutChart({ innerRadius = 0.6, ...rest }: DonutChartProps) {
   return <PieChart {...rest} innerRadius={innerRadius} />;

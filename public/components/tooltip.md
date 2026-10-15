@@ -9,6 +9,10 @@
 
 Short hint shown on hover and focus. Accessible via role="tooltip" + aria-describedby. Supports 4 placements, 3 themes, optional arrow, and configurable delay.
 
+## Used by
+
+- `widget-kit`
+
 ## Design tokens consumed
 
 - `--border`

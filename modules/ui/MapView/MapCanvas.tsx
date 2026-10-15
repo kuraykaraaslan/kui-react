@@ -1,7 +1,7 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
 import { LeafletCanvas } from './parts/LeafletCanvas';
-import type { MapMarker, MapRoute, MapTilesConfig, MapZone } from './types';
+import type { MapDisplayOptions, MapMarker, MapRoute, MapTilesConfig, MapZone } from './types';
 
 export type MapCanvasProps = {
   markers?: MapMarker[];
@@ -13,13 +13,15 @@ export type MapCanvasProps = {
   tiles?: MapTilesConfig;
   /** Fit the view to the markers with this padding (px). Default = 32. */
   fitBoundsPadding?: number;
+  /** Fit the view to the markers (default). `false` keeps `center` and `zoom`. */
+  fitBounds?: boolean;
   onMarkerClick?: (id: string) => void;
   /** Text shown until the map chunk resolves. Default = "Loading map…". */
   loadingLabel?: string;
   /** Accessible name of the map region. Default = "Map". */
   ariaLabel?: string;
   className?: string;
-};
+} & MapDisplayOptions;
 
 const noop = () => {};
 
@@ -38,10 +40,12 @@ export function MapCanvas({
   zoom = 6,
   tiles,
   fitBoundsPadding = 32,
+  fitBounds = true,
   onMarkerClick,
   loadingLabel = 'Loading map…',
   ariaLabel = 'Map',
   className,
+  ...display
 }: MapCanvasProps) {
   return (
     <div role="region" aria-label={ariaLabel} className={cn('h-full w-full', className)} style={{ isolation: 'isolate' }}>
@@ -54,11 +58,12 @@ export function MapCanvas({
         showZones
         showRoutes
         addMode={false}
-        fitBoundsPadding={fitBoundsPadding}
+        fitBoundsPadding={fitBounds ? fitBoundsPadding : undefined}
         onMapClick={noop}
         onMarkerClick={onMarkerClick}
         tiles={tiles}
         loadingLabel={loadingLabel}
+        {...display}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { cn } from '@/libs/utils/cn';
-import type { FieldOption, FieldSchema } from '../types';
+import { shouldShow, type FieldOption, type FieldSchema, type FontValue } from '../types';
 import type { FieldOverrides } from '../schema-form.context';
 
 export const controlCls =
@@ -38,16 +38,27 @@ export function FieldControl(props: FieldControlProps) {
     case 'text':
     case 'url':
       return (
-        <input id={id} type={field.type} value={str} placeholder={field.placeholder}
+        <input id={id} type={field.type} value={str} placeholder={field.placeholder} maxLength={field.maxLength}
           onChange={(e) => onChange(e.target.value)} className={controlCls} {...aria} />
       );
+    case 'data-key':
+      return field.multiple ? (
+        <input id={id} type="text" value={Array.isArray(value) ? (value as string[]).join(', ') : ''}
+          placeholder={field.placeholder || 'Comma separated'}
+          onChange={(e) => onChange(e.target.value.split(',').map((x) => x.trim()).filter(Boolean))} className={controlCls} {...aria} />
+      ) : (
+        <input id={id} type="text" value={str} placeholder={field.placeholder} maxLength={128}
+          onChange={(e) => onChange(e.target.value)} className={controlCls} {...aria} />
+      );
+    case 'font':
+      return <FontControl {...props} />;
     case 'date':
       return <input id={id} type="date" value={str} onChange={(e) => onChange(e.target.value)} className={controlCls} {...aria} />;
     case 'datetime':
       return <input id={id} type="datetime-local" value={str} onChange={(e) => onChange(e.target.value)} className={controlCls} {...aria} />;
     case 'textarea':
       return (
-        <textarea id={id} rows={3} value={str} placeholder={field.placeholder}
+        <textarea id={id} rows={3} value={str} placeholder={field.placeholder} maxLength={field.maxLength}
           onChange={(e) => onChange(e.target.value)} className={cn(controlCls, 'resize-y')} {...aria} />
       );
     case 'number':
@@ -68,6 +79,7 @@ export function FieldControl(props: FieldControlProps) {
         </label>
       );
     case 'select':
+      if (field.display === 'segmented' || field.display === 'cards') return <ChoiceControl {...props} />;
       return (
         <select id={id} value={str} onChange={(e) => onChange(e.target.value)} className={controlCls} {...aria}>
           {!field.required && <option value="">-</option>}
@@ -125,14 +137,114 @@ function MultiSelectControl({ id, field, value, onChange }: FieldControlProps) {
   );
 }
 
+/** Theme colours offered first by every colour field: they follow light/dark and tenant themes. */
+export const THEME_COLOR_TOKENS: ReadonlyArray<{ label: string; value: string }> = [
+  { label: 'Primary', value: 'var(--primary)' },
+  { label: 'Secondary', value: 'var(--secondary)' },
+  { label: 'Success', value: 'var(--success)' },
+  { label: 'Info', value: 'var(--info)' },
+  { label: 'Warning', value: 'var(--warning)' },
+  { label: 'Error', value: 'var(--error)' },
+  { label: 'Text', value: 'var(--text-primary)' },
+  { label: 'Muted text', value: 'var(--text-secondary)' },
+  { label: 'Strong border', value: 'var(--border-strong)' },
+  { label: 'Raised surface', value: 'var(--surface-raised)' },
+  { label: 'Sunken surface', value: 'var(--surface-sunken)' },
+];
+
+/**
+ * Any CSS colour or a theme token. Theme swatches first (they adapt to dark mode), then a free
+ * value: the native picker for a hex, or type rgb()/hsl()/hex by hand. Empty = the default.
+ */
 function ColorControl({ id, value, field, onChange }: FieldControlProps) {
-  const hex = typeof value === 'string' ? value : typeof field.value === 'string' ? field.value : '';
-  const swatch = /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : '#000000';
+  const current = typeof value === 'string' ? value : '';
+  const hex = /^#[0-9a-fA-F]{6}$/.test(current) ? current : '#000000';
   return (
-    <div className="flex items-center gap-2">
-      <input type="color" aria-label={`${field.label} picker`} value={swatch}
-        onChange={(e) => onChange(e.target.value)} className="h-9 w-12 rounded border border-border bg-transparent p-0.5" />
-      <input id={id} type="text" value={hex} placeholder="#rrggbb" onChange={(e) => onChange(e.target.value)} className={controlCls} />
+    <div className="space-y-2">
+      <div role="radiogroup" aria-label={`${field.label}: theme colours`} className="flex flex-wrap gap-1.5">
+        {THEME_COLOR_TOKENS.map((t) => (
+          <button key={t.value} type="button" role="radio" aria-checked={current === t.value} title={t.label} aria-label={t.label}
+            onClick={() => onChange(t.value)}
+            className={cn('h-6 w-6 rounded-full border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+              current === t.value && 'ring-2 ring-offset-1 ring-border-focus')}
+            style={{ background: t.value }} />
+        ))}
+      </div>
+      <div className="flex items-center gap-2">
+        <input type="color" aria-label={`${field.label}: pick a colour`} value={hex}
+          onChange={(e) => onChange(e.target.value)} className="h-9 w-12 shrink-0 rounded border border-border bg-transparent p-0.5" />
+        <input id={id} type="text" value={current} placeholder={field.placeholder || 'Default'}
+          onChange={(e) => onChange(e.target.value.trim() || undefined)} className={controlCls} />
+        {current && (
+          <button type="button" onClick={() => onChange(undefined)} aria-label={`Clear ${field.label}`}
+            className="shrink-0 rounded px-2 text-xs text-text-secondary hover:text-text-primary focus-visible:ring-2 focus-visible:ring-border-focus">
+            Clear
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** A select drawn as a segmented row or as picture cards (`display`). */
+function ChoiceControl({ id, field, value, onChange }: FieldControlProps) {
+  const current = (value ?? field.value ?? '') as string;
+  const cards = field.display === 'cards';
+  return (
+    <div id={id} role="radiogroup" aria-label={field.label}
+      className={cards ? 'grid grid-cols-2 gap-2 sm:grid-cols-3' : 'inline-flex flex-wrap rounded-md border border-border p-0.5'}>
+      {(field.options ?? []).map((o) => {
+        const v = optVal(o);
+        const on = v === current;
+        return (
+          <button key={v} type="button" role="radio" aria-checked={on} onClick={() => onChange(v)}
+            data-preview={typeof o === 'string' ? undefined : o.preview}
+            className={cn(
+              'text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+              cards
+                ? cn('rounded-lg border px-2 py-3 text-center', on ? 'border-primary bg-primary-subtle text-primary' : 'border-border text-text-secondary hover:border-border-strong')
+                : cn('rounded px-2.5 py-1', on ? 'bg-primary text-primary-fg' : 'text-text-secondary hover:text-text-primary'),
+            )}>
+            {optLabel(o)}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+const FONT_WEIGHTS = [300, 400, 500, 600, 700, 800] as const;
+
+/** Size + unit, weight, family, italic. An empty part inherits the theme's. */
+function FontControl({ id, field, value, onChange }: FieldControlProps) {
+  const f = (value && typeof value === 'object' ? value : (field.value ?? {})) as FontValue;
+  const set = (patch: Partial<FontValue>) => {
+    const next: FontValue = { ...f, ...patch };
+    for (const k of Object.keys(next) as (keyof FontValue)[]) if (next[k] === undefined) delete next[k];
+    onChange(Object.keys(next).length ? next : undefined);
+  };
+  const small = cn(controlCls, 'px-2');
+  return (
+    <div id={id} className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <input type="number" min={1} max={400} aria-label={`${field.label}: size`} placeholder="Size" value={f.size ?? ''}
+        onChange={(e) => set({ size: e.target.value === '' ? undefined : Number(e.target.value) })} className={small} />
+      <select aria-label={`${field.label}: unit`} value={f.unit ?? 'px'} onChange={(e) => set({ unit: e.target.value as FontValue['unit'] })} className={small}>
+        <option value="px">px</option><option value="rem">rem</option><option value="em">em</option>
+      </select>
+      <select aria-label={`${field.label}: weight`} value={f.weight ?? ''}
+        onChange={(e) => set({ weight: e.target.value ? (Number(e.target.value) as FontValue['weight']) : undefined })} className={small}>
+        <option value="">Weight</option>
+        {FONT_WEIGHTS.map((w) => <option key={w} value={w}>{w}</option>)}
+      </select>
+      <select aria-label={`${field.label}: family`} value={f.family ?? ''}
+        onChange={(e) => set({ family: (e.target.value || undefined) as FontValue['family'] })} className={small}>
+        <option value="">Font</option><option value="sans">Sans</option><option value="serif">Serif</option><option value="mono">Mono</option>
+      </select>
+      <label className="col-span-2 inline-flex items-center gap-2 text-xs text-text-secondary sm:col-span-4">
+        <input type="checkbox" checked={f.style === 'italic'} onChange={(e) => set({ style: e.target.checked ? 'italic' : undefined })}
+          className="h-4 w-4 rounded accent-primary" />
+        Italic
+      </label>
     </div>
   );
 }
@@ -173,8 +285,11 @@ function RepeaterControl({ id, field, value, onChange, overrides, depth = 0 }: F
     [next[i], next[t]] = [next[t], next[i]];
     onChange(next);
   };
+  // A new item starts with the declared defaults; text starts empty, and a number, colour or choice
+  // without a default stays absent (not 0 or ''), so it means "automatic" until someone sets it.
   const add = () => onChange([...items, Object.fromEntries(
-    Object.entries(sub).map(([k, f]) => [k, f.type === 'repeater' ? [] : f.value ?? (f.type === 'boolean' ? false : '')]),
+    Object.entries(sub).filter(([, f]) => f.value !== undefined || ['repeater', 'boolean', 'text', 'textarea', 'url'].includes(f.type))
+      .map(([k, f]) => [k, f.type === 'repeater' ? [] : f.value ?? (f.type === 'boolean' ? false : '')]),
   )]);
   const btn = 'px-1.5 py-0.5 text-xs rounded text-text-secondary hover:text-text-primary disabled:opacity-30 focus-visible:ring-2 focus-visible:ring-border-focus';
   const title = (it: Row, i: number) => {
@@ -197,6 +312,7 @@ function RepeaterControl({ id, field, value, onChange, overrides, depth = 0 }: F
             {Object.entries(sub).map(([k, f]) => {
               const cid = `${id}-${i}-${k}`;
               if (f.type === 'repeater' && depth >= 1) return null; // nesting is capped at two levels
+              if (!shouldShow(f, it)) return null; // an item field's showIf reads its own item
               return (
                 <div key={k}>
                   <label htmlFor={cid} className="block mb-1 text-[11px] text-text-secondary">{f.label}</label>

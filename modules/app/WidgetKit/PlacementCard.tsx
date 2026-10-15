@@ -1,0 +1,128 @@
+'use client';
+import { useMemo, useState } from 'react';
+import { Modal } from '@/modules/ui/Modal';
+import type { ReactNode } from 'react';
+import { WidgetCard, type WidgetCardState } from './WidgetCard';
+import { resolvePlacement, toCsvText } from './settings/resolve';
+import type { SettingsTemplate, Sparse } from './settings/types';
+import type { ControlRequest, SlotData, SlotSpec, WidgetKindView, WidgetViewProps } from './kind';
+import { useWidgetKit } from './WidgetKitContext';
+import { useNow } from './useNow';
+
+export interface PlacementCardProps {
+  title?: string;
+  template: SettingsTemplate;
+  slots: SlotSpec[];
+  view: WidgetKindView;
+  /** Stored placement settings (sparse, with `$card`, `$format`, `$v`). */
+  settings: Sparse | null | undefined;
+  /** Board settings (`core:board`) for the board's card defaults. */
+  board?: Sparse | null;
+  definitionDefaults?: Sparse | null;
+  data: Record<string, SlotData | undefined>;
+  /** Slot keys that are bound to a source. */
+  boundSlots?: string[];
+  loading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
+  onRefresh?: () => void;
+  refreshing?: boolean;
+  onControl?: (request: ControlRequest) => Promise<unknown>;
+  controlDisabledReason?: string;
+  /** Viewers see "No data" for an unbound widget; editors see "Not configured yet". */
+  isEditor?: boolean;
+  headerRight?: ReactNode;
+  badges?: ReactNode;
+  renderLink?: (href: string, children: ReactNode, className?: string) => ReactNode;
+  className?: string;
+  /** Fixed "now" (tests, screenshots); by default the card ticks every 30 seconds. */
+  now?: number;
+  /** Host props for the view beyond the common ones (params, resolveUrl, confirm, a table's paging and row actions, …). */
+  viewProps?: Partial<WidgetViewProps> & Record<string, unknown>;
+}
+
+/** The newest `fetchedAt` across bound slots. */
+function newestFetch(data: Record<string, SlotData | undefined>): number | null {
+  let best: number | null = null;
+  for (const d of Object.values(data)) {
+    const t = d?.fetchedAt ? Date.parse(d.fetchedAt) : NaN;
+    if (Number.isFinite(t) && (best === null || t > best)) best = t;
+  }
+  return best;
+}
+
+function download(name: string, text: string) {
+  const blob = new Blob([`﻿${text}`], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/** One placement: resolved settings → `WidgetCard` + the type's view, with full screen and CSV. */
+export function PlacementCard({
+  title, template, slots, view, settings, board, definitionDefaults, data, boundSlots, loading = false, error,
+  onRetry, onRefresh, refreshing, onControl, controlDisabledReason, isEditor = false, headerRight, badges, renderLink,
+  className, now: nowProp, viewProps,
+}: PlacementCardProps) {
+  const { locale } = useWidgetKit();
+  const ticking = useNow();
+  const now = nowProp ?? ticking;
+  const [full, setFull] = useState(false);
+  const r = useMemo(
+    () => resolvePlacement({ template, slotCount: slots.length, settings, board, definitionDefaults }),
+    [template, slots.length, settings, board, definitionDefaults],
+  );
+  const bound = boundSlots ?? Object.keys(data).filter((k) => data[k] !== undefined);
+  const requiredUnbound = slots.some((s) => s.required && !bound.some((b) => b === s.key || b.startsWith(`${s.key}#`)));
+  const fetchedAt = newestFetch(data);
+  const stale = !!r.card.staleAfterSeconds && fetchedAt !== null && now - fetchedAt > r.card.staleAfterSeconds * 1000;
+
+  let state: WidgetCardState = 'ready';
+  if (error) state = 'error';
+  else if (loading && fetchedAt === null) state = 'loading';
+  else if (slots.length > 0 && requiredUnbound) state = isEditor ? 'unconfigured' : 'empty';
+  else if (view.isEmpty?.(data, r.settings)) state = 'empty';
+
+  const body = (
+    <view.View {...viewProps} settings={r.settings} format={r.format} data={data} locale={locale} stale={stale} title={title}
+      onControl={onControl} controlDisabledReason={controlDisabledReason} renderLink={renderLink ?? viewProps?.renderLink} />
+  );
+  const onExport = r.caps.exportable && view.toCsv
+    ? () => download(`${(title || template.label).replace(/[^\w.-]+/g, '-')}-${new Date().toISOString().slice(0, 10)}.csv`,
+      toCsvText(view.toCsv!(data, r.settings, r.format)))
+    : undefined;
+
+  return (
+    <>
+      <WidgetCard
+        title={title}
+        card={r.card}
+        state={state}
+        stale={stale}
+        updatedAt={fetchedAt}
+        unconfiguredText="Bind data to this widget in its settings."
+        errorText={error ?? undefined}
+        onRetry={onRetry}
+        onRefresh={onRefresh}
+        refreshing={refreshing}
+        onExport={onExport}
+        onFullscreen={() => setFull(true)}
+        headerRight={headerRight}
+        badges={badges}
+        className={className}
+        locale={locale}
+      >
+        {body}
+      </WidgetCard>
+      {full && (
+        <Modal open fullscreen onClose={() => setFull(false)} title={title || template.label}>
+          <div className="@container h-full min-h-[60vh]">{body}</div>
+        </Modal>
+      )}
+    </>
+  );
+}
+

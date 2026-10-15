@@ -611,6 +611,12 @@
     "category": "App",
     "file": "schema-form.md"
   },
+  "widget-kit": {
+    "name": "WidgetKit",
+    "layer": "app",
+    "category": "App",
+    "file": "widget-kit.md"
+  },
   "ruleset-editor": {
     "name": "RulesetEditor",
     "layer": "app",

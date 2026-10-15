@@ -20,7 +20,10 @@ export type {
   MapViewProps,
   MapTiles,
   MapTilesConfig,
+  MapMarkerShape,
+  MapDisplayOptions,
 } from './types';
+export { safeMarkerColor, safeMarkerIcon } from './types';
 export { MapCanvas } from './MapCanvas';
 export type { MapCanvasProps } from './MapCanvas';
 
@@ -45,7 +48,14 @@ export function MapView({
   className,
   tiles,
   loadingLabel = 'Loading map…',
+  minZoom,
+  maxZoom,
+  cluster,
+  showLabels,
+  tooltipTrigger,
+  renderLink,
 }: MapViewProps) {
+  const display = { minZoom, maxZoom, cluster, showLabels, tooltipTrigger, renderLink };
   const { ref, visible } = useInViewport<HTMLDivElement>();
   const [addMode, setAddMode] = useState(false);
   const [showZones, setShowZones] = useState(true);
@@ -104,6 +114,7 @@ export function MapView({
               onMarkerClick={onMarkerClick}
               tiles={tiles}
               loadingLabel={loadingLabel}
+              {...display}
             />
           )}
         </div>

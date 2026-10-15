@@ -9,6 +9,10 @@
 
 Side panel sliding in from the screen edge. Left / right placement with focus management and Escape close. Body scroll is locked while open via the shared Overlays useScrollLock hook (iOS rubber-band safe). Accepts closeOnRouteChange (M6 stub).
 
+## Used by
+
+- `widget-kit`
+
 ## Design tokens consumed
 
 - `--border`

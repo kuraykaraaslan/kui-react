@@ -14,6 +14,7 @@ Focus-trapped dialog. Closes on Escape and backdrop click. Requires role="dialog
 - `onboarding-wizard`
 - `rich-text-editor`
 - `share-dialog`
+- `widget-kit`
 
 ## Design tokens consumed
 

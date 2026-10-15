@@ -1,6 +1,7 @@
 'use client';
 import type { ReactNode } from 'react';
 import { cn } from '@/libs/utils/cn';
+import { Tooltip } from '../Tooltip';
 import type { AsyncControlState } from '@/libs/hooks/useAsyncControl';
 
 export type ControlMessages = {
@@ -33,6 +34,16 @@ export type ControlTileProps = {
   /** Wired to the state line's "Retry" button on failure / mismatch. Omit to hide the button. */
   onRetry?: () => void;
   messages?: Partial<ControlMessages>;
+  /**
+   * Draw the tile's own frame (border, background, padding). Default `true`. Pass `false` when
+   * the control sits inside a host card (e.g. a dashboard `WidgetCard`) that already frames it.
+   */
+  framed?: boolean;
+  /**
+   * Why the control is disabled (no command, old data, unknown state …). Shown in a tooltip over
+   * the control (its text stays in the accessibility tree). The control itself must also be disabled.
+   */
+  disabledReason?: string;
   children: ReactNode;
   className?: string;
 };
@@ -42,13 +53,22 @@ export type ControlTileProps = {
  * live status line (pending / confirmed / mismatch / failed / read-only). One place, so
  * the controls cannot drift on what "pending" or "failed" looks like.
  */
-export function ControlTile({ title, state, error, readOnly, reportedText, onRetry, messages, children, className }: ControlTileProps) {
+export function ControlTile({
+  title, state, error, readOnly, reportedText, onRetry, messages, framed = true, disabledReason, children, className,
+}: ControlTileProps) {
   const m = { ...DEFAULT_CONTROL_MESSAGES, ...messages };
   return (
-    <div className={cn('rounded-lg border border-border bg-surface-raised p-3', className)}>
+    <div
+      className={cn(framed ? 'rounded-lg border border-border bg-surface-raised p-3' : 'flex h-full min-h-0 flex-col', className)}
+      data-disabled-reason={disabledReason || undefined}
+    >
       {title && <h3 className="mb-2 text-sm font-semibold text-text-primary">{title}</h3>}
-      <div className="space-y-2">
-        {children}
+      <div className={cn('space-y-2', !framed && 'flex min-h-0 flex-1 flex-col justify-center')}>
+        {disabledReason ? (
+          <Tooltip content={disabledReason} className="flex w-full [&>span:first-child]:min-w-0 [&>span:first-child]:flex-1">
+            {children}
+          </Tooltip>
+        ) : children}
         {reportedText && <p className="text-xs text-text-secondary">{reportedText}</p>}
         <div className="flex min-h-5 items-center gap-2 text-xs" aria-live="polite">
           {state === 'pending' && (

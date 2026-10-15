@@ -1,0 +1,102 @@
+// Settings templates for dashboard widgets (next-boilerplate phase 21).
+//
+// A template is the versioned description of one part of a widget's settings: the common card
+// (`core:card`), the value format (`core:format`), the board (`core:board`) or one widget type
+// (`builtin:<type>`). Pure TypeScript, no React: next-boilerplate's server validates and migrates
+// with the same code its browser renders with.
+
+import type { FieldSchema } from '../../SchemaForm/types';
+
+export type TemplateId =
+  | 'core:card' | 'core:format' | 'core:board'
+  | `builtin:${string}` | `ext:${string}` | `manifest:${string}` | `x:${string}` | `tenant:${string}`;
+
+/**
+ * Where a template's values live inside a settings object. '' = top level (the widget type's own
+ * keys); `$card`, `$format`, `$x:<module>` are reserved namespaces.
+ */
+export type TemplateNamespace = '' | '$card' | '$format' | `$x:${string}`;
+
+export type EditorTab = 'Display' | 'Data' | 'Card' | 'Actions' | 'Look' | 'Toolbar' | 'Behaviour';
+
+export interface TemplateField extends FieldSchema {
+  /** The template version that introduced the field. */
+  since: number;
+  /** Hidden from the editor, still read; a later version drops it. */
+  deprecated?: { since: number; replacedBy?: string; removeIn: number };
+}
+
+export interface TemplateGroup {
+  id: string;
+  label: string;
+  tab: EditorTab;
+  since: number;
+  /** Only shown when this holds for the widget (a capability or a bound slot). */
+  showWhen?: { caps?: keyof WidgetCaps; slotBound?: string };
+}
+
+/** What a widget can do; decides which common groups apply. */
+export interface WidgetCaps {
+  /** It reads bound data (has data slots). */
+  hasData: boolean;
+  /** Its data can be downloaded as CSV. */
+  exportable: boolean;
+  /** It prints numbers, so `core:format` applies. */
+  formatsNumbers: boolean;
+}
+
+export type Sparse = Record<string, unknown>;
+
+/** Declarative migration operations: the only kind a tenant-authored template may use. */
+export type MigrationOp =
+  | { op: 'rename'; from: string; to: string }
+  | { op: 'mapValue'; key: string; map: Record<string, unknown>; else?: unknown }
+  | { op: 'materializeDefault'; key: string; value: unknown }
+  | { op: 'clamp'; key: string; min?: number; max?: number }
+  | { op: 'drop'; key: string }
+  | { op: 'each'; key: string; ops: MigrationOp[] };
+
+export interface MigrationStep {
+  from: number;
+  /** Always `from + 1`. */
+  to: number;
+  /** One line, shown in the editor's upgrade notice and the changelog. */
+  note: string;
+  ops?: MigrationOp[];
+  /** Code escape hatch for code-owned templates only. Pure; must not assume any key exists. */
+  up?: (settings: Sparse) => Sparse;
+  /** A changed default: 'preserve' keeps old boards' look, 'propagate' changes them on purpose. */
+  defaultChanges?: Array<{ key: string; from: unknown; to: unknown; policy: 'preserve' | 'propagate' }>;
+}
+
+export interface SettingsTemplate {
+  id: TemplateId;
+  /** Current version; monotonic integer starting at 1. */
+  version: number;
+  namespace: TemplateNamespace;
+  label: string;
+  groups: TemplateGroup[];
+  fields: Record<string, TemplateField>;
+  /** Contiguous and append-only: migrations[i] goes from version i+1 to i+2. */
+  migrations: MigrationStep[];
+  /** Cross-field checks, e.g. min below max. */
+  rules?: Array<(values: Sparse) => Array<{ path: string; message: string }>>;
+  /** The widget prints numbers (core:format applies). Type templates only. */
+  format?: boolean;
+  /** The widget's data can be exported as CSV. Type templates only. */
+  exportable?: boolean;
+  /** Card defaults this widget type needs (e.g. a map has no padding). Type templates only. */
+  cardDefaults?: Sparse;
+  /** Value-format defaults for this widget type. Type templates only. */
+  formatDefaults?: Sparse;
+  /** Terminal: the type was retired; its steps stay so old data still migrates. */
+  retired?: boolean;
+}
+
+/** `settings.$v`: which template version wrote each part of a settings object. */
+export type SettingsStamp = Partial<Record<TemplateId, number>>;
+
+export interface Issue {
+  path: string;
+  message: string;
+}

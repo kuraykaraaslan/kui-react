@@ -111,3 +111,23 @@ export type {
   FieldType as SchemaFieldType,
   JsonSchemaSubset,
 } from './SchemaForm';
+
+// Dashboard widget kit (next-boilerplate dashboard phase 21): card, settings templates, editor, views, board
+export {
+  WidgetCard,
+  PlacementCard,
+  WidgetSettingsEditor,
+  WidgetBoard,
+  WidgetKitProvider,
+  BUILTIN_KINDS,
+  BUILTIN_VIEWS,
+} from './WidgetKit';
+export type {
+  CardSettings,
+  WidgetCardProps,
+  PlacementCardProps,
+  WidgetSettingsEditorProps,
+  WidgetBoardProps,
+  BoardDocument,
+  SettingsTemplate,
+} from './WidgetKit';

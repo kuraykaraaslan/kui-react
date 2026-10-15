@@ -13,9 +13,11 @@ type GridProps = {
   yTicks: number[];
   /** Pixel x positions of vertical grid lines. Default = []. */
   xTicks?: number[];
+  /** Line colour. Default = the theme's grid token. */
+  color?: string;
 };
 
-export function Grid({ rect, yTicks, xTicks = [] }: GridProps) {
+export function Grid({ rect, yTicks, xTicks = [], color = chartTheme.gridStroke }: GridProps) {
   return (
     <g aria-hidden="true" opacity={0.5}>
       {yTicks.map((y, i) => (
@@ -25,7 +27,7 @@ export function Grid({ rect, yTicks, xTicks = [] }: GridProps) {
           x2={rect.x + rect.width}
           y1={y}
           y2={y}
-          stroke={chartTheme.gridStroke}
+          stroke={color}
           strokeDasharray="2 4"
           strokeWidth={1}
         />
@@ -37,7 +39,7 @@ export function Grid({ rect, yTicks, xTicks = [] }: GridProps) {
           x2={x}
           y1={rect.y}
           y2={rect.y + rect.height}
-          stroke={chartTheme.gridStroke}
+          stroke={color}
           strokeDasharray="2 4"
           strokeWidth={1}
         />

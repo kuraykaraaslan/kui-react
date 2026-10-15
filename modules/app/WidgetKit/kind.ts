@@ -1,0 +1,110 @@
+// The contract between a widget type's view and its host (pure types, no React runtime).
+
+import type { ComponentType, ReactNode } from 'react';
+import type { ValueFormat } from './settings/style';
+import type { SettingsTemplate, Sparse } from './settings/types';
+
+/** One data slot's result: the same shape next-boilerplate's data sources answer with. */
+export interface SlotData {
+  shape: 'scalar' | 'series' | 'table' | 'record';
+  value?: number | string | boolean | null;
+  series?: Array<{ name: string; points: Array<{ t: string; v: number }> }>;
+  columns?: Array<{ key: string; label: string; type: 'text' | 'number' | 'date' | 'badge' }>;
+  rows?: Array<Record<string, unknown>>;
+  total?: number;
+  record?: Record<string, unknown>;
+  fetchedAt?: string;
+  /** The time window the query ran with (a pinned one may name its own time zone). */
+  window?: { explicitTimezone?: string; [key: string]: unknown };
+  /** A server-paged table echoes what page it is (next-boilerplate 18.1). */
+  paging?: PagedEcho;
+}
+
+/** What a server-paged result echoes. */
+export interface PagedEcho {
+  page: number;
+  pageSize: number;
+  sortable: string[];
+  searchable: boolean;
+  sort?: { key: string; dir: 'asc' | 'desc' };
+  q?: string;
+}
+
+/** A command's confirmation policy, enforced again by the server. */
+export interface ControlConfirm {
+  mode: 'none' | 'confirm' | 'typed';
+  /** The text to type for 'typed', or the question for 'confirm'. */
+  text?: string;
+}
+
+/** A data slot a widget type declares. */
+export interface SlotSpec {
+  key: string;
+  label: string;
+  shape: SlotData['shape'];
+  required: boolean;
+  /** May be bound to several sources (`<slot>`, `<slot>#2` … `<slot>#8`). */
+  repeatable?: boolean;
+}
+
+/** What a control asks its host to do. The host runs the command and checks everything server-side. */
+export interface ControlRequest {
+  kind: 'run' | 'set';
+  value?: unknown;
+  /** Present when the command asked for confirmation; the host sends it on so the server checks it again. */
+  confirmation?: { confirmed: true; typed?: string };
+}
+
+export interface WidgetViewProps {
+  /** Effective type settings: the template defaults layered under the stored values. */
+  settings: Sparse;
+  /** Effective `core:format` values (empty for widgets that print no numbers). */
+  format: ValueFormat;
+  /** Bound results by slot key (`series`, `series#2`, …). */
+  data: Record<string, SlotData | undefined>;
+  locale?: string;
+  /** The data is older than the card's `staleAfterSeconds`. */
+  stale?: boolean;
+  /** Controls only: perform the request (resolves when the host is done; rejects on failure). */
+  onControl?: (request: ControlRequest) => Promise<unknown>;
+  /** Controls only: the host cannot act (no command bound, no permission). */
+  controlDisabledReason?: string;
+  /** Map/table/links: build a link for internal navigation; absent = plain anchors. */
+  renderLink?: (href: string, children: ReactNode, className?: string) => ReactNode;
+  /** Navigate imperatively to an internal path (row and marker clicks). */
+  onNavigate?: (href: string) => void;
+  /** Rewrite an internal asset path for this host (e.g. prefix a tenant). Absent = as is. */
+  resolveUrl?: (url: string) => string;
+  /** Board parameters, for `{{param_<key>}}` in texts. */
+  params?: Record<string, unknown>;
+  /** A clicked element target (markdown `[label](action:<id>)`): the host runs that action. */
+  onElementClick?: (id: string) => void;
+  /** Controls only: the bound command's confirmation policy. */
+  confirm?: ControlConfirm;
+  /** The card's title (e.g. an iframe's accessible name). */
+  title?: string;
+}
+
+export interface WidgetKindView {
+  View: ComponentType<WidgetViewProps>;
+  /** True when the bound data has nothing to show (the card then shows its no-data text). */
+  isEmpty?: (data: WidgetViewProps['data'], settings: Sparse) => boolean;
+  /** CSV rows (first row = header) for the card's download button. */
+  toCsv?: (data: WidgetViewProps['data'], settings: Sparse, format: ValueFormat) => string[][];
+}
+
+/** A builtin widget type, pure data: what next-boilerplate's catalog and any host need to offer it. */
+export interface BuiltinKindSpec {
+  /** Stable type key, e.g. 'stat.value'. The template id is `builtin:<type>`. */
+  type: string;
+  label: string;
+  /** Catalog category: Charts, Data, Content, Controls, Gauges & Levels, Maps & Location, Device Controls. */
+  category: string;
+  description: string;
+  /** Font Awesome class for the catalog. */
+  icon: string;
+  defaultW: number;
+  defaultH: number;
+  slots: SlotSpec[];
+  template: SettingsTemplate;
+}

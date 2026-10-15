@@ -12,6 +12,18 @@
 // only. M2+ will add log scale + time scale tick generators.
 
 import { chartTheme } from '../theme';
+import type { AxisTextStyle } from '../types';
+
+/** SVG text attributes for an axis text style (unset parts follow the theme). */
+export function axisTextProps(style?: AxisTextStyle) {
+  return {
+    fontSize: style?.fontSize ?? chartTheme.fontSize.axis,
+    fill: style?.color ?? chartTheme.axisText,
+    fontWeight: style?.fontWeight,
+    fontFamily: style?.fontFamily,
+    fontStyle: style?.fontStyle,
+  };
+}
 
 export type AxisTick = {
   position: number;       // pixel coord (already scaled by parent)
@@ -29,9 +41,12 @@ type XAxisProps = {
   xEnd: number;
   /** Hide axis line; keep tick labels (sparkline style). */
   hideLine?: boolean;
+  /** Tick label style. Default = the theme's axis text. */
+  textStyle?: AxisTextStyle;
 };
 
-export function XAxis({ ticks, y, xStart, xEnd, hideLine }: XAxisProps) {
+export function XAxis({ ticks, y, xStart, xEnd, hideLine, textStyle }: XAxisProps) {
+  const text = axisTextProps(textStyle);
   return (
     <g aria-hidden="true">
       {!hideLine && (
@@ -58,8 +73,7 @@ export function XAxis({ ticks, y, xStart, xEnd, hideLine }: XAxisProps) {
             x={t.position}
             y={y + 16}
             textAnchor="middle"
-            fontSize={chartTheme.fontSize.axis}
-            fill={chartTheme.axisText}
+            {...text}
           >
             {t.label}
           </text>
@@ -77,9 +91,12 @@ type YAxisProps = {
   yStart: number;
   yEnd: number;
   hideLine?: boolean;
+  /** Tick label style. Default = the theme's axis text. */
+  textStyle?: AxisTextStyle;
 };
 
-export function YAxis({ ticks, x, yStart, yEnd, hideLine }: YAxisProps) {
+export function YAxis({ ticks, x, yStart, yEnd, hideLine, textStyle }: YAxisProps) {
+  const text = axisTextProps(textStyle);
   return (
     <g aria-hidden="true">
       {!hideLine && (
@@ -106,8 +123,7 @@ export function YAxis({ ticks, x, yStart, yEnd, hideLine }: YAxisProps) {
             x={x - 8}
             y={t.position + 4}
             textAnchor="end"
-            fontSize={chartTheme.fontSize.axis}
-            fill={chartTheme.axisText}
+            {...text}
           >
             {t.label}
           </text>

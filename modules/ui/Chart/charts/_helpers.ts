@@ -4,7 +4,7 @@
 // Kept dependency-free so it can be mirrored 1:1 in EJS's
 // /modules/ui/Chart/scripts/chart-helpers.js.
 
-import type { Series, PlotRect } from '../types';
+import type { Series, PlotRect, CurveType, LineStyle, LegendValue, ThresholdLine } from '../types';
 
 /** Generate `count + 1` evenly spaced numeric tick values between `lo` and `hi`. */
 export function niceTicks(lo: number, hi: number, count = 4): number[] {
@@ -128,3 +128,78 @@ export function stackTops(series: Series[]): Array<Array<number | null>> {
     return running[i];
   }));
 }
+
+type Pt = { x: number; y: number };
+
+/**
+ * Step path (value held until the next point). `after` draws horizontal-then-vertical, `before`
+ * vertical-then-horizontal: tracing the same points in reverse with `before` retraces an `after` path,
+ * which is what a stacked area's lower edge needs.
+ */
+export function stepPath(points: Array<Pt | null>, mode: 'after' | 'before' = 'after'): string {
+  let d = '';
+  let prev: Pt | null = null;
+  for (const p of points) {
+    if (!p) { prev = null; continue; }
+    if (!prev) d += `M${p.x} ${p.y} `;
+    else d += mode === 'after' ? `H${p.x} V${p.y} ` : `V${p.y} H${p.x} `;
+    prev = p;
+  }
+  return d.trim();
+}
+
+/** The path for a curve type. */
+export function curvePath(points: Array<Pt | null>, curve: CurveType = 'smooth', stepMode: 'after' | 'before' = 'after'): string {
+  if (curve === 'step') return stepPath(points, stepMode);
+  return curve === 'linear' ? linePath(points) : smoothPath(points);
+}
+
+/** `curvePath` without the leading move: continues an open path (a stacked area's lower edge). */
+export function continuePath(points: Pt[], curve: CurveType, stepMode: 'after' | 'before'): string {
+  if (!points.length) return '';
+  return `L${points[0].x} ${points[0].y} ${curvePath(points, curve, stepMode).replace(/^M[^A-Z]*/, '')}`.trim();
+}
+
+/** SVG dash pattern for a stroke style at a width. Dotted relies on a round line cap. */
+export function dashArray(style: LineStyle | undefined, width = 2): string | undefined {
+  if (style === 'dashed') return `${Math.max(4, width * 3)} ${Math.max(3, width * 2)}`;
+  if (style === 'dotted') return `0 ${Math.max(3, width * 2)}`;
+  return undefined;
+}
+
+/** The latest / min / max / avg / total of a series' non-null values; null when it has none. */
+export function seriesStats(series: Series): Record<LegendValue, number> | null {
+  const ys = series.data.map((p) => p.y).filter((y): y is number => typeof y === 'number' && Number.isFinite(y));
+  if (!ys.length) return null;
+  const total = ys.reduce((a, b) => a + b, 0);
+  return { latest: ys[ys.length - 1], min: Math.min(...ys), max: Math.max(...ys), avg: total / ys.length, total };
+}
+
+/** The value domain after fixed bounds and thresholds: `yMin`/`yMax` win; thresholds widen an automatic end. */
+export function resolveDomain(
+  base: { min: number; max: number },
+  opts: { min?: number; max?: number; thresholds?: ThresholdLine[] } = {},
+): { min: number; max: number } {
+  let { min, max } = base;
+  for (const t of opts.thresholds ?? []) {
+    if (typeof t?.value !== 'number' || !Number.isFinite(t.value)) continue;
+    if (t.value < min) min = t.value;
+    if (t.value > max) max = t.value;
+  }
+  if (typeof opts.min === 'number' && Number.isFinite(opts.min)) min = opts.min;
+  if (typeof opts.max === 'number' && Number.isFinite(opts.max)) max = opts.max;
+  if (!(max > min)) {
+    if (typeof opts.max === 'number' && typeof opts.min !== 'number') min = max - 1;
+    else max = min + 1;
+  }
+  return { min, max };
+}
+
+/** A rough pixel width for a tick label, so the plot leaves room for long ones (units, big numbers). */
+export function labelWidth(labels: string[], fontSize = 11): number {
+  const longest = labels.reduce((m, l) => Math.max(m, l.length), 0);
+  return Math.ceil(longest * fontSize * 0.6);
+}
+
+/** Default number text for ticks and tooltips. */
+export const defaultNumber = (v: number): string => String(Math.round(v * 100) / 100);
