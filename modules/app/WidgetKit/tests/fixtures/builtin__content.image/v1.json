@@ -1,0 +1,18 @@
+{
+  "input": {
+    "fit": "cover",
+    "position": "center",
+    "radius": 0,
+    "captionPlacement": "below",
+    "captionColor": "var(--text-secondary)",
+    "openInNewTab": true
+  },
+  "expected": {
+    "fit": "cover",
+    "position": "center",
+    "radius": 0,
+    "captionPlacement": "below",
+    "captionColor": "var(--text-secondary)",
+    "openInNewTab": true
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "input": {
+    "layout": "input",
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "showValue": true,
+    "valueColor": "var(--text-primary)",
+    "buttonColor": "var(--primary)",
+    "borderColor": "var(--border)",
+    "disableWhen": [
+      "stale"
+    ]
+  },
+  "expected": {
+    "layout": "input",
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "showValue": true,
+    "valueColor": "var(--text-primary)",
+    "buttonColor": "var(--primary)",
+    "borderColor": "var(--border)",
+    "disableWhen": [
+      "stale"
+    ]
+  }
+}

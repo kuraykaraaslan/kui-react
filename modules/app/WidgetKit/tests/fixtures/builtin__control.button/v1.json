@@ -1,0 +1,18 @@
+{
+  "input": {
+    "layout": "button",
+    "iconSize": 16,
+    "appearance": "filled",
+    "mainColor": "var(--primary)",
+    "size": "md",
+    "fullWidth": true
+  },
+  "expected": {
+    "layout": "button",
+    "iconSize": 16,
+    "appearance": "filled",
+    "mainColor": "var(--primary)",
+    "size": "md",
+    "fullWidth": true
+  }
+}

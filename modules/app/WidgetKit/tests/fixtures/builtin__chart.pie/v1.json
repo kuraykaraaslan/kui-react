@@ -1,0 +1,26 @@
+{
+  "input": {
+    "labelColumn": "label",
+    "valueColumn": "value",
+    "layout": "pie",
+    "donutWidth": 40,
+    "maxSlices": 8,
+    "sort": "desc",
+    "valueLabels": "none",
+    "legend": "bottom",
+    "legendValue": "none",
+    "showTooltip": true
+  },
+  "expected": {
+    "labelColumn": "label",
+    "valueColumn": "value",
+    "layout": "pie",
+    "donutWidth": 40,
+    "maxSlices": 8,
+    "sort": "desc",
+    "valueLabels": "none",
+    "legend": "bottom",
+    "legendValue": "none",
+    "showTooltip": true
+  }
+}

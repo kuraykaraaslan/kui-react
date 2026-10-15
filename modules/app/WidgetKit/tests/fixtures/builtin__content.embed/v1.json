@@ -1,0 +1,10 @@
+{
+  "input": {
+    "aspect": "fill",
+    "allowFullscreen": true
+  },
+  "expected": {
+    "aspect": "fill",
+    "allowFullscreen": true
+  }
+}

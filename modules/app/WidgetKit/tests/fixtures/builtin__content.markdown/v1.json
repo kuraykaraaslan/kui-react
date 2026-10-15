@@ -1,0 +1,24 @@
+{
+  "input": {
+    "layout": "plain",
+    "content": "",
+    "calloutColor": "var(--info)",
+    "calloutBackground": "var(--info-subtle)",
+    "align": "start",
+    "textSize": "md",
+    "textColor": "var(--text-primary)",
+    "linkColor": "var(--primary)",
+    "missingText": "—"
+  },
+  "expected": {
+    "layout": "plain",
+    "content": "",
+    "calloutColor": "var(--info)",
+    "calloutBackground": "var(--info-subtle)",
+    "align": "start",
+    "textSize": "md",
+    "textColor": "var(--text-primary)",
+    "linkColor": "var(--primary)",
+    "missingText": "—"
+  }
+}

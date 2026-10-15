@@ -1,0 +1,32 @@
+{
+  "input": {
+    "layout": "stacked",
+    "autoScale": true,
+    "valueColor": "var(--text-primary)",
+    "labelColor": "var(--text-secondary)",
+    "iconColor": "var(--primary)",
+    "iconSize": 28,
+    "rangeEdges": "from",
+    "rangeTarget": "value",
+    "compareAs": "percent",
+    "increaseIs": "neutral",
+    "showArrow": true,
+    "upColor": "var(--success)",
+    "downColor": "var(--error)"
+  },
+  "expected": {
+    "layout": "stacked",
+    "autoScale": true,
+    "valueColor": "var(--text-primary)",
+    "labelColor": "var(--text-secondary)",
+    "iconColor": "var(--primary)",
+    "iconSize": 28,
+    "rangeEdges": "from",
+    "rangeTarget": "value",
+    "compareAs": "percent",
+    "increaseIs": "neutral",
+    "showArrow": true,
+    "upColor": "var(--success)",
+    "downColor": "var(--error)"
+  }
+}

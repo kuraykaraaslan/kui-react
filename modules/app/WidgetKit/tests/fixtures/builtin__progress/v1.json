@@ -1,0 +1,30 @@
+{
+  "input": {
+    "layout": "bar-labelled",
+    "target": 100,
+    "valueText": "value",
+    "valueColor": "var(--text-primary)",
+    "barColor": "var(--primary)",
+    "trackColor": "var(--surface-overlay)",
+    "thickness": 8,
+    "roundedEnds": true,
+    "ringSize": 96,
+    "rangeEdges": "from",
+    "showTicks": false,
+    "ticksColor": "var(--text-secondary)"
+  },
+  "expected": {
+    "layout": "bar-labelled",
+    "target": 100,
+    "valueText": "value",
+    "valueColor": "var(--text-primary)",
+    "barColor": "var(--primary)",
+    "trackColor": "var(--surface-overlay)",
+    "thickness": 8,
+    "roundedEnds": true,
+    "ringSize": 96,
+    "rangeEdges": "from",
+    "showTicks": false,
+    "ticksColor": "var(--text-secondary)"
+  }
+}

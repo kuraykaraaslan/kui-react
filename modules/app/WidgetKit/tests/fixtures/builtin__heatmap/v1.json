@@ -1,0 +1,24 @@
+{
+  "input": {
+    "xColumn": "x",
+    "yColumn": "y",
+    "valueColumn": "value",
+    "scale": "sequential",
+    "color": "var(--primary)",
+    "rangeEdges": "from",
+    "valueLabels": "none",
+    "legend": "bottom",
+    "showTooltip": true
+  },
+  "expected": {
+    "xColumn": "x",
+    "yColumn": "y",
+    "valueColumn": "value",
+    "scale": "sequential",
+    "color": "var(--primary)",
+    "rangeEdges": "from",
+    "valueLabels": "none",
+    "legend": "bottom",
+    "showTooltip": true
+  }
+}

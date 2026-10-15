@@ -1,0 +1,18 @@
+{
+  "input": {
+    "layout": "list",
+    "labelColor": "var(--text-secondary)",
+    "valueColor": "var(--text-primary)",
+    "maxRows": 20,
+    "emptyValue": "—",
+    "dividers": true
+  },
+  "expected": {
+    "layout": "list",
+    "labelColor": "var(--text-secondary)",
+    "valueColor": "var(--text-primary)",
+    "maxRows": 20,
+    "emptyValue": "—",
+    "dividers": true
+  }
+}

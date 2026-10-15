@@ -1,0 +1,36 @@
+{
+  "input": {
+    "columns": [],
+    "maxRows": 10,
+    "paging": "none",
+    "sortable": true,
+    "defaultSortDir": "desc",
+    "search": true,
+    "columnPicker": false,
+    "density": "compact",
+    "stickyHeader": true,
+    "striped": false,
+    "stripeColor": "var(--surface-sunken)",
+    "borderColor": "var(--border)",
+    "headerColor": "var(--text-secondary)",
+    "cellColor": "var(--text-primary)",
+    "rangeEdges": "from"
+  },
+  "expected": {
+    "columns": [],
+    "maxRows": 10,
+    "paging": "none",
+    "sortable": true,
+    "defaultSortDir": "desc",
+    "search": true,
+    "columnPicker": false,
+    "density": "compact",
+    "stickyHeader": true,
+    "striped": false,
+    "stripeColor": "var(--surface-sunken)",
+    "borderColor": "var(--border)",
+    "headerColor": "var(--text-secondary)",
+    "cellColor": "var(--text-primary)",
+    "rangeEdges": "from"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "input": {
+    "layout": "list",
+    "columns": "auto",
+    "links": [],
+    "labelColor": "var(--text-primary)",
+    "descriptionColor": "var(--text-secondary)",
+    "iconColor": "var(--primary)",
+    "iconSize": 16,
+    "accentColor": "var(--primary)",
+    "openExternalInNewTab": true
+  },
+  "expected": {
+    "layout": "list",
+    "columns": "auto",
+    "links": [],
+    "labelColor": "var(--text-primary)",
+    "descriptionColor": "var(--text-secondary)",
+    "iconColor": "var(--primary)",
+    "iconSize": 16,
+    "accentColor": "var(--primary)",
+    "openExternalInNewTab": true
+  }
+}

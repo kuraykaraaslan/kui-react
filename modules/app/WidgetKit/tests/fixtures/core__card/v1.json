@@ -1,0 +1,40 @@
+{
+  "input": {
+    "showTitle": true,
+    "titleIconSize": 16,
+    "variant": "raised",
+    "padding": 12,
+    "radius": 12,
+    "background": "default",
+    "backgroundColor": "var(--surface-raised)",
+    "backgroundSize": "cover",
+    "overlayBlur": 0,
+    "buttons": [
+      "fullscreen"
+    ],
+    "showUpdated": "off",
+    "staleAfterSeconds": 0,
+    "staleDisplay": "badge",
+    "hideOnMobile": false,
+    "hideOnDesktop": false
+  },
+  "expected": {
+    "showTitle": true,
+    "titleIconSize": 16,
+    "variant": "raised",
+    "padding": 12,
+    "radius": 12,
+    "background": "default",
+    "backgroundColor": "var(--surface-raised)",
+    "backgroundSize": "cover",
+    "overlayBlur": 0,
+    "buttons": [
+      "fullscreen"
+    ],
+    "showUpdated": "off",
+    "staleAfterSeconds": 0,
+    "staleDisplay": "badge",
+    "hideOnMobile": false,
+    "hideOnDesktop": false
+  }
+}

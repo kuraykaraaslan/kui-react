@@ -1,0 +1,40 @@
+{
+  "input": {
+    "layout": "default",
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "showValue": true,
+    "valueColor": "var(--text-primary)",
+    "showTicks": true,
+    "mainColor": "var(--primary)",
+    "trackColor": "var(--surface-sunken)",
+    "disabledMainColor": "var(--text-disabled)",
+    "disabledTrackColor": "var(--surface-sunken)",
+    "iconColor": "var(--text-secondary)",
+    "commit": "release",
+    "debounceMs": 500,
+    "disableWhen": [
+      "stale"
+    ]
+  },
+  "expected": {
+    "layout": "default",
+    "min": 0,
+    "max": 100,
+    "step": 1,
+    "showValue": true,
+    "valueColor": "var(--text-primary)",
+    "showTicks": true,
+    "mainColor": "var(--primary)",
+    "trackColor": "var(--surface-sunken)",
+    "disabledMainColor": "var(--text-disabled)",
+    "disabledTrackColor": "var(--surface-sunken)",
+    "iconColor": "var(--text-secondary)",
+    "commit": "release",
+    "debounceMs": 500,
+    "disableWhen": [
+      "stale"
+    ]
+  }
+}

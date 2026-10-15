@@ -1,0 +1,20 @@
+{
+  "input": {
+    "layout": "badge",
+    "iconSize": 32,
+    "fallbackColor": "var(--text-secondary)",
+    "showValue": false,
+    "valueColor": "var(--text-secondary)",
+    "staleAsUnknown": true,
+    "unknownLabel": "Unknown"
+  },
+  "expected": {
+    "layout": "badge",
+    "iconSize": 32,
+    "fallbackColor": "var(--text-secondary)",
+    "showValue": false,
+    "valueColor": "var(--text-secondary)",
+    "staleAsUnknown": true,
+    "unknownLabel": "Unknown"
+  }
+}

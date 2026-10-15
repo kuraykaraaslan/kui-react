@@ -37,3 +37,16 @@ WidgetKitContext.tsx  host hooks: icon resolver, field overrides, locale
 4. No stored code and no raw CSS in settings (the only ThingsBoard features not taken).
 
 See [/AGENTS.md](../../../AGENTS.md).
+
+## Changing a template
+
+| Change | Bump the version? | What else |
+|---|---|---|
+| Add a field (its default renders exactly as before), an option, or change a label/group/`advanced` | No | Give the field `since: <current version>` |
+| Change a default, rename, retype, narrow a range, remove an option | Yes | Append a migration step (`ops` or `up`); never edit or delete an old step |
+| Remove a field | Yes, twice | First `deprecated: { since, replacedBy?, removeIn }`, drop it at least one version later |
+
+`tests/templates.lock.json` records every field at its version and fails a change that needed a bump.
+After an intended bump, run `UPDATE_TEMPLATE_LOCK=1 npx vitest run modules/app/WidgetKit/tests/templates-lock.test.ts`:
+it locks the new version and writes a golden fixture `tests/fixtures/<id>/v<N>.json` for it. Existing fixtures
+are append-only, so settings saved by every past version keep migrating.

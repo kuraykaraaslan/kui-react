@@ -1,0 +1,32 @@
+{
+  "input": {
+    "timeColumn": "time",
+    "titleColumn": "title",
+    "layout": "timeline",
+    "order": "newest",
+    "maxItems": 10,
+    "timeDisplay": "relative",
+    "groupByDay": false,
+    "titleColor": "var(--text-primary)",
+    "descriptionColor": "var(--text-secondary)",
+    "descriptionLines": 2,
+    "timeColor": "var(--text-secondary)",
+    "markerColor": "var(--text-disabled)",
+    "lineColor": "var(--border)"
+  },
+  "expected": {
+    "timeColumn": "time",
+    "titleColumn": "title",
+    "layout": "timeline",
+    "order": "newest",
+    "maxItems": 10,
+    "timeDisplay": "relative",
+    "groupByDay": false,
+    "titleColor": "var(--text-primary)",
+    "descriptionColor": "var(--text-secondary)",
+    "descriptionLines": 2,
+    "timeColor": "var(--text-secondary)",
+    "markerColor": "var(--text-disabled)",
+    "lineColor": "var(--border)"
+  }
+}

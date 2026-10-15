@@ -1,0 +1,20 @@
+{
+  "input": {
+    "curve": "smooth",
+    "lineWidth": 2,
+    "showPoints": false,
+    "showGrid": true,
+    "legend": "auto",
+    "legendValues": [],
+    "tooltip": "axis"
+  },
+  "expected": {
+    "curve": "smooth",
+    "lineWidth": 2,
+    "showPoints": false,
+    "showGrid": true,
+    "legend": "auto",
+    "legendValues": [],
+    "tooltip": "axis"
+  }
+}

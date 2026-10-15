@@ -1,0 +1,34 @@
+{
+  "input": {
+    "latColumn": "lat",
+    "lngColumn": "lng",
+    "tooltipColumns": [],
+    "markerStyle": "pin",
+    "markerSize": 24,
+    "cluster": false,
+    "colorBy": "fixed",
+    "markerColor": "var(--primary)",
+    "rangeEdges": "from",
+    "showLabels": false,
+    "tooltipTrigger": "hover",
+    "fitBounds": true,
+    "zoom": 4,
+    "tileStyle": "auto"
+  },
+  "expected": {
+    "latColumn": "lat",
+    "lngColumn": "lng",
+    "tooltipColumns": [],
+    "markerStyle": "pin",
+    "markerSize": 24,
+    "cluster": false,
+    "colorBy": "fixed",
+    "markerColor": "var(--primary)",
+    "rangeEdges": "from",
+    "showLabels": false,
+    "tooltipTrigger": "hover",
+    "fitBounds": true,
+    "zoom": 4,
+    "tileStyle": "auto"
+  }
+}

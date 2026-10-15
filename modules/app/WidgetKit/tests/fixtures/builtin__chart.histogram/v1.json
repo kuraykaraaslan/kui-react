@@ -1,0 +1,16 @@
+{
+  "input": {
+    "valueColumn": "value",
+    "barColor": "var(--primary)",
+    "valueLabels": "none",
+    "showGrid": true,
+    "showTooltip": true
+  },
+  "expected": {
+    "valueColumn": "value",
+    "barColor": "var(--primary)",
+    "valueLabels": "none",
+    "showGrid": true,
+    "showTooltip": true
+  }
+}

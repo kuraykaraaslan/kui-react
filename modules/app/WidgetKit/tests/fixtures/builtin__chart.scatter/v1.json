@@ -1,0 +1,20 @@
+{
+  "input": {
+    "xColumn": "x",
+    "yColumn": "y",
+    "pointColor": "var(--primary)",
+    "pointSize": "md",
+    "showGrid": true,
+    "legend": "auto",
+    "showTooltip": true
+  },
+  "expected": {
+    "xColumn": "x",
+    "yColumn": "y",
+    "pointColor": "var(--primary)",
+    "pointSize": "md",
+    "showGrid": true,
+    "legend": "auto",
+    "showTooltip": true
+  }
+}

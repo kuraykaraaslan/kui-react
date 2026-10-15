@@ -1,0 +1,36 @@
+{
+  "input": {
+    "layout": "right",
+    "labelColor": "var(--text-primary)",
+    "iconColor": "var(--text-secondary)",
+    "iconSize": 20,
+    "showStateText": true,
+    "onTextColor": "var(--text-primary)",
+    "offTextColor": "var(--text-secondary)",
+    "unknownTextColor": "var(--warning)",
+    "onColor": "var(--success)",
+    "offColor": "var(--border-strong)",
+    "disabledColor": "var(--surface-sunken)",
+    "thumbColor": "var(--primary-fg)",
+    "disableWhen": [
+      "stale"
+    ]
+  },
+  "expected": {
+    "layout": "right",
+    "labelColor": "var(--text-primary)",
+    "iconColor": "var(--text-secondary)",
+    "iconSize": 20,
+    "showStateText": true,
+    "onTextColor": "var(--text-primary)",
+    "offTextColor": "var(--text-secondary)",
+    "unknownTextColor": "var(--warning)",
+    "onColor": "var(--success)",
+    "offColor": "var(--border-strong)",
+    "disabledColor": "var(--surface-sunken)",
+    "thumbColor": "var(--primary-fg)",
+    "disableWhen": [
+      "stale"
+    ]
+  }
+}

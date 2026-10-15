@@ -1,0 +1,22 @@
+{
+  "input": {
+    "stacked": false,
+    "orientation": "vertical",
+    "valueLabels": "none",
+    "barRadius": 4,
+    "showGrid": true,
+    "legend": "auto",
+    "legendValues": [],
+    "tooltip": "axis"
+  },
+  "expected": {
+    "stacked": false,
+    "orientation": "vertical",
+    "valueLabels": "none",
+    "barRadius": 4,
+    "showGrid": true,
+    "legend": "auto",
+    "legendValues": [],
+    "tooltip": "axis"
+  }
+}
