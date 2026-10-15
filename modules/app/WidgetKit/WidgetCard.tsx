@@ -212,7 +212,7 @@ export function WidgetCard({
 
       {/* A container for the views' auto-sizing: width only, plus height from lg up when the card sits in
           a fixed-height cell (`fixedHeight`). */}
-      <div className={cn('relative @container min-h-0 flex-1 overflow-auto', fixedHeight && 'lg:[container-type:size]')} style={{ padding: pad }}>
+      <div className={cn('relative @container min-h-0 flex-1 overflow-auto', fixedHeight && 'lg:[container-type:size]')} style={{ padding: pad === 0 ? 0 : `${pad}px ${pad}px ${Math.max(pad, 16)}px` }}>
         {bodyState === 'loading' ? (
           <div className="flex h-full min-h-16 flex-col gap-2" role="status" aria-label="Loading">
             <div className="h-4 w-1/3 animate-pulse rounded bg-surface-sunken" />
