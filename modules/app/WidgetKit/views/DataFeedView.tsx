@@ -1,12 +1,19 @@
 'use client';
-import { Fragment, useMemo, type CSSProperties, type ReactNode } from 'react';
+import { useMemo, type CSSProperties, type ReactNode } from 'react';
 import { cn } from '@/libs/utils/cn';
 import type { FontValue } from '../../SchemaForm/types';
 import { cssColor, fontStyle } from '../settings/style';
 import type { Sparse } from '../settings/types';
-import { SettingIcon } from '../WidgetKitContext';
+import { useWidgetKit } from '../WidgetKitContext';
+import { useNow } from '../useNow';
 import type { SlotData, WidgetKindView, WidgetViewProps } from '../kind';
-import { dataColor, declaredColumns, rawText } from './DataTableView';
+import {
+  declaredColumns, formatDateValue, fullDate, matchValue, rawText, relativeTime, statusColor, toEpoch,
+  type DateDisplay, type ValueColor,
+} from './DataTableView';
+import { IconTile, Meta, tint } from './ui';
+
+export { relativeTime };
 
 type S = {
   timeColumn?: string;
@@ -14,11 +21,17 @@ type S = {
   descriptionColumn?: string;
   colorColumn?: string;
   iconColumn?: string;
-  layout?: 'timeline' | 'list' | 'compact';
+  valueColors?: ValueColor[];
+  layout?: 'timeline' | 'list' | 'compact' | 'cards';
   order?: 'newest' | 'oldest';
   maxItems?: number;
-  timeDisplay?: 'relative' | 'time' | 'date' | 'datetime';
+  timeDisplay?: DateDisplay;
+  timePattern?: string;
+  timePosition?: 'side' | 'below';
   groupByDay?: boolean;
+  indicator?: 'dot' | 'icon' | 'bar' | 'none';
+  divider?: boolean;
+  dividerColor?: string;
   titleFont?: FontValue;
   titleColor?: string;
   descriptionFont?: FontValue;
@@ -46,17 +59,22 @@ export interface FeedItem {
 }
 
 const ICON_RE = /^[a-z0-9:-]+(?: [a-z0-9:-]+){0,3}$/i;
+const iconName = (v: unknown) => (typeof v === 'string' && v.length <= 64 && ICON_RE.test(v.trim()) ? v.trim() : undefined);
 
-const parseAt = (raw: unknown): number | null => {
-  if (raw === null || raw === undefined || raw === '') return null;
-  const at = typeof raw === 'number' ? raw : Date.parse(String(raw));
-  return Number.isFinite(at) ? at : null;
+/** The icon a severity colour suggests when the row names none (indicator "icon"). */
+const TONE_ICON: Record<string, string> = {
+  'var(--success)': 'fas fa-circle-check',
+  'var(--warning)': 'fas fa-triangle-exclamation',
+  'var(--error)': 'fas fa-circle-exclamation',
+  'var(--info)': 'fas fa-circle-info',
+  'var(--primary)': 'fas fa-circle-info',
 };
 
 /**
  * Table rows → feed items in the configured order. A row with no title is skipped (an untitled
  * line says nothing); a row whose time does not parse is kept but always sorts last, so a bad
- * timestamp never hides an event. `max` caps the result (0 = no cap).
+ * timestamp never hides an event. `max` caps the result (0 = no cap). The colour column may hold a
+ * colour, a tone name, a status word or a value the value-colour map names.
  */
 export function feedItems(slot: SlotData | undefined, settings: Sparse, max?: number): FeedItem[] {
   const s = settings as S;
@@ -67,14 +85,16 @@ export function feedItems(slot: SlotData | undefined, settings: Sparse, max?: nu
     const title = row[titleKey];
     if (title === null || title === undefined || String(title).trim() === '') return;
     const description = s.descriptionColumn && row[s.descriptionColumn] != null ? String(row[s.descriptionColumn]) : '';
-    const icon = s.iconColumn ? row[s.iconColumn] : undefined;
+    const colorRaw = s.colorColumn ? row[s.colorColumn] : undefined;
+    const mapped = matchValue(colorRaw, s.valueColors);
+    const icon = iconName(s.iconColumn ? row[s.iconColumn] : undefined) ?? iconName(mapped?.icon);
     items.push({
       id: String(i),
-      at: parseAt(row[timeKey]),
+      at: toEpoch(row[timeKey]),
       title: typeof title === 'object' ? JSON.stringify(title) : String(title),
       description: description.length > 500 ? `${description.slice(0, 497)}…` : description,
-      color: s.colorColumn ? dataColor(row[s.colorColumn]) : undefined,
-      icon: typeof icon === 'string' && icon.length <= 64 && ICON_RE.test(icon.trim()) ? icon.trim() : undefined,
+      color: cssColor(mapped?.color) ?? statusColor(colorRaw),
+      icon,
       row,
     });
   });
@@ -87,28 +107,9 @@ export function feedItems(slot: SlotData | undefined, settings: Sparse, max?: nu
   return cap > 0 ? items.slice(0, cap) : items;
 }
 
-/** "5 minutes ago" in the viewer's locale. */
-export function relativeTime(at: number, now = Date.now(), locale?: string): string {
-  const diffSec = Math.round((at - now) / 1000);
-  const abs = Math.abs(diffSec);
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
-  if (abs < 60) return rtf.format(diffSec, 'second');
-  if (abs < 3600) return rtf.format(Math.round(diffSec / 60), 'minute');
-  if (abs < 86_400) return rtf.format(Math.round(diffSec / 3600), 'hour');
-  if (abs < 30 * 86_400) return rtf.format(Math.round(diffSec / 86_400), 'day');
-  if (abs < 365 * 86_400) return rtf.format(Math.round(diffSec / (30 * 86_400)), 'month');
-  return rtf.format(Math.round(diffSec / (365 * 86_400)), 'year');
-}
-
 /** The time as the `timeDisplay` setting asks. */
-export function feedTime(at: number, display: S['timeDisplay'] = 'relative', locale?: string, now = Date.now()): string {
-  const d = new Date(at);
-  switch (display) {
-    case 'time': return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' });
-    case 'date': return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: d.getFullYear() === new Date(now).getFullYear() ? undefined : 'numeric' });
-    case 'datetime': return d.toLocaleString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-    default: return relativeTime(at, now, locale);
-  }
+export function feedTime(at: number, display: DateDisplay = 'relative', locale?: string, now = Date.now(), pattern?: string): string {
+  return formatDateValue(at, { display, pattern, now, relativeStyle: 'long' }, locale);
 }
 
 const dayKey = (at: number | null) => {
@@ -116,6 +117,17 @@ const dayKey = (at: number | null) => {
   const d = new Date(at);
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 };
+
+/** "Today", "Yesterday", else "Tue, 13 Oct". */
+function dayLabel(at: number, now: number, locale?: string): string {
+  const start = (t: number) => { const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); };
+  const days = Math.round((start(at) - start(now)) / 86_400_000);
+  if (days === 0 || days === -1) {
+    const text = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(days, 'day');
+    return text.charAt(0).toLocaleUpperCase(locale) + text.slice(1);
+  }
+  return new Date(at).toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' });
+}
 
 export interface FeedMessages { unknownDay: string }
 
@@ -125,14 +137,19 @@ export type DataFeedViewProps = WidgetViewProps & {
   messages?: Partial<FeedMessages>;
 };
 
-/** `data.feed`: events as a timeline, a list or compact lines. */
+/** `data.feed`: events as a timeline, a list, compact lines or cards. */
 export function DataFeedView({ settings, data, locale, now, messages }: DataFeedViewProps) {
   const s = settings as S;
   const items = useMemo(() => feedItems(data.events, settings), [data.events, settings]);
   const layout = s.layout ?? 'timeline';
-  const clock = now ?? Date.now();
+  const clock = useNow(30_000);
+  const nowMs = now ?? clock;
   const unknownDay = messages?.unknownDay ?? 'Time unknown';
   const lines = typeof s.descriptionLines === 'number' ? s.descriptionLines : 2;
+  const indicator = s.indicator ?? 'dot';
+  const timeBelow = s.timePosition === 'below';
+  const divider = s.divider !== false;
+  const dividerColor = cssColor(s.dividerColor);
 
   const titleStyle = fontStyle(s.titleFont, s.titleColor);
   const descStyle: CSSProperties = {
@@ -141,64 +158,123 @@ export function DataFeedView({ settings, data, locale, now, messages }: DataFeed
   };
   const timeStyle = fontStyle(s.timeFont, s.timeColor);
   const markerDefault = cssColor(s.markerColor) ?? 'var(--text-disabled)';
+  const colorOf = (it: FeedItem) => it.color ?? markerDefault;
 
   const time = (it: FeedItem, className?: string): ReactNode => it.at === null ? null : (
-    <time className={cn('text-xs text-text-secondary', className)} style={timeStyle} dateTime={new Date(it.at).toISOString()}>
-      {feedTime(it.at, s.timeDisplay, locale, clock)}
-    </time>
+    <Meta className={cn('whitespace-nowrap tabular-nums', className)} style={timeStyle}>
+      <time dateTime={new Date(it.at).toISOString()} title={fullDate(it.at, locale)}>
+        {feedTime(it.at, s.timeDisplay, locale, nowMs, s.timePattern)}
+      </time>
+    </Meta>
   );
 
-  const marker = (it: FeedItem): ReactNode => {
-    const color = it.color ?? markerDefault;
-    const icon = it.icon ?? s.icon;
-    const drawn = icon ? <SettingIcon name={icon} className="text-xs" style={{ color, fontSize: 12, width: 12, height: 12 }} /> : null;
-    return drawn
-      ? <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-surface-sunken" aria-hidden="true">{drawn}</span>
-      : <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden="true" />;
+  const { renderIcon } = useWidgetKit();
+  // An icon only when the host can draw it; otherwise the dot (never an empty tile).
+  const drawable = (name: string | undefined) => (name && renderIcon && renderIcon(name, {}) != null ? name : undefined);
+  const iconOf = (it: FeedItem) => drawable(it.icon) ?? drawable(s.icon) ?? drawable(it.color ? TONE_ICON[it.color] : undefined);
+
+  /** The marker before an item: a dot, a tinted icon tile, or nothing (a bar is drawn on the item itself). */
+  const marker = (it: FeedItem, size: 'sm' | 'md' = 'md'): ReactNode => {
+    if (indicator === 'none' || indicator === 'bar') return null;
+    const color = colorOf(it);
+    const icon = indicator === 'icon' ? iconOf(it) : undefined;
+    if (icon) return <span data-part="marker" aria-hidden="true"><IconTile name={icon} color={color} size={size === 'sm' ? 22 : 28} /></span>;
+    return (
+      <span
+        data-part="marker"
+        aria-hidden="true"
+        className={cn(
+          'flex shrink-0 items-center justify-center',
+          // In icon mode a dot keeps the icon's slot, so every title starts at the same x.
+          indicator === 'icon' ? (size === 'sm' ? 'h-[22px] w-[22px]' : 'h-7 w-7') : size === 'sm' ? 'h-4 w-4' : 'h-5 w-5',
+        )}
+      >
+        <span className="h-2 w-2 rounded-full" style={{ background: color, boxShadow: `0 0 0 3px ${tint(color, 18)}` }} />
+      </span>
+    );
   };
+  const barStyle = (it: FeedItem): CSSProperties | undefined =>
+    indicator === 'bar' ? { boxShadow: `inset 3px 0 0 ${colorOf(it)}`, paddingLeft: 12 } : undefined;
+
+  const title = (it: FeedItem, className?: string) => (
+    <p data-part="title" className={cn('min-w-0 break-words text-[13px] font-medium leading-snug text-text-primary', className)} style={titleStyle}>{it.title}</p>
+  );
+  const desc = (it: FeedItem) => it.description
+    ? <p data-part="description" className="mt-0.5 break-words text-xs leading-snug text-text-secondary" style={descStyle}>{it.description}</p>
+    : null;
+  const text = (it: FeedItem) => (
+    <div className="min-w-0 flex-1">
+      {timeBelow ? title(it) : (
+        <div className="flex items-baseline justify-between gap-3">
+          {title(it)}
+          {time(it, 'shrink-0')}
+        </div>
+      )}
+      {desc(it)}
+      {timeBelow && time(it, 'mt-0.5 block')}
+    </div>
+  );
+  const rule = divider ? 'border-b border-border last:border-b-0' : '';
+  const ruleStyle = divider && dividerColor ? { borderColor: dividerColor } : undefined;
 
   const entry = (it: FeedItem, last: boolean): ReactNode => {
     if (layout === 'compact') {
       return (
-        <li key={it.id} className="flex min-w-0 items-center gap-2 py-0.5" data-feed-item>
-          <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: it.color ?? markerDefault }} aria-hidden="true" />
-          <span className="min-w-0 flex-1 truncate text-sm text-text-primary" style={titleStyle}>{it.title}</span>
+        <li key={it.id} className={cn('flex min-h-8 min-w-0 items-center gap-2.5 py-1', rule)} style={{ ...ruleStyle, ...barStyle(it) }} data-feed-item>
+          {marker(it, 'sm')}
+          <span data-part="title" className="min-w-0 flex-1 truncate text-[13px] text-text-primary" style={titleStyle}>{it.title}</span>
           {time(it, 'shrink-0')}
+        </li>
+      );
+    }
+    if (layout === 'cards') {
+      return (
+        <li
+          key={it.id}
+          className="flex gap-3 rounded-lg border border-border p-2.5"
+          style={{
+            background: tint('var(--text-primary)', 2),
+            ...(indicator === 'bar' || indicator === 'dot' ? { boxShadow: `inset 3px 0 0 ${colorOf(it)}`, paddingLeft: 13 } : {}),
+          }}
+          data-feed-item
+        >
+          {indicator === 'icon' && marker(it)}
+          {text(it)}
         </li>
       );
     }
     if (layout === 'list') {
       return (
-        <li key={it.id} className="flex gap-3 border-b border-border/50 py-2 last:border-0" data-feed-item>
+        <li key={it.id} className={cn('flex min-h-9 items-start gap-3 py-2', rule)} style={{ ...ruleStyle, ...barStyle(it) }} data-feed-item>
           {marker(it)}
-          <div className="min-w-0 flex-1">
-            <div className="flex items-baseline justify-between gap-2">
-              <p className="min-w-0 break-words text-sm text-text-primary" style={titleStyle}>{it.title}</p>
-              {time(it, 'shrink-0')}
-            </div>
-            {it.description && <p className="break-words text-xs text-text-secondary" style={descStyle}>{it.description}</p>}
-          </div>
+          {text(it)}
         </li>
       );
     }
+    // Timeline: markers on a vertical line.
+    const line = cssColor(s.lineColor);
     return (
-      <li key={it.id} className="relative flex gap-3 pb-3" data-feed-item>
-        {!last && (
-          <span className="absolute bottom-0 left-[9px] top-6 w-px bg-border" style={cssColor(s.lineColor) ? { background: cssColor(s.lineColor) } : undefined} aria-hidden="true" />
+      <li key={it.id} className="relative flex gap-3 pb-3 last:pb-0" style={barStyle(it)} data-feed-item>
+        {!last && indicator !== 'none' && indicator !== 'bar' && (
+          <span
+            className="absolute bottom-0 w-px bg-border"
+            style={{ left: indicator === 'icon' && iconOf(it) ? 13.5 : 9.5, top: indicator === 'icon' && iconOf(it) ? 32 : 22, ...(line ? { background: line } : {}) }}
+            aria-hidden="true"
+          />
         )}
-        <span className="flex w-5 shrink-0 justify-center">{marker(it)}</span>
-        <div className="min-w-0 flex-1">
-          <p className="break-words text-sm text-text-primary" style={titleStyle}>{it.title}</p>
-          {it.description && <p className="break-words text-xs text-text-secondary" style={descStyle}>{it.description}</p>}
-          {time(it)}
-        </div>
+        {marker(it)}
+        {text(it)}
       </li>
     );
   };
 
-  if (!s.groupByDay) {
-    return <ol className={cn('flex flex-col', layout === 'compact' && 'gap-0.5')}>{items.map((it, i) => entry(it, i === items.length - 1))}</ol>;
-  }
+  const list = (group: FeedItem[]) => (
+    <ol className={cn('flex flex-col', layout === 'cards' && 'gap-2')}>
+      {group.map((it, i) => entry(it, i === group.length - 1))}
+    </ol>
+  );
+
+  if (!s.groupByDay) return list(items);
 
   const groups: Array<{ key: string; at: number | null; items: FeedItem[] }> = [];
   for (const it of items) {
@@ -208,16 +284,14 @@ export function DataFeedView({ settings, data, locale, now, messages }: DataFeed
     else groups.push({ key, at: it.at, items: [it] });
   }
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       {groups.map((g) => (
-        <Fragment key={g.key}>
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
-            {g.at === null ? unknownDay : new Date(g.at).toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' })}
-          </h4>
-          <ol className={cn('flex flex-col', layout === 'compact' && 'gap-0.5')}>
-            {g.items.map((it, i) => entry(it, i === g.items.length - 1))}
-          </ol>
-        </Fragment>
+        <section key={g.key} className="flex flex-col gap-1.5">
+            <h4 className="text-[11px] font-semibold uppercase tracking-wide text-text-secondary">
+              {g.at === null ? unknownDay : dayLabel(g.at, nowMs, locale)}
+            </h4>
+            {list(g.items)}
+        </section>
       ))}
     </div>
   );
@@ -228,9 +302,12 @@ export const DATA_FEED_VIEW: WidgetKindView = {
   isEmpty: (data, settings) => feedItems(data.events, settings, 1).length === 0,
   toCsv: (data, settings) => {
     const s = settings as S;
+    const declared = declaredColumns(data.events);
+    const known = new Set(declared.map((c) => c.key));
+    // Configured columns the result actually has (defaults such as `icon` may name a column the query lacks).
     const keys = [s.timeColumn || 'time', s.titleColumn || 'title', s.descriptionColumn, s.colorColumn, s.iconColumn]
-      .filter((k, i, a): k is string => !!k && a.indexOf(k) === i);
-    const label = (k: string) => declaredColumns(data.events).find((c) => c.key === k)?.label || k;
+      .filter((k, i, a): k is string => !!k && a.indexOf(k) === i && (i < 2 || known.has(k)));
+    const label = (k: string) => declared.find((c) => c.key === k)?.label || k;
     const items = feedItems(data.events, settings, 0);
     return [keys.map(label), ...items.map((it) => keys.map((k) => rawText(it.row[k])))];
   },

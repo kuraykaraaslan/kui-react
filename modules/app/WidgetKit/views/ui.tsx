@@ -33,7 +33,8 @@ export function Metric({
   style?: CSSProperties;
 }) {
   const custom = font && Object.keys(font).length > 0;
-  const u = unit ? <span className="text-[0.5em] font-medium text-text-secondary">{unit}</span> : null;
+  // The unit is half the number's size, but never smaller than readable text.
+  const u = unit ? <span className="text-[max(0.5em,11px)] font-medium text-text-secondary">{unit}</span> : null;
   return (
     <span
       className={cn('inline-flex items-baseline gap-[0.25em] font-semibold leading-none tracking-tight tabular-nums text-text-primary', className)}
@@ -53,9 +54,9 @@ export function MetricLabel({ children, font, color, className }: { children: Re
 }
 
 /** Secondary information (a time, "of 100K", a caption). */
-export function Meta({ children, className, style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
+export function Meta({ children, className, style, title }: { children: ReactNode; className?: string; style?: CSSProperties; title?: string }) {
   if (children === null || children === undefined || children === '') return null;
-  return <span className={cn('text-[11px] leading-snug text-text-secondary/80', className)} style={style}>{children}</span>;
+  return <span title={title} className={cn('text-[11px] leading-snug text-text-secondary/80', className)} style={style}>{children}</span>;
 }
 
 /** A change chip: ▲ +12 % in the colour of what the change means. */
@@ -95,7 +96,7 @@ export function IconTile({ name, color, background, size = 36 }: { name?: string
 
 /** A status: a dot (or icon) and a word, tinted with its colour. */
 export function Pill({
-  label, color, background, icon, size = 'md', variant = 'soft',
+  label, color, background, icon, size = 'md', variant = 'soft', className,
 }: {
   label: ReactNode;
   color?: string;
@@ -103,19 +104,20 @@ export function Pill({
   icon?: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'soft' | 'solid' | 'dot';
+  className?: string;
 }) {
   const c = cssColor(color) ?? 'var(--text-secondary)';
   const pad = size === 'lg' ? 'px-3 py-1.5 text-sm gap-2' : size === 'sm' ? 'px-2 py-0.5 text-[11px] gap-1' : 'px-2.5 py-1 text-xs gap-1.5';
   if (variant === 'dot') {
     return (
-      <span className={cn('inline-flex items-center font-medium text-text-primary', size === 'lg' ? 'gap-2 text-sm' : 'gap-1.5 text-xs')}>
+      <span className={cn('inline-flex items-center font-medium text-text-primary', size === 'lg' ? 'gap-2 text-sm' : 'gap-1.5 text-xs', className)}>
         <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: c }} />{label}
       </span>
     );
   }
   const solid = variant === 'solid';
   return (
-    <span className={cn('inline-flex items-center rounded-full font-medium', pad)}
+    <span className={cn('inline-flex items-center rounded-full font-medium', pad, className)}
       style={{ color: solid ? 'var(--primary-fg)' : c, background: cssColor(background) ?? (solid ? c : tint(c)) }}>
       {icon ? <SettingIcon name={icon} style={{ width: '1em', height: '1em', fontSize: '1em' }} /> : <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: solid ? 'currentColor' : c }} />}
       {label}
@@ -123,9 +125,9 @@ export function Pill({
   );
 }
 
-/** A label/value line in a list. */
+/** A label/value line in a list. `as`/`labelAs`/`valueAs` allow list semantics (`div`/`dt`/`dd`). */
 export function Row({
-  label, value, divider = true, labelStyle, valueStyle, className,
+  label, value, divider = true, labelStyle, valueStyle, className, as: Tag = 'div', labelAs: L = 'span', valueAs: V = 'span', ...rest
 }: {
   label: ReactNode;
   value: ReactNode;
@@ -133,12 +135,15 @@ export function Row({
   labelStyle?: CSSProperties;
   valueStyle?: CSSProperties;
   className?: string;
-}) {
+  as?: 'div' | 'li';
+  labelAs?: 'span' | 'dt';
+  valueAs?: 'span' | 'dd';
+} & Omit<React.HTMLAttributes<HTMLElement>, 'children'>) {
   return (
-    <div className={cn('flex min-h-9 items-center justify-between gap-3 py-1.5', divider && 'border-b border-border last:border-b-0', className)}>
-      <span className="min-w-0 truncate text-[13px] text-text-secondary" style={labelStyle}>{label}</span>
-      <span className="shrink-0 text-right text-[13px] font-medium tabular-nums text-text-primary" style={valueStyle}>{value}</span>
-    </div>
+    <Tag className={cn('flex min-h-9 items-center justify-between gap-3 py-1.5', divider && 'border-b border-border last:border-b-0', className)} {...rest}>
+      <L className="min-w-0 truncate text-[13px] text-text-secondary" style={labelStyle}>{label}</L>
+      <V className="m-0 shrink-0 text-right text-[13px] font-medium tabular-nums text-text-primary" style={valueStyle}>{value}</V>
+    </Tag>
   );
 }
 

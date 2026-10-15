@@ -10,7 +10,7 @@ import {
   faToggleOn, faSliders, faHashtag, faImage, faLink, faAlignLeft, faCircleDot, faList, faTimeline,
   faMapLocationDot, faTableCells, faBraille, faChartSimple, faArrowTrendUp, faBarsProgress, faGaugeHigh,
   faGaugeSimple, faCirclePlay, faWindowMaximize, faDroplet, faLightbulb, faPowerOff, faServer, faRotateLeft,
-  faCartShopping, faRotateRight, faBook, faUsers, faTriangleExclamation,
+  faCartShopping, faRotateRight, faBook, faUsers, faTriangleExclamation, faCircleInfo, faCircleXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   WidgetBoard, WidgetKitProvider, BUILTIN_KINDS, BUILTIN_VIEWS, exportBoard, useLocalSetting,
@@ -30,7 +30,8 @@ const ICONS: Record<string, IconDefinition> = {
   'arrow-trend-up': faArrowTrendUp, 'bars-progress': faBarsProgress, 'gauge-high': faGaugeHigh, 'gauge-simple': faGaugeSimple,
   'circle-play': faCirclePlay, 'window-maximize': faWindowMaximize, droplet: faDroplet, lightbulb: faLightbulb,
   'power-off': faPowerOff, server: faServer, 'cart-shopping': faCartShopping, 'rotate-right': faRotateRight,
-  book: faBook, users: faUsers, 'triangle-exclamation': faTriangleExclamation,
+  book: faBook, users: faUsers, 'triangle-exclamation': faTriangleExclamation, 'circle-info': faCircleInfo,
+  'circle-xmark': faCircleXmark,
 };
 
 /** 'fas fa-bell' → the bell; unknown names draw nothing. */

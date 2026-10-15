@@ -1,10 +1,11 @@
 'use client';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { cn } from '@/libs/utils/cn';
-import { Progress } from '@/modules/ui/Progress';
+import { Progress, type ProgressMark, type ProgressSegment } from '@/modules/ui/Progress';
 import type { FontValue } from '../../SchemaForm/types';
-import { cssColor, fontStyle, formatValue, rangeFor, type RangeEdges } from '../settings/style';
+import { cssColor, fontStyle, formatValue, rangeFor, type ColorRange, type RangeEdges } from '../settings/style';
 import type { WidgetKindView, WidgetViewProps } from '../kind';
+import { IconTile, Meta, Metric, MetricHead, MetricLabel } from './ui';
 
 const num = (v: unknown): number | null => {
   const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN;
@@ -12,26 +13,56 @@ const num = (v: unknown): number | null => {
 };
 
 type S = {
-  layout?: 'bar-labelled' | 'bar' | 'ring';
+  layout?: 'bar-labelled' | 'bar' | 'ring' | 'semicircle';
   target?: number;
+  label?: string;
+  labelFont?: FontValue;
+  labelColor?: string;
+  icon?: string;
+  iconColor?: string;
+  iconSize?: number;
+  iconBackground?: string;
   valueText?: 'value' | 'percent' | 'both' | 'none';
+  textPosition?: 'above' | 'below';
+  autoScale?: boolean;
   valueFont?: FontValue;
   valueColor?: string;
   barColor?: string;
+  barGradient?: boolean;
+  gradientStart?: string;
   trackColor?: string;
   thickness?: number;
   roundedEnds?: boolean;
-  ringSize?: number;
   ranges?: unknown;
   rangeEdges?: RangeEdges;
+  rangeDisplay?: 'bar' | 'track' | 'both';
   showTicks?: boolean;
+  tickCount?: number;
   ticksFont?: FontValue;
   ticksColor?: string;
+  marker?: number | null;
+  markerLabel?: string;
+  markerColor?: string;
 };
 
+/** Colour ranges on the value → segments in percent of the target. */
+function rangeSegments(ranges: unknown, target: number): ProgressSegment[] {
+  if (!Array.isArray(ranges) || target <= 0) return [];
+  let prev = 0;
+  return (ranges as ColorRange[]).flatMap((r) => {
+    const color = cssColor(r?.color);
+    if (!r || !color) return [];
+    const from = typeof r.from === 'number' ? (r.from / target) * 100 : prev;
+    const to = typeof r.to === 'number' ? (r.to / target) * 100 : 100;
+    prev = to;
+    return to > from ? [{ from, to, color }] : [];
+  });
+}
+
 /**
- * `progress`: a bound number against a target. A bound target wins over the typed one. A zero or
- * negative target has no percentage: the number still shows, only the bar goes.
+ * `progress`: a bound number against a target, in Stat's order (label and icon on top, the number,
+ * its meta, the bar). A bound target wins over the typed one. A zero or negative target has no
+ * percentage: the number still shows, only the bar goes.
  */
 export function ProgressView({ settings, format, data, locale }: WidgetViewProps) {
   const s = settings as S;
@@ -40,82 +71,129 @@ export function ProgressView({ settings, format, data, locale }: WidgetViewProps
   const pct = value !== null && target !== null && target > 0 ? Math.min(100, Math.max(0, (value / target) * 100)) : null;
   const layout = s.layout ?? 'bar-labelled';
   const mode = s.valueText ?? 'value';
-  const barColor = cssColor(rangeFor(value, s.ranges, s.rangeEdges ?? 'from')?.color) ?? cssColor(s.barColor) ?? 'var(--primary)';
-  const trackColor = cssColor(s.trackColor) ?? 'var(--surface-overlay)';
+  const rangeDisplay = s.rangeDisplay ?? 'bar';
+  const rangeHit = cssColor(rangeFor(value, s.ranges, s.rangeEdges ?? 'from')?.color);
+  const barColor = (rangeDisplay !== 'track' ? rangeHit : undefined) ?? cssColor(s.barColor) ?? 'var(--primary)';
+  const gradient: [string, string] | undefined = s.barGradient ? [cssColor(s.gradientStart) ?? 'var(--info)', barColor] : undefined;
+  const trackColor = cssColor(s.trackColor) ?? 'var(--border)';
   const thickness = s.thickness ?? 8;
   const rounded = s.roundedEnds !== false;
+  const segments = rangeDisplay !== 'bar' && target !== null ? rangeSegments(s.ranges, target) : [];
+  const markerAt = typeof s.marker === 'number' && target !== null && target > 0 ? (s.marker / target) * 100 : null;
+  const marks: ProgressMark[] = markerAt !== null
+    ? [{ at: markerAt, color: cssColor(s.markerColor) ?? 'var(--text-primary)', label: s.markerLabel || formatValue(s.marker, format, {}, locale) }]
+    : [];
 
+  const bare = { ...format, unit: '' };
   const valueStr = formatValue(value, format, {}, locale);
   const targetStr = target !== null ? formatValue(target, format, {}, locale) : null;
   const pctStr = pct !== null ? `${formatValue(pct, { decimals: 0 }, {}, locale)} %` : null;
-  const main = mode === 'percent' ? (pctStr ?? valueStr) : valueStr;
-  const secondary = mode === 'percent' || mode === 'none' ? null
-    : [targetStr !== null ? `of ${targetStr}` : null, mode === 'both' ? pctStr : null].filter(Boolean).join(' · ') || null;
-  const valueStyle: CSSProperties = fontStyle(s.valueFont, s.valueColor);
-  const aria = `${valueStr}${targetStr !== null ? ` of ${targetStr}` : ''}`;
+  const showsPercent = mode === 'percent' && pctStr !== null;
+  const secondary = mode === 'none' ? null
+    : mode === 'percent' ? (targetStr !== null ? `of ${targetStr}` : null)
+      : [targetStr !== null ? `of ${targetStr}` : null, mode === 'both' ? pctStr : null].filter(Boolean).join(' · ') || null;
+  const aria = `${valueStr}${targetStr !== null ? ` of ${targetStr}` : ''}${pctStr ? `, ${pctStr}` : ''}`;
+  const custom = s.autoScale === false && s.valueFont && Object.keys(s.valueFont).length > 0;
 
-  const text = mode === 'none' ? null : (
-    <div className="flex min-w-0 items-baseline justify-between gap-2">
-      <span className="text-xl font-bold tabular-nums text-text-primary" style={valueStyle} data-part="value">{main}</span>
-      {secondary && <span className="text-xs text-text-secondary" data-part="secondary">{secondary}</span>}
-    </div>
+  const metric = (size: 'xl' | 'lg' | 'md', style?: CSSProperties) => mode === 'none' ? null : (
+    <span data-part="value">
+      <Metric
+        text={showsPercent ? formatValue(pct, { decimals: 0 }, {}, locale) : formatValue(value, bare, {}, locale)}
+        unit={showsPercent ? '%' : format.unit}
+        unitPosition={showsPercent ? 'after' : format.unitPosition}
+        size={size}
+        font={custom ? s.valueFont : undefined}
+        color={s.valueColor}
+        style={custom ? undefined : style}
+      />
+    </span>
+  );
+  const meta = secondary ? <Meta><span data-part="secondary">{secondary}</span></Meta> : null;
+  const head = (
+    <MetricHead
+      label={s.label ? <MetricLabel font={s.labelFont} color={s.labelColor}>{s.label}</MetricLabel> : undefined}
+      icon={s.icon ? <IconTile name={s.icon} size={Math.round((s.iconSize ?? 20) * 1.8)} color={s.iconColor ?? undefined} background={s.iconBackground} /> : undefined}
+    />
   );
 
-  if (layout === 'ring') {
+  if (layout === 'ring' || layout === 'semicircle') {
+    const half = layout === 'semicircle';
+    const t = Math.min(30, Math.max(2, thickness * 1.25));
+    const ratio = half ? 100 / (50 + (rounded ? t / 2 : 0)) : 1;
     return (
-      <div className="flex h-full min-h-0 items-center justify-center">
-        <Progress
-          shape="circle"
-          value={pct ?? 0}
-          diameter={s.ringSize ?? 96}
-          thickness={thickness}
-          color={barColor}
-          trackColor={trackColor}
-          rounded={rounded}
-          showLabel={mode !== 'none'}
-          label={aria}
-          labelContent={
-            <span className="flex flex-col items-center leading-tight">
-              <span className="text-base font-bold" style={valueStyle} data-part="value">{main}</span>
-              {secondary && <span className="text-[10px] font-normal text-text-secondary" data-part="secondary">{secondary}</span>}
-            </span>
-          }
-        />
+      <div className="flex h-full min-h-0 flex-col gap-2">
+        {head}
+        <div className="flex min-h-0 flex-1 items-center justify-center" style={{ containerType: 'size' }}>
+          <div className="relative" style={{ width: `min(100cqw, calc(100cqh * ${ratio.toFixed(4)}))`, aspectRatio: ratio.toFixed(4), containerType: 'inline-size' }}>
+            <Progress
+              shape={half ? 'semicircle' : 'circle'}
+              value={pct ?? 0}
+              diameter="fill"
+              thickness={t}
+              color={barColor}
+              gradient={gradient}
+              trackColor={trackColor}
+              segments={segments}
+              marks={marks}
+              rounded={rounded}
+              showLabel={mode !== 'none'}
+              label={aria}
+              labelContent={
+                <span className={cn('flex flex-col items-center gap-1 leading-none', half && 'pb-[2%]')}>
+                  {metric('xl', { fontSize: half ? 'clamp(1rem, 17cqw, 3rem)' : 'clamp(1rem, 19cqw, 3rem)' })}
+                  {meta}
+                </span>
+              }
+            />
+          </div>
+        </div>
       </div>
     );
   }
 
   const bar = pct !== null ? (
-    <Progress value={pct} color={barColor} trackColor={trackColor} thickness={thickness} rounded={rounded} label={aria} className="min-w-0 flex-1" />
+    <Progress value={pct} color={barColor} gradient={gradient} trackColor={trackColor} thickness={thickness} rounded={rounded}
+      segments={segments} marks={marks} label={aria} className="min-w-0 flex-1" />
   ) : null;
-  const ticks = s.showTicks && pct !== null ? (
-    <div className="mt-1 flex justify-between text-[10px] tabular-nums text-text-secondary" style={fontStyle(s.ticksFont, s.ticksColor)} data-part="ticks">
-      <span>{formatValue(0, format, {}, locale)}</span>
-      <span>{targetStr}</span>
+  const tickN = Math.max(0, Math.min(11, s.tickCount ?? 0));
+  const scale: ReactNode = s.showTicks && pct !== null && targetStr !== null ? (
+    <div className="relative mt-1 h-3 text-[11px] leading-none tabular-nums text-text-secondary" style={fontStyle(s.ticksFont, s.ticksColor)} data-part="ticks">
+      <span className="absolute left-0">{formatValue(0, format, {}, locale)}</span>
+      {tickN > 0 && Array.from({ length: tickN }, (_, i) => (i + 1) / (tickN + 1)).map((f) => (
+        <span key={f} className="absolute -translate-x-1/2" style={{ left: `${f * 100}%` }}>{formatValue((target as number) * f, format, {}, locale)}</span>
+      ))}
+      <span className="absolute right-0">{targetStr}</span>
     </div>
   ) : null;
 
   if (layout === 'bar') {
     return (
-      <div className="flex h-full min-h-0 flex-col justify-center" data-layout="bar">
-        <div className={cn('flex items-center gap-3')}>
-          {bar}
-          {mode !== 'none' && (
-            <span className="shrink-0 text-sm font-semibold tabular-nums text-text-primary" style={valueStyle} data-part="value">
-              {main}{secondary ? <span className="ml-1 text-xs font-normal text-text-secondary">{secondary}</span> : null}
-            </span>
-          )}
+      <div className="flex h-full min-h-0 flex-col gap-2" data-layout="bar">
+        {head}
+        <div className="mt-auto flex flex-col gap-1">
+          <div className="flex items-center gap-3">
+            {bar}
+            {metric('lg')}
+          </div>
+          {scale}
+          {meta}
         </div>
-        {ticks}
       </div>
     );
   }
 
+  const text = (mode !== 'none' || meta) ? (
+    <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">{metric('xl')}{meta}</div>
+  ) : null;
+  const below = s.textPosition === 'below';
   return (
-    <div className="flex h-full min-h-0 flex-col justify-center" data-layout="bar-labelled">
-      {text}
-      {bar && <div className="mt-2 flex">{bar}</div>}
-      {ticks}
+    <div className="flex h-full min-h-0 flex-col gap-2" data-layout="bar-labelled">
+      {head}
+      <div className="mt-auto flex flex-col gap-2.5">
+        {!below && text}
+        {bar && <div className="flex flex-col">{bar}{scale}</div>}
+        {below && text}
+      </div>
     </div>
   );
 }

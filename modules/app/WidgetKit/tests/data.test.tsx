@@ -6,9 +6,10 @@ import type { SlotData } from '../kind';
 import { DATA_TABLE, DATA_TABLE_KIND } from '../templates/data-table';
 import { DATA_FEED, DATA_FEED_KIND } from '../templates/data-feed';
 import { MAP, MAP_KIND } from '../templates/map';
-import { DATA_TABLE_VIEW, DataTableView, expandLinkTemplate, tableColumns } from '../views/DataTableView';
+import { DATA_TABLE_VIEW, DataTableView, expandLinkTemplate, formatDatePattern, ruleMatches, statusColor, tableColumns } from '../views/DataTableView';
 import { DATA_FEED_VIEW, DataFeedView, feedItems } from '../views/DataFeedView';
-import { MAP_VIEW, MapWidgetView, buildMarkers } from '../views/MapView';
+import { MAP_VIEW, MapWidgetView, TILE_PRESETS, buildMarkers, mapLegend } from '../views/MapView';
+import { WidgetKitProvider } from '../WidgetKitContext';
 
 const templates: SettingsTemplate[] = [DATA_TABLE, DATA_FEED, MAP];
 
@@ -78,7 +79,7 @@ describe('DataTableView', () => {
 
   it('renders a badge cell for a badge column and a bar cell on request', () => {
     renderTable({ columns: [{ key: 'name' }, { key: 'status' }, { key: 'temp', cell: 'bar', ranges: [{ from: 50, color: '#ff0000' }] }] });
-    expect(screen.getByText('warning').className).toMatch(/bg-warning-subtle/);
+    expect(screen.getByText('warning').closest('span')!.style.color).toBe('var(--warning)');
     const meters = screen.getAllByRole('meter');
     expect(meters).toHaveLength(3);
     expect((meters[0].firstChild as HTMLElement).style.background).toBe('rgb(255, 0, 0)');
@@ -99,8 +100,10 @@ describe('DataTableView', () => {
     expect(screen.getByText('Showing 2 of 3 rows')).toBeTruthy();
     unmount();
     renderTable({ maxRows: 2, paging: 'pages' });
-    fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
+    expect(screen.getByText('1–2 of 3')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(bodyRows()).toHaveLength(1);
+    expect(screen.getByText('Page 2 of 2')).toBeTruthy();
     fireEvent.change(screen.getByRole('searchbox', { name: 'Search' }), { target: { value: 'pum' } });
     expect(bodyRows()).toHaveLength(1);
     expect(within(bodyRows()[0]).getByText('Pump')).toBeTruthy();
@@ -127,13 +130,118 @@ describe('DataTableView', () => {
     expect(screen.getAllByRole('link')[0]).toHaveAttribute('href', '/t/devices/Boiler');
   });
 
-  it('look: density, striped, row colour, header colour, desktop-only columns', () => {
-    renderTable({ density: 'comfortable', striped: true, rowColorColumn: 'status', headerColor: '#123456', columns: [{ key: 'name' }, { key: 'temp', visible: 'desktop' }] });
+  it('look: density, striped, row colour, header colour, desktop-only and phone-only columns', () => {
+    renderTable({ density: 'comfortable', striped: true, rowColorColumn: 'status', headerColor: '#123456', columns: [{ key: 'name' }, { key: 'temp', visible: 'desktop' }, { key: 'secret', visible: 'mobile' }] });
     const header = screen.getByRole('columnheader', { name: /Name/ });
-    expect(header.className).toMatch(/py-3/);
     expect(header.style.color).toBe('rgb(18, 52, 86)');
+    expect(within(bodyRows()[0]).getAllByRole('cell')[0].className).toMatch(/h-11/);
     expect(screen.getByRole('columnheader', { name: /Temperature/ }).className).toMatch(/hidden md:table-cell/);
+    expect(screen.getByRole('columnheader', { name: /Secret/ }).className).toMatch(/md:hidden/);
     expect(bodyRows()[0].style.background).toContain('color-mix');
+  });
+
+  it('rows are 36px by default and 28px compact; the header is a subtle band', () => {
+    const { unmount } = renderTable();
+    expect(within(bodyRows()[0]).getAllByRole('cell')[0].className).toMatch(/\bh-9\b/);
+    expect(screen.getByRole('columnheader', { name: /Name/ }).className).toMatch(/text-xs font-medium/);
+    unmount();
+    renderTable({ density: 'compact', headerBackground: '#eeeeee' });
+    expect(within(bodyRows()[0]).getAllByRole('cell')[0].className).toMatch(/\bh-7\b/);
+    expect(screen.getByRole('columnheader', { name: /Name/ }).style.background).toBe('rgb(238, 238, 238)');
+  });
+
+  it('dates: relative by default, then date, time, datetime or a custom pattern, per table or per column', () => {
+    const now = Date.parse('2026-10-15T12:00:00');
+    const dated: SlotData = {
+      shape: 'table',
+      columns: [{ key: 'name', label: 'Name', type: 'text' }, { key: 'seen', label: 'Seen', type: 'date' }],
+      rows: [{ name: 'A', seen: '2026-10-15T11:34:00' }],
+    };
+    const show = (over: Sparse) => {
+      const r = render(<DataTableView settings={tableSettings(over)} format={{}} data={{ rows: dated }} locale="en" now={now} />);
+      const text = within(bodyRows()[0]).getAllByRole('cell')[1].textContent;
+      r.unmount();
+      return text;
+    };
+    expect(show({})).toBe('26m ago');
+    expect(show({ dateFormat: 'date' })).toBe('Oct 15');
+    expect(show({ dateFormat: 'time' })).toMatch(/11:34/);
+    expect(show({ dateFormat: 'custom', datePattern: "dd.MM.yyyy 'at' HH:mm" })).toBe('15.10.2026 at 11:34');
+    expect(show({ dateFormat: 'date', columns: [{ key: 'name' }, { key: 'seen', dateFormat: 'custom', datePattern: 'HH:mm:ss' }] })).toBe('11:34:00');
+    expect(formatDatePattern(new Date(2026, 0, 5, 15, 7), 'd/M/yy h:mm a')).toBe('5/1/26 3:07 PM');
+  });
+
+  it('badge columns map values to colours, labels and styles; status words colour without a map', () => {
+    renderTable({
+      columns: [
+        { key: 'name', cell: 'badge', badgeStyle: 'dot', valueMap: [{ value: 'boiler', color: '#00ff00', label: 'Hot one' }] },
+        { key: 'status', cell: 'badge', badgeStyle: 'solid' },
+      ],
+    });
+    const hot = screen.getByText('Hot one');
+    expect((hot.firstChild as HTMLElement).style.background).toBe('rgb(0, 255, 0)');
+    expect(screen.getByText('success').closest('span')!.style.background).toBe('var(--success)');
+    expect(statusColor('Online')).toBe('var(--success)');
+    expect(statusColor('OFFLINE')).toBe('var(--error)');
+    expect(statusColor('banana')).toBeUndefined();
+  });
+
+  it('a value map alone makes an Auto column a badge; text cells take the map colour when shown as text', () => {
+    renderTable({ columns: [{ key: 'name', valueMap: [{ value: 'Pump', color: '#0000ff' }] }, { key: 'secret', cell: 'text', valueMap: [{ value: 'x', color: '#ff0000' }] }] });
+    expect(screen.getByText('Pump').closest('span')!.style.color).toBe('rgb(0, 0, 255)');
+    expect(screen.getByText('x').closest('td')!.style.color).toBe('rgb(255, 0, 0)');
+  });
+
+  it('number, progress and icon cells', () => {
+    render(
+      <WidgetKitProvider value={{ renderIcon: (name, p) => <i data-icon={name} style={p?.style} /> }}>
+        <DataTableView
+          settings={tableSettings({ columns: [
+            { key: 'name', cell: 'icon', valueMap: [{ value: 'Boiler', icon: 'fas fa-fire', color: '#ff0000' }], icon: 'fas fa-circle' },
+            { key: 'temp', cell: 'progress', barMax: 80, ranges: [{ from: 50, color: '#ff0000' }] },
+            { key: 'path', cell: 'number' },
+          ] })}
+          format={{}} data={{ rows: table }} locale="en"
+        />
+      </WidgetKitProvider>,
+    );
+    expect(document.querySelector('[data-icon="fas fa-fire"]')).toBeTruthy();
+    expect(document.querySelectorAll('[data-icon="fas fa-circle"]')).toHaveLength(2);
+    const meters = screen.getAllByRole('meter');
+    expect(meters[0]).toHaveAttribute('aria-valuemax', '80');
+    expect((meters[0].firstChild as HTMLElement).style.width).toBe('89.375%');
+    expect(screen.getByText('89 %')).toBeTruthy();
+    expect(screen.getAllByRole('columnheader')[2].className).toMatch(/text-right/);
+  });
+
+  it('row rules colour the background, the text or a left bar; row numbers and empty text', () => {
+    renderTable({
+      showRowNumbers: true,
+      rowRules: [
+        { column: 'temp', op: 'gt', value: '60', color: '#ff0000', target: 'background' },
+        { column: 'name', op: 'contains', value: 'um', color: '#0000ff', target: 'text' },
+        { column: 'status', op: 'eq', value: 'ERROR', color: '#00ff00', target: 'bar' },
+      ],
+    });
+    const [boiler, pump, fan] = bodyRows();
+    expect(boiler.style.background).toContain('rgb(255, 0, 0)');
+    expect(pump.style.color).toBe('rgb(0, 0, 255)');
+    expect(within(fan).getAllByRole('cell')[0].style.boxShadow).toContain('#00ff00');
+    expect(within(fan).getAllByRole('cell')[0].textContent).toBe('3');
+    expect(ruleMatches({ column: 'a', op: 'empty' }, { a: '' })).toBe(true);
+    expect(ruleMatches({ column: 'a', op: 'lte', value: '5' }, { a: 5 })).toBe(true);
+    expect(ruleMatches({ column: 'a', op: 'ne', value: 'x' }, { a: 'X' })).toBe(false);
+  });
+
+  it('empty text replaces "No matching rows"; scroll mode shows every row; hover can be turned off', () => {
+    const { unmount } = renderTable({ emptyText: 'Nothing here' });
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Search' }), { target: { value: 'zzz' } });
+    expect(screen.getByText('Nothing here')).toBeTruthy();
+    unmount();
+    renderTable({ maxRows: 1, paging: 'scroll', rowHover: false, gridLines: 'none' });
+    expect(bodyRows()).toHaveLength(3);
+    expect(bodyRows()[0].className).not.toMatch(/hover:/);
+    expect(within(bodyRows()[0]).getAllByRole('cell')[0].className).not.toMatch(/border-b/);
   });
 
   it('server paging: echoes page/sort and asks the host for the next page', () => {
@@ -141,6 +249,7 @@ describe('DataTableView', () => {
     const paged = { ...table, total: 30, paging: { page: 1, pageSize: 3, sortable: ['temp'], searchable: true } } as SlotData;
     render(<DataTableView settings={tableSettings()} format={{}} data={{ rows: paged }} paging={{ set }} />);
     expect(screen.getByText(/Page 1 of 10/)).toBeTruthy();
+    expect(screen.getByText('1–3 of 30')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
     expect(set).toHaveBeenCalledWith({ page: 2 });
     fireEvent.click(screen.getByRole('button', { name: /Temperature/ }));
@@ -175,7 +284,7 @@ const events: SlotData = {
   ],
 };
 const feedSettings = (over: Sparse = {}) => effective(DATA_FEED, over);
-const titles = () => [...document.querySelectorAll('[data-feed-item]')].map((li) => li.querySelector('p, span.truncate')?.textContent);
+const titles = () => [...document.querySelectorAll('[data-feed-item]')].map((li) => li.querySelector('[data-part="title"]')?.textContent);
 
 describe('DataFeedView', () => {
   it('newest first by default; untitled rows skipped; unknown time last', () => {
@@ -188,13 +297,51 @@ describe('DataFeedView', () => {
     render(<DataFeedView settings={feedSettings({ order: 'oldest', maxItems: 2, colorColumn: 'tone', layout: 'compact', timeDisplay: 'date' })} format={{}} data={{ events }} now={NOW} locale="en" />);
     expect(titles()).toEqual(['Oldest', 'Middle']);
     const middle = [...document.querySelectorAll('[data-feed-item]')][1];
-    expect((middle.firstChild as HTMLElement).style.background).toBe('var(--warning)');
+    expect((middle.querySelector('[data-part="marker"] span') as HTMLElement).style.background).toBe('var(--warning)');
     expect(screen.queryByText(/ago/)).toBeNull();
   });
 
   it('groups by day', () => {
     render(<DataFeedView settings={feedSettings({ groupByDay: true })} format={{}} data={{ events }} now={NOW} locale="en" />);
-    expect(screen.getAllByRole('heading').length).toBe(3);
+    expect(screen.getAllByRole('heading').map((h) => h.textContent)).toEqual(['Today', 'Yesterday', 'Time unknown']);
+  });
+
+  it('severity: status words and the severity map colour items; indicator dot, icon, bar or none', () => {
+    const sev: SlotData = { shape: 'table', rows: [
+      { time: '2026-10-15T11:00:00Z', title: 'A', level: 'Critical' },
+      { time: '2026-10-15T10:00:00Z', title: 'B', level: 'minor' },
+      { time: '2026-10-15T09:00:00Z', title: 'C', level: 'custom' },
+    ] };
+    const items = feedItems(sev, feedSettings({ colorColumn: 'level', valueColors: [{ value: 'CUSTOM', color: '#123456', icon: 'fas fa-star' }] }));
+    expect(items.map((i) => i.color)).toEqual(['var(--error)', 'var(--warning)', '#123456']);
+    expect(items[2].icon).toBe('fas fa-star');
+    const icons = render(
+      <WidgetKitProvider value={{ renderIcon: (name) => <i data-icon={name} /> }}>
+        <DataFeedView settings={feedSettings({ colorColumn: 'level', indicator: 'icon', layout: 'list' })} format={{}} data={{ events: sev }} now={NOW} locale="en" />
+      </WidgetKitProvider>,
+    );
+    expect(document.querySelector('[data-icon="fas fa-circle-exclamation"]')).toBeTruthy();
+    expect(document.querySelector('[data-icon="fas fa-triangle-exclamation"]')).toBeTruthy();
+    icons.unmount();
+    const bar = render(<DataFeedView settings={feedSettings({ colorColumn: 'level', indicator: 'bar', layout: 'list' })} format={{}} data={{ events: sev }} now={NOW} locale="en" />);
+    expect((document.querySelector('[data-feed-item]') as HTMLElement).style.boxShadow).toContain('var(--error)');
+    expect(document.querySelector('[data-part="marker"]')).toBeNull();
+    bar.unmount();
+    render(<DataFeedView settings={feedSettings({ indicator: 'none' })} format={{}} data={{ events }} now={NOW} locale="en" />);
+    expect(document.querySelector('[data-part="marker"]')).toBeNull();
+  });
+
+  it('layouts, time position and pattern, dividers', () => {
+    const { unmount } = render(<DataFeedView settings={feedSettings({ layout: 'cards' })} format={{}} data={{ events }} now={NOW} locale="en" />);
+    expect((document.querySelector('[data-feed-item]') as HTMLElement).className).toMatch(/rounded-lg border/);
+    unmount();
+    const below = render(<DataFeedView settings={feedSettings({ layout: 'list', timePosition: 'below', timeDisplay: 'custom', timePattern: "'at' HH:mm", divider: false })} format={{}} data={{ events }} now={NOW} locale="en" />);
+    const first = document.querySelector('[data-feed-item]') as HTMLElement;
+    expect(first.className).not.toMatch(/border-b/);
+    expect(first.querySelector('time')!.textContent).toMatch(/^at \d\d:55$/);
+    // Below the text: the time follows the title instead of sharing its line.
+    expect(first.querySelector('time')!.closest('.justify-between')).toBeNull();
+    below.unmount();
   });
 
   it('isEmpty and toCsv', () => {
@@ -202,6 +349,7 @@ describe('DataFeedView', () => {
     expect(DATA_FEED_VIEW.isEmpty!({ events }, s)).toBe(false);
     expect(DATA_FEED_VIEW.isEmpty!({ events: { shape: 'table', rows: [{ title: '' }] } }, s)).toBe(true);
     const csv = DATA_FEED_VIEW.toCsv!({ events }, s, {});
+    // Default columns the result does not declare (description, color, icon) stay out of the file.
     expect(csv[0]).toEqual(['When', 'What']);
     expect(csv[1]).toEqual(['2026-10-15T11:55:00Z', 'Newest']);
     expect(csv).toHaveLength(5);
@@ -231,13 +379,20 @@ describe('map', () => {
   it('builds markers from valid rows only, with style, size and tooltip fields', () => {
     const { markers } = buildMarkers(points, mapSettings({ labelColumn: 'name', idColumn: 'id', tooltipColumns: ['status', 'load'], markerStyle: 'dot', markerSize: 30 }));
     expect(markers.map((m) => m.id)).toEqual(['ist', 'ank']);
-    expect(markers[0]).toMatchObject({ shape: 'dot', size: 30, color: 'var(--primary)', label: 'Istanbul' });
+    // Coloured by the status column by default.
+    expect(markers[0]).toMatchObject({ shape: 'dot', size: 30, color: 'var(--success)', label: 'Istanbul' });
+    expect(markers[0].tooltip).toMatchObject({ title: 'Istanbul', color: 'var(--success)' });
     expect(markers[0].tooltip?.fields).toEqual([{ label: 'Status', value: 'success' }, { label: 'Load', value: '10' }]);
+    // Without the status among the fields, it names itself under the title.
+    expect(buildMarkers(points, mapSettings({ labelColumn: 'name' })).markers[1].tooltip?.description).toBe('error');
+    expect(buildMarkers(points, mapSettings({ colorBy: 'fixed', markerStyle: 'circle' })).markers[0]).toMatchObject({ color: 'var(--primary)', shape: 'circle' });
   });
 
   it('colours markers from a column or from ranges on a value', () => {
     expect(buildMarkers(points, mapSettings({ colorBy: 'column', colorColumn: 'status' })).markers.map((m) => m.color))
       .toEqual(['var(--success)', 'var(--error)']);
+    expect(buildMarkers(points, mapSettings({ valueColors: [{ value: 'SUCCESS', color: '#00ff00', label: 'Fine' }] })).markers.map((m) => m.color))
+      .toEqual(['#00ff00', 'var(--error)']);
     expect(buildMarkers(points, mapSettings({ colorBy: 'ranges', valueColumn: 'load', ranges: [{ from: 50, color: '#ff0000' }] })).markers.map((m) => m.color))
       .toEqual(['var(--primary)', '#ff0000']);
   });
@@ -249,15 +404,36 @@ describe('map', () => {
     expect(bad[0].tooltip?.href).toBeUndefined();
   });
 
-  it('renders a labelled map region', () => {
-    render(<MapWidgetView settings={mapSettings()} format={{}} data={{ points }} ariaLabel="Sites" />);
+  it('renders a labelled map region with a colour legend', () => {
+    const { unmount } = render(<MapWidgetView settings={mapSettings({ legendPosition: 'topright' })} format={{}} data={{ points }} ariaLabel="Sites" />);
     expect(screen.getByRole('region', { name: 'Sites' })).toBeTruthy();
+    const legend = screen.getByRole('list', { name: 'Legend' });
+    expect(within(legend).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['success1', 'error1']);
+    expect(legend.className).toMatch(/top-2 right-2/);
+    unmount();
+    render(<MapWidgetView settings={mapSettings({ legend: false })} format={{}} data={{ points }} />);
+    expect(screen.queryByRole('list', { name: 'Legend' })).toBeNull();
+  });
+
+  it('legend: configured status colours first, ranges by their labels, nothing for one colour', () => {
+    expect(mapLegend(points, mapSettings({ valueColors: [{ value: 'idle', color: '#999999', label: 'Idle' }, { value: 'error', color: '#ff0000', label: 'Down' }] })))
+      .toEqual([{ label: 'Idle', color: '#999999', count: 0 }, { label: 'Down', color: '#ff0000', count: 1 }, { label: 'success', color: 'var(--success)', count: 1 }]);
+    expect(mapLegend(points, mapSettings({ colorBy: 'ranges', valueColumn: 'load', ranges: [{ to: 50, color: '#00ff00' }, { from: 50, color: '#ff0000', label: 'Busy' }] })))
+      .toEqual([{ label: '< 50', color: '#00ff00' }, { label: 'Busy', color: '#ff0000' }]);
+    expect(mapLegend(points, mapSettings({ colorBy: 'fixed' }))).toEqual([]);
+  });
+
+  it('every tile style is keyless and follows the theme by default', () => {
+    expect(TILE_PRESETS.auto).toHaveProperty('dark');
+    for (const t of Object.values(TILE_PRESETS)) {
+      for (const layer of 'url' in t ? [t] : [t.light, t.dark]) expect(layer.url).not.toMatch(/cartocdn/);
+    }
   });
 
   it('isEmpty and toCsv', () => {
     const s = mapSettings({ labelColumn: 'name', tooltipColumns: ['load'] });
     expect(MAP_VIEW.isEmpty!({ points }, s)).toBe(false);
     expect(MAP_VIEW.isEmpty!({ points: { shape: 'table', rows: [{ lat: 'x', lng: 'y' }] } }, s)).toBe(true);
-    expect(MAP_VIEW.toCsv!({ points }, s, {})).toEqual([['Lat', 'Lng', 'Name', 'Load'], ['41', '29', 'Istanbul', '10'], ['39.9', '32.8', 'Ankara', '90']]);
+    expect(MAP_VIEW.toCsv!({ points }, s, {})).toEqual([['Lat', 'Lng', 'Name', 'Status', 'Load'], ['41', '29', 'Istanbul', 'success', '10'], ['39.9', '32.8', 'Ankara', 'error', '90']]);
   });
 });

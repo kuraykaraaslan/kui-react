@@ -5,24 +5,45 @@ import type { FontValue } from '../../SchemaForm/types';
 import { cssColor, fontStyle } from '../settings/style';
 import type { WidgetKindView, WidgetViewProps } from '../kind';
 import { hostImageSrc, hostLink, resolveLink } from './content-logic';
+import { tint } from './ui';
 
 type S = {
   src?: string;
   alt?: string;
-  fit?: 'cover' | 'contain' | 'fill';
-  position?: 'center' | 'top' | 'bottom' | 'left' | 'right';
+  fit?: 'cover' | 'contain' | 'fill' | 'none';
+  position?: string;
   radius?: number;
+  background?: string;
+  zoomOnHover?: boolean;
   overlayColor?: string;
+  overlayOpacity?: number;
+  grayscale?: number;
+  brightness?: number;
   caption?: string;
-  captionPlacement?: 'below' | 'overlay';
+  captionPlacement?: 'overlay' | 'overlay-top' | 'below' | 'above';
+  captionAlign?: 'start' | 'center' | 'end';
   captionFont?: FontValue;
   captionColor?: string;
+  captionBackground?: string;
   href?: string;
   openInNewTab?: boolean;
 };
 
-const FITS = new Set(['cover', 'contain', 'fill']);
-const POSITIONS = new Set(['center', 'top', 'bottom', 'left', 'right']);
+const FITS = new Set(['cover', 'contain', 'fill', 'none']);
+const POSITIONS = new Set(['center', 'top', 'bottom', 'left', 'right', 'top left', 'top right', 'bottom left', 'bottom right']);
+const CAPTION_ALIGN = { start: 'text-left', center: 'text-center', end: 'text-right' } as const;
+const num = (v: unknown, lo: number, hi: number, dflt: number) =>
+  typeof v === 'number' && Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : dflt;
+
+/** The image's CSS filter from the greyscale and brightness settings, or undefined at the defaults. */
+export function imageFilter(s: Pick<S, 'grayscale' | 'brightness'>): string | undefined {
+  const parts: string[] = [];
+  const g = num(s.grayscale, 0, 100, 0);
+  const b = num(s.brightness, 20, 200, 100);
+  if (g > 0) parts.push(`grayscale(${g}%)`);
+  if (b !== 100) parts.push(`brightness(${b}%)`);
+  return parts.length ? parts.join(' ') : undefined;
+}
 
 /** `content.image`: an image from an allow-listed address (internal path, https, http; never data:). */
 export function ContentImageView({ settings, renderLink, resolveUrl }: WidgetViewProps) {
@@ -39,29 +60,66 @@ export function ContentImageView({ settings, renderLink, resolveUrl }: WidgetVie
     );
   }
   const radius = typeof s.radius === 'number' && s.radius > 0 ? s.radius : undefined;
-  const overlay = cssColor(s.overlayColor);
+  const overlayBase = cssColor(s.overlayColor);
+  const overlay = overlayBase ? tint(overlayBase, num(s.overlayOpacity, 0, 100, 30)) : undefined;
   const caption = typeof s.caption === 'string' && s.caption.trim() ? s.caption : null;
-  const overCaption = caption && s.captionPlacement === 'overlay';
+  const placement = s.captionPlacement ?? 'overlay';
+  const onImage = placement === 'overlay' || placement === 'overlay-top';
+  const align = CAPTION_ALIGN[s.captionAlign ?? 'start'] ?? CAPTION_ALIGN.start;
+  const captionBg = cssColor(s.captionBackground);
   const imgStyle: CSSProperties = {
     objectFit: FITS.has(s.fit ?? '') ? s.fit : 'cover',
     objectPosition: POSITIONS.has(s.position ?? '') ? s.position : 'center',
+    filter: imageFilter(s),
   };
 
+  const captionEl = caption ? (
+    onImage ? (
+      <span
+        className={cn(
+          'absolute inset-x-0 px-3 py-2 text-[13px] font-medium leading-snug text-text-primary',
+          !captionBg && 'bg-surface-base/75 backdrop-blur-sm',
+          placement === 'overlay-top' ? 'top-0' : 'bottom-0',
+          align,
+        )}
+        style={{ ...(captionBg ? { background: captionBg } : {}), ...fontStyle(s.captionFont, s.captionColor) }}
+      >
+        {caption}
+      </span>
+    ) : (
+      <figcaption
+        className={cn('shrink-0 px-3 py-1.5 text-xs text-text-secondary', align)}
+        style={{ ...(captionBg ? { background: captionBg } : {}), ...fontStyle(s.captionFont, s.captionColor) }}
+      >
+        {caption}
+      </figcaption>
+    )
+  ) : null;
+
   const picture = (
-    <span className="relative block h-full w-full overflow-hidden" style={radius ? { borderRadius: radius } : undefined}>
+    <span
+      className="group/img relative block h-full w-full overflow-hidden"
+      style={{ borderRadius: radius, background: cssColor(s.background) }}
+    >
       {/* A plain <img>: the source is an author-supplied address on any host. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt={s.alt ?? ''} loading="lazy" referrerPolicy="no-referrer" className="block h-full w-full" style={imgStyle} />
+      <img
+        src={src}
+        alt={s.alt ?? ''}
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        className={cn(
+          'block h-full w-full',
+          s.zoomOnHover && 'transition-transform duration-300 ease-out group-hover/img:scale-105 motion-reduce:transition-none motion-reduce:group-hover/img:scale-100',
+        )}
+        style={imgStyle}
+      />
       {overlay && <span aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ background: overlay }} />}
-      {overCaption && (
-        <span className="absolute inset-x-0 bottom-0 p-2 text-sm text-text-inverse" style={fontStyle(s.captionFont, s.captionColor)}>
-          {caption}
-        </span>
-      )}
+      {onImage && captionEl}
     </span>
   );
 
-  const cls = 'block h-full w-full rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus';
+  const cls = 'block h-full w-full rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-border-focus';
   let body: ReactNode = picture;
   if (link) {
     if (!link.external && renderLink) body = renderLink(link.href, picture, cls);
@@ -80,11 +138,10 @@ export function ContentImageView({ settings, renderLink, resolveUrl }: WidgetVie
   }
 
   return (
-    <figure className={cn('flex h-full min-h-0 flex-col')}>
+    <figure className="flex h-full min-h-0 flex-col">
+      {placement === 'above' && captionEl}
       <div className="min-h-0 flex-1">{body}</div>
-      {caption && !overCaption && (
-        <figcaption className="px-2 py-1 text-xs text-text-secondary" style={fontStyle(s.captionFont, s.captionColor)}>{caption}</figcaption>
-      )}
+      {placement === 'below' && captionEl}
     </figure>
   );
 }

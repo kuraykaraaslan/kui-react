@@ -60,3 +60,46 @@ export function confirmProps(confirm: ControlConfirm | undefined): {
 
 /** A text setting, or `undefined` when it is empty (so the control's own default applies). */
 export const textOr = (v: unknown): string | undefined => (typeof v === 'string' && v.trim() ? v : undefined);
+
+/** The feedback and confirmation texts every control template offers (`feedbackFields`). */
+export type FeedbackSettings = {
+  pendingText?: string;
+  successText?: string;
+  failureText?: string;
+  confirmQuestion?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+};
+
+/**
+ * Control messages from the feedback settings, layered over the policy's own question. The
+ * question override changes only what is SHOWN: the policy (none / confirm / typed) and the text to
+ * type stay the command's, and the server checks them again.
+ */
+export function controlMessages(s: FeedbackSettings, policyMessages?: { confirmPrompt: string }): Record<string, string> | undefined {
+  const out: Record<string, string> = { ...policyMessages };
+  const put = (key: string, v: unknown) => { const t = textOr(v); if (t) out[key] = t; };
+  put('pending', s.pendingText);
+  put('confirmed', s.successText);
+  put('failed', s.failureText);
+  put('confirmPrompt', s.confirmQuestion);
+  put('confirm', s.confirmLabel);
+  put('cancel', s.cancelLabel);
+  return Object.keys(out).length ? out : undefined;
+}
+
+/** Template fields for `FeedbackSettings` (one group; all advanced, empty = the control's own text). */
+export function feedbackFields(group = 'feedback') {
+  const text = (label: string, placeholder: string, description?: string) => ({
+    label, type: 'text' as const, maxLength: 80, placeholder, group, advanced: true, ...(description ? { description } : {}),
+  });
+  return {
+    pendingText: text('While sending', 'Sending…'),
+    successText: text('After success', 'Done'),
+    failureText: text('After a failure', 'The change failed.', 'The reason the write failed is added after it.'),
+    confirmQuestion: text('Confirmation question', 'Are you sure?',
+      'Shown when the command asks for confirmation. Only the wording changes: whether to ask, and the text to type, stay the command’s.'),
+    confirmLabel: text('Confirm button', 'Confirm'),
+    cancelLabel: text('Cancel button', 'Cancel'),
+  };
+}

@@ -1,3 +1,4 @@
+import { act } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -20,7 +21,10 @@ import { CONTROL_BUTTON_VIEW } from '../views/ControlButtonView';
 import { CONTROL_SWITCH_VIEW } from '../views/ControlSwitchView';
 import { CONTROL_SLIDER_VIEW } from '../views/ControlSliderView';
 import { CONTROL_SETPOINT_VIEW } from '../views/ControlSetpointView';
-import { resolveEmbedUrl, resolveLink } from '../views/content-logic';
+import { EMBED_SANDBOX, embedSandbox, resolveEmbedUrl, resolveLink } from '../views/content-logic';
+import { buttonLookOf } from '../views/ControlButtonView';
+import { footerKeys, keyLabel } from '../views/ContentMarkdownView';
+import { imageFilter } from '../views/ContentImageView';
 import { parseMarkdown } from '../views/markdown';
 
 const CASES: Array<[SettingsTemplate, { type: string; template: SettingsTemplate }, WidgetKindView]> = [
@@ -201,7 +205,7 @@ describe('controls', () => {
   it('a switch with an unknown state is disabled by disableWhen [unknown]', () => {
     render(<CONTROL_SWITCH_VIEW.View {...props(CONTROL_SWITCH, { onControl: vi.fn(), settings: { disableWhen: ['unknown'] } })} />);
     expect(screen.getByRole('switch')).toBeDisabled();
-    expect(screen.getAllByText('State unknown').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Unknown').length).toBeGreaterThan(0);
   });
   it('a control with no onControl is disabled as not connected', () => {
     render(<CONTROL_BUTTON_VIEW.View {...props(CONTROL_BUTTON)} />);
@@ -211,7 +215,8 @@ describe('controls', () => {
     const onControl = vi.fn().mockResolvedValue(undefined);
     render(<CONTROL_BUTTON_VIEW.View {...props(CONTROL_BUTTON, { settings: { label: 'Start', mainColor: '#00ff00' }, onControl })} />);
     const btn = screen.getByRole('button', { name: 'Start' });
-    expect(btn.style.background).toContain('rgb(0, 255, 0)');
+    expect(btn.style.getPropertyValue('--kb-bg')).toBe('#00ff00');
+    expect(btn.className).toContain('bg-[color:var(--kb-bg)]');
     await userEvent.setup().click(btn);
     expect(onControl).toHaveBeenCalledWith({ kind: 'run' });
   });
@@ -288,7 +293,7 @@ describe('host hooks', () => {
       resolveUrl: (u) => `/t/acme${u}`,
     })} />);
     expect(screen.getByRole('link', { name: 'Users' })).toHaveAttribute('href', '/t/acme/admin/users');
-    expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute('href', 'https://kui.dev/');
+    expect(screen.getByRole('link', { name: /^Docs/ })).toHaveAttribute('href', 'https://kui.dev/');
   });
   it('embed frame is named by the card title, else by the host', () => {
     const settings = { url: 'https://grafana.com/d/1' };
@@ -370,5 +375,293 @@ describe('host hooks', () => {
     expect(onControl).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: 'Confirm' }));
     expect(onControl).toHaveBeenCalledWith({ kind: 'set', value: 41, confirmation: { confirmed: true } });
+  });
+});
+
+describe('embed settings', () => {
+  const url = 'https://www.openstreetmap.org/export/embed.html?bbox=1,2,3,4';
+  it('the sandbox can only lose permissions, never gain same-origin or top navigation', () => {
+    expect(embedSandbox(undefined)).toBe(EMBED_SANDBOX);
+    expect(embedSandbox(['scripts'])).toBe('allow-scripts');
+    expect(embedSandbox([])).toBe('');
+    const crafted = embedSandbox(['same-origin', 'top-navigation', 'scripts allow-same-origin', 'forms', 42]);
+    expect(crafted).toBe('allow-forms');
+    for (const v of [crafted, embedSandbox(['same-origin'])]) {
+      expect(v).not.toContain('same-origin');
+      expect(v).not.toContain('top-navigation');
+    }
+    const { container } = render(<CONTENT_EMBED_VIEW.View {...props(CONTENT_EMBED, { settings: { url, sandboxAllow: ['forms', 'same-origin'] } })} />);
+    expect(container.querySelector('iframe')!.getAttribute('sandbox')).toBe('allow-forms');
+  });
+  it('the address bar names the host, shows the hint and opens the page in a new tab', () => {
+    render(<CONTENT_EMBED_VIEW.View {...props(CONTENT_EMBED, { settings: { url } })} />);
+    expect(screen.getByText('www.openstreetmap.org')).toBeInTheDocument();
+    expect(screen.getByText(/may not allow embedding/)).toBeInTheDocument();
+    const open = screen.getByRole('link', { name: /Open/ });
+    expect(open).toHaveAttribute('href', url.replace('?', '?'));
+    expect(open).toHaveAttribute('target', '_blank');
+    expect(open.getAttribute('rel')).toContain('noopener');
+  });
+  it('the bar can be hidden or moved; the hint and link text are settings', () => {
+    const { container, rerender } = render(<CONTENT_EMBED_VIEW.View {...props(CONTENT_EMBED, { settings: { url, showToolbar: false } })} />);
+    expect(screen.queryByRole('link')).toBeNull();
+    rerender(<CONTENT_EMBED_VIEW.View {...props(CONTENT_EMBED, { settings: { url, toolbarPosition: 'top', hintText: 'Live map', openLabel: 'Full map' } })} />);
+    expect(screen.getByText('Live map')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Full map/ })).toBeInTheDocument();
+    expect(container.firstElementChild!.firstElementChild!.className).toContain('border-b');
+  });
+  it('zoom scales the frame, border and radius frame it', () => {
+    const { container } = render(<CONTENT_EMBED_VIEW.View {...props(CONTENT_EMBED, { settings: { url, zoom: 50, border: true, borderColor: '#ff0000', radius: 12 } })} />);
+    const frame = container.querySelector('iframe')!;
+    expect(frame.style.transform).toBe('scale(0.5)');
+    expect(frame.style.width).toBe('200%');
+    const box = frame.parentElement!;
+    expect(box.style.borderColor).toBe('rgb(255, 0, 0)');
+    expect(box.style.borderRadius).toBe('12px');
+  });
+  it('reloads the frame on the refresh interval', () => {
+    vi.useFakeTimers();
+    try {
+      const { container } = render(<CONTENT_EMBED_VIEW.View {...props(CONTENT_EMBED, { settings: { url, refreshSeconds: 30 } })} />);
+      const first = container.querySelector('iframe');
+      act(() => { vi.advanceTimersByTime(30_000); });
+      expect(container.querySelector('iframe')).not.toBe(first);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe('markdown settings', () => {
+  it('callout styles use theme tones; custom uses its colours; an icon setting is accepted', () => {
+    const { container, rerender } = render(<CONTENT_MARKDOWN_VIEW.View {...props(CONTENT_MARKDOWN, { settings: { content: 'Hi', layout: 'callout', calloutStyle: 'warning' } })} />);
+    const box = () => container.querySelector('.border-l-4') as HTMLElement;
+    expect(box().style.borderLeftColor).toBe('var(--warning)');
+    expect(box().style.background).toBe('var(--warning-subtle)');
+    rerender(<CONTENT_MARKDOWN_VIEW.View {...props(CONTENT_MARKDOWN, { settings: { content: 'Hi', layout: 'callout', calloutStyle: 'custom', calloutColor: '#00ff00' } })} />);
+    expect(box().style.borderLeftColor).toBe('rgb(0, 255, 0)');
+  });
+  it('clamps long text to a number of lines; scrolls by default', () => {
+    const { container, rerender } = render(<CONTENT_MARKDOWN_VIEW.View {...props(CONTENT_MARKDOWN, { settings: { content: 'a\n\nb', overflow: 'clamp', clampLines: 3 } })} />);
+    const text = container.querySelector('.space-y-2') as HTMLElement;
+    expect(text.style.webkitLineClamp).toBe('3');
+    rerender(<CONTENT_MARKDOWN_VIEW.View {...props(CONTENT_MARKDOWN, { settings: { content: 'a' } })} />);
+    expect((container.firstElementChild as HTMLElement).className).toContain('overflow-auto');
+  });
+  it('heading font and colour, link underline, padding and vertical position change the render', () => {
+    const { container } = render(<CONTENT_MARKDOWN_VIEW.View {...props(CONTENT_MARKDOWN, {
+      settings: { content: '# Title\n\n[x](/a)', headingColor: '#ff0000', headingFont: { weight: 800 }, linkUnderline: 'always', padding: 12, verticalAlign: 'center' },
+    })} />);
+    const h = screen.getByText('Title');
+    expect(h.style.color).toBe('rgb(255, 0, 0)');
+    expect(h.style.fontWeight).toBe('800');
+    expect(container.querySelector('a')!.className).toContain('underline');
+    expect(container.querySelector('a')!.className).not.toContain('hover:underline');
+    expect((container.firstElementChild as HTMLElement).style.padding).toBe('12px');
+    expect(container.querySelector('.justify-center')).not.toBeNull();
+  });
+  it('lists record values as a footer: chosen keys, else every scalar; values are escaped text', () => {
+    const record = { model: 'S200', uptimeHours: 12, nested: { a: 1 }, html: '<b>x</b>' };
+    expect(footerKeys(record, [])).toEqual(['model', 'uptimeHours', 'html']);
+    expect(footerKeys(record, ['model'])).toEqual(['model']);
+    expect(keyLabel('uptimeHours')).toBe('Uptime hours');
+    expect(keyLabel('serial_number')).toBe('Serial number');
+    const { container, rerender } = render(<CONTENT_MARKDOWN_VIEW.View {...props(CONTENT_MARKDOWN, {
+      settings: { content: 'Hi', showRecord: true }, data: { record: { shape: 'record', record } },
+    })} />);
+    expect(screen.getByText('Uptime hours')).toBeInTheDocument();
+    expect(screen.getByText('<b>x</b>')).toBeInTheDocument();
+    expect(container.querySelector('b')).toBeNull();
+    rerender(<CONTENT_MARKDOWN_VIEW.View {...props(CONTENT_MARKDOWN, {
+      settings: { content: 'Hi', showRecord: false }, data: { record: { shape: 'record', record } },
+    })} />);
+    expect(screen.queryByText('Uptime hours')).toBeNull();
+  });
+});
+
+describe('image settings', () => {
+  const src = 'https://x.dev/a.png';
+  it('filters, zoom on hover and overlay strength change the render', () => {
+    expect(imageFilter({})).toBeUndefined();
+    expect(imageFilter({ grayscale: 100, brightness: 80 })).toBe('grayscale(100%) brightness(80%)');
+    const { container } = render(<CONTENT_IMAGE_VIEW.View {...props(CONTENT_IMAGE, {
+      settings: { src, grayscale: 50, zoomOnHover: true, overlayColor: '#000000', overlayOpacity: 40 },
+    })} />);
+    const img = container.querySelector('img')!;
+    expect(img.style.filter).toBe('grayscale(50%)');
+    expect(img.className).toContain('group-hover/img:scale-105');
+    const overlay = container.querySelector('[aria-hidden="true"]') as HTMLElement;
+    expect(overlay.style.background).toContain('40%');
+  });
+  it('caption positions: on the image (top or bottom), below or above; background and alignment', () => {
+    const { container, rerender } = render(<CONTENT_IMAGE_VIEW.View {...props(CONTENT_IMAGE, { settings: { src, caption: 'Line 2' } })} />);
+    expect(screen.getByText('Line 2').className).toContain('bottom-0');
+    rerender(<CONTENT_IMAGE_VIEW.View {...props(CONTENT_IMAGE, { settings: { src, caption: 'Line 2', captionPlacement: 'overlay-top' } })} />);
+    expect(screen.getByText('Line 2').className).toContain('top-0');
+    rerender(<CONTENT_IMAGE_VIEW.View {...props(CONTENT_IMAGE, { settings: { src, caption: 'Line 2', captionPlacement: 'above', captionAlign: 'end', captionBackground: '#ff0000' } })} />);
+    const cap = container.querySelector('figcaption')!;
+    expect(cap.parentElement!.firstElementChild).toBe(cap);
+    expect(cap.className).toContain('text-right');
+    expect(cap.style.background).toBe('rgb(255, 0, 0)');
+  });
+});
+
+describe('links settings', () => {
+  const links = [{ label: 'Users', href: '/admin/users', description: 'Everyone' }, { label: 'Docs', href: 'https://kui.dev' }];
+  it('tiles lay out in columns; descriptions can be hidden; dividers are a setting', () => {
+    const { container, rerender } = render(<CONTENT_LINKS_VIEW.View {...props(CONTENT_LINKS, { settings: { links, layout: 'tiles', columns: '2' } })} />);
+    expect((container.querySelector('ul') as HTMLElement).style.gridTemplateColumns).toBe('repeat(2, minmax(0, 1fr))');
+    expect(screen.getByText('Everyone')).toBeInTheDocument();
+    rerender(<CONTENT_LINKS_VIEW.View {...props(CONTENT_LINKS, { settings: { links, showDescription: false } })} />);
+    expect(screen.queryByText('Everyone')).toBeNull();
+    expect(container.querySelector('ul')!.className).toContain('divide-y');
+    rerender(<CONTENT_LINKS_VIEW.View {...props(CONTENT_LINKS, { settings: { links, divider: false } })} />);
+    expect(container.querySelector('ul')!.className).not.toContain('divide-y');
+  });
+  it('external links are marked and say they open a new tab; item colour and radius reach the items', () => {
+    const { container, rerender } = render(<CONTENT_LINKS_VIEW.View {...props(CONTENT_LINKS, { settings: { links, itemColor: '#eeeeee', radius: 4 } })} />);
+    const docs = screen.getByRole('link', { name: /Docs/ });
+    expect(docs.textContent).toContain('↗');
+    expect(docs).toHaveAccessibleName(/^Docs ?\(opens in a new tab\)$/);
+    const li = container.querySelector('li') as HTMLElement;
+    expect(li.style.getPropertyValue('--kui-link-bg')).toBe('#eeeeee');
+    expect(li.style.getPropertyValue('--kui-link-radius')).toBe('4px');
+    rerender(<CONTENT_LINKS_VIEW.View {...props(CONTENT_LINKS, { settings: { links, externalMark: false, openExternalInNewTab: false } })} />);
+    expect(screen.getByRole('link', { name: 'Docs' }).textContent).not.toContain('↗');
+    expect(screen.getByRole('link', { name: 'Docs' })).not.toHaveAttribute('target');
+  });
+});
+
+describe('button settings', () => {
+  it('colours per state become CSS variables the state classes read', () => {
+    const look = buttonLookOf({ appearance: 'outlined', mainColor: '#0000ff', hoverColor: '#00ff00', disabledColor: '#cccccc', disabledTextColor: '#333333' });
+    expect(look.style).toMatchObject({ '--kb-fg': '#0000ff', '--kb-border': '#0000ff', '--kb-hover-bg': '#00ff00', '--kb-dis-bg': '#cccccc' });
+    expect(look.className).toContain('hover:bg-[color:var(--kb-hover-bg)]');
+    expect(look.className).toContain('disabled:text-[color:var(--kb-dis-fg)]');
+    expect(buttonLookOf({ mainColor: 'url(x)' }).style).not.toHaveProperty('--kb-bg');
+  });
+  it('round icon and pill layouts, icon after the text, and a description', async () => {
+    const onControl = vi.fn().mockResolvedValue(undefined);
+    const { container, rerender } = render(<CONTROL_BUTTON_VIEW.View {...props(CONTROL_BUTTON, { settings: { layout: 'icon', label: 'Power' }, onControl })} />);
+    const round = screen.getByRole('button', { name: 'Power' });
+    expect(round.className).toContain('rounded-full');
+    rerender(<CONTROL_BUTTON_VIEW.View {...props(CONTROL_BUTTON, { settings: { layout: 'fab', label: 'Go', description: 'Starts the line' }, onControl })} />);
+    expect(screen.getByRole('button', { name: 'Go' }).className).toContain('shadow-md');
+    expect(screen.getByText('Starts the line')).toBeInTheDocument();
+    expect(container.querySelector('.justify-end')).not.toBeNull();
+  });
+  it('feedback texts replace the status line; a failure keeps its reason', async () => {
+    const user = userEvent.setup();
+    const ok = vi.fn().mockResolvedValue(undefined);
+    const { unmount } = render(<CONTROL_BUTTON_VIEW.View {...props(CONTROL_BUTTON, { settings: { successText: 'Line restarted' }, onControl: ok })} />);
+    await user.click(screen.getByRole('button', { name: 'Run' }));
+    expect(await screen.findByText('Line restarted')).toBeInTheDocument();
+    unmount();
+    const bad = vi.fn().mockRejectedValue(new Error('PLC offline'));
+    render(<CONTROL_BUTTON_VIEW.View {...props(CONTROL_BUTTON, { settings: { failureText: 'Restart failed' }, onControl: bad })} />);
+    await user.click(screen.getByRole('button', { name: 'Run' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Restart failed (PLC offline)');
+  });
+  it('the confirmation wording is a setting; the policy and the typed text stay the command’s', async () => {
+    const onControl = vi.fn().mockResolvedValue(undefined);
+    const user = userEvent.setup();
+    render(<CONTROL_BUTTON_VIEW.View {...props(CONTROL_BUTTON, {
+      settings: { confirmQuestion: 'Restart line 2 now?', confirmLabel: 'Restart', cancelLabel: 'Keep running' },
+      onControl, confirm: { mode: 'typed', text: 'line-2' },
+    })} />);
+    await user.click(screen.getByRole('button', { name: 'Run' }));
+    expect(screen.getByText('Restart line 2 now?')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Keep running' })).toBeInTheDocument();
+    const confirm = screen.getByRole('button', { name: 'Restart' });
+    expect(confirm).toBeDisabled();
+    await user.type(screen.getByRole('textbox'), 'line-2');
+    await user.click(confirm);
+    expect(onControl).toHaveBeenCalledWith({ kind: 'run', confirmation: { confirmed: true, typed: 'line-2' } });
+  });
+});
+
+describe('switch settings', () => {
+  const on = { value: { shape: 'scalar' as const, value: true } };
+  it('shows the state as large text in the on colour, as a pill, or not at all', () => {
+    const { rerender } = render(<CONTROL_SWITCH_VIEW.View {...props(CONTROL_SWITCH, { data: on, onControl: vi.fn(), settings: { label: 'Pump', onColor: '#00ff00' } })} />);
+    expect(screen.getByText('Pump')).toBeInTheDocument();
+    expect(screen.getByText('On').parentElement!.style.color).toBe('rgb(0, 255, 0)');
+    expect(screen.getByRole('switch')).toHaveAccessibleName('Pump');
+    expect(screen.getByRole('switch')).toHaveAccessibleDescription('On');
+    rerender(<CONTROL_SWITCH_VIEW.View {...props(CONTROL_SWITCH, { data: on, onControl: vi.fn(), settings: { stateDisplay: 'pill', onLabel: 'Running' } })} />);
+    expect(screen.getByText('Running').className).not.toContain('font-semibold');
+    rerender(<CONTROL_SWITCH_VIEW.View {...props(CONTROL_SWITCH, { data: on, onControl: vi.fn(), settings: { stateDisplay: 'none' } })} />);
+    expect(screen.queryByText('On')).toBeNull();
+  });
+  it('size and per-state knob colours change the switch', () => {
+    const { container } = render(<CONTROL_SWITCH_VIEW.View {...props(CONTROL_SWITCH, {
+      data: { value: { shape: 'scalar', value: false } }, onControl: vi.fn(), settings: { size: 'lg', thumbOffColor: '#ff0000' },
+    })} />);
+    expect(container.querySelector('.h-7.w-12')).not.toBeNull();
+    expect((container.querySelector('.h-6.w-6') as HTMLElement).style.background).toBe('rgb(255, 0, 0)');
+  });
+  it('the card title names the switch when there is no label', () => {
+    render(<CONTROL_SWITCH_VIEW.View {...props(CONTROL_SWITCH, { data: on, onControl: vi.fn(), title: 'Coolant pump' })} />);
+    expect(screen.getByRole('switch')).toHaveAccessibleName('Coolant pump');
+  });
+});
+
+describe('slider settings', () => {
+  const v = { value: { shape: 'scalar' as const, value: 40 } };
+  it('label, value position and min/max', () => {
+    const { container, rerender } = render(<CONTROL_SLIDER_VIEW.View {...props(CONTROL_SLIDER, { data: v, onControl: vi.fn(), settings: { label: 'Speed' } })} />);
+    expect(screen.getByText('Speed')).toBeInTheDocument();
+    expect(screen.getByRole('slider')).toHaveAccessibleName('Speed');
+    expect(screen.getByText('0')).toBeInTheDocument();
+    rerender(<CONTROL_SLIDER_VIEW.View {...props(CONTROL_SLIDER, { data: v, onControl: vi.fn(), settings: { showMinMax: false, showValue: false } })} />);
+    expect(screen.queryByText('0')).toBeNull();
+    expect(screen.queryByText('40')).toBeNull();
+    rerender(<CONTROL_SLIDER_VIEW.View {...props(CONTROL_SLIDER, { data: v, onControl: vi.fn(), settings: { valuePosition: 'end' } })} />);
+    expect(container.querySelector('.items-start .shrink-0')?.textContent).toBe('40');
+  });
+  it('tick marks with labels, thickness, thumb size and a vertical direction', () => {
+    const { container, rerender } = render(<CONTROL_SLIDER_VIEW.View {...props(CONTROL_SLIDER, {
+      data: v, onControl: vi.fn(), settings: { tickMarks: 5, tickLabels: true, thickness: 10, thumbSize: 24 },
+    })} />);
+    expect(screen.getByText('25')).toBeInTheDocument();
+    expect(screen.getByText('75')).toBeInTheDocument();
+    const input = screen.getByRole('slider');
+    expect(input.style.height).toBe('10px');
+    expect(input.style.getPropertyValue('--kui-slider-thumb-size')).toBe('24px');
+    rerender(<CONTROL_SLIDER_VIEW.View {...props(CONTROL_SLIDER, { data: v, onControl: vi.fn(), settings: { orientation: 'vertical' } })} />);
+    expect(screen.getByRole('slider')).toHaveAttribute('aria-orientation', 'vertical');
+    expect(screen.getByRole('slider').style.writingMode).toBe('vertical-lr');
+    expect(container).toBeTruthy();
+  });
+});
+
+describe('setpoint settings', () => {
+  const v = { value: { shape: 'scalar' as const, value: 22 } };
+  it('shows the label and the current value; the caption, unit and range are settings', () => {
+    const { rerender } = render(<CONTROL_SETPOINT_VIEW.View {...props(CONTROL_SETPOINT, {
+      data: v, format: { unit: '°C' }, onControl: vi.fn(), settings: { label: 'Target', layout: 'stepper' },
+    })} />);
+    expect(screen.getByText('Target')).toBeInTheDocument();
+    expect(screen.getByText('Now')).toBeInTheDocument();
+    expect(screen.getAllByText('°C').length).toBe(2);
+    rerender(<CONTROL_SETPOINT_VIEW.View {...props(CONTROL_SETPOINT, {
+      data: v, format: { unit: '°C' }, onControl: vi.fn(), settings: { layout: 'stepper', unitDisplay: 'hide', currentLabel: 'Actual', showRange: true, min: 10, max: 30 },
+    })} />);
+    expect(screen.queryByText('°C')).toBeNull();
+    expect(screen.getByText('Actual')).toBeInTheDocument();
+    expect(screen.getByText('10 – 30')).toBeInTheDocument();
+    rerender(<CONTROL_SETPOINT_VIEW.View {...props(CONTROL_SETPOINT, { data: v, onControl: vi.fn(), settings: { showValue: false } })} />);
+    expect(screen.queryByText('Now')).toBeNull();
+  });
+  it('a dial steps and writes like the stepper; button colours apply', async () => {
+    const onControl = vi.fn().mockResolvedValue(undefined);
+    const { container } = render(<CONTROL_SETPOINT_VIEW.View {...props(CONTROL_SETPOINT, {
+      data: v, onControl, settings: { layout: 'dial', step: 2, buttonColor: '#ff0000', buttonTextColor: '#00ff00' },
+    })} />);
+    expect(container.querySelector('svg circle')).not.toBeNull();
+    const up = screen.getByRole('button', { name: 'Increase' });
+    expect(up.style.color).toBe('rgb(0, 255, 0)');
+    await userEvent.setup().click(up);
+    expect(onControl).toHaveBeenCalledWith({ kind: 'set', value: 24 });
   });
 });

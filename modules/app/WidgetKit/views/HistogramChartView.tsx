@@ -1,51 +1,95 @@
 'use client';
 import { useMemo } from 'react';
-import { BarChart, type Series } from '@/modules/ui/Chart';
+import { BarChart, type CategoryMarker, type Series } from '@/modules/ui/Chart';
 import type { WidgetKindView, WidgetViewProps } from '../kind';
 import { cssColor, formatValue, type ValueFormat } from '../settings/style';
-import { histogramBins, type HistogramBin } from './chart-data';
-import { axisProps, useChartHeight } from './chart-props';
+import { histogramBins, valueStats, type HistogramBin } from './chart-data';
+import { animateOf, axisProps, num, str, tooltipProps, valueLabelStyleOf } from './chart-props';
 
 type S = Record<string, unknown>;
-const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+const nul = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
 
-const binsOf = (data: WidgetViewProps['data'], s: S): HistogramBin[] => {
+const valuesOf = (data: WidgetViewProps['data'], s: S): unknown[] => {
   const col = typeof s.valueColumn === 'string' && s.valueColumn ? s.valueColumn : 'value';
-  return histogramBins((data.values?.rows ?? []).map((r) => r[col]), num(s.bins), num(s.min), num(s.max));
+  return (data.values?.rows ?? []).map((r) => r[col]);
 };
+const binsOf = (data: WidgetViewProps['data'], s: S): HistogramBin[] =>
+  histogramBins(valuesOf(data, s), nul(s.bins), nul(s.min), nul(s.max), s.binEdges !== 'exact');
 
-/** `x – y` bin labels in the widget format (unit, decimals). */
+/** Decimals a bin edge needs: none for whole steps, else enough for the step (0.25 → 2). */
+function edgeDecimals(bins: HistogramBin[], format: ValueFormat): number | undefined {
+  if (typeof format.decimals === 'number') return format.decimals;
+  const w = bins.length ? bins[0].to - bins[0].from : 1;
+  if (!(w > 0)) return undefined;
+  const allWhole = bins.every((b) => Number.isInteger(Math.round(b.from * 1e9) / 1e9));
+  return allWhole && Number.isInteger(Math.round(w * 1e9) / 1e9) ? 0 : Math.min(4, Math.max(1, -Math.floor(Math.log10(w)) + 1));
+}
+
+/**
+ * Bins as one bar series. Each bar's category is its range in the widget format (`100–140 ms`, the
+ * tooltip heading); the axis prints the bin edges compactly (`100`, `140`, …) via `edgeTicks`.
+ */
 export function binSeries(bins: HistogramBin[], format: ValueFormat, name: string, locale?: string, color?: string): Series[] | null {
   if (bins.length === 0) return null;
-  const fmt = (n: number) => formatValue(n, format, {}, locale);
+  const d = edgeDecimals(bins, format);
+  const edge = (n: number) => formatValue(n, { ...format, unit: '', decimals: d }, {}, locale);
+  const unit = format.unit ? (format.unitPosition === 'before' ? '' : ` ${format.unit}`) : '';
+  const pre = format.unit && format.unitPosition === 'before' ? `${format.unit} ` : '';
   return [{
     id: 'histogram',
     name,
     ...(color ? { color } : {}),
     format: (v: number) => String(Math.round(v)),
-    data: bins.map((b) => ({ x: bins.length === 1 && b.from === b.to ? fmt(b.from) : `${fmt(b.from)}–${fmt(b.to)}`, y: b.count })),
+    data: bins.map((b) => ({ x: bins.length === 1 && b.from === b.to ? `${pre}${edge(b.from)}${unit}` : `${pre}${edge(b.from)}–${edge(b.to)}${unit}`, y: b.count })),
   }];
 }
 
-/** `chart.histogram`: equal-width bins of one numeric column, drawn as bars. */
+/** Axis ticks on the bin edges, compact numbers with the unit. */
+export function edgeTicks(bins: HistogramBin[], format: ValueFormat, locale?: string): Array<{ at: number; label: string }> {
+  const d = edgeDecimals(bins, format);
+  const f = (n: number) => formatValue(n, { ...format, notation: Math.abs(n) >= 10_000 ? 'compact' : format.notation, decimals: d }, {}, locale);
+  if (bins.length === 1) return [{ at: 0.5, label: f(bins[0].from) }];
+  return [...bins.map((b, i) => ({ at: i, label: f(b.from) })), { at: bins.length, label: f(bins[bins.length - 1].to) }];
+}
+
+/** `chart.histogram`: equal-width bins (on round edges by default) of one numeric column, drawn as bars. */
 export function HistogramChartView({ settings, format, data, locale }: WidgetViewProps) {
   const s = settings;
+  const bins = useMemo(() => binsOf(data, s), [data, s]);
   const series = useMemo(
-    () => binSeries(binsOf(data, s), format, typeof s.countLabel === 'string' && s.countLabel ? s.countLabel : 'Count', locale, cssColor(s.barColor)),
-    [data, s, format, locale],
+    () => binSeries(bins, format, str(s.countLabel) ?? 'Count', locale, cssColor(s.barColor)),
+    [bins, s.countLabel, s.barColor, format, locale],
   );
-  const [ref, height] = useChartHeight();
-  if (!series) return <div ref={ref} className="h-full" />;
+  const markers = useMemo(() => {
+    const stats = s.showMean === true || s.showMedian === true ? valueStats(valuesOf(data, s)) : null;
+    if (!stats || bins.length === 0) return undefined;
+    const lo = bins[0].from;
+    const w = bins[0].to - bins[0].from || 1;
+    const color = cssColor(s.markerColor) ?? 'var(--text-primary)';
+    const out: CategoryMarker[] = [];
+    const text = (v: number) => formatValue(v, { ...format, decimals: undefined }, {}, locale);
+    if (s.showMean === true) out.push({ at: (stats.mean - lo) / w, label: `Mean ${text(stats.mean)}`, color, style: 'dashed' });
+    if (s.showMedian === true) out.push({ at: (stats.median - lo) / w, label: `Median ${text(stats.median)}`, color, style: 'dotted' });
+    return out;
+  }, [s, data, bins, format, locale]);
+  if (!series) return <div className="h-full" />;
   return (
-    <div ref={ref} className="h-full min-h-0 w-full">
+    <div className="h-full min-h-0 w-full">
       <BarChart
         series={series}
-        height={height}
+        fill
         showLegend={false}
         showValues={s.valueLabels === 'value'}
-        showTooltip={s.showTooltip !== false}
+        valueLabelPosition={s.valueLabelPosition === 'inside' ? 'inside' : 'outside'}
+        valueLabelStyle={valueLabelStyleOf(s)}
+        radius={num(s.barRadius) ?? 3}
+        barWidth={(num(s.barWidth) ?? 92) / 100}
+        categoryTicks={edgeTicks(bins, format, locale)}
+        markers={markers}
         yFormat={(v) => String(Math.round(v * 100) / 100)}
         {...axisProps(s)}
+        {...tooltipProps(s)}
+        animate={animateOf(s)}
         ariaLabel="Histogram"
       />
     </div>

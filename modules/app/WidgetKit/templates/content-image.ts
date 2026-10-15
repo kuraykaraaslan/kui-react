@@ -3,7 +3,7 @@ import type { SettingsTemplate } from '../settings/types';
 import type { BuiltinKindSpec } from '../kind';
 import { safeImageRule, safeLinkRule } from '../views/content-logic';
 
-/** `content.image`: an image from an allow-listed address, with fit, caption, overlay and an optional link. */
+/** `content.image`: an image from an allow-listed address, with fit, filters, caption, overlay and an optional link. */
 export const CONTENT_IMAGE: SettingsTemplate = {
   id: 'builtin:content.image',
   version: 1,
@@ -15,6 +15,7 @@ export const CONTENT_IMAGE: SettingsTemplate = {
   groups: [
     { id: 'image', label: 'Image', tab: 'Display', since: 1 },
     { id: 'display', label: 'Display', tab: 'Display', since: 1 },
+    { id: 'effects', label: 'Overlay and filters', tab: 'Display', since: 1 },
     { id: 'caption', label: 'Caption', tab: 'Display', since: 1 },
     { id: 'link', label: 'Link', tab: 'Display', since: 1 },
   ],
@@ -29,23 +30,41 @@ export const CONTENT_IMAGE: SettingsTemplate = {
     },
     fit: {
       label: 'Fit', type: 'select', display: 'segmented', value: 'cover', group: 'display', required: true,
-      options: [opt('cover', 'Cover'), opt('contain', 'Contain'), opt('fill', 'Stretch')],
+      options: [opt('cover', 'Cover'), opt('contain', 'Contain'), opt('fill', 'Stretch'), opt('none', 'Original size')],
     },
     position: {
       label: 'Position', type: 'select', value: 'center', group: 'display', required: true, advanced: true,
-      options: [opt('center', 'Centre'), opt('top', 'Top'), opt('bottom', 'Bottom'), opt('left', 'Left'), opt('right', 'Right')],
+      options: [
+        opt('center', 'Centre'), opt('top', 'Top'), opt('bottom', 'Bottom'), opt('left', 'Left'), opt('right', 'Right'),
+        opt('top left', 'Top left'), opt('top right', 'Top right'), opt('bottom left', 'Bottom left'), opt('bottom right', 'Bottom right'),
+      ],
     },
     radius: { label: 'Corner radius (px)', type: 'number', min: 0, max: 48, value: 0, group: 'display', advanced: true },
-    overlayColor: colorField('Overlay colour', 'display', undefined, {
-      advanced: true, description: 'A colour over the image, e.g. rgba(0,0,0,0.3).',
+    background: colorField('Background', 'display', undefined, {
+      advanced: true, description: 'Behind an image that does not fill the card (Contain, Original size). Empty = none.',
     }),
+    zoomOnHover: { label: 'Zoom in on hover', type: 'boolean', value: false, group: 'effects' },
+    overlayColor: colorField('Overlay colour', 'effects', undefined, {
+      description: 'A colour laid over the image, e.g. to make a caption readable. Empty = none.',
+    }),
+    overlayOpacity: { label: 'Overlay strength (%)', type: 'number', min: 0, max: 100, step: 5, value: 30, group: 'effects',
+      advanced: true, description: 'Applied to the overlay colour.' },
+    grayscale: { label: 'Greyscale (%)', type: 'number', min: 0, max: 100, step: 5, value: 0, group: 'effects', advanced: true },
+    brightness: { label: 'Brightness (%)', type: 'number', min: 20, max: 200, step: 5, value: 100, group: 'effects', advanced: true },
     caption: { label: 'Caption', type: 'text', maxLength: 200, group: 'caption' },
     captionPlacement: {
-      label: 'Caption position', type: 'select', display: 'segmented', value: 'below', group: 'caption', required: true, advanced: true,
-      options: [opt('below', 'Below the image'), opt('overlay', 'Over the image')],
+      label: 'Caption position', type: 'select', value: 'overlay', group: 'caption', required: true,
+      options: [opt('overlay', 'On the image, bottom'), opt('overlay-top', 'On the image, top'), opt('below', 'Below the image'), opt('above', 'Above the image')],
+    },
+    captionAlign: {
+      label: 'Caption alignment', type: 'select', display: 'segmented', value: 'start', group: 'caption', required: true, advanced: true,
+      options: [opt('start', 'Left'), opt('center', 'Centre'), opt('end', 'Right')],
     },
     captionFont: fontField('Caption font', 'caption', { advanced: true }),
-    captionColor: colorField('Caption colour', 'caption', 'var(--text-secondary)', { advanced: true }),
+    captionColor: colorField('Caption colour', 'caption', undefined, { advanced: true, description: 'Empty = from the theme.' }),
+    captionBackground: colorField('Caption background', 'caption', undefined, {
+      advanced: true, description: 'Empty = a frosted bar on the image, none below or above it.',
+    }),
     href: {
       label: 'Link', type: 'text', maxLength: 2048, placeholder: '/admin or https://…', group: 'link',
       description: 'Optional. An internal path or an https / http / mailto address.',

@@ -11,6 +11,19 @@ const RANGE_ITEM: Record<string, FieldSchema> = {
   label: { label: 'Label', type: 'text', maxLength: 40, placeholder: 'High' },
 };
 
+const DATE_OPTIONS = [
+  opt('relative', '5m ago'), opt('date', '15 Oct'), opt('time', '14:05'), opt('datetime', '15 Oct 14:05'), opt('custom', 'Custom pattern'),
+];
+const PATTERN_HELP = 'yyyy yy MMMM MMM MM M EEEE EEE dd d HH H hh h mm ss a; text in \'quotes\' is kept as is. Example: dd.MM.yyyy HH:mm';
+
+/** A value → colour (and label, icon) map for one column. */
+const VALUE_MAP_ITEM: Record<string, FieldSchema> = {
+  value: { label: 'Value', type: 'text', maxLength: 80, required: true, placeholder: 'Online' },
+  color: { label: 'Colour', type: 'color', value: 'var(--success)' },
+  label: { label: 'Shown as', type: 'text', maxLength: 60, placeholder: 'The value' },
+  icon: { label: 'Icon', type: 'icon', placeholder: 'fas fa-circle-check' },
+};
+
 /** Every column link template is an internal path before `{column}` expansion. */
 const columnLinksAreInternal = (v: Sparse) =>
   (Array.isArray(v.columns) ? v.columns : []).flatMap((c, i) => {
@@ -32,7 +45,10 @@ export const DATA_TABLE: SettingsTemplate = {
   groups: [
     { id: 'columns', label: 'Columns', tab: 'Display', since: 1 },
     { id: 'rows', label: 'Rows', tab: 'Display', since: 1 },
+    { id: 'viewer', label: 'Viewer tools', tab: 'Display', since: 1 },
+    { id: 'dates', label: 'Dates', tab: 'Display', since: 1 },
     { id: 'look', label: 'Look', tab: 'Look', since: 1 },
+    { id: 'rowColour', label: 'Row colour', tab: 'Look', since: 1 },
     { id: 'header', label: 'Header', tab: 'Look', since: 1 },
     { id: 'cells', label: 'Cells', tab: 'Look', since: 1 },
     { id: 'colour', label: 'Colour ranges', tab: 'Look', since: 1 },
@@ -46,78 +62,130 @@ export const DATA_TABLE: SettingsTemplate = {
         label: { label: 'Header', type: 'text', maxLength: 60, placeholder: 'As declared' },
         visible: {
           label: 'Show', type: 'select', value: 'always', required: true,
-          options: [opt('always', 'Always'), opt('desktop', 'Not on phones'), opt('hidden', 'Hidden')],
+          options: [opt('always', 'Always'), opt('desktop', 'Not on phones'), opt('mobile', 'Only on phones'), opt('hidden', 'Hidden')],
         },
         cell: {
-          label: 'Cell', type: 'select', display: 'segmented', value: 'auto', required: true,
-          options: [opt('auto', 'Auto'), opt('text', 'Text'), opt('badge', 'Badge'), opt('bar', 'Bar'), opt('link', 'Link')],
-          description: 'Auto: a badge for badge columns, otherwise text. Badge: the value names a colour (success, warning, error, info, neutral, primary). Bar: a bar on the raw number, coloured by the ranges. Link: internal paths only.',
+          label: 'Cell', type: 'select', value: 'auto', required: true,
+          options: [
+            opt('auto', 'Auto'), opt('text', 'Text'), opt('number', 'Number'), opt('date', 'Date'), opt('badge', 'Badge'),
+            opt('bar', 'Bar'), opt('progress', 'Progress'), opt('link', 'Link'), opt('icon', 'Icon'),
+          ],
+          description: 'Auto: badge for badge columns or when a value map is set, numbers right-aligned, dates by the date format, else text. Badge: a coloured pill from the value map, or a colour or status word (success, Online, Offline…). Bar: a bar against the largest value. Progress: a bar from 0 to the maximum (100). Link: internal paths only. Icon: the value map\'s icon, or the value when it is an icon name.',
         },
+        valueMap: {
+          label: 'Value colours', type: 'repeater', max: 30, value: [], fields: { ...VALUE_MAP_ITEM },
+          description: 'Maps a value (case does not matter) to a colour, a label and an icon. Badges and icons use it; text cells take its colour.',
+        },
+        badgeStyle: {
+          label: 'Badge style', type: 'select', display: 'segmented', value: 'soft', showIf: { cell: ['badge', 'auto'] },
+          options: [opt('soft', 'Tinted'), opt('dot', 'Dot'), opt('solid', 'Solid')],
+        },
+        icon: { label: 'Default icon', type: 'icon', placeholder: 'fas fa-circle', showIf: { cell: 'icon' }, advanced: true },
+        dateFormat: {
+          label: 'Date shown as', type: 'select', value: 'inherit', showIf: { cell: ['date', 'auto'] },
+          options: [opt('inherit', 'As the table'), ...DATE_OPTIONS],
+        },
+        datePattern: { label: 'Date pattern', type: 'text', maxLength: 60, placeholder: 'dd.MM.yyyy HH:mm', showIf: { dateFormat: 'custom' }, description: PATTERN_HELP },
         linkTemplate: {
           label: 'Link', type: 'text', maxLength: 300, placeholder: '/admin/devices/{id}', showIf: { cell: 'link' },
           description: 'Internal path only; {column} is replaced by the row\'s value. Empty = the cell value is the path.',
         },
         sortable: { label: 'Sortable', type: 'boolean', value: true, advanced: true },
         align: {
-          label: 'Align', type: 'select', value: 'auto', advanced: true,
-          options: [opt('auto', 'Auto (numbers right)'), opt('start', 'Start'), opt('center', 'Centre'), opt('end', 'End')],
+          label: 'Align', type: 'select', display: 'segmented', value: 'auto', advanced: true,
+          options: [opt('auto', 'Auto'), opt('start', 'Start'), opt('center', 'Centre'), opt('end', 'End')],
+          description: 'Auto: numbers, bars and progress to the end, icons centred, the rest to the start.',
         },
         width: {
           label: 'Width', type: 'select', value: 'auto', advanced: true,
           options: [opt('auto', 'Auto'), opt('narrow', 'Narrow'), opt('wide', 'Wide'), opt('px', 'Fixed (px)')],
         },
         widthPx: { label: 'Width (px)', type: 'number', min: 24, max: 800, value: 120, advanced: true, showIf: { width: 'px' } },
+        wrap: {
+          label: 'Long text', type: 'select', display: 'segmented', value: 'nowrap', advanced: true,
+          options: [opt('nowrap', 'One line'), opt('truncate', 'Cut with …'), opt('wrap', 'Wrap')],
+        },
         ...itemFormatFields(),
+        font: { label: 'Font', type: 'font', advanced: true },
         color: { label: 'Text colour', type: 'color', advanced: true },
         headerColor: { label: 'Header colour', type: 'color', advanced: true },
         barMax: {
-          label: 'Bar maximum', type: 'number', nullable: true, display: 'input', advanced: true, placeholder: 'Largest value',
-          showIf: { cell: 'bar' }, description: 'The value of a full bar. Empty = the largest value in the loaded rows.',
+          label: 'Bar maximum', type: 'number', nullable: true, display: 'input', advanced: true, placeholder: 'Largest value / 100',
+          showIf: { cell: ['bar', 'progress'] }, description: 'The value of a full bar. Empty = the largest loaded value for Bar, 100 for Progress.',
         },
         ranges: {
           label: 'Colour ranges', type: 'repeater', max: 20, advanced: true, fields: { ...RANGE_ITEM },
-          description: 'Bar cells take the colour of the first range the value falls in (text cells too, when set). Empty = the table\'s ranges.',
+          description: 'Bars, progress and badges take the colour of the first range the value falls in (text cells too, when set). Empty = the table\'s ranges.',
         },
       },
     },
     maxRows: {
-      label: 'Rows shown', type: 'number', display: 'input', min: 1, max: 100, value: 10, group: 'rows',
-      description: 'Per page with page buttons. For a query that pages on the server, the server decides the page size.',
+      label: 'Rows per page', type: 'number', display: 'input', min: 1, max: 100, value: 10, group: 'rows',
+      description: 'Rows per page with page buttons, or the most rows shown without them. For a query that pages on the server, the server decides.',
     },
     paging: {
       label: 'More rows', type: 'select', display: 'segmented', value: 'none', group: 'rows', required: true,
-      options: [opt('none', 'None'), opt('pages', 'Page buttons')],
+      options: [opt('none', 'Cut off'), opt('pages', 'Page buttons'), opt('scroll', 'Scroll all')],
       description: 'Pages through the loaded rows. A query that pages on the server always shows its own pager.',
     },
-    sortable: { label: 'Viewers can sort', type: 'boolean', value: true, group: 'rows' },
-    defaultSort: { label: 'Sort by', type: 'data-key', slot: 'rows', group: 'rows', advanced: true, placeholder: 'The query\'s order' },
+    defaultSort: { label: 'Sort by', type: 'data-key', slot: 'rows', group: 'rows', placeholder: 'The query\'s order' },
     defaultSortDir: {
-      label: 'Direction', type: 'select', display: 'segmented', value: 'desc', group: 'rows', advanced: true, required: true,
+      label: 'Direction', type: 'select', display: 'segmented', value: 'desc', group: 'rows', required: true,
       options: [opt('desc', 'Descending'), opt('asc', 'Ascending')],
     },
+    showRowNumbers: { label: 'Row numbers', type: 'boolean', value: false, group: 'rows' },
+    emptyText: { label: 'Text when no row matches', type: 'text', maxLength: 120, placeholder: 'No matching rows.', group: 'rows', advanced: true },
     search: {
-      label: 'Search box', type: 'boolean', value: true, group: 'rows',
+      label: 'Search box', type: 'boolean', value: true, group: 'viewer',
       description: 'Filters the loaded rows; for a query that pages on the server, shown when the query supports search.',
     },
-    columnPicker: { label: 'Viewers can hide columns', type: 'boolean', value: false, group: 'rows', advanced: true },
+    sortable: { label: 'Viewers can sort', type: 'boolean', value: true, group: 'viewer' },
+    columnPicker: { label: 'Viewers can hide columns', type: 'boolean', value: false, group: 'viewer' },
+    dateFormat: { label: 'Dates shown as', type: 'select', value: 'relative', group: 'dates', required: true, options: DATE_OPTIONS },
+    datePattern: { label: 'Date pattern', type: 'text', maxLength: 60, placeholder: 'dd.MM.yyyy HH:mm', group: 'dates', showIf: { dateFormat: 'custom' }, description: PATTERN_HELP },
     density: {
-      label: 'Row height', type: 'select', display: 'segmented', value: 'compact', group: 'look', required: true,
-      options: [opt('compact', 'Compact'), opt('normal', 'Normal'), opt('comfortable', 'Roomy')],
+      label: 'Row height', type: 'select', display: 'segmented', value: 'normal', group: 'look', required: true,
+      options: [opt('compact', 'Compact (28)'), opt('normal', 'Normal (36)'), opt('comfortable', 'Roomy (44)')],
     },
+    gridLines: {
+      label: 'Lines', type: 'select', display: 'segmented', value: 'rows', group: 'look', required: true,
+      options: [opt('rows', 'Between rows'), opt('all', 'Grid'), opt('none', 'None')],
+    },
+    rowHover: { label: 'Highlight the row under the pointer', type: 'boolean', value: true, group: 'look', advanced: true },
     stickyHeader: { label: 'Keep the header visible', type: 'boolean', value: true, group: 'look', advanced: true },
     striped: { label: 'Striped rows', type: 'boolean', value: false, group: 'look' },
-    stripeColor: colorField('Stripe colour', 'look', 'var(--surface-sunken)', { advanced: true, showIf: { striped: true } }),
-    borderColor: colorField('Border colour', 'look', 'var(--border)', { advanced: true }),
+    stripeColor: colorField('Stripe colour', 'look', undefined, { advanced: true, showIf: { striped: true }, placeholder: 'A faint tint' }),
+    borderColor: colorField('Line colour', 'look', 'var(--border)', { advanced: true }),
     rowColorColumn: {
-      label: 'Row colour column', type: 'data-key', slot: 'rows', group: 'look', advanced: true,
-      description: 'A column holding a colour name (success, warning, error, info, neutral, primary) or a CSS colour tints the row.',
+      label: 'Row colour column', type: 'data-key', slot: 'rows', group: 'rowColour', advanced: true,
+      description: 'A column holding a colour, a colour name (success, warning, error, info, neutral, primary) or a status word (Online, Offline…) tints the row.',
+    },
+    rowRules: {
+      label: 'Row colour rules', type: 'repeater', group: 'rowColour', max: 20, value: [],
+      description: 'The first rule a row matches colours it. Numbers compare as numbers, text ignores case.',
+      fields: {
+        column: { label: 'Column', type: 'data-key', slot: 'rows', required: true },
+        op: {
+          label: 'Is', type: 'select', value: 'eq',
+          options: [
+            opt('eq', 'Equal to'), opt('ne', 'Not equal to'), opt('gt', 'Greater than'), opt('gte', 'At least'),
+            opt('lt', 'Less than'), opt('lte', 'At most'), opt('contains', 'Contains'), opt('empty', 'Empty'),
+          ],
+        },
+        value: { label: 'Value', type: 'text', maxLength: 80, showIf: { op: ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'contains'] } },
+        color: { label: 'Colour', type: 'color', value: 'var(--warning)' },
+        target: {
+          label: 'Colours', type: 'select', display: 'segmented', value: 'background',
+          options: [opt('background', 'Background'), opt('bar', 'Left bar'), opt('text', 'Text')],
+        },
+      },
     },
     headerFont: fontField('Header font', 'header', { advanced: true }),
     headerColor: colorField('Header text colour', 'header', 'var(--text-secondary)'),
-    headerBackground: colorField('Header background', 'header', undefined, { advanced: true }),
+    headerBackground: colorField('Header background', 'header', undefined, { advanced: true, placeholder: 'A faint band' }),
     cellFont: fontField('Cell font', 'cells', { advanced: true }),
     cellColor: colorField('Cell text colour', 'cells', 'var(--text-primary)', { advanced: true }),
-    ...rangesFields('Colours for Bar cells (on the raw value) when the column has no ranges of its own.', 'colour'),
+    ...rangesFields('Colours for Bar and Progress cells (on the raw value) when the column has no ranges of its own.', 'colour'),
   }),
   rules: [columnLinksAreInternal],
   migrations: [],

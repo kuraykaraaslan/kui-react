@@ -1,14 +1,15 @@
 'use client';
 import { useMemo } from 'react';
-import { ScatterChart } from '@/modules/ui/Chart';
+import { ScatterChart, type PointShape } from '@/modules/ui/Chart';
 import type { WidgetKindView, WidgetViewProps } from '../kind';
 import { cssColor, formatValue } from '../settings/style';
 import { rowsToScatterSeries, tableCsv } from './chart-data';
-import { axisProps, legendProps, legendReserve, thresholdLines, useChartHeight } from './chart-props';
+import { animateOf, axisProps, legendProps, num, str, thresholdLines, tooltipProps } from './chart-props';
 
 type S = Record<string, unknown>;
 const col = (v: unknown, fallback: string) => (typeof v === 'string' && v ? v : fallback);
-const RADIUS: Record<string, number> = { sm: 3, md: 4, lg: 6 };
+const RADIUS: Record<string, number> = { sm: 3, md: 4, lg: 6, xl: 8 };
+const SHAPES = new Set(['circle', 'square', 'diamond', 'triangle']);
 
 const pointsOf = (data: WidgetViewProps['data'], s: S) => rowsToScatterSeries(data.points?.rows, {
   x: col(s.xColumn, 'x'),
@@ -16,7 +17,7 @@ const pointsOf = (data: WidgetViewProps['data'], s: S) => rowsToScatterSeries(da
   group: typeof s.groupColumn === 'string' && s.groupColumn ? s.groupColumn : undefined,
 });
 
-/** `chart.scatter`: points from a bound table, one series per group. */
+/** `chart.scatter`: points from a bound table, one series per group, with an optional trend line each. */
 export function ScatterChartView({ settings, data, locale }: WidgetViewProps) {
   const s = settings;
   const raw = useMemo(() => pointsOf(data, s), [data, s]);
@@ -32,25 +33,27 @@ export function ScatterChartView({ settings, data, locale }: WidgetViewProps) {
     const single = raw.length === 1 ? cssColor(s.pointColor) : undefined;
     return raw.map((g) => ({ ...g, ...(pinned.get(g.id) ?? single ? { color: pinned.get(g.id) ?? single } : {}) }));
   }, [raw, s.groupColors, s.pointColor]);
-  const legend = legendProps(s, series?.length ?? 0);
-  const [ref, height] = useChartHeight(legendReserve(legend.showLegend, legend.legendPosition));
-  if (!series) return <div ref={ref} className="h-full" />;
-  const dec = (v: unknown) => (typeof v === 'number' ? v : undefined);
-  const unit = (v: unknown) => (typeof v === 'string' && v ? v : undefined);
+  if (!series) return <div className="h-full" />;
+  const unit = (v: unknown) => str(v);
   return (
-    <div ref={ref} className="h-full min-h-0 w-full">
+    <div className="h-full min-h-0 w-full">
       <ScatterChart
         series={series}
-        height={height}
+        fill
         pointRadius={RADIUS[String(s.pointSize)] ?? 4}
-        {...legend}
+        pointShape={SHAPES.has(String(s.pointShape)) ? (s.pointShape as PointShape) : 'circle'}
+        pointOpacity={num(s.pointOpacity) ?? 0.8}
+        trendLine={s.trendLine === true}
+        trendColor={cssColor(s.trendColor)}
+        {...legendProps(s, series.length)}
         {...axisProps(s)}
-        xMin={typeof s.xMin === 'number' ? s.xMin : undefined}
-        xMax={typeof s.xMax === 'number' ? s.xMax : undefined}
-        xFormat={(v) => formatValue(v, { unit: unit(s.xUnit), decimals: dec(s.xDecimals) }, {}, locale)}
-        yFormat={(v) => formatValue(v, { unit: unit(s.yUnit), decimals: dec(s.yDecimals) }, {}, locale)}
+        {...tooltipProps(s)}
+        xMin={num(s.xMin)}
+        xMax={num(s.xMax)}
+        xFormat={(v) => formatValue(v, { unit: unit(s.xUnit), decimals: num(s.xDecimals) }, {}, locale)}
+        yFormat={(v) => formatValue(v, { unit: unit(s.yUnit), decimals: num(s.yDecimals) }, {}, locale)}
         thresholds={thresholdLines(s.thresholds)}
-        showTooltip={s.showTooltip !== false}
+        animate={animateOf(s)}
         ariaLabel="Scatter chart"
       />
     </div>

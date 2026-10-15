@@ -1,10 +1,10 @@
-import { colorField, fontField, layoutField, minBelowMax, opt, rangesFields, since, valueStyleFields } from '../settings/packs';
+import { colorField, fontField, iconFields, layoutField, minBelowMax, opt, rangesFields, since } from '../settings/packs';
 import type { SettingsTemplate } from '../settings/types';
 import type { BuiltinKindSpec } from '../kind';
 
 const ranges = rangesFields('The value takes the colour of the range it falls in. Leave empty for a single colour.');
 
-/** `gauge`: one bound number on an arc, a donut or a bar, with colour bands. */
+/** `gauge`: one bound number on an arc, a donut, a bar or a level, with colour ranges. */
 export const GAUGE: SettingsTemplate = {
   id: 'builtin:gauge',
   version: 1,
@@ -22,6 +22,8 @@ export const GAUGE: SettingsTemplate = {
   ],
   groups: [
     { id: 'layout', label: 'Layout', tab: 'Display', since: 1 },
+    { id: 'label', label: 'Label', tab: 'Display', since: 1 },
+    { id: 'icon', label: 'Icon', tab: 'Display', since: 1 },
     { id: 'scale', label: 'Scale', tab: 'Display', since: 1 },
     { id: 'value', label: 'Value', tab: 'Display', since: 1 },
     { id: 'needle', label: 'Needle', tab: 'Display', since: 1 },
@@ -35,6 +37,7 @@ export const GAUGE: SettingsTemplate = {
       opt('donut', 'Donut', 'gauge-donut'),
       opt('bar-horizontal', 'Horizontal bar', 'gauge-bar-h'),
       opt('bar-vertical', 'Vertical bar', 'gauge-bar-v'),
+      opt('level', 'Level (thermometer)', 'gauge-level'),
     ]),
     startAngle: {
       label: 'Start angle (°)', type: 'number', display: 'input', min: -360, max: 360, value: -135, group: 'layout', advanced: true,
@@ -44,27 +47,47 @@ export const GAUGE: SettingsTemplate = {
       label: 'End angle (°)', type: 'number', display: 'input', min: -360, max: 360, value: 135, group: 'layout', advanced: true,
       showIf: { layout: 'donut' },
     },
+    label: { label: 'Label', type: 'text', maxLength: 80, placeholder: 'Above the gauge', group: 'label' },
+    labelFont: fontField('Label font', 'label', { advanced: true }),
+    labelColor: colorField('Label colour', 'label', 'var(--text-secondary)', { advanced: true }),
+    ...iconFields('icon', 'var(--primary)', 20),
+    iconBackground: colorField('Icon background', 'icon', undefined, { advanced: true }),
     min: { label: 'Minimum', type: 'number', display: 'input', value: 0, group: 'scale', description: 'Used when no minimum slot is bound.' },
     max: { label: 'Maximum', type: 'number', display: 'input', value: 100, group: 'scale', description: 'Used when no maximum slot is bound.' },
     showMinMax: { label: 'Show min and max', type: 'boolean', value: true, group: 'scale' },
-    minMaxFont: fontField('Min / max font', 'scale', { advanced: true, showIf: { showMinMax: true } }),
-    minMaxColor: colorField('Min / max colour', 'scale', 'var(--text-secondary)', { advanced: true, showIf: { showMinMax: true } }),
-    ticks: { label: 'Tick marks', type: 'number', min: 0, max: 21, value: 0, group: 'scale', advanced: true, description: '0 = none; ends included.' },
+    minMaxFont: fontField('Scale font', 'scale', { advanced: true }),
+    minMaxColor: colorField('Scale colour', 'scale', 'var(--text-secondary)', { advanced: true }),
+    ticks: { label: 'Tick marks', type: 'number', min: 0, max: 21, value: 0, group: 'scale', description: '0 = none; ends included.' },
+    tickLabels: { label: 'Values at the ticks', type: 'boolean', value: false, group: 'scale', advanced: true },
+    tickColor: colorField('Tick colour', 'scale', 'var(--border-strong)', { advanced: true }),
     showValue: { label: 'Show the number', type: 'boolean', value: true, group: 'value' },
-    ...valueStyleFields('value'),
-    unitTitle: { label: 'Units title', type: 'text', maxLength: 40, placeholder: 'Temperature', group: 'value', description: 'A caption under the gauge.' },
+    valueFont: fontField('Value font', 'value', { advanced: true, description: 'Empty = sized to the gauge.' }),
+    valueColor: colorField('Value colour', 'value', 'var(--text-primary)'),
+    unitTitle: { label: 'Units title', type: 'text', maxLength: 40, placeholder: 'Temperature', group: 'value', description: 'A caption under the number.' },
     needle: { label: 'Needle', type: 'boolean', value: false, group: 'needle' },
+    needleStyle: {
+      label: 'Needle style', type: 'select', display: 'segmented', value: 'line', group: 'needle', required: true, showIf: { needle: true },
+      options: [opt('line', 'Line'), opt('arrow', 'Pointer'), opt('marker', 'Notch')],
+    },
     needleColor: colorField('Needle colour', 'needle', 'var(--text-primary)', { advanced: true, showIf: { needle: true } }),
-    barColor: colorField('Bar colour', 'bar', 'var(--primary)', { description: 'Used when no colour range matches.' }),
+    barColorMode: {
+      label: 'Bar colour', type: 'select', display: 'segmented', value: 'range', group: 'bar', required: true,
+      options: [opt('range', 'From the colour ranges'), opt('constant', 'Always the same')],
+    },
+    barColor: colorField('Bar colour', 'bar', 'var(--primary)', { description: 'Used when no colour range matches, or always.' }),
     trackColor: colorField('Track colour', 'bar', 'var(--border)', { advanced: true }),
-    thickness: { label: 'Thickness', type: 'number', min: 2, max: 40, value: 16, group: 'bar' },
-    roundedCaps: { label: 'Rounded ends', type: 'boolean', value: false, group: 'bar', advanced: true },
+    thickness: { label: 'Thickness', type: 'number', min: 2, max: 40, value: 14, group: 'bar' },
+    roundedCaps: { label: 'Rounded ends', type: 'boolean', value: true, group: 'bar', advanced: true },
     ranges: ranges.ranges,
     // Today's gauge counts a value on a boundary in the band ending there.
     rangeEdges: { ...ranges.rangeEdges, value: 'to' },
-    rangeTarget: {
-      label: 'Ranges show as', type: 'select', display: 'segmented', value: 'both', group: 'colour', required: true,
-      options: [opt('both', 'Bands and bar colour'), opt('bar', 'Bar colour'), opt('track', 'Bands on the track')],
+    rangeDisplay: {
+      label: 'Show the ranges on the scale', type: 'select', display: 'segmented', value: 'outer', group: 'colour', required: true,
+      options: [opt('outer', 'Thin line beside the bar'), opt('track', 'Tinted track'), opt('off', 'Off')],
+    },
+    rangeOpacity: {
+      label: 'Track tint (%)', type: 'number', min: 5, max: 100, step: 5, value: 35, group: 'colour', advanced: true,
+      showIf: { rangeDisplay: 'track' },
     },
     animation: { label: 'Animate changes', type: 'boolean', value: true, group: 'motion', advanced: true },
   }),
@@ -75,7 +98,7 @@ export const GAUGE_KIND: BuiltinKindSpec = {
   type: 'gauge',
   label: 'Gauge',
   category: 'Gauges & Levels',
-  description: 'One bound number on a half-donut gauge with threshold bands.',
+  description: 'One bound number on an arc, a donut, a bar or a level, with colour ranges.',
   icon: 'fas fa-gauge-high',
   defaultW: 3,
   defaultH: 3,

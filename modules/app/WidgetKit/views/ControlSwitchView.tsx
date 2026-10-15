@@ -1,21 +1,24 @@
 'use client';
-import { ControlSwitch } from '@/modules/ui/ControlTile';
+import type { ReactNode } from 'react';
+import { cn } from '@/libs/utils/cn';
+import { ControlSwitch, type ControlSwitchParts } from '@/modules/ui/ControlTile';
 import { asBoolean } from '@/modules/ui/ControlTile/control-logic';
 import type { FontValue } from '../../SchemaForm/types';
-import { cssColor, fontStyle } from '../settings/style';
-import { SettingIcon } from '../WidgetKitContext';
+import { cssColor } from '../settings/style';
 import type { WidgetKindView, WidgetViewProps } from '../kind';
-import { confirmProps, controlBlockReason, requestControl, textOr } from './control-common';
+import { confirmProps, controlBlockReason, controlMessages, requestControl, textOr, type FeedbackSettings } from './control-common';
+import { IconTile, Metric, MetricHead, MetricLabel, Pill } from './ui';
 
-type S = {
+type S = FeedbackSettings & {
   layout?: 'right' | 'left' | 'centered';
+  size?: 'auto' | 'sm' | 'md' | 'lg';
   label?: string;
   labelFont?: FontValue;
   labelColor?: string;
   icon?: string;
   iconColor?: string;
   iconSize?: number;
-  showStateText?: boolean;
+  stateDisplay?: 'text' | 'pill' | 'none';
   onLabel?: string;
   offLabel?: string;
   unknownLabel?: string;
@@ -23,10 +26,15 @@ type S = {
   onTextColor?: string;
   offTextColor?: string;
   unknownTextColor?: string;
+  onIcon?: string;
+  offIcon?: string;
+  unknownIcon?: string;
   onColor?: string;
   offColor?: string;
   disabledColor?: string;
   thumbColor?: string;
+  thumbOffColor?: string;
+  thumbDisabledColor?: string;
   onMatch?: string;
   disableWhen?: string[];
 };
@@ -44,32 +52,72 @@ export function switchState(value: unknown, onMatch?: string): boolean | null {
   return asBoolean(value);
 }
 
-/** `control.switch`: reads the bound state, asks the host to write the toggled value. */
+/** `control.switch`: label and icon on top, the state and the switch below (the value widgets' order). */
 export function ControlSwitchView(props: WidgetViewProps) {
   const s = props.settings as S;
   const state = switchState(props.data.value?.value, s.onMatch);
   const iconSize = typeof s.iconSize === 'number' ? s.iconSize : 20;
   const set = requestControl(props.onControl, 'set');
+  const layout = s.layout === 'left' || s.layout === 'centered' ? s.layout : 'right';
+  const display = s.stateDisplay === 'pill' || s.stateDisplay === 'none' ? s.stateDisplay : 'text';
+  const size = s.size === 'sm' || s.size === 'md' || s.size === 'lg' ? s.size : layout === 'centered' ? 'lg' : 'md';
+  const onColor = cssColor(s.onColor) ?? 'var(--success)';
+  const { messages: policyMessages, ...confirm } = confirmProps(props.confirm);
+
+  const render = (p: ControlSwitchParts): ReactNode => {
+    const stateIcon = p.state === 'on' ? s.onIcon : p.state === 'off' ? s.offIcon : s.unknownIcon;
+    const color = p.state === 'on' ? cssColor(s.onTextColor) ?? onColor
+      : p.state === 'off' ? cssColor(s.offTextColor) ?? 'var(--text-secondary)'
+        : cssColor(s.unknownTextColor) ?? 'var(--warning)';
+    const iconName = stateIcon || s.icon;
+    const icon = iconName ? (
+      <IconTile name={iconName} size={Math.round(iconSize * (layout === 'centered' ? 1.4 : 1.8))} color={stateIcon && !cssColor(s.iconColor) ? color : s.iconColor} />
+    ) : null;
+    const label = <MetricLabel font={s.labelFont} color={s.labelColor}>{textOr(s.label)}</MetricLabel>;
+    const showState = display !== 'none' || p.state === 'unknown';
+    const stateEl = !showState ? null : display === 'pill' ? (
+      <span id={p.stateId} className="min-w-0"><Pill label={p.stateText} color={color} icon={stateIcon || undefined} /></span>
+    ) : (
+      <span id={p.stateId} className="min-w-0 truncate">
+        <Metric text={p.stateText} size={p.state === 'unknown' || layout === 'centered' ? 'md' : 'lg'} font={s.stateFont} color={color} />
+      </span>
+    );
+    if (layout === 'centered') {
+      return (
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-1.5 text-center [&>*]:shrink-0">
+          {(icon || textOr(s.label)) && <div className="flex max-w-full items-center gap-2">{icon}{label}</div>}
+          {p.control}{stateEl}
+        </div>
+      );
+    }
+    return (
+      <div className="flex min-h-0 flex-1 flex-col gap-2">
+        <MetricHead label={label} icon={icon} />
+        <div className={cn('mt-auto flex min-h-9 items-center gap-3', layout === 'right' ? 'justify-between' : 'justify-start')}>
+          {layout === 'right' ? <>{stateEl ?? <span />}{p.control}</> : <>{p.control}{stateEl}</>}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <ControlSwitch
       framed={false}
       value={state}
-      {...confirmProps(props.confirm)}
+      {...confirm}
+      messages={controlMessages(s, policyMessages)}
       onCommit={(next, confirmation) => set(next, confirmation)}
-      layout={s.layout ?? 'right'}
-      label={textOr(s.label)}
-      labelStyle={fontStyle(s.labelFont, s.labelColor)}
-      icon={s.icon ? <SettingIcon name={s.icon} style={{ width: iconSize, height: iconSize, fontSize: iconSize, color: cssColor(s.iconColor) }} /> : undefined}
-      showStateText={s.showStateText !== false}
+      // The switch's accessible name (the parts above draw the visible label).
+      label={textOr(s.label) ?? textOr(props.title)}
       onLabel={textOr(s.onLabel)}
       offLabel={textOr(s.offLabel)}
-      unknownLabel={textOr(s.unknownLabel)}
-      stateStyles={{
-        on: fontStyle(s.stateFont, s.onTextColor),
-        off: fontStyle(s.stateFont, s.offTextColor),
-        unknown: fontStyle(s.stateFont, s.unknownTextColor),
+      unknownLabel={textOr(s.unknownLabel) ?? 'Unknown'}
+      size={size}
+      renderLayout={render}
+      colors={{
+        on: onColor, off: cssColor(s.offColor), disabled: cssColor(s.disabledColor),
+        thumb: cssColor(s.thumbColor), thumbOff: cssColor(s.thumbOffColor), thumbDisabled: cssColor(s.thumbDisabledColor),
       }}
-      colors={{ on: cssColor(s.onColor), off: cssColor(s.offColor), disabled: cssColor(s.disabledColor), thumb: cssColor(s.thumbColor) }}
       disabledReason={controlBlockReason(props, s.disableWhen, state === null)}
     />
   );

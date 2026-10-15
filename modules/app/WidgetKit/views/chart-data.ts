@@ -3,7 +3,9 @@
 // cells and CSV rows. Behaviour matches next-boilerplate's renderers it replaces
 // (series-chart, series-config, general-logic, widget-logic).
 
-import type { Series } from '@/modules/ui/Chart';
+import type { PointShape, Series } from '@/modules/ui/Chart';
+import { niceStep } from '@/modules/ui/Chart/charts/_helpers';
+import { clockText, dayMonthText } from '@/modules/ui/Chart/charts/_time';
 import type { SlotData } from '../kind';
 import { cssColor, formatValue, type ValueFormat } from '../settings/style';
 
@@ -49,17 +51,23 @@ export function mergeSeriesSlots(data: Data | undefined, base = 'series'): SlotD
   return { ...data[keys[0]], shape: 'series', series: merged };
 }
 
-/** `2026-10-06T12:00:00Z` → `12:00` for a short span, `Oct 6` for a long one; non-dates pass through. */
-export function formatAxisLabels(labels: string[], locale?: string): string[] {
+const DAY_MS = 24 * 3_600_000;
+
+/**
+ * Short category labels for timestamps: `HH:mm` within two days, `d MMM` for daily data (`d MMM HH:mm`
+ * when points are closer than a day), `MMM yy` past four months. Non-dates pass through.
+ */
+export function formatAxisLabels(labels: string[], locale?: string, timeZone?: string): string[] {
   const times = labels.map((l) => Date.parse(l));
   if (times.length === 0 || times.some((t) => Number.isNaN(t))) return labels;
   const spanMs = Math.max(...times) - Math.min(...times);
-  const options: Intl.DateTimeFormatOptions = spanMs <= 2 * 24 * 3_600_000
-    ? { hour: '2-digit', minute: '2-digit' }
-    : spanMs <= 120 * 24 * 3_600_000
-      ? { month: 'short', day: 'numeric' }
-      : { year: '2-digit', month: 'short' };
-  return times.map((t) => new Date(t).toLocaleString(locale, options));
+  const sorted = [...times].sort((a, b) => a - b);
+  const minGap = sorted.slice(1).reduce((m, t, i) => Math.min(m, t - sorted[i]), Infinity);
+  if (spanMs <= 2 * DAY_MS) return times.map((t) => clockText(t, locale, timeZone));
+  if (spanMs <= 120 * DAY_MS) {
+    return times.map((t) => (minGap < DAY_MS ? `${dayMonthText(t, locale, timeZone)} ${clockText(t, locale, timeZone)}` : dayMonthText(t, locale, timeZone)));
+  }
+  return times.map((t) => new Date(t).toLocaleDateString(locale, { year: '2-digit', month: 'short', ...(timeZone ? { timeZone } : {}) }));
 }
 
 /** Band-axis series: every series aligned onto the union of timestamps (no shifted second series). */
@@ -68,7 +76,7 @@ export function toBandSeries(result: SlotData | undefined, locale?: string): Ser
   if (!series || series.length === 0) return null;
   const stamps = [...new Set(series.flatMap((s) => s.points.map((p) => p.t)))].sort();
   if (stamps.length === 0) return null;
-  const labels = formatAxisLabels(stamps, locale);
+  const labels = formatAxisLabels(stamps, locale, result?.window?.explicitTimezone);
   return series.map((s) => {
     const byT = new Map(s.points.map((p) => [p.t, p.v]));
     return { id: s.name, name: s.name, data: stamps.map((t, i) => ({ x: labels[i], y: byT.get(t) ?? null })) };
@@ -104,7 +112,12 @@ export interface SeriesRule {
   lineStyle?: 'solid' | 'dashed' | 'dotted';
   width?: number | null;
   showPoints?: '' | 'on' | 'off';
+  pointShape?: '' | PointShape;
+  pointSize?: number | null;
+  fill?: '' | 'none' | 'opacity' | 'gradient';
   fillOpacity?: number | null;
+  axis?: 'left' | 'right';
+  stack?: string;
   startHidden?: boolean;
 }
 
@@ -133,6 +146,11 @@ export interface SeriesStyleOptions {
   showPoints?: boolean;
   /** Colour for series without their own (else the palette). */
   defaultColor?: string;
+  /** Chart-level point mark and radius (series rules override). */
+  pointShape?: PointShape;
+  pointSize?: number;
+  /** Chart-level fill style: fade to clear (gradient) or flat. */
+  fillGradient?: boolean;
 }
 
 /** Apply the `series` repeater (label, colour, format, stroke) to chart series. Ids stay the source names. */
@@ -143,6 +161,13 @@ export function applySeriesRules(series: Series[], rules: unknown, o: SeriesStyl
     const color = cssColor(r.color) ?? cssColor(o.defaultColor);
     const width = typeof r.width === 'number' ? r.width : o.lineWidth;
     const points = r.showPoints === 'on' ? true : r.showPoints === 'off' ? false : o.showPoints;
+    const shape = r.pointShape || o.pointShape;
+    const size = typeof r.pointSize === 'number' ? r.pointSize : o.pointSize;
+    // Fill: 'none' clears it; 'opacity' / 'gradient' pick the style (a line gets 0.25 unless an opacity is set).
+    const fillOpacity = r.fill === 'none' ? 0
+      : typeof r.fillOpacity === 'number' ? r.fillOpacity
+        : r.fill === 'opacity' || r.fill === 'gradient' ? (o.fillGradient === undefined ? 0.25 : undefined) : undefined;
+    const gradient = r.fill === 'gradient' ? true : r.fill === 'opacity' ? false : o.fillGradient;
     return {
       ...s,
       name: r.label ? r.label.replaceAll('${name}', s.name) : s.name,
@@ -150,7 +175,12 @@ export function applySeriesRules(series: Series[], rules: unknown, o: SeriesStyl
       ...(r.lineStyle ? { lineStyle: r.lineStyle } : {}),
       ...(width !== undefined ? { strokeWidth: width } : {}),
       ...(points !== undefined ? { showPoints: points } : {}),
-      ...(typeof r.fillOpacity === 'number' ? { fillOpacity: r.fillOpacity } : {}),
+      ...(shape ? { pointShape: shape } : {}),
+      ...(size !== undefined ? { pointSize: size } : {}),
+      ...(fillOpacity !== undefined ? { fillOpacity } : {}),
+      ...(gradient ? { fillGradient: true } : {}),
+      ...(r.axis === 'right' ? { yAxis: 'right' as const } : {}),
+      ...(r.stack ? { stack: r.stack } : {}),
       ...(r.startHidden ? { hidden: true } : {}),
       format: (v: number) => formatValue(v, o.format, override, o.locale),
     };
@@ -158,20 +188,23 @@ export function applySeriesRules(series: Series[], rules: unknown, o: SeriesStyl
 }
 
 /**
- * The value-axis formatter: a per-series unit/decimals override is used on the axis only when
- * every series that has one agrees and no series is left on the widget format with a unit clash.
+ * A value axis's formatter (`side` picks the series drawn on it): the series' unit/decimals override
+ * when every series on that axis agrees; when they disagree, plain numbers (no unit is better than a
+ * wrong one). Tick decimals follow the widget's unless set.
  */
-export function axisFormat(series: Series[], rules: unknown, format: ValueFormat, locale?: string): (v: number) => string {
+export function axisFormat(series: Series[], rules: unknown, format: ValueFormat, locale?: string, side?: 'left' | 'right'): (v: number) => string {
   const overrides = new Set<string>();
   let sample: { unit?: string; decimals?: number } | undefined;
   for (const s of series) {
+    if (side && (s.yAxis === 'right') !== (side === 'right')) continue;
     const r = ruleFor(s.id, rules);
     const o = defined({ unit: r?.unit, decimals: typeof r?.decimals === 'number' ? r.decimals : undefined });
     overrides.add(JSON.stringify([o.unit ?? null, o.decimals ?? null]));
     sample = o;
   }
-  const one = overrides.size === 1 && sample ? sample : {};
-  return (v) => formatValue(v, format, one, locale);
+  const one = overrides.size === 1 && sample ? sample : overrides.size > 1 ? { unit: '' } : {};
+  // Ticks sit on round steps: a whole tick prints whole (20 °C, not 20.0 °C).
+  return (v) => formatValue(v, format, Number.isInteger(v) && format.notation !== 'compact' ? { ...one, decimals: 0 } : one, locale);
 }
 
 // ── chart.pie ──────────────────────────────────────────────────────────────
@@ -262,14 +295,25 @@ export function autoBinCount(n: number): number {
   return Math.min(50, Math.max(3, Math.ceil(Math.log2(Math.max(1, n)) + 1)));
 }
 
-/** Equal-width bins over [min, max]; the last bin is closed on the right. All-equal values give one bin. */
-export function histogramBins(values: unknown[], bins?: number | null, rangeMin?: number | null, rangeMax?: number | null): HistogramBin[] {
+/**
+ * Equal-width bins over [min, max]; the last bin is closed on the right. All-equal values give one bin.
+ * `nice` puts the edges on round numbers (100, 140, 180 rather than 102.0, 138.4): the bin width is a
+ * round step near (max − min) / bins and an unpinned end moves out to the step, so the count may differ by one.
+ */
+export function histogramBins(values: unknown[], bins?: number | null, rangeMin?: number | null, rangeMax?: number | null, nice = false): HistogramBin[] {
   const nums = values.map(asNumber).filter((v): v is number => v !== null);
   if (nums.length === 0) return [];
-  const lo = rangeMin ?? Math.min(...nums);
-  const hi = rangeMax ?? Math.max(...nums);
+  let lo = rangeMin ?? Math.min(...nums);
+  let hi = rangeMax ?? Math.max(...nums);
   if (!(hi > lo)) return [{ from: lo, to: hi, count: nums.filter((v) => v === lo).length }];
-  const k = Math.min(50, Math.max(1, Math.trunc(bins ?? autoBinCount(nums.length)) || autoBinCount(nums.length)));
+  let k = Math.min(50, Math.max(1, Math.trunc(bins ?? autoBinCount(nums.length)) || autoBinCount(nums.length)));
+  if (nice) {
+    const step = niceStep(hi - lo, k);
+    if (rangeMin === null || rangeMin === undefined) lo = Math.floor(lo / step + 1e-9) * step;
+    if (rangeMax === null || rangeMax === undefined) hi = Math.ceil(hi / step - 1e-9) * step;
+    if (!(hi > lo)) hi = lo + step;
+    k = Math.min(50, Math.max(1, Math.round((hi - lo) / step)));
+  }
   const width = (hi - lo) / k;
   const out: HistogramBin[] = Array.from({ length: k }, (_, i) => ({ from: lo + i * width, to: lo + (i + 1) * width, count: 0 }));
   for (const v of nums) {
@@ -277,6 +321,17 @@ export function histogramBins(values: unknown[], bins?: number | null, rangeMin?
     out[Math.min(k - 1, Math.floor((v - lo) / width))].count += 1;
   }
   return out;
+}
+
+/** Mean and median of the numeric values (null when there are none). */
+export function valueStats(values: unknown[]): { mean: number; median: number } | null {
+  const nums = values.map(asNumber).filter((v): v is number => v !== null).sort((a, b) => a - b);
+  if (!nums.length) return null;
+  const mid = nums.length >> 1;
+  return {
+    mean: nums.reduce((a, b) => a + b, 0) / nums.length,
+    median: nums.length % 2 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2,
+  };
 }
 
 // ── heatmap ───────────────────────────────────────────────────────────────

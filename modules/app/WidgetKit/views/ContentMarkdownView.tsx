@@ -3,26 +3,62 @@ import { Fragment, useMemo, type CSSProperties, type ReactNode } from 'react';
 import { cn } from '@/libs/utils/cn';
 import type { FontValue } from '../../SchemaForm/types';
 import { cssColor, fontStyle, formatValue, type ValueFormat } from '../settings/style';
+import { SettingIcon } from '../WidgetKitContext';
 import type { WidgetKindView, WidgetViewProps } from '../kind';
 import { parseMarkdown, type MdInline } from './markdown';
 import { hostLink } from './content-logic';
+import { Row } from './ui';
 
 type S = {
   layout?: 'plain' | 'callout';
   content?: string;
+  calloutStyle?: 'info' | 'success' | 'warning' | 'error' | 'custom';
   calloutColor?: string;
   calloutBackground?: string;
+  calloutIcon?: string;
   align?: 'start' | 'center' | 'end';
+  verticalAlign?: 'top' | 'center' | 'bottom';
   textSize?: 'sm' | 'md' | 'lg';
   textFont?: FontValue;
   textColor?: string;
+  headingFont?: FontValue;
   headingColor?: string;
   linkColor?: string;
+  linkUnderline?: 'hover' | 'always';
+  padding?: number;
+  overflow?: 'scroll' | 'clamp';
+  clampLines?: number;
   missingText?: string;
+  showRecord?: boolean;
+  recordKeys?: unknown;
 };
 
 const SIZE = { sm: 'text-xs', md: 'text-sm', lg: 'text-base' } as const;
 const ALIGN = { start: 'text-left', center: 'text-center', end: 'text-right' } as const;
+const VALIGN = { top: 'justify-start', center: 'justify-center', bottom: 'justify-end' } as const;
+/** The callout tones: theme tokens, so light and dark both work. */
+const CALLOUT: Record<'info' | 'success' | 'warning' | 'error', { accent: string; background: string }> = {
+  info: { accent: 'var(--info)', background: 'var(--info-subtle)' },
+  success: { accent: 'var(--success)', background: 'var(--success-subtle)' },
+  warning: { accent: 'var(--warning)', background: 'var(--warning-subtle)' },
+  error: { accent: 'var(--error)', background: 'var(--error-subtle)' },
+};
+const MAX_FOOTER = 12;
+
+/** `uptimeHours` / `serial_number` -> "Uptime hours" / "Serial number". */
+export function keyLabel(key: string): string {
+  const words = key.split('.').pop()!.replace(/[_-]+/g, ' ').replace(/([a-z0-9])([A-Z])/g, '$1 $2').trim().toLowerCase();
+  return words ? words[0].toUpperCase() + words.slice(1) : key;
+}
+
+/** The footer's keys: the chosen ones, else every scalar of the record (capped). */
+export function footerKeys(record: Record<string, unknown>, chosen: unknown): string[] {
+  const picked = Array.isArray(chosen) ? chosen.filter((k): k is string => typeof k === 'string' && k !== '') : [];
+  if (picked.length) return picked.slice(0, MAX_FOOTER);
+  return Object.keys(record)
+    .filter((k) => ['string', 'number', 'boolean'].includes(typeof record[k]))
+    .slice(0, MAX_FOOTER);
+}
 
 /** A record value by key (`a.b` reads nested objects). */
 function readField(record: Record<string, unknown>, key: string): unknown {
@@ -52,6 +88,8 @@ type Ctx = {
   resolveUrl?: WidgetViewProps['resolveUrl'];
   params?: Record<string, unknown>;
   onElementClick?: WidgetViewProps['onElementClick'];
+  /** The links' underline class. */
+  underline: string;
 };
 
 /** A `{{key}}` placeholder's text: `param_<name>` reads board params, anything else the record. Unbound = literal. */
@@ -83,7 +121,7 @@ function Inline({ nodes, ctx }: { nodes: MdInline[]; ctx: Ctx }): ReactNode {
             key={i}
             type="button"
             onClick={() => onClick(n.id)}
-            className="cursor-pointer rounded-sm text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+            className={cn('cursor-pointer rounded-sm text-primary underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus', ctx.underline)}
             style={ctx.linkStyle}
           >
             {children}
@@ -91,7 +129,7 @@ function Inline({ nodes, ctx }: { nodes: MdInline[]; ctx: Ctx }): ReactNode {
         );
       }
       case 'link': {
-        const cls = 'rounded-sm text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus';
+        const cls = cn('rounded-sm text-primary underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus', ctx.underline);
         const children = <Inline nodes={n.children} ctx={ctx} />;
         if (!n.external && ctx.renderLink) {
           return <span key={i} style={ctx.linkStyle}>{ctx.renderLink(n.href, children, cls)}</span>;
@@ -119,62 +157,94 @@ export function ContentMarkdownView({ settings, format, data, locale, renderLink
   const s = settings as S;
   const content = typeof s.content === 'string' ? s.content : '';
   const blocks = useMemo(() => parseMarkdown(content), [content]);
-  const record = data.record?.record;
+  const raw = data.record?.record;
+  const record = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : undefined;
   const linkColor = cssColor(s.linkColor);
+  const missing = typeof s.missingText === 'string' ? s.missingText : '—';
   const ctx: Ctx = {
-    record: record && typeof record === 'object' ? record : undefined,
+    record,
     format,
-    missing: typeof s.missingText === 'string' ? s.missingText : '—',
+    missing,
     locale,
     linkStyle: linkColor ? { color: linkColor } : undefined,
     renderLink,
     resolveUrl,
     params: params && typeof params === 'object' ? params : undefined,
     onElementClick,
+    underline: s.linkUnderline === 'always' ? 'underline' : 'hover:underline',
   };
-  const headingStyle: CSSProperties | undefined = cssColor(s.headingColor) ? { color: cssColor(s.headingColor) } : undefined;
+  const headingStyle: CSSProperties = fontStyle(s.headingFont, s.headingColor);
   const callout = s.layout === 'callout';
+  const tone = s.calloutStyle === 'custom'
+    ? { accent: cssColor(s.calloutColor) ?? 'var(--primary)', background: cssColor(s.calloutBackground) ?? 'var(--primary-subtle)' }
+    : CALLOUT[s.calloutStyle ?? 'info'] ?? CALLOUT.info;
+  const clamp = s.overflow === 'clamp' && typeof s.clampLines === 'number' && s.clampLines >= 1 ? Math.floor(s.clampLines) : null;
+  const padding = typeof s.padding === 'number' && s.padding > 0 ? s.padding : undefined;
+  const footer = s.showRecord && record ? footerKeys(record, s.recordKeys) : [];
 
-  return (
+  const text = (
     <div
       className={cn(
-        'h-full min-h-0 space-y-2 overflow-auto break-words text-text-primary',
+        'min-w-0 space-y-2 break-words',
         SIZE[s.textSize ?? 'md'] ?? SIZE.md,
         ALIGN[s.align ?? 'start'] ?? ALIGN.start,
-        callout && 'rounded-md border-l-4 border-info bg-info-subtle p-3',
       )}
-      style={{
-        ...fontStyle(s.textFont, s.textColor),
-        ...(callout && cssColor(s.calloutColor) ? { borderLeftColor: cssColor(s.calloutColor) } : {}),
-        ...(callout && cssColor(s.calloutBackground) ? { background: cssColor(s.calloutBackground) } : {}),
-      }}
+      style={clamp ? { display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: clamp, overflow: 'hidden' } : undefined}
     >
       {blocks.map((b, i) => {
         switch (b.t) {
           case 'heading': return (
-            <p key={i} className={cn('font-semibold', b.level <= 2 ? 'text-[1.15em]' : 'text-[1em]')} style={headingStyle}>
+            <p key={i} className={cn('font-semibold leading-snug', b.level <= 2 ? 'text-[1.15em]' : 'text-[1em]')} style={headingStyle}>
               <Inline nodes={b.children} ctx={ctx} />
             </p>
           );
-          case 'paragraph': return <p key={i}><Inline nodes={b.children} ctx={ctx} /></p>;
+          case 'paragraph': return <p key={i} className="leading-relaxed"><Inline nodes={b.children} ctx={ctx} /></p>;
           case 'quote': return (
             <blockquote key={i} className="border-l-2 border-border pl-3 text-text-secondary">
               <Inline nodes={b.children} ctx={ctx} />
             </blockquote>
           );
-          case 'code': return <pre key={i} className="overflow-x-auto rounded bg-surface-overlay p-2 text-left font-mono text-xs">{b.text}</pre>;
+          case 'code': return <pre key={i} className="overflow-x-auto rounded-md bg-surface-overlay p-2 text-left font-mono text-xs">{b.text}</pre>;
           case 'hr': return <hr key={i} className="border-border" />;
           case 'ul':
           case 'ol': {
             const List = b.t;
             return (
-              <List key={i} className={cn(b.t === 'ul' ? 'list-disc' : 'list-decimal', 'space-y-0.5 pl-5 text-left')}>
-                {b.items.map((it, j) => <li key={j}><Inline nodes={it} ctx={ctx} /></li>)}
+              <List key={i} className={cn(b.t === 'ul' ? 'list-disc' : 'list-decimal', 'space-y-1 pl-5 text-left marker:text-text-secondary')}>
+                {b.items.map((it, j) => <li key={j} className="leading-relaxed"><Inline nodes={it} ctx={ctx} /></li>)}
               </List>
             );
           }
         }
       })}
+    </div>
+  );
+
+  return (
+    <div
+      className={cn('flex h-full min-h-0 flex-col text-text-primary', clamp ? 'overflow-hidden' : 'overflow-auto')}
+      style={{ ...fontStyle(s.textFont, s.textColor), padding }}
+    >
+      <div className={cn('flex flex-[1_0_auto] flex-col', VALIGN[s.verticalAlign ?? 'top'] ?? VALIGN.top)}>
+        {callout ? (
+          <div
+            className="flex gap-2.5 rounded-lg border-l-4 p-3"
+            style={{ borderLeftColor: tone.accent, background: tone.background }}
+          >
+            {s.calloutIcon && (
+              <SettingIcon name={s.calloutIcon} className="mt-0.5 shrink-0" style={{ width: 16, height: 16, fontSize: 16, color: tone.accent }} />
+            )}
+            {text}
+          </div>
+        ) : text}
+      </div>
+      {footer.length > 0 && record && (
+        <div className="mt-3 shrink-0 border-t border-border pt-1">
+          {footer.map((k) => (
+            <Row key={k} label={keyLabel(k)} value={fieldText(readField(record, k), format, missing, locale)} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

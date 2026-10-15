@@ -3,6 +3,7 @@ import { GaugeChart, type GaugeBand, type GaugeLayout } from '@/modules/ui/Chart
 import type { FontValue } from '../../SchemaForm/types';
 import { cssColor, fontStyle, formatValue, type ColorRange, type RangeEdges } from '../settings/style';
 import type { WidgetKindView, WidgetViewProps } from '../kind';
+import { IconTile, Metric, MetricHead, MetricLabel } from './ui';
 
 const num = (v: unknown): number | null => {
   const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN;
@@ -11,6 +12,13 @@ const num = (v: unknown): number | null => {
 
 type S = {
   layout?: GaugeLayout;
+  label?: string;
+  labelFont?: FontValue;
+  labelColor?: string;
+  icon?: string;
+  iconColor?: string;
+  iconSize?: number;
+  iconBackground?: string;
   startAngle?: number;
   endAngle?: number;
   min?: number;
@@ -19,19 +27,24 @@ type S = {
   minMaxFont?: FontValue;
   minMaxColor?: string;
   ticks?: number;
+  tickLabels?: boolean;
+  tickColor?: string;
   showValue?: boolean;
   valueFont?: FontValue;
   valueColor?: string;
   unitTitle?: string;
   needle?: boolean;
+  needleStyle?: 'line' | 'arrow' | 'marker';
   needleColor?: string;
+  barColorMode?: 'range' | 'constant';
   barColor?: string;
   trackColor?: string;
   thickness?: number;
   roundedCaps?: boolean;
   ranges?: unknown;
   rangeEdges?: RangeEdges;
-  rangeTarget?: 'both' | 'bar' | 'track';
+  rangeDisplay?: 'outer' | 'track' | 'off';
+  rangeOpacity?: number;
   animation?: boolean;
 };
 
@@ -53,8 +66,9 @@ export function rangesToBands(ranges: unknown): GaugeBand[] {
 }
 
 /**
- * `gauge`: one number on an arc, a donut or a bar. A bound min / max wins over the typed one. The
- * card dims a stale gauge (`$card.staleDisplay: 'dim'`), so the view does not dim it again.
+ * `gauge`: one number on an arc, a donut, a bar or a level. A bound min / max wins over the typed
+ * one. Label top-left and icon top-right as in every single-value widget; the number is the kit's
+ * metric, sized to the gauge. The card dims a stale gauge (`$card.staleDisplay: 'dim'`).
  */
 export function GaugeView({ settings, format, data, locale }: WidgetViewProps) {
   const s = settings as S;
@@ -62,43 +76,67 @@ export function GaugeView({ settings, format, data, locale }: WidgetViewProps) {
   const min = num(data.min?.value) ?? num(s.min) ?? 0;
   const rawMax = num(data.max?.value) ?? num(s.max) ?? 100;
   const max = rawMax > min ? rawMax : min + 1;
-  // The chart draws a trailing unit smaller beside the number; a leading unit (₺ 12) stays in the text.
-  const unitAfter = format.unitPosition !== 'before';
   const scaleFormat = { ...format, unit: undefined };
+  const byRange = (s.barColorMode ?? 'range') === 'range';
+  const display = s.rangeDisplay ?? 'outer';
+  const bands = !byRange && display === 'off' ? [] : rangesToBands(s.ranges);
+  const customFont = !!s.valueFont && Object.keys(s.valueFont).length > 0;
+
+  const head = (
+    <MetricHead
+      label={s.label ? <MetricLabel font={s.labelFont} color={s.labelColor}>{s.label}</MetricLabel> : undefined}
+      icon={s.icon ? <IconTile name={s.icon} size={Math.round((s.iconSize ?? 20) * 1.8)} color={s.iconColor} background={s.iconBackground} /> : undefined}
+    />
+  );
 
   return (
-    <div className="flex h-full min-h-0 w-full items-center justify-center">
-      <GaugeChart
-        value={value}
-        min={min}
-        max={max}
-        layout={s.layout ?? 'arc'}
-        size="fill"
-        bands={rangesToBands(s.ranges)}
-        bandEdges={s.rangeEdges ?? 'to'}
-        bandDisplay={s.rangeTarget ?? 'both'}
-        format={(v) => formatValue(v, unitAfter ? scaleFormat : format, {}, locale)}
-        formatScale={(v) => formatValue(v, scaleFormat, {}, locale)}
-        unit={unitAfter && format.unit ? format.unit : undefined}
-        label={s.unitTitle || undefined}
-        needle={!!s.needle}
-        needleColor={cssColor(s.needleColor)}
-        color={cssColor(s.barColor)}
-        trackColor={cssColor(s.trackColor)}
-        thickness={s.thickness ?? 16}
-        roundedCaps={!!s.roundedCaps}
-        ticks={s.ticks ?? 0}
-        showMinMax={s.showMinMax !== false}
-        showValue={s.showValue !== false}
-        startAngle={s.startAngle ?? -135}
-        endAngle={s.endAngle ?? 135}
-        animate={s.animation !== false}
-        valueStyle={fontStyle(s.valueFont)}
-        valueColor={cssColor(s.valueColor)}
-        scaleStyle={fontStyle(s.minMaxFont)}
-        scaleColor={cssColor(s.minMaxColor)}
-        ariaLabel={s.unitTitle || 'Gauge'}
-      />
+    <div className="flex h-full min-h-0 w-full flex-col gap-2">
+      {head}
+      <div className="min-h-0 w-full flex-1">
+        <GaugeChart
+          value={value}
+          min={min}
+          max={max}
+          layout={s.layout ?? 'arc'}
+          size="fill"
+          bands={bands}
+          bandEdges={s.rangeEdges ?? 'to'}
+          bandDisplay={byRange ? (display === 'off' ? 'bar' : 'both') : 'track'}
+          bandStyle={display === 'track' ? 'track' : 'outer'}
+          bandOpacity={Math.min(100, Math.max(0, s.rangeOpacity ?? 35)) / 100}
+          format={(v) => formatValue(v, format, {}, locale)}
+          formatScale={(v) => formatValue(v, scaleFormat, {}, locale)}
+          valueContent={
+            <Metric
+              text={value === null ? '—' : formatValue(value, scaleFormat, {}, locale)}
+              unit={format.unit}
+              unitPosition={format.unitPosition}
+              font={customFont ? s.valueFont : undefined}
+              color={cssColor(s.valueColor)}
+              style={customFont && s.valueFont?.size ? undefined : { fontSize: '1em' }}
+            />
+          }
+          label={s.unitTitle || undefined}
+          needle={!!s.needle}
+          needleStyle={s.needleStyle ?? 'line'}
+          needleColor={cssColor(s.needleColor)}
+          color={cssColor(s.barColor)}
+          trackColor={cssColor(s.trackColor)}
+          thickness={s.thickness ?? 14}
+          roundedCaps={s.roundedCaps !== false}
+          ticks={s.ticks ?? 0}
+          tickLabels={!!s.tickLabels}
+          tickColor={cssColor(s.tickColor)}
+          showMinMax={s.showMinMax !== false}
+          showValue={s.showValue !== false}
+          startAngle={s.startAngle ?? -135}
+          endAngle={s.endAngle ?? 135}
+          animate={s.animation !== false}
+          scaleStyle={fontStyle(s.minMaxFont)}
+          scaleColor={cssColor(s.minMaxColor)}
+          ariaLabel={s.label || s.unitTitle || 'Gauge'}
+        />
+      </div>
     </div>
   );
 }

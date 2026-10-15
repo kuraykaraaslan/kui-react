@@ -277,6 +277,14 @@
         "decimals": {
           "type": "number"
         },
+        "axis": {
+          "type": "select",
+          "value": "left",
+          "options": [
+            "left",
+            "right"
+          ]
+        },
         "lineStyle": {
           "type": "select",
           "value": "solid",
@@ -296,6 +304,29 @@
             "",
             "on",
             "off"
+          ]
+        },
+        "pointShape": {
+          "type": "select",
+          "value": "",
+          "options": [
+            "",
+            "circle",
+            "square",
+            "diamond",
+            "triangle"
+          ]
+        },
+        "pointSize": {
+          "type": "number"
+        },
+        "fill": {
+          "type": "select",
+          "value": "",
+          "options": [
+            "",
+            "opacity",
+            "gradient"
           ]
         },
         "fillOpacity": {
@@ -324,6 +355,41 @@
       "type": "boolean",
       "value": false
     },
+    "pointShape": {
+      "type": "select",
+      "value": "circle",
+      "options": [
+        "circle",
+        "square",
+        "diamond",
+        "triangle"
+      ]
+    },
+    "pointSize": {
+      "type": "number"
+    },
+    "valueLabels": {
+      "type": "select",
+      "value": "none",
+      "options": [
+        "none",
+        "value"
+      ]
+    },
+    "valueLabelPosition": {
+      "type": "select",
+      "value": "top",
+      "options": [
+        "top",
+        "bottom"
+      ]
+    },
+    "valueLabelFont": {
+      "type": "font"
+    },
+    "valueLabelColor": {
+      "type": "color"
+    },
     "showGrid": {
       "type": "boolean",
       "value": true
@@ -345,6 +411,42 @@
     },
     "tickColor": {
       "type": "color"
+    },
+    "yFromZero": {
+      "type": "boolean",
+      "value": false
+    },
+    "showXAxis": {
+      "type": "boolean",
+      "value": true
+    },
+    "showYAxis": {
+      "type": "boolean",
+      "value": true
+    },
+    "xLabel": {
+      "type": "text"
+    },
+    "yTickCount": {
+      "type": "number"
+    },
+    "gridStyle": {
+      "type": "select",
+      "value": "dashed",
+      "options": [
+        "dashed",
+        "dotted",
+        "solid"
+      ]
+    },
+    "y2Label": {
+      "type": "text"
+    },
+    "y2Min": {
+      "type": "number"
+    },
+    "y2Max": {
+      "type": "number"
     },
     "legend": {
       "type": "select",
@@ -384,6 +486,13 @@
         "none"
       ]
     },
+    "tooltipTime": {
+      "type": "boolean",
+      "value": true
+    },
+    "tooltipDecimals": {
+      "type": "number"
+    },
     "thresholds": {
       "type": "repeater",
       "fields": {
@@ -409,8 +518,24 @@
         "width": {
           "type": "number",
           "value": 1
+        },
+        "axis": {
+          "type": "select",
+          "value": "left",
+          "options": [
+            "left",
+            "right"
+          ]
         }
       }
+    },
+    "animate": {
+      "type": "boolean",
+      "value": true
+    },
+    "zoom": {
+      "type": "boolean",
+      "value": true
     },
     "defaultColor": {
       "type": "color"
@@ -435,6 +560,17 @@
         "decimals": {
           "type": "number"
         },
+        "axis": {
+          "type": "select",
+          "value": "left",
+          "options": [
+            "left",
+            "right"
+          ]
+        },
+        "stack": {
+          "type": "text"
+        },
         "startHidden": {
           "type": "boolean",
           "value": false
@@ -453,6 +589,18 @@
         "horizontal"
       ]
     },
+    "barWidth": {
+      "type": "number",
+      "value": 70
+    },
+    "barGap": {
+      "type": "number",
+      "value": 2
+    },
+    "barRadius": {
+      "type": "number",
+      "value": 4
+    },
     "valueLabels": {
       "type": "select",
       "value": "none",
@@ -461,9 +609,20 @@
         "value"
       ]
     },
-    "barRadius": {
-      "type": "number",
-      "value": 4
+    "valueLabelPosition": {
+      "type": "select",
+      "value": "outside",
+      "options": [
+        "outside",
+        "inside",
+        "center"
+      ]
+    },
+    "valueLabelFont": {
+      "type": "font"
+    },
+    "valueLabelColor": {
+      "type": "color"
     },
     "showGrid": {
       "type": "boolean",
@@ -486,6 +645,38 @@
     },
     "tickColor": {
       "type": "color"
+    },
+    "showXAxis": {
+      "type": "boolean",
+      "value": true
+    },
+    "showYAxis": {
+      "type": "boolean",
+      "value": true
+    },
+    "xLabel": {
+      "type": "text"
+    },
+    "yTickCount": {
+      "type": "number"
+    },
+    "gridStyle": {
+      "type": "select",
+      "value": "dashed",
+      "options": [
+        "dashed",
+        "dotted",
+        "solid"
+      ]
+    },
+    "y2Label": {
+      "type": "text"
+    },
+    "y2Min": {
+      "type": "number"
+    },
+    "y2Max": {
+      "type": "number"
     },
     "legend": {
       "type": "select",
@@ -525,6 +716,17 @@
         "none"
       ]
     },
+    "tooltipTime": {
+      "type": "boolean",
+      "value": true
+    },
+    "tooltipDecimals": {
+      "type": "number"
+    },
+    "tooltipTotal": {
+      "type": "boolean",
+      "value": false
+    },
     "thresholds": {
       "type": "repeater",
       "fields": {
@@ -550,8 +752,20 @@
         "width": {
           "type": "number",
           "value": 1
+        },
+        "axis": {
+          "type": "select",
+          "value": "left",
+          "options": [
+            "left",
+            "right"
+          ]
         }
       }
+    },
+    "animate": {
+      "type": "boolean",
+      "value": true
     },
     "defaultColor": {
       "type": "color"
@@ -576,6 +790,17 @@
         "decimals": {
           "type": "number"
         },
+        "axis": {
+          "type": "select",
+          "value": "left",
+          "options": [
+            "left",
+            "right"
+          ]
+        },
+        "stack": {
+          "type": "text"
+        },
         "lineStyle": {
           "type": "select",
           "value": "solid",
@@ -595,6 +820,30 @@
             "",
             "on",
             "off"
+          ]
+        },
+        "pointShape": {
+          "type": "select",
+          "value": "",
+          "options": [
+            "",
+            "circle",
+            "square",
+            "diamond",
+            "triangle"
+          ]
+        },
+        "pointSize": {
+          "type": "number"
+        },
+        "fill": {
+          "type": "select",
+          "value": "",
+          "options": [
+            "",
+            "none",
+            "opacity",
+            "gradient"
           ]
         },
         "fillOpacity": {
@@ -623,6 +872,19 @@
       "type": "boolean",
       "value": false
     },
+    "pointShape": {
+      "type": "select",
+      "value": "circle",
+      "options": [
+        "circle",
+        "square",
+        "diamond",
+        "triangle"
+      ]
+    },
+    "pointSize": {
+      "type": "number"
+    },
     "stacked": {
       "type": "boolean",
       "value": false
@@ -636,6 +898,36 @@
         "medium",
         "solid"
       ]
+    },
+    "fillStyle": {
+      "type": "select",
+      "value": "gradient",
+      "options": [
+        "gradient",
+        "opacity"
+      ]
+    },
+    "valueLabels": {
+      "type": "select",
+      "value": "none",
+      "options": [
+        "none",
+        "value"
+      ]
+    },
+    "valueLabelPosition": {
+      "type": "select",
+      "value": "top",
+      "options": [
+        "top",
+        "bottom"
+      ]
+    },
+    "valueLabelFont": {
+      "type": "font"
+    },
+    "valueLabelColor": {
+      "type": "color"
     },
     "showGrid": {
       "type": "boolean",
@@ -658,6 +950,42 @@
     },
     "tickColor": {
       "type": "color"
+    },
+    "yFromZero": {
+      "type": "boolean",
+      "value": true
+    },
+    "showXAxis": {
+      "type": "boolean",
+      "value": true
+    },
+    "showYAxis": {
+      "type": "boolean",
+      "value": true
+    },
+    "xLabel": {
+      "type": "text"
+    },
+    "yTickCount": {
+      "type": "number"
+    },
+    "gridStyle": {
+      "type": "select",
+      "value": "dashed",
+      "options": [
+        "dashed",
+        "dotted",
+        "solid"
+      ]
+    },
+    "y2Label": {
+      "type": "text"
+    },
+    "y2Min": {
+      "type": "number"
+    },
+    "y2Max": {
+      "type": "number"
     },
     "legend": {
       "type": "select",
@@ -697,6 +1025,17 @@
         "none"
       ]
     },
+    "tooltipTime": {
+      "type": "boolean",
+      "value": true
+    },
+    "tooltipDecimals": {
+      "type": "number"
+    },
+    "tooltipTotal": {
+      "type": "boolean",
+      "value": false
+    },
     "thresholds": {
       "type": "repeater",
       "fields": {
@@ -722,8 +1061,24 @@
         "width": {
           "type": "number",
           "value": 1
+        },
+        "axis": {
+          "type": "select",
+          "value": "left",
+          "options": [
+            "left",
+            "right"
+          ]
         }
       }
+    },
+    "animate": {
+      "type": "boolean",
+      "value": true
+    },
+    "zoom": {
+      "type": "boolean",
+      "value": true
     },
     "defaultColor": {
       "type": "color"
@@ -754,6 +1109,14 @@
       "type": "number",
       "value": 40
     },
+    "startAngle": {
+      "type": "number",
+      "value": 0
+    },
+    "sliceGap": {
+      "type": "number",
+      "value": 2
+    },
     "maxSlices": {
       "type": "number",
       "value": 8
@@ -772,13 +1135,28 @@
     },
     "valueLabels": {
       "type": "select",
-      "value": "none",
+      "value": "percent",
       "options": [
         "none",
         "percent",
         "value",
-        "name"
+        "name",
+        "name-percent"
       ]
+    },
+    "labelPosition": {
+      "type": "select",
+      "value": "inside",
+      "options": [
+        "inside",
+        "outside"
+      ]
+    },
+    "labelFont": {
+      "type": "font"
+    },
+    "labelColor": {
+      "type": "color"
     },
     "colors": {
       "type": "repeater",
@@ -794,7 +1172,7 @@
     },
     "legend": {
       "type": "select",
-      "value": "bottom",
+      "value": "auto",
       "options": [
         "auto",
         "top",
@@ -822,6 +1200,19 @@
     "showTooltip": {
       "type": "boolean",
       "value": true
+    },
+    "tooltipValue": {
+      "type": "select",
+      "value": "both",
+      "options": [
+        "both",
+        "value",
+        "percent"
+      ]
+    },
+    "animate": {
+      "type": "boolean",
+      "value": true
     }
   },
   "builtin:chart.scatter@1": {
@@ -846,8 +1237,23 @@
       "options": [
         "sm",
         "md",
-        "lg"
+        "lg",
+        "xl"
       ]
+    },
+    "pointShape": {
+      "type": "select",
+      "value": "circle",
+      "options": [
+        "circle",
+        "square",
+        "diamond",
+        "triangle"
+      ]
+    },
+    "pointOpacity": {
+      "type": "number",
+      "value": 0.8
     },
     "groupColors": {
       "type": "repeater",
@@ -860,6 +1266,13 @@
           "value": "var(--primary)"
         }
       }
+    },
+    "trendLine": {
+      "type": "boolean",
+      "value": false
+    },
+    "trendColor": {
+      "type": "color"
     },
     "showGrid": {
       "type": "boolean",
@@ -891,6 +1304,26 @@
     },
     "tickColor": {
       "type": "color"
+    },
+    "showXAxis": {
+      "type": "boolean",
+      "value": true
+    },
+    "showYAxis": {
+      "type": "boolean",
+      "value": true
+    },
+    "yTickCount": {
+      "type": "number"
+    },
+    "gridStyle": {
+      "type": "select",
+      "value": "dashed",
+      "options": [
+        "dashed",
+        "dotted",
+        "solid"
+      ]
     },
     "xUnit": {
       "type": "text"
@@ -926,6 +1359,10 @@
       "type": "boolean",
       "value": true
     },
+    "tooltipTime": {
+      "type": "boolean",
+      "value": true
+    },
     "thresholds": {
       "type": "repeater",
       "fields": {
@@ -953,6 +1390,10 @@
           "value": 1
         }
       }
+    },
+    "animate": {
+      "type": "boolean",
+      "value": true
     }
   },
   "builtin:chart.histogram@1": {
@@ -969,9 +1410,25 @@
     "max": {
       "type": "number"
     },
+    "binEdges": {
+      "type": "select",
+      "value": "nice",
+      "options": [
+        "nice",
+        "exact"
+      ]
+    },
     "barColor": {
       "type": "color",
       "value": "var(--primary)"
+    },
+    "barWidth": {
+      "type": "number",
+      "value": 92
+    },
+    "barRadius": {
+      "type": "number",
+      "value": 3
     },
     "valueLabels": {
       "type": "select",
@@ -981,8 +1438,33 @@
         "value"
       ]
     },
+    "valueLabelPosition": {
+      "type": "select",
+      "value": "outside",
+      "options": [
+        "outside",
+        "inside"
+      ]
+    },
+    "valueLabelFont": {
+      "type": "font"
+    },
+    "valueLabelColor": {
+      "type": "color"
+    },
     "countLabel": {
       "type": "text"
+    },
+    "showMean": {
+      "type": "boolean",
+      "value": false
+    },
+    "showMedian": {
+      "type": "boolean",
+      "value": false
+    },
+    "markerColor": {
+      "type": "color"
     },
     "showGrid": {
       "type": "boolean",
@@ -1009,7 +1491,35 @@
     "xLabel": {
       "type": "text"
     },
+    "showXAxis": {
+      "type": "boolean",
+      "value": true
+    },
+    "showYAxis": {
+      "type": "boolean",
+      "value": true
+    },
+    "yTickCount": {
+      "type": "number"
+    },
+    "gridStyle": {
+      "type": "select",
+      "value": "dashed",
+      "options": [
+        "dashed",
+        "dotted",
+        "solid"
+      ]
+    },
     "showTooltip": {
+      "type": "boolean",
+      "value": true
+    },
+    "tooltipTime": {
+      "type": "boolean",
+      "value": true
+    },
+    "animate": {
       "type": "boolean",
       "value": true
     }
@@ -1038,6 +1548,9 @@
     "color": {
       "type": "color",
       "value": "var(--primary)"
+    },
+    "colorLow": {
+      "type": "color"
     },
     "ranges": {
       "type": "repeater",
@@ -1079,6 +1592,20 @@
         "value"
       ]
     },
+    "valueLabelFont": {
+      "type": "font"
+    },
+    "valueLabelColor": {
+      "type": "color"
+    },
+    "cellGap": {
+      "type": "number",
+      "value": 2
+    },
+    "cellRadius": {
+      "type": "number",
+      "value": 3
+    },
     "tickFont": {
       "type": "font"
     },
@@ -1107,6 +1634,10 @@
       "type": "text"
     },
     "showTooltip": {
+      "type": "boolean",
+      "value": true
+    },
+    "animate": {
       "type": "boolean",
       "value": true
     }
@@ -1229,10 +1760,12 @@
   "builtin:stat.sparkline@1": {
     "layout": {
       "type": "select",
-      "value": "value-top",
+      "value": "stacked",
       "options": [
+        "stacked",
         "value-top",
-        "value-left",
+        "inline",
+        "overlay",
         "chart-only"
       ]
     },
@@ -1246,6 +1779,30 @@
     "valueColor": {
       "type": "color",
       "value": "var(--text-primary)"
+    },
+    "label": {
+      "type": "text"
+    },
+    "labelFont": {
+      "type": "font"
+    },
+    "labelColor": {
+      "type": "color",
+      "value": "var(--text-secondary)"
+    },
+    "icon": {
+      "type": "icon"
+    },
+    "iconColor": {
+      "type": "color",
+      "value": "var(--primary)"
+    },
+    "iconSize": {
+      "type": "number",
+      "value": 20
+    },
+    "iconBackground": {
+      "type": "color"
     },
     "curve": {
       "type": "select",
@@ -1262,11 +1819,28 @@
     },
     "lineWidth": {
       "type": "number",
-      "value": 1.5
+      "value": 2
+    },
+    "fill": {
+      "type": "select",
+      "value": "gradient",
+      "options": [
+        "none",
+        "opacity",
+        "gradient"
+      ]
     },
     "fillOpacity": {
       "type": "number",
-      "value": 15
+      "value": 20
+    },
+    "showLast": {
+      "type": "boolean",
+      "value": true
+    },
+    "showMinMax": {
+      "type": "boolean",
+      "value": false
     },
     "ranges": {
       "type": "repeater",
@@ -1299,6 +1873,7 @@
       "value": "value",
       "options": [
         "value",
+        "line",
         "both"
       ]
     },
@@ -1320,6 +1895,10 @@
         "neutral"
       ]
     },
+    "showArrow": {
+      "type": "boolean",
+      "value": true
+    },
     "upColor": {
       "type": "color",
       "value": "var(--success)"
@@ -1327,6 +1906,18 @@
     "downColor": {
       "type": "color",
       "value": "var(--error)"
+    },
+    "timeRange": {
+      "type": "select",
+      "value": "auto",
+      "options": [
+        "auto",
+        "custom",
+        "off"
+      ]
+    },
+    "timeRangeText": {
+      "type": "text"
     }
   },
   "builtin:stat.attributes@1": {
@@ -1336,7 +1927,17 @@
       "options": [
         "list",
         "grid-2",
-        "grid-3"
+        "grid-3",
+        "columns"
+      ]
+    },
+    "alignment": {
+      "type": "select",
+      "value": "split",
+      "options": [
+        "split",
+        "start",
+        "center"
       ]
     },
     "fields": {
@@ -1354,8 +1955,26 @@
         "decimals": {
           "type": "number"
         },
+        "icon": {
+          "type": "icon"
+        },
         "color": {
           "type": "color"
+        },
+        "ranges": {
+          "type": "repeater",
+          "fields": {
+            "from": {
+              "type": "number"
+            },
+            "to": {
+              "type": "number"
+            },
+            "color": {
+              "type": "color",
+              "value": "var(--warning)"
+            }
+          }
         }
       }
     },
@@ -1365,6 +1984,10 @@
     "labelColor": {
       "type": "color",
       "value": "var(--text-secondary)"
+    },
+    "showIcons": {
+      "type": "boolean",
+      "value": true
     },
     "valueFont": {
       "type": "font"
@@ -1387,6 +2010,10 @@
     },
     "dividerColor": {
       "type": "color"
+    },
+    "striped": {
+      "type": "boolean",
+      "value": false
     }
   },
   "builtin:progress@1": {
@@ -1396,12 +2023,37 @@
       "options": [
         "bar-labelled",
         "bar",
-        "ring"
+        "ring",
+        "semicircle"
       ]
     },
     "target": {
       "type": "number",
       "value": 100
+    },
+    "label": {
+      "type": "text"
+    },
+    "labelFont": {
+      "type": "font"
+    },
+    "labelColor": {
+      "type": "color",
+      "value": "var(--text-secondary)"
+    },
+    "icon": {
+      "type": "icon"
+    },
+    "iconColor": {
+      "type": "color",
+      "value": "var(--primary)"
+    },
+    "iconSize": {
+      "type": "number",
+      "value": 20
+    },
+    "iconBackground": {
+      "type": "color"
     },
     "valueText": {
       "type": "select",
@@ -1412,6 +2064,18 @@
         "both",
         "none"
       ]
+    },
+    "textPosition": {
+      "type": "select",
+      "value": "above",
+      "options": [
+        "above",
+        "below"
+      ]
+    },
+    "autoScale": {
+      "type": "boolean",
+      "value": true
     },
     "valueFont": {
       "type": "font"
@@ -1424,9 +2088,17 @@
       "type": "color",
       "value": "var(--primary)"
     },
+    "barGradient": {
+      "type": "boolean",
+      "value": false
+    },
+    "gradientStart": {
+      "type": "color",
+      "value": "var(--info)"
+    },
     "trackColor": {
       "type": "color",
-      "value": "var(--surface-overlay)"
+      "value": "var(--border)"
     },
     "thickness": {
       "type": "number",
@@ -1435,10 +2107,6 @@
     "roundedEnds": {
       "type": "boolean",
       "value": true
-    },
-    "ringSize": {
-      "type": "number",
-      "value": 96
     },
     "ranges": {
       "type": "repeater",
@@ -1466,9 +2134,22 @@
         "to"
       ]
     },
+    "rangeDisplay": {
+      "type": "select",
+      "value": "bar",
+      "options": [
+        "bar",
+        "track",
+        "both"
+      ]
+    },
     "showTicks": {
       "type": "boolean",
       "value": false
+    },
+    "tickCount": {
+      "type": "number",
+      "value": 0
     },
     "ticksFont": {
       "type": "font"
@@ -1476,6 +2157,16 @@
     "ticksColor": {
       "type": "color",
       "value": "var(--text-secondary)"
+    },
+    "marker": {
+      "type": "number"
+    },
+    "markerLabel": {
+      "type": "text"
+    },
+    "markerColor": {
+      "type": "color",
+      "value": "var(--text-primary)"
     }
   },
   "builtin:gauge@1": {
@@ -1486,7 +2177,8 @@
         "arc",
         "donut",
         "bar-horizontal",
-        "bar-vertical"
+        "bar-vertical",
+        "level"
       ]
     },
     "startAngle": {
@@ -1496,6 +2188,30 @@
     "endAngle": {
       "type": "number",
       "value": 135
+    },
+    "label": {
+      "type": "text"
+    },
+    "labelFont": {
+      "type": "font"
+    },
+    "labelColor": {
+      "type": "color",
+      "value": "var(--text-secondary)"
+    },
+    "icon": {
+      "type": "icon"
+    },
+    "iconColor": {
+      "type": "color",
+      "value": "var(--primary)"
+    },
+    "iconSize": {
+      "type": "number",
+      "value": 20
+    },
+    "iconBackground": {
+      "type": "color"
     },
     "min": {
       "type": "number",
@@ -1520,6 +2236,14 @@
       "type": "number",
       "value": 0
     },
+    "tickLabels": {
+      "type": "boolean",
+      "value": false
+    },
+    "tickColor": {
+      "type": "color",
+      "value": "var(--border-strong)"
+    },
     "showValue": {
       "type": "boolean",
       "value": true
@@ -1538,9 +2262,26 @@
       "type": "boolean",
       "value": false
     },
+    "needleStyle": {
+      "type": "select",
+      "value": "line",
+      "options": [
+        "line",
+        "arrow",
+        "marker"
+      ]
+    },
     "needleColor": {
       "type": "color",
       "value": "var(--text-primary)"
+    },
+    "barColorMode": {
+      "type": "select",
+      "value": "range",
+      "options": [
+        "range",
+        "constant"
+      ]
     },
     "barColor": {
       "type": "color",
@@ -1552,11 +2293,11 @@
     },
     "thickness": {
       "type": "number",
-      "value": 16
+      "value": 14
     },
     "roundedCaps": {
       "type": "boolean",
-      "value": false
+      "value": true
     },
     "ranges": {
       "type": "repeater",
@@ -1584,14 +2325,18 @@
         "to"
       ]
     },
-    "rangeTarget": {
+    "rangeDisplay": {
       "type": "select",
-      "value": "both",
+      "value": "outer",
       "options": [
-        "both",
-        "bar",
-        "track"
+        "outer",
+        "track",
+        "off"
       ]
+    },
+    "rangeOpacity": {
+      "type": "number",
+      "value": 35
     },
     "animation": {
       "type": "boolean",
@@ -1601,17 +2346,36 @@
   "builtin:state@1": {
     "layout": {
       "type": "select",
-      "value": "badge",
+      "value": "big",
       "options": [
+        "big",
         "badge",
         "dot",
         "tile",
         "icon"
       ]
     },
+    "alignment": {
+      "type": "select",
+      "value": "start",
+      "options": [
+        "start",
+        "center"
+      ]
+    },
     "iconSize": {
       "type": "number",
-      "value": 32
+      "value": 18
+    },
+    "label": {
+      "type": "text"
+    },
+    "labelFont": {
+      "type": "font"
+    },
+    "labelColor": {
+      "type": "color",
+      "value": "var(--text-secondary)"
     },
     "states": {
       "type": "repeater",
@@ -1637,6 +2401,10 @@
         },
         "icon": {
           "type": "icon"
+        },
+        "pulse": {
+          "type": "boolean",
+          "value": false
         }
       }
     },
@@ -1653,8 +2421,12 @@
     "fallbackIcon": {
       "type": "icon"
     },
-    "labelFont": {
+    "stateFont": {
       "type": "font"
+    },
+    "showSince": {
+      "type": "boolean",
+      "value": true
     },
     "showValue": {
       "type": "boolean",
@@ -1693,6 +2465,7 @@
           "options": [
             "always",
             "desktop",
+            "mobile",
             "hidden"
           ]
         },
@@ -1702,10 +2475,60 @@
           "options": [
             "auto",
             "text",
+            "number",
+            "date",
             "badge",
             "bar",
-            "link"
+            "progress",
+            "link",
+            "icon"
           ]
+        },
+        "valueMap": {
+          "type": "repeater",
+          "value": [],
+          "fields": {
+            "value": {
+              "type": "text"
+            },
+            "color": {
+              "type": "color",
+              "value": "var(--success)"
+            },
+            "label": {
+              "type": "text"
+            },
+            "icon": {
+              "type": "icon"
+            }
+          }
+        },
+        "badgeStyle": {
+          "type": "select",
+          "value": "soft",
+          "options": [
+            "soft",
+            "dot",
+            "solid"
+          ]
+        },
+        "icon": {
+          "type": "icon"
+        },
+        "dateFormat": {
+          "type": "select",
+          "value": "inherit",
+          "options": [
+            "inherit",
+            "relative",
+            "date",
+            "time",
+            "datetime",
+            "custom"
+          ]
+        },
+        "datePattern": {
+          "type": "text"
         },
         "linkTemplate": {
           "type": "text"
@@ -1738,11 +2561,23 @@
           "type": "number",
           "value": 120
         },
+        "wrap": {
+          "type": "select",
+          "value": "nowrap",
+          "options": [
+            "nowrap",
+            "truncate",
+            "wrap"
+          ]
+        },
         "unit": {
           "type": "text"
         },
         "decimals": {
           "type": "number"
+        },
+        "font": {
+          "type": "font"
         },
         "color": {
           "type": "color"
@@ -1782,12 +2617,9 @@
       "value": "none",
       "options": [
         "none",
-        "pages"
+        "pages",
+        "scroll"
       ]
-    },
-    "sortable": {
-      "type": "boolean",
-      "value": true
     },
     "defaultSort": {
       "type": "data-key"
@@ -1800,7 +2632,18 @@
         "asc"
       ]
     },
+    "showRowNumbers": {
+      "type": "boolean",
+      "value": false
+    },
+    "emptyText": {
+      "type": "text"
+    },
     "search": {
+      "type": "boolean",
+      "value": true
+    },
+    "sortable": {
       "type": "boolean",
       "value": true
     },
@@ -1808,14 +2651,41 @@
       "type": "boolean",
       "value": false
     },
+    "dateFormat": {
+      "type": "select",
+      "value": "relative",
+      "options": [
+        "relative",
+        "date",
+        "time",
+        "datetime",
+        "custom"
+      ]
+    },
+    "datePattern": {
+      "type": "text"
+    },
     "density": {
       "type": "select",
-      "value": "compact",
+      "value": "normal",
       "options": [
         "compact",
         "normal",
         "comfortable"
       ]
+    },
+    "gridLines": {
+      "type": "select",
+      "value": "rows",
+      "options": [
+        "rows",
+        "all",
+        "none"
+      ]
+    },
+    "rowHover": {
+      "type": "boolean",
+      "value": true
     },
     "stickyHeader": {
       "type": "boolean",
@@ -1826,8 +2696,7 @@
       "value": false
     },
     "stripeColor": {
-      "type": "color",
-      "value": "var(--surface-sunken)"
+      "type": "color"
     },
     "borderColor": {
       "type": "color",
@@ -1835,6 +2704,45 @@
     },
     "rowColorColumn": {
       "type": "data-key"
+    },
+    "rowRules": {
+      "type": "repeater",
+      "value": [],
+      "fields": {
+        "column": {
+          "type": "data-key"
+        },
+        "op": {
+          "type": "select",
+          "value": "eq",
+          "options": [
+            "eq",
+            "ne",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "contains",
+            "empty"
+          ]
+        },
+        "value": {
+          "type": "text"
+        },
+        "color": {
+          "type": "color",
+          "value": "var(--warning)"
+        },
+        "target": {
+          "type": "select",
+          "value": "background",
+          "options": [
+            "background",
+            "bar",
+            "text"
+          ]
+        }
+      }
     },
     "headerFont": {
       "type": "font"
@@ -1890,13 +2798,32 @@
       "value": "title"
     },
     "descriptionColumn": {
-      "type": "data-key"
+      "type": "data-key",
+      "value": "description"
     },
     "colorColumn": {
-      "type": "data-key"
+      "type": "data-key",
+      "value": "color"
     },
     "iconColumn": {
-      "type": "data-key"
+      "type": "data-key",
+      "value": "icon"
+    },
+    "valueColors": {
+      "type": "repeater",
+      "value": [],
+      "fields": {
+        "value": {
+          "type": "text"
+        },
+        "color": {
+          "type": "color",
+          "value": "var(--error)"
+        },
+        "icon": {
+          "type": "icon"
+        }
+      }
     },
     "layout": {
       "type": "select",
@@ -1904,7 +2831,8 @@
       "options": [
         "timeline",
         "list",
-        "compact"
+        "compact",
+        "cards"
       ]
     },
     "order": {
@@ -1919,6 +2847,10 @@
       "type": "number",
       "value": 10
     },
+    "groupByDay": {
+      "type": "boolean",
+      "value": false
+    },
     "timeDisplay": {
       "type": "select",
       "value": "relative",
@@ -1926,12 +2858,44 @@
         "relative",
         "time",
         "date",
-        "datetime"
+        "datetime",
+        "custom"
       ]
     },
-    "groupByDay": {
-      "type": "boolean",
-      "value": false
+    "timePattern": {
+      "type": "text"
+    },
+    "timePosition": {
+      "type": "select",
+      "value": "side",
+      "options": [
+        "side",
+        "below"
+      ]
+    },
+    "timeFont": {
+      "type": "font"
+    },
+    "timeColor": {
+      "type": "color",
+      "value": "var(--text-secondary)"
+    },
+    "indicator": {
+      "type": "select",
+      "value": "dot",
+      "options": [
+        "dot",
+        "icon",
+        "bar",
+        "none"
+      ]
+    },
+    "markerColor": {
+      "type": "color",
+      "value": "var(--text-disabled)"
+    },
+    "icon": {
+      "type": "icon"
     },
     "titleFont": {
       "type": "font"
@@ -1951,19 +2915,13 @@
       "type": "number",
       "value": 2
     },
-    "timeFont": {
-      "type": "font"
+    "divider": {
+      "type": "boolean",
+      "value": true
     },
-    "timeColor": {
+    "dividerColor": {
       "type": "color",
-      "value": "var(--text-secondary)"
-    },
-    "markerColor": {
-      "type": "color",
-      "value": "var(--text-disabled)"
-    },
-    "icon": {
-      "type": "icon"
+      "value": "var(--border)"
     },
     "lineColor": {
       "type": "color",
@@ -1980,14 +2938,11 @@
       "value": "lng"
     },
     "labelColumn": {
-      "type": "data-key"
+      "type": "data-key",
+      "value": "label"
     },
     "idColumn": {
       "type": "data-key"
-    },
-    "tooltipColumns": {
-      "type": "data-key",
-      "value": []
     },
     "markerStyle": {
       "type": "select",
@@ -1995,6 +2950,7 @@
       "options": [
         "pin",
         "dot",
+        "circle",
         "icon"
       ]
     },
@@ -2009,9 +2965,13 @@
       "type": "boolean",
       "value": false
     },
+    "clusterRadius": {
+      "type": "number",
+      "value": 40
+    },
     "colorBy": {
       "type": "select",
-      "value": "fixed",
+      "value": "column",
       "options": [
         "fixed",
         "column",
@@ -2023,7 +2983,24 @@
       "value": "var(--primary)"
     },
     "colorColumn": {
-      "type": "data-key"
+      "type": "data-key",
+      "value": "status"
+    },
+    "valueColors": {
+      "type": "repeater",
+      "value": [],
+      "fields": {
+        "value": {
+          "type": "text"
+        },
+        "color": {
+          "type": "color",
+          "value": "var(--success)"
+        },
+        "label": {
+          "type": "text"
+        }
+      }
     },
     "valueColumn": {
       "type": "data-key"
@@ -2054,6 +3031,20 @@
         "to"
       ]
     },
+    "legend": {
+      "type": "boolean",
+      "value": true
+    },
+    "legendPosition": {
+      "type": "select",
+      "value": "bottomleft",
+      "options": [
+        "bottomleft",
+        "bottomright",
+        "topleft",
+        "topright"
+      ]
+    },
     "showLabels": {
       "type": "boolean",
       "value": false
@@ -2063,12 +3054,32 @@
       "value": "hover",
       "options": [
         "hover",
-        "click"
+        "click",
+        "none"
+      ]
+    },
+    "tooltipColumns": {
+      "type": "data-key",
+      "value": []
+    },
+    "tileStyle": {
+      "type": "select",
+      "value": "auto",
+      "options": [
+        "auto",
+        "light",
+        "grey",
+        "dark",
+        "streets"
       ]
     },
     "fitBounds": {
       "type": "boolean",
       "value": true
+    },
+    "fitPadding": {
+      "type": "number",
+      "value": 32
     },
     "centerLat": {
       "type": "number"
@@ -2086,15 +3097,23 @@
     "maxZoom": {
       "type": "number"
     },
-    "tileStyle": {
+    "zoomButtons": {
+      "type": "boolean",
+      "value": true
+    },
+    "controlsPosition": {
       "type": "select",
-      "value": "auto",
+      "value": "topleft",
       "options": [
-        "auto",
-        "light",
-        "grey",
-        "dark"
+        "topleft",
+        "topright",
+        "bottomleft",
+        "bottomright"
       ]
+    },
+    "scrollZoom": {
+      "type": "boolean",
+      "value": false
     },
     "linkTemplate": {
       "type": "text"
@@ -2116,13 +3135,27 @@
       "type": "textarea",
       "value": ""
     },
+    "calloutStyle": {
+      "type": "select",
+      "value": "info",
+      "options": [
+        "info",
+        "success",
+        "warning",
+        "error",
+        "custom"
+      ]
+    },
     "calloutColor": {
       "type": "color",
-      "value": "var(--info)"
+      "value": "var(--primary)"
     },
     "calloutBackground": {
       "type": "color",
-      "value": "var(--info-subtle)"
+      "value": "var(--primary-subtle)"
+    },
+    "calloutIcon": {
+      "type": "icon"
     },
     "align": {
       "type": "select",
@@ -2131,6 +3164,15 @@
         "start",
         "center",
         "end"
+      ]
+    },
+    "verticalAlign": {
+      "type": "select",
+      "value": "top",
+      "options": [
+        "top",
+        "center",
+        "bottom"
       ]
     },
     "textSize": {
@@ -2149,6 +3191,9 @@
       "type": "color",
       "value": "var(--text-primary)"
     },
+    "headingFont": {
+      "type": "font"
+    },
     "headingColor": {
       "type": "color"
     },
@@ -2156,9 +3201,41 @@
       "type": "color",
       "value": "var(--primary)"
     },
+    "linkUnderline": {
+      "type": "select",
+      "value": "hover",
+      "options": [
+        "hover",
+        "always"
+      ]
+    },
+    "padding": {
+      "type": "number",
+      "value": 0
+    },
+    "overflow": {
+      "type": "select",
+      "value": "scroll",
+      "options": [
+        "scroll",
+        "clamp"
+      ]
+    },
+    "clampLines": {
+      "type": "number",
+      "value": 6
+    },
     "missingText": {
       "type": "text",
       "value": "—"
+    },
+    "showRecord": {
+      "type": "boolean",
+      "value": false
+    },
+    "recordKeys": {
+      "type": "data-key",
+      "value": []
     }
   },
   "builtin:content.image@1": {
@@ -2174,7 +3251,8 @@
       "options": [
         "cover",
         "contain",
-        "fill"
+        "fill",
+        "none"
       ]
     },
     "position": {
@@ -2185,33 +3263,69 @@
         "top",
         "bottom",
         "left",
-        "right"
+        "right",
+        "top left",
+        "top right",
+        "bottom left",
+        "bottom right"
       ]
     },
     "radius": {
       "type": "number",
       "value": 0
     },
+    "background": {
+      "type": "color"
+    },
+    "zoomOnHover": {
+      "type": "boolean",
+      "value": false
+    },
     "overlayColor": {
       "type": "color"
+    },
+    "overlayOpacity": {
+      "type": "number",
+      "value": 30
+    },
+    "grayscale": {
+      "type": "number",
+      "value": 0
+    },
+    "brightness": {
+      "type": "number",
+      "value": 100
     },
     "caption": {
       "type": "text"
     },
     "captionPlacement": {
       "type": "select",
-      "value": "below",
+      "value": "overlay",
       "options": [
+        "overlay",
+        "overlay-top",
         "below",
-        "overlay"
+        "above"
+      ]
+    },
+    "captionAlign": {
+      "type": "select",
+      "value": "start",
+      "options": [
+        "start",
+        "center",
+        "end"
       ]
     },
     "captionFont": {
       "type": "font"
     },
     "captionColor": {
-      "type": "color",
-      "value": "var(--text-secondary)"
+      "type": "color"
+    },
+    "captionBackground": {
+      "type": "color"
     },
     "href": {
       "type": "text"
@@ -2228,6 +3342,7 @@
       "options": [
         "list",
         "grid",
+        "tiles",
         "buttons"
       ]
     },
@@ -2239,7 +3354,8 @@
         "1",
         "2",
         "3",
-        "4"
+        "4",
+        "6"
       ]
     },
     "links": {
@@ -2266,6 +3382,24 @@
         }
       }
     },
+    "showDescription": {
+      "type": "boolean",
+      "value": true
+    },
+    "divider": {
+      "type": "boolean",
+      "value": true
+    },
+    "itemColor": {
+      "type": "color"
+    },
+    "accentColor": {
+      "type": "color",
+      "value": "var(--primary)"
+    },
+    "radius": {
+      "type": "number"
+    },
     "labelFont": {
       "type": "font"
     },
@@ -2280,6 +3414,14 @@
       "type": "color",
       "value": "var(--text-secondary)"
     },
+    "iconStyle": {
+      "type": "select",
+      "value": "tile",
+      "options": [
+        "tile",
+        "plain"
+      ]
+    },
     "iconColor": {
       "type": "color",
       "value": "var(--primary)"
@@ -2288,9 +3430,9 @@
       "type": "number",
       "value": 16
     },
-    "accentColor": {
-      "type": "color",
-      "value": "var(--primary)"
+    "externalMark": {
+      "type": "boolean",
+      "value": true
     },
     "openExternalInNewTab": {
       "type": "boolean",
@@ -2311,9 +3453,66 @@
         "1:1"
       ]
     },
+    "zoom": {
+      "type": "number",
+      "value": 100
+    },
+    "border": {
+      "type": "boolean",
+      "value": false
+    },
+    "borderColor": {
+      "type": "color",
+      "value": "var(--border)"
+    },
+    "radius": {
+      "type": "number",
+      "value": 0
+    },
+    "background": {
+      "type": "color",
+      "value": "var(--surface-base)"
+    },
+    "showToolbar": {
+      "type": "boolean",
+      "value": true
+    },
+    "toolbarPosition": {
+      "type": "select",
+      "value": "bottom",
+      "options": [
+        "top",
+        "bottom"
+      ]
+    },
+    "hintText": {
+      "type": "text",
+      "value": "Blank? The site may not allow embedding."
+    },
+    "openLabel": {
+      "type": "text"
+    },
+    "refreshSeconds": {
+      "type": "number"
+    },
     "allowFullscreen": {
       "type": "boolean",
       "value": true
+    },
+    "sandboxAllow": {
+      "type": "multi-select",
+      "value": [
+        "scripts",
+        "forms",
+        "popups",
+        "presentation"
+      ],
+      "options": [
+        "scripts",
+        "forms",
+        "popups",
+        "presentation"
+      ]
     }
   },
   "builtin:control.button@1": {
@@ -2322,7 +3521,9 @@
       "value": "button",
       "options": [
         "button",
-        "tile"
+        "tile",
+        "icon",
+        "fab"
       ]
     },
     "label": {
@@ -2337,6 +3538,24 @@
     "iconSize": {
       "type": "number",
       "value": 16
+    },
+    "iconPosition": {
+      "type": "select",
+      "value": "start",
+      "options": [
+        "start",
+        "end"
+      ]
+    },
+    "description": {
+      "type": "text"
+    },
+    "descriptionFont": {
+      "type": "font"
+    },
+    "descriptionColor": {
+      "type": "color",
+      "value": "var(--text-secondary)"
     },
     "appearance": {
       "type": "select",
@@ -2373,6 +3592,45 @@
     "fullWidth": {
       "type": "boolean",
       "value": true
+    },
+    "align": {
+      "type": "select",
+      "value": "center",
+      "options": [
+        "start",
+        "center",
+        "end"
+      ]
+    },
+    "hoverColor": {
+      "type": "color"
+    },
+    "hoverTextColor": {
+      "type": "color"
+    },
+    "disabledColor": {
+      "type": "color"
+    },
+    "disabledTextColor": {
+      "type": "color"
+    },
+    "pendingText": {
+      "type": "text"
+    },
+    "successText": {
+      "type": "text"
+    },
+    "failureText": {
+      "type": "text"
+    },
+    "confirmQuestion": {
+      "type": "text"
+    },
+    "confirmLabel": {
+      "type": "text"
+    },
+    "cancelLabel": {
+      "type": "text"
     }
   },
   "builtin:control.switch@1": {
@@ -2385,6 +3643,16 @@
         "centered"
       ]
     },
+    "size": {
+      "type": "select",
+      "value": "auto",
+      "options": [
+        "auto",
+        "sm",
+        "md",
+        "lg"
+      ]
+    },
     "label": {
       "type": "text"
     },
@@ -2393,22 +3661,27 @@
     },
     "labelColor": {
       "type": "color",
-      "value": "var(--text-primary)"
+      "value": "var(--text-secondary)"
     },
     "icon": {
       "type": "icon"
     },
     "iconColor": {
       "type": "color",
-      "value": "var(--text-secondary)"
+      "value": "var(--primary)"
     },
     "iconSize": {
       "type": "number",
       "value": 20
     },
-    "showStateText": {
-      "type": "boolean",
-      "value": true
+    "stateDisplay": {
+      "type": "select",
+      "value": "text",
+      "options": [
+        "text",
+        "pill",
+        "none"
+      ]
     },
     "onLabel": {
       "type": "text"
@@ -2423,8 +3696,7 @@
       "type": "font"
     },
     "onTextColor": {
-      "type": "color",
-      "value": "var(--text-primary)"
+      "type": "color"
     },
     "offTextColor": {
       "type": "color",
@@ -2433,6 +3705,15 @@
     "unknownTextColor": {
       "type": "color",
       "value": "var(--warning)"
+    },
+    "onIcon": {
+      "type": "icon"
+    },
+    "offIcon": {
+      "type": "icon"
+    },
+    "unknownIcon": {
+      "type": "icon"
     },
     "onColor": {
       "type": "color",
@@ -2450,6 +3731,12 @@
       "type": "color",
       "value": "var(--primary-fg)"
     },
+    "thumbOffColor": {
+      "type": "color"
+    },
+    "thumbDisabledColor": {
+      "type": "color"
+    },
     "onMatch": {
       "type": "text"
     },
@@ -2462,6 +3749,24 @@
         "stale",
         "unknown"
       ]
+    },
+    "pendingText": {
+      "type": "text"
+    },
+    "successText": {
+      "type": "text"
+    },
+    "failureText": {
+      "type": "text"
+    },
+    "confirmQuestion": {
+      "type": "text"
+    },
+    "confirmLabel": {
+      "type": "text"
+    },
+    "cancelLabel": {
+      "type": "text"
     }
   },
   "builtin:control.slider@1": {
@@ -2473,6 +3778,24 @@
         "extended",
         "compact"
       ]
+    },
+    "orientation": {
+      "type": "select",
+      "value": "horizontal",
+      "options": [
+        "horizontal",
+        "vertical"
+      ]
+    },
+    "label": {
+      "type": "text"
+    },
+    "labelFont": {
+      "type": "font"
+    },
+    "labelColor": {
+      "type": "color",
+      "value": "var(--text-secondary)"
     },
     "min": {
       "type": "number",
@@ -2490,6 +3813,15 @@
       "type": "boolean",
       "value": true
     },
+    "valuePosition": {
+      "type": "select",
+      "value": "top",
+      "options": [
+        "top",
+        "end",
+        "bottom"
+      ]
+    },
     "valueFont": {
       "type": "font"
     },
@@ -2497,12 +3829,16 @@
       "type": "color",
       "value": "var(--text-primary)"
     },
-    "showTicks": {
+    "showMinMax": {
       "type": "boolean",
       "value": true
     },
     "tickMarks": {
       "type": "number"
+    },
+    "tickLabels": {
+      "type": "boolean",
+      "value": false
     },
     "mainColor": {
       "type": "color",
@@ -2520,6 +3856,14 @@
       "type": "color",
       "value": "var(--surface-sunken)"
     },
+    "thickness": {
+      "type": "number",
+      "value": 6
+    },
+    "thumbSize": {
+      "type": "number",
+      "value": 18
+    },
     "startIcon": {
       "type": "icon"
     },
@@ -2529,6 +3873,10 @@
     "iconColor": {
       "type": "color",
       "value": "var(--text-secondary)"
+    },
+    "iconSize": {
+      "type": "number",
+      "value": 16
     },
     "commit": {
       "type": "select",
@@ -2551,6 +3899,24 @@
         "stale",
         "unknown"
       ]
+    },
+    "pendingText": {
+      "type": "text"
+    },
+    "successText": {
+      "type": "text"
+    },
+    "failureText": {
+      "type": "text"
+    },
+    "confirmQuestion": {
+      "type": "text"
+    },
+    "confirmLabel": {
+      "type": "text"
+    },
+    "cancelLabel": {
+      "type": "text"
     }
   },
   "builtin:control.setpoint@1": {
@@ -2559,8 +3925,19 @@
       "value": "input",
       "options": [
         "input",
-        "stepper"
+        "stepper",
+        "dial"
       ]
+    },
+    "label": {
+      "type": "text"
+    },
+    "labelFont": {
+      "type": "font"
+    },
+    "labelColor": {
+      "type": "color",
+      "value": "var(--text-secondary)"
     },
     "min": {
       "type": "number",
@@ -2574,9 +3951,23 @@
       "type": "number",
       "value": 1
     },
+    "showRange": {
+      "type": "boolean",
+      "value": false
+    },
     "showValue": {
       "type": "boolean",
       "value": true
+    },
+    "currentLabel": {
+      "type": "text"
+    },
+    "currentFont": {
+      "type": "font"
+    },
+    "currentColor": {
+      "type": "color",
+      "value": "var(--text-primary)"
     },
     "valueFont": {
       "type": "font"
@@ -2585,6 +3976,14 @@
       "type": "color",
       "value": "var(--text-primary)"
     },
+    "unitDisplay": {
+      "type": "select",
+      "value": "show",
+      "options": [
+        "show",
+        "hide"
+      ]
+    },
     "applyLabel": {
       "type": "text"
     },
@@ -2592,9 +3991,19 @@
       "type": "color",
       "value": "var(--primary)"
     },
+    "buttonTextColor": {
+      "type": "color"
+    },
     "borderColor": {
       "type": "color",
       "value": "var(--border)"
+    },
+    "dialColor": {
+      "type": "color"
+    },
+    "dialTrackColor": {
+      "type": "color",
+      "value": "var(--surface-sunken)"
     },
     "disableWhen": {
       "type": "multi-select",
@@ -2605,6 +4014,24 @@
         "stale",
         "unknown"
       ]
+    },
+    "pendingText": {
+      "type": "text"
+    },
+    "successText": {
+      "type": "text"
+    },
+    "failureText": {
+      "type": "text"
+    },
+    "confirmQuestion": {
+      "type": "text"
+    },
+    "confirmLabel": {
+      "type": "text"
+    },
+    "cancelLabel": {
+      "type": "text"
     }
   }
 }

@@ -103,7 +103,8 @@ export function StatValueView({ settings, format, data, locale }: WidgetViewProp
   return (
     <div className="flex h-full min-h-0 flex-col gap-2" style={surface}>
       <MetricHead label={label} icon={icon} />
-      <div className="mt-auto flex flex-col gap-1.5">{metric}{delta}</div>
+      {/* Number and change share a line (wrapping when narrow), so a short card keeps both visible. */}
+      <div className="mt-auto flex flex-wrap items-baseline gap-x-2.5 gap-y-1">{metric}{delta}</div>
     </div>
   );
 }

@@ -121,6 +121,21 @@ export function resolveEmbedUrl(raw: unknown): EmbedResult {
 export const EMBED_SANDBOX = 'allow-scripts allow-popups allow-forms allow-presentation';
 export const EMBED_REFERRER_POLICY = 'no-referrer';
 
+/** The permissions an author may switch OFF (the setting's option values), each one token of `EMBED_SANDBOX`. */
+export const EMBED_PERMISSIONS = ['scripts', 'forms', 'popups', 'presentation'] as const;
+
+/**
+ * The sandbox for an author's permission list. A setting can only REMOVE permissions from
+ * `EMBED_SANDBOX`, never add one: anything not in `EMBED_PERMISSIONS` (`same-origin`,
+ * `top-navigation`, a crafted string) is ignored. Not a list = the full default set.
+ * An empty result is the strictest sandbox (`sandbox=""`).
+ */
+export function embedSandbox(allow: unknown): string {
+  if (!Array.isArray(allow)) return EMBED_SANDBOX;
+  const wanted = new Set(allow.filter((x): x is string => typeof x === 'string'));
+  return EMBED_PERMISSIONS.filter((p) => wanted.has(p)).map((p) => `allow-${p}`).join(' ');
+}
+
 // ── Links ──────────────────────────────────────────────────────────────────
 
 export interface QuickLink {
