@@ -175,6 +175,100 @@ export function sampleSources(now = Date.now()): SampleSource[] {
         record: { model: 'Nexus S200', firmware: '2.4.1', serialNumber: 'NX-200-04817', site: 'Istanbul Plant', temperature: lastT, uptimeHours: 1284, battery: 87 },
       },
     },
+    ...themedSources(now, at),
+  ];
+}
+
+/**
+ * The sources the themed sample boards add (energy, sales, infrastructure). A generator of their own,
+ * so the sources above keep their exact values.
+ */
+function themedSources(now: number, at: (minAgo: number) => string): SampleSource[] {
+  const r = rng(77);
+  const hourOf = (t: string) => new Date(t).getHours() + new Date(t).getMinutes() / 60;
+  const solar = walk(11, now, 48, 15, 0, 6, 0).map((p) => {
+    const h = hourOf(p.t);
+    const sun = Math.max(0, Math.sin(((h - 6) / 14) * Math.PI));
+    return { t: p.t, v: Math.round(sun * 180 + (sun > 0 ? Math.abs(p.v) : 0)) };
+  });
+  const grid = walk(12, now, 48, 15, 210, 30, 0).map((p, i) => ({ t: p.t, v: Math.max(40, p.v - Math.round(solar[i].v * 0.6)) }));
+  const requests = walk(13, now, 48, 15, 840, 120, 0);
+  const errors = walk(14, now, 48, 15, 6, 3, 0).map((p) => ({ ...p, v: Math.max(0, p.v) }));
+  const visitors = walk(15, now, 14, 24 * 60, 16500, 1800, 0);
+  const memory = walk(16, now, 48, 15, 70, 4, 0).map((p) => ({ ...p, v: Math.min(96, Math.max(40, p.v)) }));
+  const PRODUCTS = [
+    ['Smart thermostat', 'Climate'], ['Door sensor', 'Security'], ['Air quality monitor', 'Climate'], ['Smart plug', 'Energy'],
+    ['Water leak sensor', 'Security'], ['Energy meter', 'Energy'], ['Motion sensor', 'Security'], ['Gateway Pro', 'Networking'],
+  ];
+  const SERVICES = [
+    ['api-gateway', 'Healthy', 'eu-central'], ['auth', 'Healthy', 'eu-central'], ['telemetry-ingest', 'Degraded', 'eu-west'],
+    ['rules-engine', 'Healthy', 'eu-west'], ['notifications', 'Healthy', 'eu-central'], ['reports', 'Down', 'eu-west'], ['billing', 'Healthy', 'eu-central'],
+  ];
+  return [
+    { key: 'sample.energy.today', label: 'Sample · Energy used today (kWh)', data: { shape: 'scalar', value: 4820, fetchedAt: at(2) } },
+    { key: 'sample.energy.yesterday', label: 'Sample · Energy used yesterday (kWh)', data: { shape: 'scalar', value: 5110, fetchedAt: at(2) } },
+    { key: 'sample.co2', label: 'Sample · CO₂ today (t)', data: { shape: 'scalar', value: 1.92, fetchedAt: at(2) } },
+    { key: 'sample.storage', label: 'Sample · Battery storage (%)', data: { shape: 'scalar', value: 68, fetchedAt: at(0) } },
+    { key: 'sample.visitors', label: 'Sample · Visitors today', data: { shape: 'scalar', value: 18420, fetchedAt: at(1) } },
+    { key: 'sample.visitors.yesterday', label: 'Sample · Visitors yesterday', data: { shape: 'scalar', value: 16950, fetchedAt: at(1) } },
+    { key: 'sample.conversion', label: 'Sample · Conversion rate (%)', data: { shape: 'scalar', value: 3.4, fetchedAt: at(1) } },
+    { key: 'sample.conversion.yesterday', label: 'Sample · Conversion rate yesterday (%)', data: { shape: 'scalar', value: 3.7, fetchedAt: at(1) } },
+    { key: 'sample.aov', label: 'Sample · Average order value', data: { shape: 'scalar', value: 57.8, fetchedAt: at(1) } },
+    { key: 'sample.uptime', label: 'Sample · Uptime this month (%)', data: { shape: 'scalar', value: 99.94, fetchedAt: at(0) } },
+    { key: 'sample.errors', label: 'Sample · Errors in the last hour', data: { shape: 'scalar', value: 14, fetchedAt: at(0) } },
+    { key: 'sample.errors.before', label: 'Sample · Errors in the hour before', data: { shape: 'scalar', value: 21, fetchedAt: at(0) } },
+    { key: 'sample.memory', label: 'Sample · Memory used (%)', data: { shape: 'scalar', value: memory[memory.length - 1].v, fetchedAt: at(0) } },
+    { key: 'sample.incident', label: 'Sample · Platform status', data: { shape: 'scalar', value: 'DEGRADED', fetchedAt: at(0) } },
+    { key: 'sample.solar', label: 'Sample · Solar and grid power (kW, 12 h)', data: { shape: 'series', series: [{ name: 'Solar', points: solar }, { name: 'Grid', points: grid }], fetchedAt: at(0) } },
+    { key: 'sample.requests', label: 'Sample · Requests and errors (12 h)', data: { shape: 'series', series: [{ name: 'Requests', points: requests }, { name: 'Errors', points: errors }], fetchedAt: at(0) } },
+    { key: 'sample.visitors.series', label: 'Sample · Visitors (14 d)', data: { shape: 'series', series: [{ name: 'Visitors', points: visitors }], fetchedAt: at(1) } },
+    { key: 'sample.memory.series', label: 'Sample · Memory used (%, 12 h)', data: { shape: 'series', series: [{ name: 'Memory', points: memory }], fetchedAt: at(0) } },
+    {
+      key: 'sample.products', label: 'Sample · Best-selling products',
+      data: {
+        shape: 'table', fetchedAt: at(3),
+        columns: [
+          { key: 'product', label: 'Product', type: 'text' }, { key: 'category', label: 'Category', type: 'text' },
+          { key: 'sold', label: 'Sold', type: 'number' }, { key: 'revenue', label: 'Revenue', type: 'number' }, { key: 'stock', label: 'Stock', type: 'number' },
+        ],
+        rows: PRODUCTS.map(([product, category], i) => {
+          const sold = Math.round(420 - i * 42 + r() * 30);
+          return { id: `p-${i + 1}`, product, category, sold, revenue: Math.round(sold * (25 + r() * 60)), stock: Math.round(r() * 100) };
+        }),
+      },
+    },
+    {
+      key: 'sample.regions', label: 'Sample · Revenue by region',
+      data: {
+        shape: 'table', fetchedAt: at(3),
+        columns: [{ key: 'label', label: 'Region', type: 'text' }, { key: 'value', label: 'Revenue', type: 'number' }],
+        rows: [{ label: 'Marmara', value: 148200 }, { label: 'Central Anatolia', value: 86400 }, { label: 'Aegean', value: 71900 }, { label: 'Mediterranean', value: 52300 }, { label: 'Black Sea', value: 24800 }],
+      },
+    },
+    {
+      key: 'sample.energy.split', label: 'Sample · Energy by consumer',
+      data: {
+        shape: 'table', fetchedAt: at(2),
+        columns: [{ key: 'label', label: 'Consumer', type: 'text' }, { key: 'value', label: 'kWh', type: 'number' }],
+        rows: [{ label: 'Production lines', value: 2310 }, { label: 'HVAC', value: 1120 }, { label: 'Compressors', value: 640 }, { label: 'Lighting', value: 410 }, { label: 'Offices', value: 340 }],
+      },
+    },
+    {
+      key: 'sample.services', label: 'Sample · Services',
+      data: {
+        shape: 'table', fetchedAt: at(0),
+        columns: [
+          { key: 'service', label: 'Service', type: 'text' }, { key: 'status', label: 'Status', type: 'text' }, { key: 'region', label: 'Region', type: 'text' },
+          { key: 'latency', label: 'p95 (ms)', type: 'number' }, { key: 'errorRate', label: 'Errors (%)', type: 'number' }, { key: 'deployedAt', label: 'Deployed', type: 'date' },
+        ],
+        rows: SERVICES.map(([service, status, region], i) => ({
+          id: `svc-${i + 1}`, service, status, region,
+          latency: status === 'Down' ? 0 : Math.round((status === 'Degraded' ? 640 : 90) + r() * 160),
+          errorRate: status === 'Down' ? 100 : round(status === 'Degraded' ? 4 + r() * 3 : r() * 0.8, 2),
+          deployedAt: at(Math.round(60 + r() * 60 * 24 * 6)),
+        })),
+      },
+    },
   ];
 }
 

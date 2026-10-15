@@ -11,6 +11,7 @@ import {
   faMapLocationDot, faTableCells, faBraille, faChartSimple, faArrowTrendUp, faBarsProgress, faGaugeHigh,
   faGaugeSimple, faCirclePlay, faWindowMaximize, faDroplet, faLightbulb, faPowerOff, faServer, faRotateLeft,
   faCartShopping, faRotateRight, faBook, faUsers, faTriangleExclamation, faCircleInfo, faCircleXmark,
+  faLeaf, faPiggyBank, faBug, faPercent, faReceipt, faFlagCheckered,
 } from '@fortawesome/free-solid-svg-icons';
 import {
   WidgetBoard, WidgetKitProvider, BUILTIN_KINDS, BUILTIN_VIEWS, exportBoard, useLocalSetting,
@@ -31,7 +32,8 @@ const ICONS: Record<string, IconDefinition> = {
   'circle-play': faCirclePlay, 'window-maximize': faWindowMaximize, droplet: faDroplet, lightbulb: faLightbulb,
   'power-off': faPowerOff, server: faServer, 'cart-shopping': faCartShopping, 'rotate-right': faRotateRight,
   book: faBook, users: faUsers, 'triangle-exclamation': faTriangleExclamation, 'circle-info': faCircleInfo,
-  'circle-xmark': faCircleXmark,
+  'circle-xmark': faCircleXmark, leaf: faLeaf, 'piggy-bank': faPiggyBank, bug: faBug, percent: faPercent,
+  receipt: faReceipt, 'flag-checkered': faFlagCheckered,
 };
 
 /** 'fas fa-bell' → the bell; unknown names draw nothing. */

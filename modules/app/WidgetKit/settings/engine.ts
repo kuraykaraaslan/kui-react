@@ -203,7 +203,8 @@ function checkField(field: FieldSchema, value: unknown, path: string, issues: Is
         for (const [k, f] of Object.entries(sub)) {
           const v = checkField(f, src[k] === '' && f.type !== 'text' && f.type !== 'textarea' ? undefined : src[k], `${path}.${i}.${k}`, issues);
           if (v !== undefined) row[k] = v;
-          else if (f.required) issues.push({ path: `${path}.${i}.${k}`, message: `${f.label} is required` });
+          // Items are sparse like the rest: a required field with a default may be left out.
+          else if (f.required && f.value === undefined) issues.push({ path: `${path}.${i}.${k}`, message: `${f.label} is required` });
         }
         return row;
       });

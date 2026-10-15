@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: { absolute: `Widget gallery · ${THEME_TITLES.iot}` },
 };
 
-/** Every builtin widget type on one board, each bound to sample data. */
+/** Five themed sample boards and one with every builtin widget type, all bound to sample data. */
 export default function IoTWidgetGalleryPage() {
   return <WidgetGallery />;
 }

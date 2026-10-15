@@ -56,6 +56,17 @@ describe('validate', () => {
     expect(r.values.ranges).toEqual([{ to: 5, color: '#00ff00' }, { from: 5 }]);
     expect(r.issues.map((i) => i.path)).toEqual(expect.arrayContaining(['valueColor', 'ranges.1.color']));
   });
+  it('lets a required item field with a default stay out (sparse); refuses one without a default', () => {
+    const t: SettingsTemplate = {
+      ...STAT_VALUE, fields: { list: { type: 'repeater', label: 'List', since: 1, fields: {
+        mode: { type: 'select', label: 'Mode', required: true, value: 'a', options: [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }] },
+        name: { type: 'text', label: 'Name', required: true },
+      } } },
+    } as SettingsTemplate;
+    const r = validate(t, { list: [{ name: 'x' }, {}] });
+    expect(r.values.list).toEqual([{ name: 'x' }, {}]);
+    expect(r.issues.map((i) => i.path)).toEqual(['list.1.name']);
+  });
   it('refuses an option that is not offered', () => {
     expect(validate(STAT_VALUE, { layout: 'spiral' }).issues).toHaveLength(1);
   });

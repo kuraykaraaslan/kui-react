@@ -26,3 +26,4 @@ export { useLocalSetting } from './useLocalSetting';
 export { useNow } from './useNow';
 export { sampleSources, sampleData, SAMPLE_GALLERY_BOARD } from './sample/sample-data';
 export type { SampleSource } from './sample/sample-data';
+export { SAMPLE_BOARDS, SAMPLE_PLANT_BOARD, SAMPLE_SALES_BOARD, SAMPLE_ENERGY_BOARD, SAMPLE_INFRA_BOARD, SAMPLE_SITES_BOARD } from './sample/sample-boards';
