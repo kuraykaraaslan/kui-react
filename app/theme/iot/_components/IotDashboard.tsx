@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useSyncExternalStore } from 'react';
 import type { CSSProperties } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -81,7 +81,12 @@ function DemoDataEditor({ placement, update }: { placement: BoardPlacement; upda
  * that can be edited ThingsBoard-style, and the whole board (every card with its settings and data
  * binding) exports to and imports from one JSON file. Edits stay in this browser.
  */
+const noop = () => () => {};
+
 export function IotDashboard() {
+  // The demo's data and the saved board exist only in the browser (timestamps relative to "now",
+  // localStorage): render the board after hydration so server and client agree.
+  const isClient = useSyncExternalStore(noop, () => true, () => false);
   const [stored, setStored] = useLocalSetting(STORAGE_KEY);
   const doc = useMemo(() => parseBoard(stored), [stored]);
   const [pump, setPump] = useState<boolean>(true);
@@ -96,6 +101,10 @@ export function IotDashboard() {
     }
     return out;
   }, [doc.placements, pump]);
+
+  if (!isClient) {
+    return <div className="h-full p-6" aria-busy="true"><div className="h-96 animate-pulse rounded-xl bg-surface-sunken" /></div>;
+  }
 
   return (
     <WidgetKitProvider value={{ renderIcon }}>

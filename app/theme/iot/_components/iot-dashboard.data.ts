@@ -40,9 +40,9 @@ export const DEMO_SOURCES: DemoSource[] = [
       shape: 'table', fetchedAt: at(1),
       columns: [
         { key: 'name', label: 'Device', type: 'text' }, { key: 'model', label: 'Model', type: 'text' },
-        { key: 'status', label: 'Status', type: 'badge' }, { key: 'lastSeen', label: 'Last seen', type: 'date' },
+        { key: 'status', label: 'Status', type: 'text' }, { key: 'lastSeen', label: 'Last seen', type: 'date' },
       ],
-      rows: DEVICES.map((d) => ({ id: d.slug, name: d.name, model: d.model ?? d.type, status: STATUS_TONE[d.status] ?? 'neutral', lastSeen: d.lastSeenAt ? new Date(d.lastSeenAt).toISOString() : null })),
+      rows: DEVICES.map((d) => ({ id: d.slug, name: d.name, model: d.model ?? d.type, status: d.status.charAt(0) + d.status.slice(1).toLowerCase(), lastSeen: d.lastSeenAt ? new Date(d.lastSeenAt).toISOString() : null })),
     },
   },
   {
