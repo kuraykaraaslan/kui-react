@@ -35,6 +35,8 @@ export interface PlacementCardProps {
   badges?: ReactNode;
   renderLink?: (href: string, children: ReactNode, className?: string) => ReactNode;
   className?: string;
+  /** The card sits in a fixed-height grid cell (see `WidgetCard.fixedHeight`). */
+  fixedHeight?: boolean;
   /** Fixed "now" (tests, screenshots); by default the card ticks every 30 seconds. */
   now?: number;
   /** Host props for the view beyond the common ones (params, resolveUrl, confirm, a table's paging and row actions, …). */
@@ -65,7 +67,7 @@ function download(name: string, text: string) {
 export function PlacementCard({
   title, template, slots, view, settings, board, definitionDefaults, data, boundSlots, loading = false, error,
   onRetry, onRefresh, refreshing, onControl, controlDisabledReason, isEditor = false, headerRight, badges, renderLink,
-  className, now: nowProp, viewProps,
+  className, now: nowProp, viewProps, fixedHeight = false,
 }: PlacementCardProps) {
   const { locale } = useWidgetKit();
   const ticking = useNow();
@@ -114,6 +116,7 @@ export function PlacementCard({
         badges={badges}
         className={className}
         locale={locale}
+        fixedHeight={fixedHeight}
       >
         {body}
       </WidgetCard>

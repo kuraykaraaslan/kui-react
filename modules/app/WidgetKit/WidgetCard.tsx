@@ -39,6 +39,12 @@ export type WidgetCardProps = {
   className?: string;
   style?: CSSProperties;
   locale?: string;
+  /**
+   * The card sits in a cell of fixed height (a placed grid cell). Then, from lg up, the body is a size
+   * container and views can scale to the card's height too. Leave it off where cards size to their
+   * content: size containment would collapse them.
+   */
+  fixedHeight?: boolean;
 } & Omit<React.HTMLAttributes<HTMLElement>, 'title' | 'children' | 'style'>;
 
 const VARIANT: Record<NonNullable<CardSettings['variant']>, string> = {
@@ -101,7 +107,7 @@ const iconBtn = cn(
 export function WidgetCard({
   title, card, state = 'ready', stale = false, updatedAt, unconfiguredText = 'Not configured yet.',
   errorText = 'This widget could not load its data.', onRetry, onFullscreen, onExport, onRefresh, refreshing = false,
-  headerRight, badges, footer, children, className, style, locale, ...rest
+  headerRight, badges, footer, children, className, style, locale, fixedHeight = false, ...rest
 }: WidgetCardProps) {
   const variant = card.variant ?? 'raised';
   const bgMode = card.background ?? 'default';
@@ -204,9 +210,9 @@ export function WidgetCard({
         </header>
       )}
 
-      {/* A container for the views' auto-sizing: width only on small screens (cards size to their content
-          there), width AND height from lg up, where every grid cell has a fixed height. */}
-      <div className="relative @container min-h-0 flex-1 overflow-auto lg:[container-type:size]" style={{ padding: pad }}>
+      {/* A container for the views' auto-sizing: width only, plus height from lg up when the card sits in
+          a fixed-height cell (`fixedHeight`). */}
+      <div className={cn('relative @container min-h-0 flex-1 overflow-auto', fixedHeight && 'lg:[container-type:size]')} style={{ padding: pad }}>
         {bodyState === 'loading' ? (
           <div className="flex h-full min-h-16 flex-col gap-2" role="status" aria-label="Loading">
             <div className="h-4 w-1/3 animate-pulse rounded bg-surface-sunken" />

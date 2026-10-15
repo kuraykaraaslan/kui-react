@@ -170,6 +170,7 @@ export function WidgetBoard({
                   board={board}
                   data={data[p.id] ?? {}}
                   isEditor={editing}
+                  fixedHeight
                   now={now}
                   onControl={onControl ? (req) => onControl(p.id, req) : undefined}
                   controlDisabledReason={controlDisabledReason?.(p)}
