@@ -61,7 +61,7 @@ export function StatValueView({ settings, format, data, locale }: WidgetViewProp
   const cmp = comparison(value, num(data.compare?.value), s, format, locale);
 
   const valueStyle: CSSProperties = {
-    ...(s.autoScale !== false ? { fontSize: 'clamp(1.25rem, 22cqmin, 4rem)' } : {}),
+    ...(s.autoScale !== false ? { fontSize: 'clamp(1.25rem, 16cqi, 3.5rem)' } : {}),
     ...fontStyle(s.autoScale !== false ? undefined : s.valueFont, s.valueColor),
     ...(rangeColor && target === 'value' ? { color: rangeColor } : {}),
   };
@@ -108,13 +108,15 @@ export function StatValueView({ settings, format, data, locale }: WidgetViewProp
         'flex h-full min-h-0 gap-3 rounded-lg',
         layout === 'inline' ? 'flex-row items-center' : 'flex-col',
         layout === 'centered' && 'items-center justify-center text-center',
-        layout === 'stacked' && 'justify-between',
+        layout === 'stacked' && 'relative justify-between',
       )}
       style={bg}
     >
       {layout === 'stacked' ? (
         <>
-          <div className="flex items-start justify-between gap-2">{label ?? <span />}{icon}</div>
+          {/* The icon sits in the corner and takes no row, so a short card still has room for the number. */}
+          {icon && <span className="absolute right-0 top-0">{icon}</span>}
+          <div className="min-w-0" style={icon ? { paddingRight: iconSize * 1.6 + 8 } : undefined}>{label}</div>
           <div className="flex flex-col gap-1">{text}{delta}</div>
         </>
       ) : (
