@@ -126,6 +126,8 @@ export function WidgetCard({
     ...style,
   };
   const pad = typeof card.padding === 'number' ? card.padding : 12;
+  // The title row and footer keep readable side spacing even when the body has none (a map, a table).
+  const chromePad = Math.max(pad, 12);
   const hasHeader = showTitle || !!headerRight || !!badges || buttons.length > 0 || staleMode !== null;
 
   return (
@@ -152,7 +154,7 @@ export function WidgetCard({
       )}
 
       {hasHeader && (
-        <header className="relative flex min-w-0 items-start gap-2" style={{ padding: `${Math.max(pad - 4, 6)}px ${pad}px 0` }}>
+        <header className="relative flex min-w-0 items-start gap-2" style={{ padding: `${Math.max(pad - 4, 8)}px ${chromePad}px ${pad === 0 ? 8 : 0}px` }}>
           {showTitle && card.titleIcon && (
             <SettingIcon name={card.titleIcon} className="mt-0.5 shrink-0 text-text-secondary"
               style={{ width: card.titleIconSize ?? 16, height: card.titleIconSize ?? 16, fontSize: card.titleIconSize ?? 16, color: cssColor(card.titleIconColor) }} />
@@ -230,7 +232,7 @@ export function WidgetCard({
       </div>
 
       {(updated || footer) && (
-        <footer className="relative flex items-center justify-between gap-2 text-xs text-text-secondary" style={{ padding: `0 ${pad}px ${Math.max(pad - 4, 6)}px` }}>
+        <footer className="relative flex items-center justify-between gap-2 text-xs text-text-secondary" style={{ padding: `${pad === 0 ? 6 : 0}px ${chromePad}px ${Math.max(pad - 4, 8)}px` }}>
           <span>{footer}</span>
           {updated && <span>Updated {updated}</span>}
         </footer>
