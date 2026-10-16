@@ -6,6 +6,8 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ### Added
 
+- `WidgetKit` `PlacementCard`: `exportData`, an async source for the CSV export, so a host can
+  write every page of a server-paged table's current filter instead of the page on screen.
 - `Chart`: `GaugeChart` (half-donut, threshold bands, `role="meter"`), `HeatmapChart` (matrix), a
   continuous time axis with viewer-local drag-to-zoom on `LineChart` / `AreaChart`
   (`xAxis="time"`, alias `xScale`), and `stacked` on `BarChart` / `AreaChart` (phase 9 §9.1, §9.3, §9.4).

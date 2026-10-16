@@ -39,6 +39,12 @@ export interface PlacementCardProps {
   fixedHeight?: boolean;
   /** Fixed "now" (tests, screenshots); by default the card ticks every 30 seconds. */
   now?: number;
+  /**
+   * The data the CSV export writes, when it is more than what the card shows: a server-paged table holds
+   * one page in `data`, and the host fetches every page of the current filter here. Defaults to `data`.
+   * A rejection exports nothing (the host reports its own error).
+   */
+  exportData?: () => Promise<Record<string, SlotData | undefined>>;
   /** Host props for the view beyond the common ones (params, resolveUrl, confirm, a table's paging and row actions, …). */
   viewProps?: Partial<WidgetViewProps> & Record<string, unknown>;
 }
@@ -67,7 +73,7 @@ function download(name: string, text: string) {
 export function PlacementCard({
   title, template, slots, view, settings, board, definitionDefaults, data, boundSlots, loading = false, error,
   onRetry, onRefresh, refreshing, onControl, controlDisabledReason, isEditor = false, headerRight, badges, renderLink,
-  className, now: nowProp, viewProps, fixedHeight = false,
+  className, now: nowProp, viewProps, fixedHeight = false, exportData,
 }: PlacementCardProps) {
   const { locale } = useWidgetKit();
   const ticking = useNow();
@@ -93,8 +99,12 @@ export function PlacementCard({
       onControl={onControl} controlDisabledReason={controlDisabledReason} renderLink={renderLink ?? viewProps?.renderLink} />
   );
   const onExport = r.caps.exportable && view.toCsv
-    ? () => download(`${(title || template.label).replace(/[^\w.-]+/g, '-')}-${new Date().toISOString().slice(0, 10)}.csv`,
-      toCsvText(view.toCsv!(data, r.settings, r.format)))
+    ? async () => {
+      let rows: Record<string, SlotData | undefined>;
+      try { rows = exportData ? await exportData() : data; } catch { return; }
+      download(`${(title || template.label).replace(/[^\w.-]+/g, '-')}-${new Date().toISOString().slice(0, 10)}.csv`,
+        toCsvText(view.toCsv!(rows, r.settings, r.format)));
+    }
     : undefined;
 
   return (
