@@ -16,6 +16,7 @@ import { STATE_VIEW } from './StateView';
 import { DATA_TABLE_VIEW } from './DataTableView';
 import { DATA_FEED_VIEW } from './DataFeedView';
 import { MAP_VIEW } from './MapView';
+import { VIEWER_MODEL_VIEW } from './ViewerModelView';
 import { CONTENT_MARKDOWN_VIEW } from './ContentMarkdownView';
 import { CONTENT_IMAGE_VIEW } from './ContentImageView';
 import { CONTENT_LINKS_VIEW } from './ContentLinksView';
@@ -42,6 +43,7 @@ export const BUILTIN_VIEWS: Readonly<Record<string, WidgetKindView>> = {
   'data.table': DATA_TABLE_VIEW,
   'data.feed': DATA_FEED_VIEW,
   'map': MAP_VIEW,
+  'viewer.model': VIEWER_MODEL_VIEW,
   'content.markdown': CONTENT_MARKDOWN_VIEW,
   'content.image': CONTENT_IMAGE_VIEW,
   'content.links': CONTENT_LINKS_VIEW,

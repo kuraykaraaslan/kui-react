@@ -205,6 +205,30 @@ export const safeRowLinksRule = (key: string, field: string): Rule => (v) => {
   return out;
 };
 
+/**
+ * A 3D model address (`viewer.model`): an internal path or `https:` only. No `http:` (a secure page
+ * cannot fetch it), no `data:` or `blob:` (a stored setting must not carry the model itself).
+ */
+export function resolveModelUrl(raw: unknown): string | null {
+  const link = resolveLink(raw);
+  if (!link) return null;
+  if (!link.external) return link.href;
+  return link.href.startsWith('https:') ? link.href : null;
+}
+
+/** Save-time: every model row's address must be an internal path or https. */
+export const safeModelUrlsRule = (key: string, field = 'url'): Rule => (v) => {
+  const rows = Array.isArray(v[key]) ? (v[key] as Array<Record<string, unknown>>) : [];
+  const out: Array<{ path: string; message: string }> = [];
+  rows.forEach((row, i) => {
+    const url = row && typeof row === 'object' ? row[field] : undefined;
+    if (typeof url === 'string' && url !== '' && !resolveModelUrl(url)) {
+      out.push({ path: `${key}.${i}.${field}`, message: 'A model must be an internal path (/…) or an https address' });
+    }
+  });
+  return out;
+};
+
 /** Save-time: a positive step. */
 export const positiveStep = (key: string): Rule => (v) =>
   typeof v[key] === 'number' && (v[key] as number) <= 0 ? [{ path: key, message: 'Step must be greater than 0' }] : [];

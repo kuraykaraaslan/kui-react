@@ -5,6 +5,7 @@
 
 import type { SlotData } from '../kind';
 import type { BoardDocument, BoardPlacement } from '../settings/board';
+import { PLANT_MODEL } from './sample-boards';
 
 export interface SampleSource {
   key: string;
@@ -176,7 +177,43 @@ export function sampleSources(now = Date.now()): SampleSource[] {
       },
     },
     ...themedSources(now, at),
+    ...plantSources(at),
   ];
+}
+
+/**
+ * Sensors on the sample process plant (kui-viewer's Coordination demo models, served from
+ * /samples/plant/). Coordinates are the IFC model's (metres, Z up), on the equipment they measure.
+ */
+function plantSources(at: (minAgo: number) => string): SampleSource[] {
+  const SENSORS: Array<[string, string, number, number, number, string, number, string, string]> = [
+    // id, label, x, y, z, measure, value, unit, status
+    ['TT-101', 'C-101 top temperature', -38, 0, 34, 'Temperature', 118.4, '°C', 'Normal'],
+    ['PT-102', 'R-102 desalter pressure', -38, -14, 12.3, 'Pressure', 9.8, 'bar', 'Normal'],
+    ['TT-103', 'D-103 reflux drum', -21, 0, 21.5, 'Temperature', 46.2, '°C', 'Normal'],
+    ['TT-105', 'E-105B outlet', -18, -10.2, 7.1, 'Temperature', 212.7, '°C', 'Warning'],
+    ['FT-113', 'P-113A discharge flow', -15, -7.5, 1.4, 'Flow', 3.1, 'm³/h', 'Alarm'],
+    ['TT-106', 'A-106 air cooler outlet', 60, 0, 14.6, 'Temperature', 54.9, '°C', 'Normal'],
+    ['PT-401', 'V-401 LPG bullet', 27, -22, 4.6, 'Pressure', 14.6, 'bar', 'Warning'],
+    ['FT-202', 'TK-202 fill flow', 138, 0, 15.6, 'Flow', 186, 'm³/h', 'Normal'],
+    ['FT-301', 'F-301 flare flow', -62, 30, 60, 'Flow', 0.8, 't/h', 'Normal'],
+  ];
+  return [{
+    key: 'sample.plant.sensors', label: 'Sample · Plant sensors (3D)',
+    data: {
+      shape: 'table', fetchedAt: at(0),
+      columns: [
+        { key: 'id', label: 'Tag', type: 'text' }, { key: 'label', label: 'Sensor', type: 'text' },
+        { key: 'x', label: 'X (m)', type: 'number' }, { key: 'y', label: 'Y (m)', type: 'number' }, { key: 'z', label: 'Z (m)', type: 'number' },
+        { key: 'measure', label: 'Measures', type: 'text' }, { key: 'value', label: 'Reading', type: 'number' },
+        { key: 'unit', label: 'Unit', type: 'text' }, { key: 'status', label: 'Status', type: 'text' },
+        { key: 'updatedAt', label: 'Updated', type: 'date' },
+      ],
+      rows: SENSORS.map(([id, label, x, y, z, measure, value, unit, status], i) => ({
+        id, label, x, y, z, measure, value, unit, status, updatedAt: at(i % 3),
+      })),
+    },
+  }];
 }
 
 /**
@@ -334,5 +371,6 @@ export const SAMPLE_GALLERY_BOARD: BoardDocument = {
     P('switch', 'control.switch', 'Coolant pump', 8, 49, 4, 3, { value: 'sample.pump' }, { label: 'Pump power', icon: 'fas fa-droplet' }),
     P('slider', 'control.slider', 'Fan speed', 0, 52, 6, 3, { value: 'sample.cpu' }, { $format: { unit: '%' }, label: 'Speed', startIcon: 'fas fa-fan', tickMarks: 5 }),
     P('setpoint', 'control.setpoint', 'Thermostat', 6, 52, 6, 3, { value: 'sample.setpoint' }, { $format: { unit: '°C', decimals: 1 }, label: 'Target temperature', layout: 'stepper', min: 10, max: 30, step: 0.5 }),
+    P('viewer', 'viewer.model', 'Process plant (3D)', 0, 55, 12, 10, { sensors: 'sample.plant.sensors' }, PLANT_MODEL),
   ],
 };

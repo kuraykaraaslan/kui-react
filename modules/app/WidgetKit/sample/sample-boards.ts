@@ -15,6 +15,25 @@ const WARN = 'var(--warning)';
 const BAD = 'var(--error)';
 const INFO = 'var(--info)';
 
+/**
+ * The process plant of kui-viewer's Coordination demo (three federated discipline models, served from
+ * public/samples/plant/) with its sensors as live markers. Shared by the plant board and the gallery.
+ */
+export const PLANT_MODEL: Record<string, unknown> = {
+  models: [
+    { url: '/samples/plant/Plant-Structure.ifc', label: 'Structure', visible: true },
+    { url: '/samples/plant/Plant-Process.ifc', label: 'Process', visible: true },
+    { url: '/samples/plant/Plant-Utilities.ifc', label: 'Utilities', visible: true },
+  ],
+  labelColumn: 'id',
+  tooltipColumns: ['label', 'measure'],
+  valueColors: [
+    { value: 'Normal', color: OK, label: 'Normal' },
+    { value: 'Warning', color: WARN, label: 'Warning' },
+    { value: 'Alarm', color: BAD, label: 'Alarm' },
+  ],
+};
+
 /** A factory line: is it running, how hot, how much power, and the controls to act. */
 export const SAMPLE_PLANT_BOARD = board('Plant operations', [
   P('status', 'state', 'Line 2', 0, 0, 3, 3, { value: 'sample.state' }, {
@@ -25,28 +44,29 @@ export const SAMPLE_PLANT_BOARD = board('Plant operations', [
     label: 'Hall average', icon: 'fas fa-temperature-half', increaseIs: 'bad', compareAs: 'delta', compareLabel: 'vs. yesterday',
     ranges: [{ from: 26, color: BAD }], $format: { unit: '°C', decimals: 1 },
   }),
-  P('load', 'gauge', 'Line load', 6, 0, 3, 6, { value: 'sample.cpu' }, {
-    layout: 'arc', label: 'Capacity used', needle: true, $format: { unit: '%' },
-    ranges: [{ to: 60, color: OK }, { from: 60, to: 85, color: WARN }, { from: 85, color: BAD }],
-  }),
-  P('pump', 'control.switch', 'Coolant pump', 9, 0, 3, 3, { value: 'sample.pump' }, { label: 'Pump power', icon: 'fas fa-droplet', stateDisplay: 'pill' }),
-  P('energy', 'stat.sparkline', 'Hall temperature', 0, 3, 6, 3, { series: 'sample.temperature.series' }, {
-    label: 'Last 12 hours', showChange: 'delta', increaseIs: 'bad', fill: 'gradient', showMinMax: true, $format: { unit: '°C', decimals: 1 },
-  }),
-  P('restart', 'control.button', 'Restart line', 9, 3, 3, 3, {}, {
+  P('pump', 'control.switch', 'Coolant pump', 6, 0, 3, 3, { value: 'sample.pump' }, { label: 'Pump power', icon: 'fas fa-droplet', stateDisplay: 'pill' }),
+  P('restart', 'control.button', 'Restart line', 9, 0, 3, 3, {}, {
     label: 'Restart', icon: 'fas fa-rotate-right', description: 'After a stop, restarts conveyor 2', fullWidth: true,
     confirmQuestion: 'Restart conveyor 2 now?', confirmLabel: 'Restart',
   }),
-  P('climate', 'chart.line', 'Climate', 0, 6, 8, 7, { series: 'sample.climate' }, {
+  P('model', 'viewer.model', 'Process plant (3D)', 0, 3, 8, 11, { sensors: 'sample.plant.sensors' }, PLANT_MODEL),
+  P('load', 'gauge', 'Line load', 8, 3, 4, 6, { value: 'sample.cpu' }, {
+    layout: 'arc', label: 'Capacity used', needle: true, $format: { unit: '%' },
+    ranges: [{ to: 60, color: OK }, { from: 60, to: 85, color: WARN }, { from: 85, color: BAD }],
+  }),
+  P('setpoint', 'control.setpoint', 'Thermostat', 8, 9, 4, 5, { value: 'sample.setpoint' }, {
+    layout: 'stepper', label: 'Target temperature', min: 16, max: 28, step: 0.5, $format: { unit: '°C', decimals: 1 },
+  }),
+  P('energy', 'stat.sparkline', 'Hall temperature', 0, 14, 8, 3, { series: 'sample.temperature.series' }, {
+    label: 'Last 12 hours', showChange: 'delta', increaseIs: 'bad', fill: 'gradient', showMinMax: true, $format: { unit: '°C', decimals: 1 },
+  }),
+  P('fan', 'control.slider', 'Extractor fan', 8, 14, 4, 3, { value: 'sample.cpu' }, { label: 'Speed', startIcon: 'fas fa-fan', tickMarks: 5, $format: { unit: '%' } }),
+  P('climate', 'chart.line', 'Climate', 0, 17, 8, 7, { series: 'sample.climate' }, {
     series: [{ key: 'Temperature', unit: '°C', decimals: 1 }, { key: 'Humidity', unit: '%', decimals: 0, axis: 'right', lineStyle: 'dashed' }],
     thresholds: [{ value: 24, label: 'Too warm', color: BAD, style: 'dashed', width: 1 }], legendValues: ['latest', 'max'],
   }),
-  P('setpoint', 'control.setpoint', 'Thermostat', 8, 6, 4, 4, { value: 'sample.setpoint' }, {
-    layout: 'stepper', label: 'Target temperature', min: 16, max: 28, step: 0.5, $format: { unit: '°C', decimals: 1 },
-  }),
-  P('fan', 'control.slider', 'Extractor fan', 8, 10, 4, 3, { value: 'sample.cpu' }, { label: 'Speed', startIcon: 'fas fa-fan', tickMarks: 5, $format: { unit: '%' } }),
-  P('power', 'chart.area', 'Power draw', 0, 13, 8, 7, { series: 'sample.power' }, { stacked: true, fill: 'soft', legendValues: ['latest', 'avg'], $format: { unit: 'kW' } }),
-  P('events', 'data.feed', 'Line events', 8, 13, 4, 7, { events: 'sample.events' }, { layout: 'timeline', maxItems: 5 }),
+  P('events', 'data.feed', 'Line events', 8, 17, 4, 7, { events: 'sample.events' }, { layout: 'timeline', maxItems: 5 }),
+  P('power', 'chart.area', 'Power draw', 0, 24, 12, 7, { series: 'sample.power' }, { stacked: true, fill: 'soft', legendValues: ['latest', 'avg'], $format: { unit: 'kW' } }),
 ]);
 
 /** A shop: how today compares, where orders come from, what sells. */

@@ -29,7 +29,7 @@ const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
 /**
  * The widget gallery: five themed boards (plant, sales, energy, infrastructure, sites) and one with all
- * 24 builtin types, each bound to WidgetKit's sample data. The visual reference for the kit.
+ * 25 builtin types, each bound to WidgetKit's sample data. The visual reference for the kit.
  */
 export function WidgetGallery() {
   const isClient = useSyncExternalStore(noop, () => true, () => false);

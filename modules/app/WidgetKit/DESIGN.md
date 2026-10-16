@@ -1,6 +1,6 @@
 # WidgetKit view design
 
-One look for all 24 widget types. Every view builds from `views/ui.tsx`; a view never invents its own
+One look for all 25 widget types. Every view builds from `views/ui.tsx`; a view never invents its own
 font size, colour, spacing or chip. Settings may override a part (a font, a colour), never the system.
 
 ## Roles

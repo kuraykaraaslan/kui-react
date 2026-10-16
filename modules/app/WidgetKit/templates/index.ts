@@ -17,6 +17,7 @@ import { STATE_KIND } from './state';
 import { DATA_TABLE_KIND } from './data-table';
 import { DATA_FEED_KIND } from './data-feed';
 import { MAP_KIND } from './map';
+import { VIEWER_MODEL_KIND } from './viewer-model';
 import { CONTENT_MARKDOWN_KIND } from './content-markdown';
 import { CONTENT_IMAGE_KIND } from './content-image';
 import { CONTENT_LINKS_KIND } from './content-links';
@@ -43,6 +44,7 @@ export const BUILTIN_KINDS: readonly BuiltinKindSpec[] = [
   DATA_TABLE_KIND,
   DATA_FEED_KIND,
   MAP_KIND,
+  VIEWER_MODEL_KIND,
   CONTENT_MARKDOWN_KIND,
   CONTENT_IMAGE_KIND,
   CONTENT_LINKS_KIND,

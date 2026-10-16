@@ -4033,5 +4033,198 @@
     "cancelLabel": {
       "type": "text"
     }
+  },
+  "builtin:viewer.model@1": {
+    "models": {
+      "type": "repeater",
+      "value": [],
+      "fields": {
+        "url": {
+          "type": "url"
+        },
+        "label": {
+          "type": "text"
+        },
+        "visible": {
+          "type": "boolean",
+          "value": true
+        }
+      }
+    },
+    "idColumn": {
+      "type": "data-key",
+      "value": "id"
+    },
+    "labelColumn": {
+      "type": "data-key",
+      "value": "label"
+    },
+    "xColumn": {
+      "type": "data-key",
+      "value": "x"
+    },
+    "yColumn": {
+      "type": "data-key",
+      "value": "y"
+    },
+    "zColumn": {
+      "type": "data-key",
+      "value": "z"
+    },
+    "coordinates": {
+      "type": "select",
+      "value": "z-up",
+      "options": [
+        "z-up",
+        "y-up"
+      ]
+    },
+    "valueColumn": {
+      "type": "data-key",
+      "value": "value"
+    },
+    "unitColumn": {
+      "type": "data-key",
+      "value": "unit"
+    },
+    "markerSize": {
+      "type": "number",
+      "value": 14
+    },
+    "pulseAlarms": {
+      "type": "boolean",
+      "value": true
+    },
+    "colorBy": {
+      "type": "select",
+      "value": "column",
+      "options": [
+        "fixed",
+        "column",
+        "ranges"
+      ]
+    },
+    "markerColor": {
+      "type": "color",
+      "value": "var(--primary)"
+    },
+    "colorColumn": {
+      "type": "data-key",
+      "value": "status"
+    },
+    "valueColors": {
+      "type": "repeater",
+      "value": [],
+      "fields": {
+        "value": {
+          "type": "text"
+        },
+        "color": {
+          "type": "color",
+          "value": "var(--error)"
+        },
+        "label": {
+          "type": "text"
+        }
+      }
+    },
+    "ranges": {
+      "type": "repeater",
+      "fields": {
+        "from": {
+          "type": "number"
+        },
+        "to": {
+          "type": "number"
+        },
+        "color": {
+          "type": "color",
+          "value": "var(--success)"
+        },
+        "label": {
+          "type": "text"
+        }
+      }
+    },
+    "rangeEdges": {
+      "type": "select",
+      "value": "from",
+      "options": [
+        "from",
+        "to"
+      ]
+    },
+    "legend": {
+      "type": "boolean",
+      "value": true
+    },
+    "legendPosition": {
+      "type": "select",
+      "value": "bottomleft",
+      "options": [
+        "bottomleft",
+        "bottomright",
+        "topleft",
+        "topright"
+      ]
+    },
+    "showSensorLabels": {
+      "type": "boolean",
+      "value": true
+    },
+    "labelContent": {
+      "type": "select",
+      "value": "both",
+      "options": [
+        "label",
+        "value",
+        "both"
+      ]
+    },
+    "tooltipTrigger": {
+      "type": "select",
+      "value": "hover",
+      "options": [
+        "hover",
+        "click",
+        "none"
+      ]
+    },
+    "tooltipColumns": {
+      "type": "data-key",
+      "value": []
+    },
+    "background": {
+      "type": "color"
+    },
+    "showNavCube": {
+      "type": "boolean",
+      "value": true
+    },
+    "showGrid": {
+      "type": "boolean",
+      "value": false
+    },
+    "cameraPreset": {
+      "type": "select",
+      "value": "iso",
+      "options": [
+        "iso",
+        "top",
+        "front"
+      ]
+    },
+    "autoFitOnLoad": {
+      "type": "boolean",
+      "value": true
+    },
+    "interactive": {
+      "type": "boolean",
+      "value": true
+    },
+    "scrollZoom": {
+      "type": "boolean",
+      "value": false
+    }
   }
 }
