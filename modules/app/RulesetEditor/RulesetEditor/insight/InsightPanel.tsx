@@ -1,7 +1,8 @@
 'use client';
 import { useId, useState } from 'react';
 import { Ic } from './Ic';
-import { faBug, faGaugeHigh, faTableList, faTriangleExclamation, faXmark, type IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { faBug, faGaugeHigh, faTableList, faTriangleExclamation, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { cn } from '@/libs/utils/cn';
 import { MessagesProvider, useMergedMessages, useMessages, type EditorMessages } from '../messages';
 import { BusiestTab } from './BusiestTab';
