@@ -20,7 +20,10 @@ const registry = JSON.parse(
 );
 
 const themes: { id: string; route: string }[] = registry.themes;
-const MASK_SELECTOR = 'video, canvas, img[src^="http"], .leaflet-container';
+// Leaflet's own tiles and marker images are left out of the img mask: their boxes reach far past the
+// map they are clipped to, so masking them painted over neighbouring content (the code panel, the
+// rest of the page). The .leaflet-container mask already covers the map.
+const MASK_SELECTOR = 'video, canvas, img[src^="http"]:not([class*="leaflet-"]), .leaflet-container';
 
 const RATCHETED_RULES = [
   'color-contrast',
