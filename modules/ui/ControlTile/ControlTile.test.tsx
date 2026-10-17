@@ -73,6 +73,17 @@ describe('ControlSetpoint', () => {
 });
 
 describe('ControlButton', () => {
+  it('is an ordinary button without `pressed`, and a toggle announced by aria-pressed with it', () => {
+    const { rerender } = render(<ControlButton label="Fan" onCommit={async () => {}} />);
+    expect(screen.getByRole('button', { name: 'Fan' })).not.toHaveAttribute('aria-pressed');
+    rerender(<ControlButton label="Fan" pressed={false} onCommit={async () => {}} />);
+    expect(screen.getByRole('button', { name: 'Fan' })).toHaveAttribute('aria-pressed', 'false');
+    rerender(<ControlButton label="Fan" pressed onCommit={async () => {}} />);
+    expect(screen.getByRole('button', { name: 'Fan', pressed: true })).toHaveAttribute('data-pressed', 'true');
+    rerender(<ControlButton label="Fan" layout="icon" pressed onCommit={async () => {}} />);
+    expect(screen.getByRole('button', { name: 'Fan' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
   it('fires immediately without a confirmation policy', async () => {
     const onCommit = vi.fn().mockResolvedValue(undefined);
     render(<ControlButton label="Reboot" onCommit={onCommit} />);

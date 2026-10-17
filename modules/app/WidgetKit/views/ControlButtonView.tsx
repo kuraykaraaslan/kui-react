@@ -81,7 +81,7 @@ export function buttonLookOf(s: S): { style: CSSProperties; className: string } 
   return { style, className: cn(cls) };
 }
 
-/** `control.button`: one press asks the host to run the placement's command. */
+/** `control.button`: one press asks the host to run the placement's command. With `pressed` it is a toggle. */
 export function ControlButtonView(props: WidgetViewProps) {
   const s = props.settings as S;
   const appearance = s.appearance && VARIANT[s.appearance] ? s.appearance : 'filled';
@@ -112,6 +112,7 @@ export function ControlButtonView(props: WidgetViewProps) {
         buttonStyle={look.style}
         buttonClassName={look.className}
         disabledReason={controlBlockReason(props, [], false)}
+        pressed={typeof props.pressed === 'boolean' ? props.pressed : undefined}
         {...confirm}
         messages={controlMessages(s, policyMessages)}
         onCommit={(confirmation) => run(undefined, confirmation)}

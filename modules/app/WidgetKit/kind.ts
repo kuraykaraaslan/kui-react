@@ -69,6 +69,11 @@ export interface WidgetViewProps {
   onControl?: (request: ControlRequest) => Promise<unknown>;
   /** Controls only: the host cannot act (no command bound, no permission). */
   controlDisabledReason?: string;
+  /**
+   * `control.button` only: the toggle state the host derived (e.g. from a board parameter the press sets).
+   * Absent = an ordinary button; `true` / `false` = a toggle, drawn and announced (`aria-pressed`) as such.
+   */
+  pressed?: boolean;
   /** Map/table/links: build a link for internal navigation; absent = plain anchors. */
   renderLink?: (href: string, children: ReactNode, className?: string) => ReactNode;
   /** Navigate imperatively to an internal path (row and marker clicks). */

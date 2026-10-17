@@ -48,6 +48,12 @@ export type ControlButtonProps = {
   buttonClassName?: string;
   /** Draw the tile frame. Default `true`. */
   framed?: boolean;
+  /**
+   * A toggle-like button's state: `true` is drawn pressed and announced `aria-pressed="true"`, `false`
+   * announced `aria-pressed="false"`. Absent (the default) is an ordinary button with no pressed state.
+   * The button never flips it itself: the host derives it from the state the press changes.
+   */
+  pressed?: boolean;
   messages?: Partial<ControlMessages & ControlButtonMessages>;
   className?: string;
 };
@@ -65,7 +71,7 @@ const DEFAULTS: ControlButtonMessages = { ...DEFAULT_CONFIRM_MESSAGES, run: 'Run
 export function ControlButton({
   title, label, onCommit, confirm = 'none', confirmText = '', readOnly = false, disabled = false, disabledReason,
   layout = 'button', icon, iconPosition = 'start', align = 'center', bodyAlign, variant = 'primary', size = 'md', fullWidth = false, buttonStyle, buttonClassName,
-  framed = true, messages, className,
+  framed = true, pressed, messages, className,
 }: ControlButtonProps) {
   const m = { ...DEFAULTS, ...messages };
   const [asking, setAsking] = useState(false);
@@ -107,6 +113,9 @@ export function ControlButton({
               disabled={blocked}
               aria-label={text}
               aria-busy={pending || undefined}
+              selected={pressed === true}
+              aria-pressed={pressed}
+              data-pressed={pressed === undefined ? undefined : String(pressed)}
               style={buttonStyle}
               className={cn('rounded-full p-0', ROUND[size], pending && 'animate-pulse motion-reduce:animate-none', buttonClassName)}
             >
@@ -123,6 +132,9 @@ export function ControlButton({
             disabled={blocked}
             loading={pending && layout !== 'tile'}
             aria-busy={pending || undefined}
+            selected={pressed === true}
+            aria-pressed={pressed}
+            data-pressed={pressed === undefined ? undefined : String(pressed)}
             iconLeft={layout !== 'tile' && iconPosition !== 'end' ? icon : undefined}
             iconRight={layout !== 'tile' && iconPosition === 'end' ? icon : undefined}
             style={buttonStyle}

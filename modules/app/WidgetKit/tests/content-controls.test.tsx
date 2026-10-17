@@ -174,6 +174,14 @@ describe('content security', () => {
 });
 
 describe('controls', () => {
+  it('a button the host gives a pressed state is a toggle; without one it is a plain button', () => {
+    const { unmount } = render(<CONTROL_BUTTON_VIEW.View {...props(CONTROL_BUTTON, { settings: { label: 'Fan' }, pressed: true })} />);
+    expect(screen.getByRole('button', { name: 'Fan' })).toHaveAttribute('aria-pressed', 'true');
+    unmount();
+    render(<CONTROL_BUTTON_VIEW.View {...props(CONTROL_BUTTON, { settings: { label: 'Fan' } })} />);
+    expect(screen.getByRole('button', { name: 'Fan' })).not.toHaveAttribute('aria-pressed');
+  });
+
   it('a switch asks the host to set the toggled value and shows success', async () => {
     const onControl = vi.fn().mockResolvedValue(undefined);
     render(<CONTROL_SWITCH_VIEW.View {...props(CONTROL_SWITCH, { data: { value: { shape: 'scalar', value: false } }, onControl })} />);
