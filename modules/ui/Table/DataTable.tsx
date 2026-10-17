@@ -6,6 +6,7 @@ import { HeaderCell } from './parts/HeaderCell';
 import { BodyRow } from './parts/BodyRow';
 import { Toolbar } from './parts/Toolbar';
 import { StateRow } from './parts/EmptyState';
+import { RowActionsCell } from './parts/RowActionsCell';
 import { useTable } from './core/useTable';
 import { useServerTable } from './core/useServerTable';
 import { cellClassFor } from './core/columnHelpers';
@@ -20,6 +21,7 @@ import type {
   DataTableFetchResult,
   DataTableMessages,
   DataTableMode,
+  DataTableRowAction,
   DataTableStateValue,
   SortState,
 } from './types';
@@ -67,6 +69,13 @@ export type DataTableProps<T extends Record<string, unknown>> = {
   state?: DataTableStateValue;
   /** Click handler for individual rows. */
   onRowClick?: (row: T) => void;
+  /**
+   * Per-row actions, shown as a menu in a trailing column (static, paginated and server modes).
+   * Hidden actions are left out per row; a row with none left gets an empty cell.
+   */
+  rowActions?: DataTableRowAction<T>[];
+  /** Accessible label of a row's actions button; a function names the row (e.g. "Actions for Acme"). */
+  rowActionsLabel?: string | ((row: T) => string);
   /** Optional message bundle for i18n. */
   messages?: Partial<DataTableMessages>;
   /** Initial sort. */
@@ -137,6 +146,31 @@ export function DataTable<T extends Record<string, unknown>>(
 }
 
 // ---------------------------------------------------------------------------
+// Row actions: a trailing column, only when `rowActions` has entries.
+// ---------------------------------------------------------------------------
+
+function rowActionsParts<T extends Record<string, unknown>>(
+  props: DataTableProps<T>,
+  msgs: DataTableMessages,
+) {
+  const { rowActions, rowActionsLabel } = props;
+  const list = rowActions && rowActions.length > 0 ? rowActions : null;
+  const labelFor = (row: T) =>
+    typeof rowActionsLabel === 'function'
+      ? rowActionsLabel(row)
+      : (rowActionsLabel ?? msgs.rowActions ?? 'Row actions');
+  return {
+    enabled: list !== null,
+    header: list ? (
+      <th scope="col" className="w-12 px-2 py-3">
+        <span className="sr-only">{msgs.actionsColumn ?? 'Actions'}</span>
+      </th>
+    ) : null,
+    cell: (row: T) => (list ? <RowActionsCell<T> row={row} actions={list} label={labelFor(row)} /> : undefined),
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Client view: static + paginated modes share this implementation.
 // ---------------------------------------------------------------------------
 
@@ -166,6 +200,7 @@ function ClientView<T extends Record<string, unknown>>(
   const msgs: DataTableMessages = { ...DEFAULT_MESSAGES, ...messages };
   const searchable = searchableProp ?? true;
   const isStatic = mode === 'static';
+  const actions = rowActionsParts(props, msgs);
 
   const table = useTable<T>({
     rows,
@@ -224,13 +259,14 @@ function ClientView<T extends Record<string, unknown>>(
                   onSetFilter={table.setColumnFilter}
                 />
               ))}
+              {actions.header}
             </tr>
           </thead>
           <tbody className="divide-y divide-border bg-surface-base">
             {resolvedState !== 'ready' ? (
               <StateRow
                 state={resolvedState as 'empty' | 'loading' | 'error'}
-                colSpan={columns.length}
+                colSpan={columns.length + (actions.enabled ? 1 : 0)}
                 message={
                   resolvedState === 'loading'
                     ? (loadingMessage ?? msgs.loading)
@@ -248,6 +284,7 @@ function ClientView<T extends Record<string, unknown>>(
                   row={row}
                   columns={columns}
                   onClick={onRowClick}
+                  actions={actions.cell(row)}
                 />
               ))
             )}
@@ -301,6 +338,7 @@ function ServerView<T extends Record<string, unknown>>(
 
   const msgs: DataTableMessages = { ...DEFAULT_MESSAGES, ...messages };
   const searchable = searchableProp ?? true;
+  const actions = rowActionsParts(props, msgs);
 
   if (!fetchPage) {
     throw new Error('DataTable mode="server" requires a `fetchPage` prop.');
@@ -359,13 +397,14 @@ function ServerView<T extends Record<string, unknown>>(
                   onSetFilter={table.setColumnFilter}
                 />
               ))}
+              {actions.header}
             </tr>
           </thead>
           <tbody className="divide-y divide-border bg-surface-base">
             {resolvedState !== 'ready' ? (
               <StateRow
                 state={resolvedState as 'empty' | 'loading' | 'error'}
-                colSpan={columns.length}
+                colSpan={columns.length + (actions.enabled ? 1 : 0)}
                 message={
                   resolvedState === 'loading'
                     ? (loadingMessage ?? msgs.loading)
@@ -381,6 +420,7 @@ function ServerView<T extends Record<string, unknown>>(
                   row={row}
                   columns={columns}
                   onClick={onRowClick}
+                  actions={actions.cell(row)}
                 />
               ))
             )}

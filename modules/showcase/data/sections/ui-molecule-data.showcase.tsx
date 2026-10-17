@@ -10,6 +10,52 @@ import { BulkActionTable } from '@/modules/ui/BulkActionTable';
 import { Timeline } from '@/modules/ui/Timeline';
 import { useCallback, useState } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
+import type { DataTableRowAction } from '@/modules/ui/Table/types';
+
+type Company = { id: string; name: string; email: string; status: string; [key: string]: unknown };
+
+const COMPANIES: Company[] = [
+  { id: 'c1', name: 'Northwind Traders', email: 'buy@northwind.example', status: 'Active' },
+  { id: 'c2', name: 'Contoso Ltd',       email: '',                       status: 'Active' },
+  { id: 'c3', name: 'Fabrikam',          email: 'info@fabrikam.example',  status: 'Archived' },
+];
+
+function RowActionsDemo() {
+  const [log, setLog] = useState('Nothing run yet');
+  const actions: DataTableRowAction<Company>[] = [
+    { id: 'open', label: 'Open', href: (row) => `#company-${row.id}` },
+    { id: 'call', label: 'Call', group: 'contact', order: 10, onClick: (row) => setLog(`Call ${row.name}`) },
+    {
+      id: 'sign',
+      label: 'Send for signature',
+      group: 'contact',
+      order: 20,
+      disabled: (row) => !row.email,
+      disabledReason: (row) => (row.email ? undefined : 'Add an email address first'),
+      onClick: (row) => setLog(`Send ${row.name} for signature`),
+    },
+    { id: 'restore', label: 'Restore', hidden: (row) => row.status !== 'Archived', onClick: (row) => setLog(`Restore ${row.name}`) },
+    { id: 'delete', label: 'Delete', group: 'danger', order: 1000, destructive: true, onClick: (row) => setLog(`Delete ${row.name}`) },
+  ];
+  return (
+    <div className="w-full space-y-2">
+      <DataTable<Company>
+        caption="Companies"
+        mode="static"
+        searchable={false}
+        rows={COMPANIES}
+        rowActions={actions}
+        rowActionsLabel={(row) => `Actions for ${row.name}`}
+        columns={[
+          { key: 'name', header: 'Company' },
+          { key: 'email', header: 'Email', render: (r) => r.email || '—' },
+          { key: 'status', header: 'Status', render: (r) => <Badge variant={r.status === 'Active' ? 'success' : 'neutral'}>{r.status}</Badge> },
+        ]}
+      />
+      <p className="text-xs text-text-secondary">{log}</p>
+    </div>
+  );
+}
 import type {
   DataTableFetchArgs,
   DataTableFetchResult,
@@ -203,7 +249,7 @@ export function Table({ columns, rows, caption, emptyMessage = 'No results found
       title: 'DataTable',
       category: 'Organism',
       abbr: 'Dt',
-      description: 'Unified table with `mode="static" | "paginated" | "server"`. Multi-column sort (Shift+click), global search, per-column filter (text + select), pagination, and unified loading/empty/error state.',
+      description: 'Unified table with `mode="static" | "paginated" | "server"`. Multi-column sort (Shift+click), global search, per-column filter (text + select), pagination, unified loading/empty/error state, and `rowActions` (a per-row actions menu with id, href, hidden, disabledReason, destructive, group and order).',
       filePath: 'modules/ui/Table/DataTable.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -314,6 +360,25 @@ export function DataTable({ columns, rows, caption, searchable = true, searchPla
           layout: 'stack' as const,
           preview: <ServerModeDemo />,
           code: `// Unified server-side data flow — the component owns sort/filter/pagination state\n// and calls \`fetchPage\` whenever it changes.\n<DataTable<User>\n  mode="server"\n  fetchPage={async ({ page, pageSize, sort, search, filters }) => {\n    const res = await fetch(buildUrl({ page, pageSize, sort, search, filters }));\n    const { rows, total } = await res.json();\n    return { rows, total };\n  }}\n  pageSize={5}\n  searchPlaceholder="Search users…"\n  columns={[\n    { key: 'name',  header: 'Name',  sortable: true },\n    { key: 'email', header: 'Email', sortable: true, filter: { kind: 'text' } },\n    { key: 'team',  header: 'Team',  sortable: true, filter: { kind: 'select', options: [\n      { label: 'Platform', value: 'platform' },\n      { label: 'Growth',   value: 'growth' },\n    ] } },\n  ]}\n/>`,
+        },
+        {
+          title: 'Row actions (rowActions)',
+          layout: 'stack' as const,
+          preview: <RowActionsDemo />,
+          code: `// A trailing column with one menu per row. Every per-row field takes a function of the row.
+<DataTable<Company>
+  rows={companies}
+  columns={columns}
+  rowActionsLabel={(row) => \`Actions for \${row.name}\`}
+  rowActions={[
+    { id: 'open', label: 'Open', href: (row) => \`/companies/\${row.id}\` },
+    { id: 'call', label: 'Call', group: 'contact', order: 10, onClick: (row) => call(row) },
+    { id: 'sign', label: 'Send for signature', group: 'contact', order: 20,
+      disabled: (row) => !row.email, disabledReason: (row) => (row.email ? undefined : 'Add an email address first') },
+    { id: 'restore', label: 'Restore', hidden: (row) => row.status !== 'Archived' },
+    { id: 'delete', label: 'Delete', group: 'danger', order: 1000, destructive: true, onClick: remove },
+  ]}
+/>`,
         },
       ],
     },
