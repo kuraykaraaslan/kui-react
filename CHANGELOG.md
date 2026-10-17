@@ -6,6 +6,33 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ### Added
 
+- Extension surfaces (next-boilerplate phase 37, UI contributions and new extension surfaces):
+  - `ContributionBoundary`: an exported error boundary for one contribution, with `fallback` (a node or
+    `({ error, reset }) => node`, nothing by default), `onError(error, info)` and `resetKeys`. It replaces
+    WidgetKit's private `ViewerBoundary` (same behaviour).
+  - `UnavailableContribution`: the placeholder admins and editors see where a contribution cannot be shown.
+    Reasons `disabled`, `unentitled`, `blocked`, `retired`, `banned`, `quarantined`, `failed`, `missing`,
+    `no-access` (default icon, tone and English text each, exported as `UNAVAILABLE_REASONS`); sizes `inline`,
+    `card`, `tab`, `node`; optional `title`, `label`, `detail`, `action` (label + `onClick` / `href`).
+  - `WidgetCard`: state `unavailable` with an `unavailable` prop (reason, texts, action); the card keeps its
+    title and drops its data buttons, stale badge and "Updated" footer.
+  - `TabGroup`: `isolate` (group or per tab) wraps each panel in `ContributionBoundary` + `Suspense`, with
+    `renderError`, `loadingFallback`, `onTabError`, `retryLabel`; tabs take `order` and a per-tab `lazy`.
+  - `DropdownMenu` items: `id`, `href`, `order`, `group`, `hidden`, `disabledReason`; `portal` renders the open
+    menu in `document.body`; helpers `arrangeMenuItems` and `mergeMenuItems`.
+  - `UserMenu`: `extraItems` (and `items` + `mergeItems`) merge contributed items with Profile / Settings /
+    Sign out, placed by group and order; `profileHref` / `settingsHref` / `signOutHref`, `onProfile` /
+    `onSettings` / `onSignOut` and `labels` for the built-in items.
+  - `AppTopBar`: `start` and `end` regions taking a node or ordered `{ id, node, order, hidden }` items.
+  - `AppSidebar`: `header` slot above the nav groups (node or `({ collapsed }) => node`, as in
+    next-boilerplate's fork); item `badge` takes any node besides a count (`AppDrawer` renders it too).
+  - `DataTable`: `rowActions` (descriptors with `id`, `label`, `icon`, `onClick` / `href`, `hidden`,
+    `disabled`, `disabledReason`, `destructive`, `group`, `order`; per-row fields may be functions of the row)
+    in a trailing menu column, and `rowActionsLabel`; exported `DataTableRowAction`, `resolveRowActions`.
+  - `CommandPalette`: commands take `group`, `order`, `hidden`; `registerCommands` (batch) and
+    `commandGroupOf`; `CommandPalette`, the registry hooks and `DEMO_COMMANDS` are exported from the app barrel.
+  - `libs/utils/orderItems`: `sortByOrder` / `groupByOrder`, the CSS-`order`-like ordering every surface uses.
+
 - `RulesetEditor` / `FlowWorkspace`: `paramEditors`, the host's own param editor per block type, shown in the node
   panel in place of the generated form (`ParamEditorProps`: `params`, `onChange`, `disabled`, `node`, `decl`, `choices`).
 - `WidgetKit` `PlacementCard`: `exportData`, an async source for the CSV export, so a host can
@@ -22,6 +49,10 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ### Changed
 
+- `CommandPalette` no longer lists sample commands by default: pass `demo` (or your own `items`). Keyboard
+  navigation now follows the on-screen group order. `CommandItem.category` is optional (alias of `group`).
+- `AppSidebarNavItem.badge` widened from `number` to `number | ReactNode`; code that reads it as a number
+  needs a `typeof` check.
 - `package.json` gained `license`, `repository`, `homepage`, `bugs`, `engines`, `keywords`. The
   package has been resolvable from `package.json` alone since 1.0.0 but shipped without this
   metadata until now.
@@ -31,6 +62,9 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ### Fixed
 
+- `usePresence` (Modal, Drawer, Popover): an overlay opened within 250 ms of mounting could stay unmounted
+  while open, because the mount-time close timer's update landed after the open click's. The timer now only
+  runs while closing and only moves `closing` on. (This was the flaky `CommandPalette` focus test.)
 - Four components (`FileInput`, `EmptyErrorState`, `FileUploadSection`, `LoadingState`) were
   missing the `'use client'` directive required by every file in `modules/ui`/`modules/app`.
 

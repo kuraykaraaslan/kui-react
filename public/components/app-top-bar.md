@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Top bar wrapper passed into AppShell's header slot. The logo slot anchors the left side while children (GlobalSearch, UserMenu, Button, etc.) are arranged in a flex row.
+Top bar wrapper passed into AppShell's header slot. The logo slot anchors the left side while children (GlobalSearch, UserMenu, Button, etc.) are arranged in a flex row. Named regions `start` (after the logo) and `end` (pushed to the far end) take a node or ordered `{ id, node, order, hidden }` items, for controls other modules contribute.
 
 ## Variants
 
@@ -37,6 +37,21 @@ Top bar wrapper passed into AppShell's header slot. The logo slot anchors the le
     <UserMenu user={currentUser} />
   </div>
 </AppTopBar>
+```
+
+### Regions: start + ordered end items
+
+```tsx
+// Contributed controls arrive as ordered items; hidden ones are left out.
+<AppTopBar
+  logo={<Logo />}
+  start={<EnvironmentBadge />}
+  end={[
+    { id: 'notifications', order: 10, node: <NotificationBell /> },
+    { id: 'calls', order: 20, node: <PresenceToggle />, hidden: !telephonyEnabled },
+    { id: 'user', order: 100, node: <UserMenu user={currentUser} /> },
+  ]}
+/>
 ```
 
 ## Full source

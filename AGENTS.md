@@ -121,13 +121,15 @@ Stateless or locally-stateful primitive components. No business logic, no extern
 | Toast | `Toast.tsx` | `variant`, `message`, `duration` |
 | Pagination | `Pagination.tsx` | `page`, `total`, `pageSize`, `onChange` |
 | Stepper | `Stepper.tsx` | `steps`, `currentStep` |
-| TabGroup | `TabGroup.tsx` | `tabs`, `activeTab`, `onChange` |
+| TabGroup | `TabGroup.tsx` | `tabs` (`order`, `lazy`, `isolate` per tab), `defaultTab`, `lazy`, `isolate` (error boundary + Suspense per panel), `renderError`, `onTabError` |
 | Breadcrumb | `Breadcrumb.tsx` | `items` (label + href) |
 | PageHeader | `PageHeader.tsx` | `title`, `subtitle`, `actions` |
 | EmptyState | `EmptyState.tsx` | `icon`, `title`, `description`, `action` |
+| ContributionBoundary | `ContributionBoundary.tsx` | `fallback` (node or `({ error, reset })`), `onError(error, info)`, `resetKeys` — isolates one contributed slot item / tab / widget / block |
+| UnavailableContribution | `UnavailableContribution.tsx` | `reason` (disabled\|unentitled\|blocked\|retired\|banned\|quarantined\|failed\|missing\|no-access), `size` (inline\|card\|tab\|node), `title`, `label`, `detail`, `action` |
 | Skeleton | `Skeleton.tsx` | Exports `SkeletonLine`, `SkeletonAvatar`, `SkeletonText`, `SkeletonCard` |
 | Table | `Table.tsx` | `columns`, `rows` |
-| DataTable | `DataTable.tsx` | `columns`, `rows`, `searchable`, `sortable` |
+| DataTable | `DataTable.tsx` | `columns`, `rows`, `searchable`, `sortable`, `rowActions` (per-row menu: `id`, `label`, `onClick`/`href`, `hidden`, `disabled`, `disabledReason`, `destructive`, `group`, `order`) |
 | AdvancedDataTable | `AdvancedDataTable.tsx` | Extends DataTable with `selectable`, row actions |
 | TreeView | `TreeView.tsx` | `nodes` (recursive), `onSelect` |
 | ButtonGroup | `ButtonGroup.tsx` | `options`, `selected`, `onChange` |
@@ -139,7 +141,7 @@ Stateless or locally-stateful primitive components. No business logic, no extern
 | SearchBar | `SearchBar.tsx` | `value`, `onChange`, `onClear`, `placeholder` |
 | DateRangePicker | `DateRangePicker.tsx` | `start`, `end`, `onChange` |
 | ContentScoreBar | `ContentScoreBar.tsx` | `score` (0–100), `label`, `thresholds` |
-| DropdownMenu | `DropdownMenu.tsx` | `trigger`, `items` (label\|icon\|danger\|disabled\|separator), `align` (left\|right) |
+| DropdownMenu | `DropdownMenu.tsx` | `trigger`, `items` (label\|icon\|danger\|disabled\|separator, plus `id`\|`href`\|`group`\|`order`\|`hidden`\|`disabledReason`), `align` (left\|right), `portal`; helpers `arrangeMenuItems`, `mergeMenuItems` |
 | Slider | `Slider.tsx` | `slides`, `autoPlay`, `autoPlayInterval`, `showDots`, `showArrows`, `loop` — accessible carousel |
 | Accordion | `Accordion.tsx` | `items`, `openIds`, `onChange`, `allowMultiple` |
 | ColorPicker | `ColorPicker/` | `value`, `onChange`, `format` (hex\|rgb\|hsl) |
@@ -163,8 +165,8 @@ Full page-section components that combine multiple UI molecules into usable work
 | Component | File | What it does |
 |-----------|------|-------------|
 | AppShell | `AppShell.tsx` | Root layout: sidebar aside + sticky top bar + main content with mobile drawer |
-| AppSidebar | `AppSidebar.tsx` | Collapsible sidebar nav with grouped items, badges, footer slot |
-| AppTopBar | `AppTopBar.tsx` | Flex wrapper for header content (logo + custom children) |
+| AppSidebar | `AppSidebar.tsx` | Collapsible sidebar nav with grouped items, count or node badges, `header` (above the nav groups) and `footer` slots |
+| AppTopBar | `AppTopBar.tsx` | Flex wrapper for header content (logo + `start` / `end` regions of ordered items + custom children) |
 | AppDrawer | `AppDrawer.tsx` | Slide-in drawer shell used inside `AppShell` mobile mode |
 | AppFooter | `AppFooter.tsx` | Site footer: logo, version badge, status pill, nav, social, copyright |
 | AppBreadcrumbs | `AppBreadcrumbs.tsx` | Breadcrumb trail with overflow collapse |
@@ -178,7 +180,7 @@ Full page-section components that combine multiple UI molecules into usable work
 | AppNav | `AppNav.tsx` | Horizontal nav bar with active-route highlighting |
 | NavDrawer | `NavDrawer.tsx` | Trigger + slide-in drawer composite for off-canvas menus |
 | GlobalSearch | `GlobalSearch.tsx` | Command-palette-style global search with result previews |
-| AppCommandBar / CommandPalette | `CommandPalette/` | ⌘K palette: fuzzy command search, grouped results, keyboard-first |
+| AppCommandBar / CommandPalette | `CommandPalette/` | ⌘K palette: fuzzy command search, grouped results, keyboard-first; shared registry (`registerCommand(s)`, `useRegisterCommand`), commands carry `group` / `order` / `hidden`; sample commands only with `demo` |
 
 ### Overlays + menus
 

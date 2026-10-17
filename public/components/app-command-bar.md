@@ -7,14 +7,14 @@
 - **status:** beta
 - **since:** 2025-04
 
-Keyboard-first command palette. Opens with ⌘K; an items prop accepts custom commands while a default navigation/actions/recent set is included.
+Keyboard-first command palette. Opens with ⌘K. Lists the `items` it gets plus every command registered with `registerCommand` / `registerCommands` / `useRegisterCommand`; commands carry `group`, `order` and `hidden`. Sample commands only with `demo`.
 
 ## Variants
 
-### Varsayılan komutlar
+### Sample commands (demo)
 
 ```tsx
-<AppCommandBar onSelect={(item) => console.log(item.label)} />
+<AppCommandBar demo onSelect={(item) => console.log(item.label)} />
 ```
 
 ### Özel items + trigger
@@ -42,14 +42,29 @@ const fuzzyItems = [
 <AppCommandBar items={fuzzyItems} />
 ```
 
+### Registered commands: group, order, hidden
+
+```tsx
+// Any module adds commands to the shared registry; the palette lists them with its own items.
+useEffect(() => registerCommands([
+  { id: 'tel-call', label: 'Call a contact', group: 'Telephony', order: 30, hidden: !canCall },
+  { id: 'tel-log', label: 'Open call log', group: 'Telephony', order: 31 },
+]), [canCall]);
+
+<AppCommandBar items={[
+  { id: 'go-home', label: 'Go to dashboard', group: 'Navigation', order: 0 },
+  { id: 'new-lead', label: 'New lead', group: 'Create', order: 10 },
+]} />
+```
+
 ## Full source
 
 ```tsx
 'use client';
 import { AppCommandBar } from '@/modules/app/CommandPalette';
 
-// With default commands:
-<AppCommandBar onSelect={(item) => router.push(item.href)} />
+// With the sample commands (demos only):
+<AppCommandBar demo onSelect={(item) => console.log(item.label)} />
 
 // With custom commands:
 <AppCommandBar
