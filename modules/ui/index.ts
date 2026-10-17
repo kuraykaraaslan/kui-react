@@ -59,6 +59,18 @@ export { Drawer } from './Drawer';
 export { DropdownMenu } from './DropdownMenu';
 export type { DropdownItem } from './DropdownMenu';
 export { EmptyState } from './EmptyState';
+export { ContributionBoundary } from './ContributionBoundary';
+export type { ContributionBoundaryProps, ContributionBoundaryFallback, ContributionBoundaryFallbackProps } from './ContributionBoundary';
+export { UnavailableContribution, UNAVAILABLE_REASONS, UNAVAILABLE_REASON_IDS } from './UnavailableContribution';
+export type {
+  UnavailableContributionProps,
+  UnavailableContributionContent,
+  UnavailableContributionAction,
+  UnavailableContributionSize,
+  UnavailableReason,
+  UnavailableReasonMeta,
+  UnavailableTone,
+} from './UnavailableContribution';
 export { MapView, MapCanvas } from './MapView';
 export type { MapVariant, MapTooltipField, MapTooltipData, MapMarker, MapZone, MapRoute, MapTiles, MapTilesConfig, MapCanvasProps } from './MapView';
 export { Modal } from './Modal';

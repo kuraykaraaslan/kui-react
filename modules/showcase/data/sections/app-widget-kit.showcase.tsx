@@ -20,6 +20,17 @@ function CardDemo() {
   );
 }
 
+function UnavailableCardDemo() {
+  const card: CardSettings = { buttons: ['fullscreen', 'refresh'] };
+  return (
+    <div className="grid w-full max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="h-48"><WidgetCard title="Open calls" card={card} state="unavailable" unavailable={{ reason: 'disabled', action: { label: 'Enable telephony' } }} /></div>
+      <div className="h-48"><WidgetCard title="Revenue forecast" card={card} state="unavailable" unavailable={{ reason: 'unentitled', action: { label: 'Upgrade' } }} /></div>
+      <div className="h-48"><WidgetCard title="Device map" card={card} state="unavailable" unavailable={{ reason: 'quarantined', action: { label: 'Retry' } }} /></div>
+    </div>
+  );
+}
+
 function PlacementDemo() {
   const kind = builtinKind('stat.value')!;
   const [settings, setSettings] = useState<Sparse>({ label: 'Rooms booked', $format: { unit: '%' }, ranges: [{ from: 80, color: 'var(--error)' }] });
@@ -67,14 +78,14 @@ export function buildAppWidgetKitData(): ShowcaseComponent[] {
       category: 'App',
       abbr: 'WK',
       description:
-        'Dashboard widget kit (next-boilerplate dashboard phase 21). WidgetCard frames every widget (title row with icon, subtitle and help, card buttons for full screen, CSV and refresh, loading/empty/unconfigured/error/stale states, "Updated" footer). Versioned settings templates (core:card, core:format, core:board and one per widget type) give ThingsBoard-depth editing with free colours (any CSS colour or a theme token); stored settings carry $v and migrate with append-only steps. WidgetSettingsEditor edits a placement in tabs with Basic/Advanced; WidgetBoard lays out a whole board with edit mode and JSON export/import that carries every card.',
+        'Dashboard widget kit (next-boilerplate dashboard phase 21). WidgetCard frames every widget (title row with icon, subtitle and help, card buttons for full screen, CSV and refresh, loading/empty/unconfigured/error/stale/unavailable states, "Updated" footer; `unavailable` keeps the title and shows an UnavailableContribution). Versioned settings templates (core:card, core:format, core:board and one per widget type) give ThingsBoard-depth editing with free colours (any CSS colour or a theme token); stored settings carry $v and migrate with append-only steps. WidgetSettingsEditor edits a placement in tabs with Basic/Advanced; WidgetBoard lays out a whole board with edit mode and JSON export/import that carries every card.',
       filePath: 'modules/app/WidgetKit/index.ts',
       sourceCode: `import { WidgetBoard, BUILTIN_KINDS, BUILTIN_VIEWS } from '@/modules/app/WidgetKit';
 
 <WidgetBoard doc={doc} onChange={setDoc} data={data} kinds={BUILTIN_KINDS} views={BUILTIN_VIEWS} />`,
       since: '2026-10',
       status: 'beta',
-      composes: ['schema-form', 'tab-group', 'drawer', 'modal', 'tooltip', 'chart', 'map-view', 'control-tile'],
+      composes: ['schema-form', 'tab-group', 'drawer', 'modal', 'tooltip', 'chart', 'map-view', 'control-tile', 'unavailable-contribution'],
       designTokens: ['--surface-raised', '--surface-base', '--border', '--text-primary', '--text-secondary', '--primary', '--warning-subtle', '--warning-fg', '--canvas-bg'],
       a11y: {
         wcagLevel: 'AA',
@@ -87,6 +98,8 @@ export function buildAppWidgetKitData(): ShowcaseComponent[] {
       },
       variants: [
         { title: 'WidgetCard', layout: 'stack' as const, preview: <CardDemo />, code: `<WidgetCard title="Load" card={card} stale={stale}>{body}</WidgetCard>` },
+        { title: 'WidgetCard unavailable (admin view of a widget whose module is off)', layout: 'stack' as const, preview: <UnavailableCardDemo />,
+          code: `<WidgetCard title="Open calls" card={card} state="unavailable"\n  unavailable={{ reason: 'disabled', action: { label: 'Enable telephony', onClick: enable } }} />` },
         { title: 'PlacementCard + WidgetSettingsEditor', layout: 'stack' as const, preview: <PlacementDemo />,
           code: `<WidgetSettingsEditor templates={[kind.template, CORE_CARD, CORE_FORMAT]} settings={settings} onChange={setSettings} caps={caps} />` },
         { title: 'WidgetBoard (edit, export, import)', layout: 'stack' as const, preview: <BoardDemo />,

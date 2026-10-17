@@ -80,6 +80,8 @@ const NAV_GROUPS: NavGroup[] = [
       { id: 'alert-banner',        title: 'AlertBanner',       category: 'Organism', abbr: 'Ab', since: '2025-02' },
       { id: 'toast',               title: 'Toast',             category: 'Organism', abbr: 'To', since: '2025-02' },
       { id: 'empty-state',         title: 'EmptyState',        category: 'Organism', abbr: 'Es', since: '2025-02' },
+      { id: 'contribution-boundary',    title: 'ContributionBoundary',    category: 'Organism', abbr: 'Eb', since: '2026-10' },
+      { id: 'unavailable-contribution', title: 'UnavailableContribution', category: 'Organism', abbr: 'Uc', since: '2026-10' },
       { id: 'pagination',          title: 'Pagination',        category: 'Organism', abbr: 'Pg', since: '2025-02' },
       { id: 'modal',               title: 'Modal',             category: 'Organism', abbr: 'Md', since: '2025-02' },
       { id: 'drawer',              title: 'Drawer',            category: 'Organism', abbr: 'Dr', since: '2025-02' },
