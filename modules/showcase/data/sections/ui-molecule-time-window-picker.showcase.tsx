@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { TimeWindowPicker, DEFAULT_CALENDAR_PERIODS, type TimeWindowValue } from '@/modules/ui/TimeWindowPicker';
+import { TimeWindowSelect } from '@/modules/ui/TimeWindowSelect';
 import type { ShowcaseComponent } from '../showcase.types';
 
 export function buildTimeWindowPickerData(): ShowcaseComponent[] {
@@ -47,7 +48,56 @@ const [win, setWin] = useState<TimeWindowValue | null>({ mode: 'relative', last:
         },
       ],
     },
+    {
+      id: 'time-window-select',
+      title: 'TimeWindowSelect',
+      category: 'Molecule',
+      abbr: 'TW',
+      since: '2026-10',
+      description:
+        'A time window behind one button, the dashboard way: the button names the window and opens a panel with Realtime (last N sliding, or the current calendar period, optionally so far) and History (last N anchored when applied, a fixed range typed in the window\'s zone, or a past period). Aggregation, grouping interval with a bucket estimate, and time zone apply to both. Edits are a draft until Update. Same `TimeWindowValue` as TimeWindowPicker.',
+      filePath: 'modules/ui/TimeWindowSelect.tsx',
+      relatedTo: ['time-window-picker', 'popover', 'date-range-picker'],
+      designTokens: ['--primary', '--primary-fg', '--border', '--surface-base', '--surface-sunken', '--surface-raised', '--text-secondary', '--border-focus', '--warning'],
+      a11y: {
+        wcagLevel: 'AA',
+        ariaPatterns: ['dialog', 'tablist', 'radiogroup', 'status'],
+        notes: 'The trigger has aria-haspopup="dialog" and aria-expanded; Realtime / History are tabs (arrow keys); every input has an accessible name from `messages`; the bucket estimate is a status; Escape and Cancel discard the draft.',
+      },
+      sourceCode: `'use client';
+import { TimeWindowSelect } from '@/modules/ui/TimeWindowSelect';
+import type { TimeWindowValue } from '@/modules/ui/TimeWindowPicker';
+
+const [win, setWin] = useState<TimeWindowValue | null>({ mode: 'relative', last: '24h' });
+<TimeWindowSelect value={win} onChange={setWin} />`,
+      variants: [
+        {
+          title: 'Default',
+          layout: 'stack' as const,
+          preview: <SelectDemo />,
+          code: `<TimeWindowSelect value={win} onChange={setWin} />`,
+        },
+        {
+          title: 'History range in a chosen zone, no period options',
+          layout: 'stack' as const,
+          preview: <SelectDemo history />,
+          code: `<TimeWindowSelect value={{ mode: 'absolute', from, to, timezone: 'Europe/Istanbul' }} onChange={setWin} calendarPeriods={[]} />`,
+        },
+      ],
+    },
   ];
+}
+
+function SelectDemo({ history = false }: { history?: boolean }) {
+  const [w, setW] = useState<TimeWindowValue | null>(history
+    ? { mode: 'absolute', from: '2026-10-16T05:00:00.000Z', to: '2026-10-16T17:00:00.000Z', timezone: 'Europe/Istanbul', interval: '1h' }
+    : { mode: 'relative', last: '24h', interval: '5m', aggregation: 'avg' });
+  return (
+    <div className="space-y-2">
+      <TimeWindowSelect value={w} onChange={setW} idPrefix={history ? 'tws-history' : 'tws-demo'} {...(history ? { calendarPeriods: [] } : {})} />
+      <pre className="text-xs text-text-secondary">{JSON.stringify(w)}</pre>
+    </div>
+  );
 }
 
 function WindowDemo({ compact = false, full = false }: { compact?: boolean; full?: boolean }) {

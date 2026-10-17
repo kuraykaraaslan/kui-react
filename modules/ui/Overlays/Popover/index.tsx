@@ -15,6 +15,9 @@ export type PopoverProps = {
    * conditional on the `as` prop (no trap for tooltips).
    */
   focusTrap?: boolean;
+  /** Controlled open state. With it, the panel opens and closes only through `onOpenChange` (e.g. an Apply button inside). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export function Popover({
@@ -23,8 +26,16 @@ export function Popover({
   placement = 'bottom',
   className,
   focusTrap = true,
+  open: openProp,
+  onOpenChange,
 }: PopoverProps) {
-  const [open, setOpen] = useState(false);
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (next: boolean | ((o: boolean) => boolean)) => {
+    const value = typeof next === 'function' ? next(open) : next;
+    if (openProp === undefined) setOpenState(value);
+    onOpenChange?.(value);
+  };
   const containerRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 

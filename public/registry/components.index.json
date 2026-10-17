@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-10-17T04:14:06.706Z",
+  "generatedAt": "2026-10-17T04:40:00.163Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -992,6 +992,44 @@
         "--border-focus"
       ],
       "variantCount": 3
+    },
+    {
+      "id": "time-window-select",
+      "name": "TimeWindowSelect",
+      "layer": "ui",
+      "category": "Molecule",
+      "filePath": "modules/ui/TimeWindowSelect.tsx",
+      "abbr": "TW",
+      "description": "A time window behind one button, the dashboard way: the button names the window and opens a panel with Realtime (last N sliding, or the current calendar period, optionally so far) and History (last N anchored when applied, a fixed range typed in the window's zone, or a past period). Aggregation, grouping interval with a bucket estimate, and time zone apply to both. Edits are a draft until Update. Same `TimeWindowValue` as TimeWindowPicker.",
+      "status": "stable",
+      "since": "2026-10",
+      "relatedTo": [
+        "time-window-picker",
+        "popover",
+        "date-range-picker"
+      ],
+      "a11y": {
+        "wcagLevel": "AA",
+        "ariaPatterns": [
+          "dialog",
+          "tablist",
+          "radiogroup",
+          "status"
+        ],
+        "notes": "The trigger has aria-haspopup=\"dialog\" and aria-expanded; Realtime / History are tabs (arrow keys); every input has an accessible name from `messages`; the bucket estimate is a status; Escape and Cancel discard the draft."
+      },
+      "designTokens": [
+        "--primary",
+        "--primary-fg",
+        "--border",
+        "--surface-base",
+        "--surface-sunken",
+        "--surface-raised",
+        "--text-secondary",
+        "--border-focus",
+        "--warning"
+      ],
+      "variantCount": 2
     },
     {
       "id": "use-async-control",

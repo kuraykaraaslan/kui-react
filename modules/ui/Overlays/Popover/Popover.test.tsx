@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Popover } from './index';
@@ -64,4 +64,26 @@ describe('Popover', () => {
     await new Promise((r) => setTimeout(r, 10));
     expect(trigger).toHaveFocus();
   });
+
+  it('controlled: open and onOpenChange drive it, and a button inside can close it', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    const { rerender } = render(
+      <Popover trigger={<button>Open</button>} open={false} onOpenChange={onOpenChange}>
+        <button>Apply</button>
+      </Popover>,
+    );
+    await user.click(screen.getByText('Open'));
+    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    rerender(
+      <Popover trigger={<button>Open</button>} open onOpenChange={onOpenChange}>
+        <button onClick={() => onOpenChange(false)}>Apply</button>
+      </Popover>,
+    );
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  });
 });
+
