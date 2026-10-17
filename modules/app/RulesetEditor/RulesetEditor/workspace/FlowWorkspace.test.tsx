@@ -134,6 +134,32 @@ describe('FlowWorkspace: tabs', () => {
   });
 });
 
+describe('FlowWorkspace: without the tab strip (showTabs={false})', () => {
+  it('draws no tab strip and does not read the saved tab order; the editor and its draft work as with it', () => {
+    localStorage.setItem(TAB_ORDER_KEY, JSON.stringify({ flows: ['night', 'main'] }));
+    const getItem = vi.spyOn(Storage.prototype, 'getItem');
+    const { ref } = setup({ showTabs: false });
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('flow-ftab-main')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'New flow' })).not.toBeInTheDocument();
+    expect(getItem).not.toHaveBeenCalledWith(TAB_ORDER_KEY);
+    getItem.mockRestore();
+    expect(nodeEl('First')).toBeInTheDocument();
+    edit(ref, graph([node('n1', 'logic.step', 'First', 40), node('n2', 'logic.step', 'Second', 300)]));
+    expect(ref.current!.isDirty()).toBe(true);
+  });
+
+  it('still jumps through a link to another flow of the list, through onOpen', async () => {
+    const own = graph([node('out1', 'action.link_out', 'Send alarm', 0, { targets: ['alarm'] })]);
+    const loadFlows = vi.fn(async () => [{ id: 'night', kind: 'flow' as const, name: 'Night', nodes: [node('a1', 'trigger.link_in', 'Alarm in', 0, { name: 'alarm' })] }]);
+    const { onOpen } = setup({ showTabs: false, flow: { id: 'main', kind: 'flow', name: 'Main flow', graph: own }, loadFlows });
+    fireEvent.contextMenu(nodeEl('Send alarm'));
+    fireEvent.click(await within(await screen.findByRole('menu')).findByRole('menuitem', { name: 'Go to the link in' }));
+    await waitFor(() => expect(onOpen).toHaveBeenCalledWith({ kind: 'flow', id: 'night' }, { nodeId: 'a1' }));
+    expect(loadFlows).toHaveBeenCalledWith(['night', 'calc']);
+  });
+});
+
 describe('FlowWorkspace: tab menu', () => {
   it('opens on right click; Rename is for the open tab only', async () => {
     const { onRename, onOpen } = setup();

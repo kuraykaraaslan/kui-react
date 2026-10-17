@@ -27,6 +27,11 @@ focused tab. The per-tab menu offers Open, Rename (the open tab only), Duplicate
 `localStorage` under `kui-ruleset-tab-order`; when storage is blocked the host order is used. A tab is navigation: it calls
 `onOpen`, `onCreate`, `onDuplicate` or `onRename`; nothing is loaded by the workspace itself.
 
+`showTabs={false}` leaves the strip out, for a host that lists, creates, renames, duplicates and exports its flows on a
+page of its own (next-boilerplate's automation editor): the editor shows the open flow only, `tabs` is still the list the
+link jumps search, `onOpen` is called for a link jump alone, and the saved tab order is not read. The draft, the leave
+guard, the link jumps and the merge work as with the strip.
+
 ## Browser draft
 
 One entry per flow or subflow (`kui-ruleset-draft:f:<id>` / `:s:<id>`), written about 0.8 s after the last change. Opening a

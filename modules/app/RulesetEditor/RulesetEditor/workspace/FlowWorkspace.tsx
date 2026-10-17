@@ -37,8 +37,17 @@ export type FlowWorkspaceRef = {
 type EditorProps = Omit<RulesetEditorProps, 'initialNodes' | 'initialEdges' | 'initialGroups' | 'initialSubflows' | 'chainName' | 'bannerSlot' | 'ref'>;
 
 export type FlowWorkspaceProps = EditorProps & {
-  /** every flow and subflow of the host (the open one may be left out until it is saved) */
+  /**
+   * every flow and subflow of the host (the open one may be left out until it is saved). With `showTabs={false}` they
+   * are not drawn and only searched for link jumps
+   */
   tabs: WorkspaceTab[];
+  /**
+   * draw the strip of flow tabs; default true. `false` is for a host that lists, creates, renames, duplicates and exports
+   * its flows on a page of its own: the editor shows the open flow only, and `onOpen` is called for link jumps alone
+   * (`onCreate`, `onDuplicate`, `onRename` and `canCreate` then go unused)
+   */
+  showTabs?: boolean;
   /** the flow in the editor. The workspace loads its graph once: give another flow to open another tab */
   flow: ActiveFlow;
   /** a tab was clicked (or a link jump): show that flow. `nodeId` is a block to select and bring into view */
@@ -106,7 +115,7 @@ export function FlowWorkspace(props: FlowWorkspaceProps) {
 }
 
 function WorkspaceBody({
-  tabs, flow, onOpen, onCreate, onDuplicate, onRename, canCreate = true, loadFlows, loadFlow, conflict, conflictActions, onConflictClose,
+  tabs, showTabs = true, flow, onOpen, onCreate, onDuplicate, onRename, canCreate = true, loadFlows, loadFlow, conflict, conflictActions, onConflictClose,
   onMerged, focusNodeId, onDirtyChange, onChange, draftStore, leaveGuard, onSave, className, nodeMenuItems, ref, ...editorProps
 }: FlowWorkspaceProps) {
   const m = useMessages();
@@ -123,9 +132,9 @@ function WorkspaceBody({
 
   /* ── tabs ── */
   const [order, setOrder] = useState<TabOrder>({});
-  // reads localStorage after hydration, so the server and first client render agree
+  // reads localStorage after hydration, so the server and first client render agree (no strip, nothing to read)
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => setOrder(readTabOrder()), []);
+  useEffect(() => { if (showTabs) setOrder(readTabOrder()); }, [showTabs]);
   const shown = useMemo(() => {
     const list = (kind: FlowKind) => {
       const a = tabs.filter((t) => t.kind === kind);
@@ -217,11 +226,13 @@ function WorkspaceBody({
 
   return (
     <div data-ruleset-workspace className={cn('flex h-full min-h-0 flex-col', FULLSCREEN_CLASSES, className)}>
-      <FlowTabs
-        flows={shown.flows} subflows={shown.subflows} active={flow} dirty={draft.dirty} readOnly={readOnly} canCreate={canCreate}
-        onOpen={open} onCreate={onCreate ? () => { if (leave()) onCreate(); } : undefined} onDuplicate={onDuplicate} onRename={onRename}
-        onExport={(t) => { void exportTab(t); }} onMove={moveTab}
-      />
+      {showTabs && (
+        <FlowTabs
+          flows={shown.flows} subflows={shown.subflows} active={flow} dirty={draft.dirty} readOnly={readOnly} canCreate={canCreate}
+          onOpen={open} onCreate={onCreate ? () => { if (leave()) onCreate(); } : undefined} onDuplicate={onDuplicate} onRename={onRename}
+          onExport={(t) => { void exportTab(t); }} onMove={moveTab}
+        />
+      )}
       <div className="min-h-0 flex-1">
         <RulesetEditor
           {...editorProps}

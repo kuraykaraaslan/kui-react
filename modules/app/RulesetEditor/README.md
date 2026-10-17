@@ -236,7 +236,7 @@ caught link; Data with the context fill bar), driven by host-supplied props. See
 
 `RulesetEditor/workspace/FlowWorkspace.tsx` wraps the editor for a host with many flows: a tab strip (reorder, menu, export),
 a browser draft per flow, link-block jumps across flows and a three-way merge for save conflicts. See
-[docs/workspace.md](docs/workspace.md). Demo: `/theme/iot/rulesets/workspace-demo`. `leaveGuard` (`true`, or a function of `dirty`) turns on a guard against losing a change: a reload or a closed tab asks the browser to confirm and a tab that leaves the flow asks first (`hooks/useLeaveGuard`, which a host can also use for its own links through `confirmLeave()`); off by default.
+[docs/workspace.md](docs/workspace.md). Demo: `/theme/iot/rulesets/workspace-demo`. `showTabs={false}` leaves the tab strip out for a host that manages its flows on a page of its own (link jumps still go through `onOpen`). `leaveGuard` (`true`, or a function of `dirty`) turns on a guard against losing a change: a reload or a closed tab asks the browser to confirm and a tab that leaves the flow asks first (`hooks/useLeaveGuard`, which a host can also use for its own links through `confirmLeave()`); off by default.
 
 ## Tests
 

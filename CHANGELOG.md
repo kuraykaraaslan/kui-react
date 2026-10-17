@@ -6,6 +6,10 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ### Added
 
+- `FlowWorkspace` (RulesetEditor): `showTabs={false}` leaves the flow tab strip out, for a host that lists, creates,
+  renames, duplicates and exports its flows on a page of its own (next-boilerplate's automation editor, which carried a
+  hand-made tab-less copy). `tabs` is still searched for link jumps and `onOpen` is called for them; the draft, leave
+  guard and merge are unchanged, and the saved tab order is not read. Default `true` (no change).
 - `ParamForm` (RulesetEditor): `suggest({ key, spec, values, row? })` gives a text field its suggestions per field and per
   row of a `rules` field (`row` is `{ param, index, values }`), as strings or `{ value, label }`; a list replaces the
   spec's `suggest`, an empty list turns it off. A field's datalist now sits with the field, so a rules row field with its
