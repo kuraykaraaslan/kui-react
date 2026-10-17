@@ -10,7 +10,8 @@ export type AppSidebarNavItem = {
   id: string;
   label: string;
   icon?: React.ReactNode;
-  badge?: number;
+  /** A count (shown when above 0) or any node, e.g. a status `Badge` or a dot. */
+  badge?: number | React.ReactNode;
   href?: string;
 };
 
@@ -21,11 +22,14 @@ export type AppSidebarNavGroup = {
   defaultExpanded?: boolean;
 };
 
-export type AppSidebarFooterRenderContext = {
+export type AppSidebarSlotRenderContext = {
   collapsed: boolean;
 };
 
-type AppSidebarFooter = React.ReactNode | ((context: AppSidebarFooterRenderContext) => React.ReactNode);
+/** Kept for existing imports; the same context now feeds `header` too. */
+export type AppSidebarFooterRenderContext = AppSidebarSlotRenderContext;
+
+type AppSidebarSlot = React.ReactNode | ((context: AppSidebarSlotRenderContext) => React.ReactNode);
 
 type AppSidebarProps = {
   navGroups?: AppSidebarNavGroup[];
@@ -35,7 +39,9 @@ type AppSidebarProps = {
   collapsed?: boolean;
   defaultCollapsed?: boolean;
   onCollapsedChange?: (collapsed: boolean) => void;
-  footer?: AppSidebarFooter;
+  /** Rendered above the nav groups (below the collapse toggle), e.g. a workspace switcher. */
+  header?: AppSidebarSlot;
+  footer?: AppSidebarSlot;
   searchable?: boolean;
   className?: string;
 };
@@ -48,6 +54,7 @@ export function AppSidebar({
   collapsed,
   defaultCollapsed = false,
   onCollapsedChange,
+  header,
   footer,
   searchable = true,
   className,
@@ -97,8 +104,11 @@ export function AppSidebar({
         .filter((g) => g.items.length > 0)
     : rawGroups;
   const footerContent = typeof footer === 'function'
-    ? (footer as (context: AppSidebarFooterRenderContext) => React.ReactNode)({ collapsed: effectiveCollapsed })
+    ? (footer as (context: AppSidebarSlotRenderContext) => React.ReactNode)({ collapsed: effectiveCollapsed })
     : footer;
+  const headerContent = typeof header === 'function'
+    ? (header as (context: AppSidebarSlotRenderContext) => React.ReactNode)({ collapsed: effectiveCollapsed })
+    : header;
 
   const setCollapsed = (next: boolean) => {
     if (collapsed === undefined) {
@@ -140,6 +150,12 @@ export function AppSidebar({
           <FontAwesomeIcon icon={faChevronLeft} className={cn('w-4 h-4 transition-transform', isCollapsed ? 'rotate-180' : '')} aria-hidden="true" />
         </button>
       </div>
+
+      {headerContent != null && (
+        <div className={cn('shrink-0 border-b border-border px-2 py-2', effectiveCollapsed && 'flex justify-center')}>
+          {headerContent}
+        </div>
+      )}
 
       {searchable && !effectiveCollapsed && (
         <div className="px-3 py-2 border-b border-border shrink-0">
@@ -206,8 +222,9 @@ export function AppSidebar({
                   <>
                     {item.icon && <span aria-hidden="true" className="shrink-0 w-5 text-center text-[15px] leading-none">{item.icon}</span>}
                     {!effectiveCollapsed && <span className="flex-1 truncate">{item.label}</span>}
-                    {!effectiveCollapsed && item.badge != null && item.badge > 0 && (
-                      <Badge variant="primary" size="sm">{item.badge}</Badge>
+                    {!effectiveCollapsed && (typeof item.badge === 'number'
+                      ? item.badge > 0 && <Badge variant="primary" size="sm">{item.badge}</Badge>
+                      : item.badge != null && item.badge !== false && <span className="shrink-0">{item.badge}</span>
                     )}
                   </>
                 );

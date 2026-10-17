@@ -113,9 +113,9 @@ export function AppDrawer({
                       {item.icon && <span aria-hidden="true">{item.icon}</span>}
                       {item.label}
                     </span>
-                    {item.badge != null && item.badge > 0 && (
-                      <Badge variant="neutral" size="sm">{item.badge}</Badge>
-                    )}
+                    {typeof item.badge === 'number'
+                      ? item.badge > 0 && <Badge variant="neutral" size="sm">{item.badge}</Badge>
+                      : item.badge != null && item.badge !== false && <span className="shrink-0">{item.badge}</span>}
                   </button>
                 ))}
               </div>

@@ -7,6 +7,7 @@ import { NotificationMenu } from '@/modules/domains/common/notification/Notifica
 import { GlobalSearch } from '@/modules/app/GlobalSearch';
 import { Avatar } from '@/modules/ui/Avatar';
 import { Button } from '@/modules/ui/Button';
+import { Badge } from '@/modules/ui/Badge';
 import { useState, type ComponentProps } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -153,6 +154,57 @@ function AppSidebarExpandedDemo() {
               )}
             </div>
           )}
+        />
+      </div>
+    </div>
+  );
+}
+
+function AppSidebarHeaderDemo() {
+  const [activeId, setActiveId] = useState('dashboard');
+  const groups = [
+    {
+      label: 'Main',
+      items: [
+        { id: 'dashboard', label: 'Dashboard', icon: <FontAwesomeIcon icon={faHouse} className="w-3 h-3" /> },
+        { id: 'analytics', label: 'Analytics', icon: <FontAwesomeIcon icon={faChartBar} className="w-3 h-3" />, badge: 3 },
+        { id: 'team', label: 'Team', icon: <FontAwesomeIcon icon={faUsers} className="w-3 h-3" />, badge: <Badge variant="warning" size="sm" dot>Beta</Badge> },
+      ],
+    },
+  ];
+  return (
+    <div className="flex justify-center py-4">
+      <div className="border border-border rounded-xl overflow-hidden bg-surface-raised flex" style={{ height: 320 }}>
+        <AppSidebar
+          navGroups={groups}
+          activeId={activeId}
+          onSelect={setActiveId}
+          searchable={false}
+          header={({ collapsed }) => (
+            <div className={collapsed ? 'flex justify-center' : 'flex items-center gap-2 px-1'}>
+              <Avatar name="Acme Corp" size="sm" />
+              {!collapsed && <span className="text-xs font-semibold text-text-primary truncate">Acme Corp</span>}
+            </div>
+          )}
+        />
+      </div>
+    </div>
+  );
+}
+
+function AppTopBarRegionsDemo() {
+  return (
+    <div className="border border-border rounded-xl overflow-hidden">
+      <div className="flex items-center h-14 px-4 bg-surface-raised">
+        <AppTopBar
+          logo={<span className="font-black text-primary text-lg">Acme</span>}
+          start={<Badge variant="neutral" size="sm">Production</Badge>}
+          end={[
+            { id: 'user', order: 100, node: <UserMenu user={DEMO_USER} onlyAvatar /> },
+            { id: 'notifications', order: 10, node: <NotificationMenuDemo /> },
+            { id: 'help', node: <Button variant="ghost" size="sm">Help</Button> },
+            { id: 'calls', order: 20, hidden: true, node: <Button variant="ghost" size="sm">Calls</Button> },
+          ]}
         />
       </div>
     </div>
@@ -325,7 +377,7 @@ export function AppShell({ logo, compactLogo, sidebarCollapsed = false, sidebar,
       title: 'AppSidebar',
       category: 'App',
       abbr: 'Ab',
-      description: 'Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter and a footer slot can host a user block or any content.',
+      description: 'Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter; a header slot (above the nav groups) and a footer slot can host a workspace switcher, a user block or any content. Item badges take a count or any node.',
       filePath: 'modules/app/AppSidebar.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -425,6 +477,18 @@ export function AppSidebar({ navGroups, navItems, activeId, onSelect, collapsed,
   defaultCollapsed
 />`,
         },
+        {
+          title: 'Header + node badges',
+          layout: 'stack' as const,
+          preview: <AppSidebarHeaderDemo />,
+          code: `<AppSidebar
+  navGroups={[{ label: 'Main', items: [
+    { id: 'analytics', label: 'Analytics', badge: 3 },                                       // a count
+    { id: 'team', label: 'Team', badge: <Badge variant="warning" size="sm" dot>Beta</Badge> }, // any node
+  ] }]}
+  header={({ collapsed }) => <WorkspaceSwitcher compact={collapsed} />}   // above the nav groups
+/>`,
+        },
       ],
     },
     {
@@ -432,7 +496,7 @@ export function AppSidebar({ navGroups, navItems, activeId, onSelect, collapsed,
       title: 'AppTopBar',
       category: 'App',
       abbr: 'AT',
-      description: 'Top bar wrapper passed into AppShell\'s header slot. The logo slot anchors the left side while children (GlobalSearch, UserMenu, Button, etc.) are arranged in a flex row.',
+      description: 'Top bar wrapper passed into AppShell\'s header slot. The logo slot anchors the left side while children (GlobalSearch, UserMenu, Button, etc.) are arranged in a flex row. Named regions `start` (after the logo) and `end` (pushed to the far end) take a node or ordered `{ id, node, order, hidden }` items, for controls other modules contribute.',
       filePath: 'modules/app/AppTopBar.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -473,6 +537,21 @@ export function AppTopBar({ logo, children, className, ...rest }) {
     <UserMenu user={currentUser} />
   </div>
 </AppTopBar>`,
+        },
+        {
+          title: 'Regions: start + ordered end items',
+          layout: 'stack' as const,
+          preview: <AppTopBarRegionsDemo />,
+          code: `// Contributed controls arrive as ordered items; hidden ones are left out.
+<AppTopBar
+  logo={<Logo />}
+  start={<EnvironmentBadge />}
+  end={[
+    { id: 'notifications', order: 10, node: <NotificationBell /> },
+    { id: 'calls', order: 20, node: <PresenceToggle />, hidden: !telephonyEnabled },
+    { id: 'user', order: 100, node: <UserMenu user={currentUser} /> },
+  ]}
+/>`,
         },
       ],
     },
