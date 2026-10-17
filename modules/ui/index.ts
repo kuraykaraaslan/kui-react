@@ -91,7 +91,7 @@ export { Stepper } from './Stepper';
 export type { StepItem } from './Stepper';
 export { TabButton } from './TabButton';
 export { TabGroup } from './TabGroup';
-export type { Tab } from './TabGroup';
+export type { Tab, TabErrorContext } from './TabGroup';
 export { Table } from './Table';
 export type { TableColumn } from './Table';
 export { TagInput } from './TagInput';

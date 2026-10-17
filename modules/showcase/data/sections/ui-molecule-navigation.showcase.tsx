@@ -3,12 +3,38 @@ import { Badge } from '@/modules/ui/Badge';
 import { Pagination } from '@/modules/ui/Pagination';
 import { Breadcrumb } from '@/modules/ui/Breadcrumb';
 import { TabGroup } from '@/modules/ui/TabGroup';
+import { Button } from '@/modules/ui/Button';
 import { Stepper } from '@/modules/ui/Stepper';
 import { TreeView } from '@/modules/ui/TreeView';
 import { TabButton } from '@/modules/ui/TabButton';
 import { ViewToggle, type ViewOrientation } from '@/modules/ui/ViewToggle';
 import { useEffect, useState } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
+
+function BrokenCallLog(): React.ReactNode {
+  throw new Error('telephony is unreachable');
+}
+
+function IsolatedTabsDemo() {
+  const [reports, setReports] = useState<string[]>([]);
+  return (
+    <div className="w-full space-y-2">
+      <TabGroup
+        label="Contact"
+        isolate
+        onTabError={(tabId, error) => setReports((r) => [...r, `${tabId}: ${error.message}`])}
+        tabs={[
+          // Contributed tabs carry an order; the host's own tabs (no order) count as 0 and stay first.
+          { id: 'calls', label: 'Calls', order: 20, lazy: true, content: <BrokenCallLog /> },
+          { id: 'overview', label: 'Overview', content: <p className="text-sm text-text-secondary">Host tab: contact details.</p> },
+          { id: 'tasks', label: 'Tasks', order: 10, lazy: true, content: <p className="text-sm text-text-secondary">Contributed by the tasks module.</p> },
+        ]}
+      />
+      <p className="text-xs text-text-disabled">Reported: {reports.length ? reports.join(', ') : 'nothing yet (open Calls)'}</p>
+      <Button size="xs" variant="ghost" onClick={() => setReports([])}>Clear log</Button>
+    </div>
+  );
+}
 
 function TabButtonDemo() {
   const [tab, setTab] = useState<'all' | 'active' | 'archived'>('all');
@@ -197,7 +223,7 @@ export function Pagination({ page, totalPages, onPageChange, className }) {
       title: 'TabGroup',
       category: 'Organism',
       abbr: 'Tg',
-      description: 'Accessible tab navigation following the role="tablist" / role="tab" / role="tabpanel" ARIA pattern. Arrow-key navigation; tabIndex=-1 on inactive tabs.',
+      description: 'Accessible tab navigation following the role="tablist" / role="tab" / role="tabpanel" ARIA pattern. Arrow-key navigation; tabIndex=-1 on inactive tabs. Optional per-tab isolation (error boundary + Suspense), `order` and per-tab `lazy` for tabs other modules contribute.',
       filePath: 'modules/ui/TabGroup.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -293,6 +319,22 @@ export function TabGroup({ tabs, defaultTab, label = 'Tabs', className }) {
             return <LazyDemo />;
           })(),
           code: `// With lazy=true, panel content is only rendered when first activated:\n<TabGroup lazy tabs={[\n  { id: 'heavy', label: 'Heavy', content: <HeavyComponent /> },\n]} />`,
+        },
+        {
+          title: 'Contributed tabs: isolate + order',
+          layout: 'stack' as const,
+          preview: <IsolatedTabsDemo />,
+          code: `// Each isolated panel sits in an error boundary + Suspense: a throwing tab shows a
+// "failed" placeholder with Retry (or renderError), the others keep working.
+<TabGroup
+  isolate
+  onTabError={(tabId, error) => report(tabId, error)}
+  tabs={[
+    { id: 'overview', label: 'Overview', content: <Overview /> },             // host: order 0
+    { id: 'tasks', label: 'Tasks', order: 10, lazy: true, content: <Tasks /> },
+    { id: 'calls', label: 'Calls', order: 20, lazy: true, content: <CallLog /> },
+  ]}
+/>`,
         },
       ],
     },
