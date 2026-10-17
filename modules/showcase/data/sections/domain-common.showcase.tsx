@@ -243,6 +243,23 @@ function UserMenuCustomDemo() {
   );
 }
 
+function UserMenuContributedDemo() {
+  return (
+    <div className="flex items-center justify-center p-8">
+      <UserMenu
+        user={ADMIN_USER}
+        profileHref="#profile"
+        extraItems={[
+          { id: 'dnd', label: 'Do not disturb', group: 'status', order: 10 },
+          { id: 'preferences', label: 'Preferences' },
+          { id: 'switch-tenant', label: 'Switch workspace', group: 'workspace', order: 600 },
+          { id: 'stop-impersonating', label: 'Stop impersonating', group: 'session', order: 900, hidden: true },
+        ]}
+      />
+    </div>
+  );
+}
+
 /* ─── PriceDisplay ─── */
 function PriceDisplaySizesDemo() {
   return (
@@ -724,7 +741,7 @@ import { UserStatusBadge } from '@/modules/domains/common/user/UserStatusBadge';
       title: 'UserMenu',
       category: 'Domain',
       abbr: 'UM',
-      description: 'Avatar + name + role trigger. Dropdown with Profile, Settings, and Sign out items. Closes on outside click.',
+      description: 'Avatar + name + role trigger. Dropdown with Profile, Settings, and Sign out items (hrefs, handlers and labels configurable). `extraItems` (or `items` + `mergeItems`) merge contributed items with the defaults, placed by group and order. Closes on outside click.',
       filePath: 'modules/domains/common/user/UserMenu.tsx',
       sourceCode: `'use client';
 import { UserMenu } from '@/modules/domains/common/user/UserMenu';
@@ -733,6 +750,7 @@ import { UserMenu } from '@/modules/domains/common/user/UserMenu';
       variants: [
         { title: 'Admin user', preview: <UserMenuAdminDemo />, code: `<UserMenu user={{ userId: 'u1', email: 'admin@acme.com', userRole: 'ADMIN', userStatus: 'ACTIVE', userProfile: { name: 'Jane Doe', profilePicture: null } }} />` },
         { title: 'Custom items', preview: <UserMenuCustomDemo />, code: `<UserMenu user={authorUser} items={[\n  { type: 'item', label: 'My Posts', icon: '📝' },\n  { type: 'separator' },\n  { type: 'item', label: 'Sign Out', icon: '↩️', danger: true },\n]} />` },
+        { title: 'Contributed items (merged)', preview: <UserMenuContributedDemo />, code: `// extraItems merge with Profile / Settings / Sign out instead of replacing them.\n// No group: joins the account items. No order: after them, before sign out (order 1000).\n<UserMenu\n  user={currentUser}\n  profileHref="/me"\n  onSignOut={signOut}\n  extraItems={[\n    { id: 'dnd', label: 'Do not disturb', group: 'status', order: 10 },\n    { id: 'preferences', label: 'Preferences' },\n    { id: 'switch-tenant', label: 'Switch workspace', group: 'workspace', order: 600 },\n    { id: 'stop-impersonating', label: 'Stop impersonating', group: 'session', order: 900, hidden: !impersonating },\n  ]}\n/>` },
       ],
     },
     {

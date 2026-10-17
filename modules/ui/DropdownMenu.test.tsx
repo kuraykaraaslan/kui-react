@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DropdownMenu, type DropdownItem } from './DropdownMenu';
+import { DropdownMenu, arrangeMenuItems, mergeMenuItems, type DropdownItem } from './DropdownMenu';
 
 const ITEMS: DropdownItem[] = [
   { label: 'Edit', onClick: vi.fn() },
@@ -109,5 +109,100 @@ describe('DropdownMenu', () => {
     screen.getByRole('menuitem', { name: 'Delete' }).focus();
     await user.tab();
     expect(screen.getByRole('menuitem', { name: 'Edit' })).toHaveFocus();
+  });
+
+  describe('contributed items', () => {
+    async function open(items: DropdownItem[], extra: Partial<React.ComponentProps<typeof DropdownMenu>> = {}) {
+      const user = userEvent.setup();
+      render(<DropdownMenu trigger={<button>Options</button>} items={items} {...extra} />);
+      await user.click(screen.getByText('Options'));
+      return user;
+    }
+
+    it('hidden items are left out, with no stray separators', async () => {
+      await open([
+        { label: 'Edit' },
+        { type: 'separator' },
+        { label: 'Call', hidden: true },
+        { type: 'separator' },
+        { label: 'Delete', danger: true },
+      ]);
+      expect(screen.queryByRole('menuitem', { name: 'Call' })).not.toBeInTheDocument();
+      expect(screen.getAllByRole('separator')).toHaveLength(1);
+    });
+
+    it('orders items by group and order, with a separator between groups', async () => {
+      await open([
+        { id: 'sign-out', label: 'Sign out', group: 'session', order: 1000 },
+        { id: 'profile', label: 'Profile', group: 'account', order: 100 },
+        { type: 'separator' },
+        { id: 'dnd', label: 'Do not disturb', group: 'status', order: 50 },
+        { id: 'settings', label: 'Settings', group: 'account', order: 200 },
+      ]);
+      expect(screen.getAllByRole('menuitem').map((i) => i.textContent)).toEqual(['Do not disturb', 'Profile', 'Settings', 'Sign out']);
+      expect(screen.getAllByRole('separator')).toHaveLength(2);
+    });
+
+    it('an item with href renders as a link and still closes the menu', async () => {
+      const onClick = vi.fn();
+      const user = await open([{ id: 'docs', label: 'Docs', href: '#docs', onClick }]);
+      const link = screen.getByRole('menuitem', { name: 'Docs' });
+      expect(link.tagName).toBe('A');
+      expect(link).toHaveAttribute('href', '#docs');
+      expect(link).toHaveAttribute('data-item-id', 'docs');
+      await user.click(link);
+      expect(onClick).toHaveBeenCalledTimes(1);
+      expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    });
+
+    it('a disabled item with href is a disabled button, never a link', async () => {
+      await open([{ label: 'Docs', href: '/docs', disabled: true }]);
+      const item = screen.getByRole('menuitem', { name: 'Docs' });
+      expect(item.tagName).toBe('BUTTON');
+      expect(item).toBeDisabled();
+    });
+
+    it('disabledReason shows under a disabled item and describes it', async () => {
+      await open([{ label: 'Archive', disabled: true, disabledReason: 'Only owners can archive' }]);
+      const item = screen.getByRole('menuitem', { name: 'Archive' });
+      expect(item).toHaveAccessibleDescription('Only owners can archive');
+      expect(item).toHaveAttribute('title', 'Only owners can archive');
+      expect(screen.getByText('Only owners can archive')).toBeInTheDocument();
+    });
+
+    it('disabledReason is ignored while the item is enabled', async () => {
+      await open([{ label: 'Archive', disabledReason: 'Only owners can archive' }]);
+      expect(screen.queryByText('Only owners can archive')).not.toBeInTheDocument();
+    });
+
+    it('portal renders the open menu in document.body, outside the trigger container', async () => {
+      const user = userEvent.setup();
+      const onClick = vi.fn();
+      const { container } = render(
+        <DropdownMenu portal align="right" trigger={<button>Options</button>} items={[{ label: 'Edit', onClick }]} />,
+      );
+      await user.click(screen.getByText('Options'));
+      const menu = screen.getByRole('menu');
+      expect(container.contains(menu)).toBe(false);
+      expect(menu.className).toContain('fixed');
+      // A click inside the portalled menu is not an outside click.
+      await user.click(screen.getByRole('menuitem', { name: 'Edit' }));
+      expect(onClick).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('arrangeMenuItems / mergeMenuItems', () => {
+    it('leaves a list without group or order exactly as it is', () => {
+      const items: DropdownItem[] = [{ label: 'A' }, { type: 'separator' }, { label: 'B' }];
+      expect(arrangeMenuItems(items)).toEqual(items);
+    });
+
+    it('mergeMenuItems replaces by id in place and appends the rest', () => {
+      const merged = mergeMenuItems(
+        [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }],
+        [{ id: 'b', label: 'B2' }, { id: 'c', label: 'C' }, { label: 'No id' }],
+      );
+      expect(merged.map((i) => (i.type === 'separator' ? '-' : i.label))).toEqual(['A', 'B2', 'C', 'No id']);
+    });
   });
 });
