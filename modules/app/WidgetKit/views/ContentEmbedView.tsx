@@ -5,6 +5,7 @@ import { cssColor } from '../settings/style';
 import type { WidgetKindView, WidgetViewProps } from '../kind';
 import { EMBED_REFERRER_POLICY, embedSandbox, resolveEmbedUrl } from './content-logic';
 import { Meta } from './ui';
+import { useWidgetKit } from '../WidgetKitContext';
 
 type S = {
   url?: string;
@@ -41,20 +42,24 @@ function useReloadTick(seconds: unknown): number {
  * `content.embed`: an external page in a hardened frame. The URL passes `resolveEmbedUrl` (https only,
  * no credentials, default port, no private / loopback / single-label host); the frame is sandboxed
  * without `allow-same-origin` (opaque origin; a setting may only switch permissions off), sends no
- * referrer and loads lazily. A refused URL renders an explanation, never a frame. Whether the SITE
+ * referrer and loads lazily. When the host names the sites it allows (`WidgetKitHost.embedHosts`), a
+ * site not on that list is refused too. A refused URL renders an explanation, never a frame. Whether the SITE
  * allows framing cannot be read from a sandboxed cross-origin frame, so the address bar says what a
  * blank frame means and offers the page in a new tab.
  */
 export function ContentEmbedView({ settings, title }: WidgetViewProps) {
   const s = settings as S;
-  const result = useMemo(() => resolveEmbedUrl(s.url), [s.url]);
+  const { embedHosts } = useWidgetKit();
+  const result = useMemo(() => resolveEmbedUrl(s.url, embedHosts), [s.url, embedHosts]);
   const tick = useReloadTick(s.refreshSeconds);
   if (!result.ok) {
     return (
       <p className="flex h-full items-center justify-center p-4 text-center text-sm text-text-secondary">
         {result.reason === 'empty'
           ? 'Set a page address in this widget’s settings.'
-          : 'This address cannot be embedded. Use a public https address.'}
+          : result.reason === 'notAllowed'
+            ? `Pages from ${result.host} may not be embedded here. An administrator can add the site to the allowed embed sites.`
+            : 'This address cannot be embedded. Use a public https address.'}
       </p>
     );
   }

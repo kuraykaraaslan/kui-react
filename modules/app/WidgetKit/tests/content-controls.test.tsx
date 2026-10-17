@@ -21,7 +21,8 @@ import { CONTROL_BUTTON_VIEW } from '../views/ControlButtonView';
 import { CONTROL_SWITCH_VIEW } from '../views/ControlSwitchView';
 import { CONTROL_SLIDER_VIEW } from '../views/ControlSliderView';
 import { CONTROL_SETPOINT_VIEW } from '../views/ControlSetpointView';
-import { EMBED_SANDBOX, embedSandbox, resolveEmbedUrl, resolveLink } from '../views/content-logic';
+import { EMBED_SANDBOX, embedHostAllowed, embedSandbox, normalizeEmbedHost, resolveEmbedUrl, resolveLink } from '../views/content-logic';
+import { WidgetKitProvider } from '../WidgetKitContext';
 import { buttonLookOf } from '../views/ControlButtonView';
 import { footerKeys, keyLabel } from '../views/ContentMarkdownView';
 import { imageFilter } from '../views/ContentImageView';
@@ -380,6 +381,40 @@ describe('host hooks', () => {
 
 describe('embed settings', () => {
   const url = 'https://www.openstreetmap.org/export/embed.html?bbox=1,2,3,4';
+  it('an allow-list entry is a public hostname or a subdomain wildcard, nothing else', () => {
+    expect(normalizeEmbedHost(' Grafana.Example.COM. ')).toBe('grafana.example.com');
+    expect(normalizeEmbedHost('*.openstreetmap.org')).toBe('*.openstreetmap.org');
+    for (const bad of ['*', '*.com', 'https://grafana.com', 'grafana.com:443', 'grafana.com/d', '8.8.8.8', 'intranet', 'nas.local', '-a.com', 'a..com', 42, '']) {
+      expect(normalizeEmbedHost(bad), String(bad)).toBeNull();
+    }
+  });
+  it('a wildcard matches subdomains only; an exact entry matches only itself; an empty list matches nothing', () => {
+    const list = ['grafana.com', '*.openstreetmap.org', 'not a host'];
+    expect(embedHostAllowed('grafana.com', list)).toBe(true);
+    expect(embedHostAllowed('GRAFANA.com.', list)).toBe(true);
+    expect(embedHostAllowed('play.grafana.com', list)).toBe(false);
+    expect(embedHostAllowed('www.openstreetmap.org', list)).toBe(true);
+    expect(embedHostAllowed('openstreetmap.org', list)).toBe(false);
+    expect(embedHostAllowed('evilopenstreetmap.org', list)).toBe(false);
+    expect(embedHostAllowed('grafana.com', [])).toBe(false);
+  });
+  it('the gate refuses a site off the list, and no list keeps the old behaviour', () => {
+    expect(resolveEmbedUrl(url, ['grafana.com'])).toEqual({ ok: false, reason: 'notAllowed', host: 'www.openstreetmap.org' });
+    expect(resolveEmbedUrl(url, []).ok).toBe(false);
+    expect(resolveEmbedUrl(url, ['*.openstreetmap.org']).ok).toBe(true);
+    expect(resolveEmbedUrl(url).ok).toBe(true);
+    // The private-host gate still comes first.
+    expect(resolveEmbedUrl('https://10.0.0.1/', ['10.0.0.1'])).toEqual({ ok: false, reason: 'host' });
+  });
+  it('a card whose site the host does not allow frames nothing and names the site', () => {
+    const { container } = render(
+      <WidgetKitProvider value={{ embedHosts: ['grafana.com'] }}>
+        <CONTENT_EMBED_VIEW.View {...props(CONTENT_EMBED, { settings: { url } })} />
+      </WidgetKitProvider>,
+    );
+    expect(container.querySelector('iframe')).toBeNull();
+    expect(screen.getByText(/Pages from www\.openstreetmap\.org may not be embedded here/)).toBeInTheDocument();
+  });
   it('the sandbox can only lose permissions, never gain same-origin or top navigation', () => {
     expect(embedSandbox(undefined)).toBe(EMBED_SANDBOX);
     expect(embedSandbox(['scripts'])).toBe('allow-scripts');

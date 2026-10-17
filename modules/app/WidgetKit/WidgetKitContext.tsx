@@ -10,6 +10,12 @@ export interface WidgetKitHost {
   fieldOverrides?: FieldOverrides;
   /** Locale for numbers and dates; defaults to the browser's. */
   locale?: string;
+  /**
+   * The sites a `content.embed` card may frame: hostnames, or `*.example.com` for its subdomains
+   * (`normalizeEmbedHost`). Absent = no list (only the public-https gate applies); an empty list
+   * allows no embed at all. A refused card says which site was refused and frames nothing.
+   */
+  embedHosts?: readonly string[];
 }
 
 const Ctx = createContext<WidgetKitHost>({});

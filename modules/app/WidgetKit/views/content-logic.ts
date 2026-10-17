@@ -59,7 +59,9 @@ export function hostImageSrc(raw: unknown, resolveUrl?: (url: string) => string)
 
 export type EmbedResult =
   | { ok: true; url: string; host: string }
-  | { ok: false; reason: 'empty' | 'invalid' | 'scheme' | 'credentials' | 'host' | 'port' };
+  | { ok: false; reason: 'empty' | 'invalid' | 'scheme' | 'credentials' | 'host' | 'port' }
+  /** The address is a valid public one, but the host's allow-list does not name its site. */
+  | { ok: false; reason: 'notAllowed'; host: string };
 
 function ipv4Blocked(h: string): boolean {
   const p = h.split('.').map(Number);
@@ -100,7 +102,7 @@ export function isPrivateHostname(hostname: string): boolean {
  * an internal address (admin consoles, router pages, metadata endpoints) or a credentialed URL.
  * Hence: `https:` only, no `user:pass@`, default port only, no private/loopback/link-local/single-label host.
  */
-export function resolveEmbedUrl(raw: unknown): EmbedResult {
+export function resolveEmbedUrl(raw: unknown, allowedHosts?: readonly string[]): EmbedResult {
   if (typeof raw !== 'string' || !raw.trim()) return { ok: false, reason: 'empty' };
   const v = raw.trim();
   if (v.length > 2048 || CONTROL.test(v)) return { ok: false, reason: 'invalid' };
@@ -110,7 +112,41 @@ export function resolveEmbedUrl(raw: unknown): EmbedResult {
   if (u.username || u.password) return { ok: false, reason: 'credentials' };
   if (u.port && u.port !== '443') return { ok: false, reason: 'port' };
   if (isPrivateHostname(u.hostname)) return { ok: false, reason: 'host' };
+  if (allowedHosts && !embedHostAllowed(u.hostname, allowedHosts)) return { ok: false, reason: 'notAllowed', host: u.hostname };
   return { ok: true, url: u.toString(), host: u.hostname };
+}
+
+const LABEL = /^(?!-)[a-z0-9-]{1,63}(?<!-)$/;
+
+/**
+ * One allow-list entry, normalised: a public hostname (`grafana.example.com`) or a wildcard for its
+ * subdomains (`*.example.com`, which does NOT match `example.com` itself). Case and a trailing dot are
+ * dropped; anything else (a scheme, port, path, IP address, private or single-label name, a bare `*`)
+ * is `null`. Hosts are named, never addresses: an IP entry would allow whatever answers on it.
+ */
+export function normalizeEmbedHost(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null;
+  const v = raw.trim().toLowerCase().replace(/\.$/, '');
+  const wild = v.startsWith('*.');
+  const name = wild ? v.slice(2) : v;
+  if (!name || name.length > 253) return null;
+  const labels = name.split('.');
+  if (labels.length < 2 || !labels.every((l) => LABEL.test(l))) return null;
+  if (/^\d+$/.test(labels[labels.length - 1]) || isPrivateHostname(name)) return null;
+  return wild ? `*.${name}` : name;
+}
+
+/**
+ * Whether `hostname` is on the allow-list. Entries go through `normalizeEmbedHost` (an invalid one
+ * allows nothing); an empty list allows nothing.
+ */
+export function embedHostAllowed(hostname: string, allowed: readonly string[]): boolean {
+  const h = hostname.toLowerCase().replace(/\.$/, '');
+  return allowed.some((raw) => {
+    const e = normalizeEmbedHost(raw);
+    if (!e) return false;
+    return e.startsWith('*.') ? h.endsWith(e.slice(1)) : h === e;
+  });
 }
 
 /**

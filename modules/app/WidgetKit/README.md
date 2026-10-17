@@ -22,7 +22,7 @@ WidgetCard.tsx        the frame: title row, buttons, body states, stale, footer
 PlacementCard.tsx     one placement: resolved settings + WidgetCard + view, full screen, CSV
 WidgetSettingsEditor.tsx  tabs (Display, Data, Card, Actions), Basic/Advanced, read-only newer parts
 WidgetBoard.tsx       a whole board: grid, edit mode, card + board settings, export/import
-WidgetKitContext.tsx  host hooks: icon resolver, field overrides, locale
+WidgetKitContext.tsx  host hooks: icon resolver, field overrides, locale, embed site allow-list (`embedHosts`)
 ```
 
 ## Rules
