@@ -15,6 +15,7 @@ export type {
   MapMarker,
   MapZone,
   MapRoute,
+  MapImage,
   MapBounds,
   MapProviderId,
   MapViewProps,

@@ -1,7 +1,8 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { cn } from '@/libs/utils/cn';
-import { MapCanvas, type MapMarker, type MapRoute, type MapTilesConfig, type MapZone } from '@/modules/ui/MapView';
+import { MapCanvas, type MapImage, type MapMarker, type MapRoute, type MapTilesConfig, type MapZone } from '@/modules/ui/MapView';
+import { hostImageSrc } from './content-logic';
 import { cssColor, rangeFor, type ColorRange, type RangeEdges } from '../settings/style';
 import type { Sparse } from '../settings/types';
 import type { SlotData, WidgetKindView, WidgetViewProps } from '../kind';
@@ -100,8 +101,9 @@ function rowColor(row: Row, s: S): string | undefined {
  * 0,0. A link is attached only when the template is an internal path (checked before expansion,
  * values URL-encoded). Capped at `MAX_MARKERS`.
  */
-export function buildMarkers(slot: SlotData | undefined, settings: Sparse, locale?: string): BuiltMarkers {
+export function buildMarkers(slot: SlotData | undefined, settings: Sparse, locale?: string, image: MapImage | null = null): BuiltMarkers {
   const s = settings as S;
+  const valid = onMap(image);
   const declared = declaredColumns(slot);
   const lat = s.latColumn || 'lat';
   const lng = s.lngColumn || 'lng';
@@ -114,7 +116,7 @@ export function buildMarkers(slot: SlotData | undefined, settings: Sparse, local
     if (markers.length >= MAX_MARKERS) return;
     const la = num(row[lat]);
     const ln = num(row[lng]);
-    if (la === null || ln === null || Math.abs(la) > 90 || Math.abs(ln) > 180) return;
+    if (la === null || ln === null || !valid(la, ln)) return;
     const rawId = s.idColumn && row[s.idColumn] != null && row[s.idColumn] !== '' ? String(row[s.idColumn]) : String(i);
     const id = rows.has(rawId) ? `${rawId}#${i}` : rawId;
     rows.set(id, row);
@@ -226,10 +228,24 @@ export type MapWidgetViewProps = WidgetViewProps & {
   layerLabels?: { layers?: string; markers?: string; zones?: string; routes?: string };
 };
 
+/** The picture of an image map (internal path or https, rewritten by the host), or null for a geographic map. */
+export function mapImage(settings: Sparse, resolveUrl?: (url: string) => string): MapImage | null {
+  const s = settings as Record<string, unknown>;
+  if (s.mapKind !== 'image') return null;
+  const w = s.imageWidth; const h = s.imageHeight;
+  if (typeof w !== 'number' || typeof h !== 'number' || !(w > 0) || !(h > 0)) return null;
+  const url = hostImageSrc(s.imageSrc, resolveUrl);
+  return url ? { url, width: w, height: h } : null;
+}
+
+/** Is a position on the map: within the picture on an image map, a valid latitude / longitude otherwise. */
+const onMap = (image: MapImage | null) => (y: number, x: number) =>
+  image ? y >= 0 && y <= image.height && x >= 0 && x <= image.width : Math.abs(y) <= 90 && Math.abs(x) <= 180;
+
 const VARIANTS = new Set<MapZone['variant']>(['primary', 'info', 'success', 'warning', 'error', 'neutral']);
 
 /** A list of [lat, lng] pairs from a cell: an array, or that array as JSON text; null when it is not one. */
-export function readPositions(cell: unknown): [number, number][] | null {
+export function readPositions(cell: unknown, valid: (y: number, x: number) => boolean = onMap(null)): [number, number][] | null {
   let v = cell;
   if (typeof v === 'string') { try { v = JSON.parse(v); } catch { return null; } }
   if (!Array.isArray(v)) return null;
@@ -237,21 +253,21 @@ export function readPositions(cell: unknown): [number, number][] | null {
   for (const p of v) {
     if (!Array.isArray(p) || p.length < 2) return null;
     const lat = Number(p[0]); const lng = Number(p[1]);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || !valid(lat, lng)) return null;
     out.push([lat, lng]);
   }
   return out;
 }
 
 /** The zones a slot's rows describe (rows without three valid corners are skipped). */
-export function buildZones(slot: SlotData | undefined, settings: Sparse): MapZone[] {
+export function buildZones(slot: SlotData | undefined, settings: Sparse, image: MapImage | null = null): MapZone[] {
   const s = settings as Record<string, unknown>;
   const col = (k: string, d: string) => (typeof s[k] === 'string' && s[k] ? (s[k] as string) : d);
   const fixed = VARIANTS.has(s.zoneVariant as MapZone['variant']) ? (s.zoneVariant as MapZone['variant']) : 'info';
   const opacity = typeof s.zoneOpacity === 'number' ? s.zoneOpacity : 0.2;
   const out: MapZone[] = [];
   (slot?.rows ?? []).forEach((row, n) => {
-    const positions = readPositions(row[col('zonePositionsColumn', 'positions')]);
+    const positions = readPositions(row[col('zonePositionsColumn', 'positions')], onMap(image));
     if (!positions || positions.length < 3) return;
     const label = row[col('zoneLabelColumn', 'name')];
     const v = typeof s.zoneVariantColumn === 'string' && s.zoneVariantColumn ? String(row[s.zoneVariantColumn] ?? '') : '';
@@ -265,14 +281,14 @@ export function buildZones(slot: SlotData | undefined, settings: Sparse): MapZon
 }
 
 /** The routes a slot's rows describe (rows without two valid points are skipped). */
-export function buildRoutes(slot: SlotData | undefined, settings: Sparse): MapRoute[] {
+export function buildRoutes(slot: SlotData | undefined, settings: Sparse, image: MapImage | null = null): MapRoute[] {
   const s = settings as Record<string, unknown>;
   const col = (k: string, d: string) => (typeof s[k] === 'string' && s[k] ? (s[k] as string) : d);
   const color = cssColor(s.routeColor) ?? 'var(--primary)';
   const weight = typeof s.routeWeight === 'number' ? s.routeWeight : 3;
   const out: MapRoute[] = [];
   (slot?.rows ?? []).forEach((row, n) => {
-    const positions = readPositions(row[col('routePositionsColumn', 'positions')]);
+    const positions = readPositions(row[col('routePositionsColumn', 'positions')], onMap(image));
     if (!positions || positions.length < 2) return;
     const label = row[col('routeLabelColumn', 'name')];
     out.push({
@@ -285,13 +301,14 @@ export function buildRoutes(slot: SlotData | undefined, settings: Sparse): MapRo
 
 /** `map`: bound rows as markers on a card-less map that fills the card, with an optional colour legend. */
 export function MapWidgetView({
-  settings, data, locale, renderLink, onMarkerClick, onNavigate, tiles, loadingLabel, ariaLabel, legendLabel = 'Legend', layerLabels,
+  settings, data, locale, renderLink, onMarkerClick, onNavigate, tiles, loadingLabel, ariaLabel, legendLabel = 'Legend', layerLabels, resolveUrl,
 }: MapWidgetViewProps) {
   const s = settings as S;
-  const { markers, rows } = useMemo(() => buildMarkers(data.points, settings, locale), [data.points, settings, locale]);
+  const image = useMemo(() => mapImage(settings, resolveUrl), [settings, resolveUrl]);
+  const { markers, rows } = useMemo(() => buildMarkers(data.points, settings, locale, image), [data.points, settings, locale, image]);
   const legend = useMemo(() => (s.legend === false ? [] : mapLegend(data.points, settings)), [data.points, settings, s.legend]);
-  const zones = useMemo(() => buildZones(data.zones, settings), [data.zones, settings]);
-  const routes = useMemo(() => buildRoutes(data.routes, settings), [data.routes, settings]);
+  const zones = useMemo(() => buildZones(data.zones, settings, image), [data.zones, settings, image]);
+  const routes = useMemo(() => buildRoutes(data.routes, settings, image), [data.routes, settings, image]);
   // The layer switch (20.3d): which layers are on. Hidden ones still frame the view, so switching never moves the map.
   const [shown, setShown] = useState({ markers: true, zones: true, routes: true });
   const layers = ([['markers', markers.length], ['zones', zones.length], ['routes', routes.length]] as const).filter(([, n]) => n > 0).map(([k]) => k);
@@ -333,6 +350,7 @@ export function MapWidgetView({
         showMarkers={shown.markers}
         showZones={shown.zones}
         showRoutes={shown.routes}
+        {...(image ? { image } : {})}
         tiles={tileSet}
         fitBounds={fit}
         fitBoundsPadding={typeof s.fitPadding === 'number' ? s.fitPadding : 32}
@@ -398,8 +416,12 @@ export function MapWidgetView({
 
 export const MAP_VIEW: WidgetKindView = {
   View: MapWidgetView,
-  isEmpty: (data, settings) => buildMarkers(data.points, settings).markers.length === 0
-    && buildZones(data.zones, settings).length === 0 && buildRoutes(data.routes, settings).length === 0,
+  // An image map shows its picture with nothing on it; a geographic one with nothing to plot is empty.
+  isEmpty: (data, settings) => {
+    const image = mapImage(settings);
+    return !image && buildMarkers(data.points, settings).markers.length === 0
+      && buildZones(data.zones, settings).length === 0 && buildRoutes(data.routes, settings).length === 0;
+  },
   toCsv: (data, settings) => {
     const s = settings as S;
     const by = s.colorBy ?? 'column';

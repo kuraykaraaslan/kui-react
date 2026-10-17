@@ -16,6 +16,7 @@ export type LeafletBundle = {
   Popup:        typeof ReactLeaflet.Popup;
   Polygon:      typeof ReactLeaflet.Polygon;
   Polyline:     typeof ReactLeaflet.Polyline;
+  ImageOverlay: typeof ReactLeaflet.ImageOverlay;
   ZoomControl:  typeof ReactLeaflet.ZoomControl;
   useMap:       typeof ReactLeaflet.useMap;
   useMapEvents: typeof ReactLeaflet.useMapEvents;
@@ -61,6 +62,7 @@ export function loadLeaflet(): Promise<LeafletBundle> {
       Popup:        rl.Popup,
       Polygon:      rl.Polygon,
       Polyline:     rl.Polyline,
+      ImageOverlay: rl.ImageOverlay,
       ZoomControl:  rl.ZoomControl,
       useMap:       rl.useMap,
       useMapEvents: rl.useMapEvents,

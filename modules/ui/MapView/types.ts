@@ -58,6 +58,16 @@ export type MapRoute = {
   dashed?: boolean;
 };
 
+/**
+ * A picture used instead of map tiles (a floor plan, a site drawing): positions are then `[y, x]` in the picture's
+ * pixels, measured from its top-left corner, and the map uses flat (non-geographic) coordinates.
+ */
+export type MapImage = {
+  url: string;
+  width: number;
+  height: number;
+};
+
 export type MapBounds = {
   north: number;
   south: number;

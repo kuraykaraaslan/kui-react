@@ -51,3 +51,31 @@ describe('map zones and routes (next-boilerplate 20.3d)', () => {
     expect(prepareForSave({ zoneOpacity: 2 }, { type: MAP }).issues.length).toBeGreaterThan(0);
   });
 });
+
+describe('image (floor-plan) map (next-boilerplate 20.3d)', () => {
+  const image = { mapKind: 'image', imageSrc: '/files/floor-1.png', imageWidth: 1200, imageHeight: 800 };
+
+  it('takes an internal or https picture with its size; anything else is no image', async () => {
+    const { mapImage } = await import('../views/MapView');
+    expect(mapImage(image)).toEqual({ url: '/files/floor-1.png', width: 1200, height: 800 });
+    expect(mapImage({ ...image, imageSrc: 'https://cdn.example.com/a.png' })?.url).toBe('https://cdn.example.com/a.png');
+    expect(mapImage({ ...image, imageSrc: 'javascript:alert(1)' })).toBeNull();
+    expect(mapImage({ ...image, imageSrc: '//evil.example/a.png' })).toBeNull();
+    expect(mapImage({ ...image, imageWidth: null })).toBeNull();
+    expect(mapImage({ mapKind: 'geo', imageSrc: '/a.png', imageWidth: 1, imageHeight: 1 })).toBeNull();
+    expect(mapImage(image, (u) => `/t/abc${u}`)?.url).toBe('/t/abc/files/floor-1.png');
+  });
+
+  it('point columns are pixels inside the picture: outside ones are skipped, and a bare picture is not empty', async () => {
+    const { buildMarkers, mapImage } = await import('../views/MapView');
+    const rows = table([{ lat: 100, lng: 900, label: 'Desk' }, { lat: 900, lng: 100, label: 'Outside' }]);
+    expect(buildMarkers(rows, { ...image, latColumn: 'lat', lngColumn: 'lng' }, undefined, mapImage(image)).markers.map((m) => m.position)).toEqual([[100, 900]]);
+    expect(buildZones(table([{ positions: [[10, 10], [10, 300], [200, 300]] }]), {}, mapImage(image))).toHaveLength(1);
+    expect(MAP_VIEW.isEmpty!({ points: table([]) }, image)).toBe(false);
+  });
+
+  it('an image map needs its picture and size', () => {
+    expect(prepareForSave({ mapKind: 'image', imageSrc: '/a.png' }, { type: MAP }).issues.map((i) => i.path)).toContain('imageSrc');
+    expect(prepareForSave(image, { type: MAP }).issues).toEqual([]);
+  });
+});

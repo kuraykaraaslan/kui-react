@@ -1,7 +1,7 @@
 'use client';
 import { cn } from '@/libs/utils/cn';
 import { LeafletCanvas } from './parts/LeafletCanvas';
-import type { MapDisplayOptions, MapMarker, MapRoute, MapTilesConfig, MapZone } from './types';
+import type { MapDisplayOptions, MapImage, MapMarker, MapRoute, MapTilesConfig, MapZone } from './types';
 
 export type MapCanvasProps = {
   markers?: MapMarker[];
@@ -11,6 +11,8 @@ export type MapCanvasProps = {
   showMarkers?: boolean;
   showZones?: boolean;
   showRoutes?: boolean;
+  /** A picture (a floor plan) instead of map tiles: positions are `[y, x]` pixels from its top-left corner. */
+  image?: MapImage;
   center?: [number, number];
   zoom?: number;
   /** One tile layer for both themes, or a light/dark pair. Default: Esri Light Gray / Dark Gray Canvas. */
@@ -43,6 +45,7 @@ export function MapCanvas({
   showMarkers = true,
   showZones = true,
   showRoutes = true,
+  image,
   center = [39.9334, 32.8597],
   zoom = 6,
   tiles,
@@ -65,6 +68,7 @@ export function MapCanvas({
         showZones={showZones}
         showRoutes={showRoutes}
         showMarkers={showMarkers}
+        {...(image ? { image } : {})}
         addMode={false}
         fitBoundsPadding={fitBounds ? fitBoundsPadding : undefined}
         onMapClick={noop}

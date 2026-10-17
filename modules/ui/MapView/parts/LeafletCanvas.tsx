@@ -9,7 +9,7 @@ import { MarkerPart } from './Marker';
 import { ClusteredMarkers } from './Cluster';
 import { ZoneShape, RouteShape } from './Shapes';
 import { CANVAS_CLASS } from './styles';
-import type { MapDisplayOptions, MapMarker, MapZone, MapRoute, MapTilesConfig } from '../types';
+import type { MapDisplayOptions, MapImage, MapMarker, MapZone, MapRoute, MapTilesConfig } from '../types';
 
 type LeafletCanvasProps = {
   center: [number, number];
@@ -21,6 +21,8 @@ type LeafletCanvasProps = {
   showRoutes: boolean;
   /** Hide the markers (a layer toggle); hidden ones still count for fitting, so toggling never moves the view. */
   showMarkers?: boolean;
+  /** A picture instead of tiles: positions are `[y, x]` pixels from its top-left corner (flat coordinates). */
+  image?: MapImage;
   addMode: boolean;
   fitBoundsPadding?: number;
   onMapClick: (lat: number, lng: number) => void;
@@ -131,9 +133,10 @@ function ViewSync({
 function InnerMap({
   center,
   zoom,
-  markers,
-  zones,
-  routes,
+  markers: rawMarkers,
+  zones: rawZones,
+  routes: rawRoutes,
+  image,
   showZones,
   showRoutes,
   showMarkers,
@@ -155,13 +158,20 @@ function InnerMap({
   fitMaxZoom,
   bundle,
 }: LeafletCanvasProps & { bundle: LeafletBundle }) {
-  const { MapContainer, TileLayer, Marker, Tooltip, Popup, Polygon, Polyline, ZoomControl, L } = bundle;
+  const { MapContainer, TileLayer, ImageOverlay, Marker, Tooltip, Popup, Polygon, Polyline, ZoomControl, L } = bundle;
+  // An image map takes `[y, x]` pixels from the picture's top-left; Leaflet's flat coordinates grow upwards.
+  const flip = image ? (p: [number, number]): [number, number] => [image.height - p[0], p[1]] : null;
+  const markers = flip ? rawMarkers.map((m) => ({ ...m, position: flip(m.position) })) : rawMarkers;
+  const zones = flip ? rawZones.map((z) => ({ ...z, positions: z.positions.map(flip) })) : rawZones;
+  const routes = flip ? rawRoutes.map((r) => ({ ...r, positions: r.positions.map(flip) })) : rawRoutes;
+  const imageBounds: [[number, number], [number, number]] | null = image ? [[0, 0], [image.height, image.width]] : null;
   const isDark = useDarkMode();
   const set = tilesProp ? ('url' in tilesProp ? { light: tilesProp, dark: tilesProp } : tilesProp) : LEAFLET_TILES;
   const tiles = isDark ? set.dark : set.light;
 
   // Fitting frames the zones' and routes' vertices too, not only the markers: a map of zones alone was not framed.
-  const fitPoints: MapMarker[] = [
+  // An image map is framed as a whole: a floor plan is read in full, not cropped to its markers.
+  const fitPoints: MapMarker[] = imageBounds ? imageBounds.map((position, n) => ({ id: `image:${n}`, position })) : [
     ...markers,
     ...zones.flatMap((z) => z.positions.map((position, n) => ({ id: `zone:${z.id}:${n}`, position }))),
     ...routes.flatMap((r) => r.positions.map((position, n) => ({ id: `route:${r.id}:${n}`, position }))),
@@ -169,18 +179,27 @@ function InnerMap({
 
   return (
     <MapContainer
-      center={center}
-      zoom={zoom}
-      {...(minZoom !== undefined ? { minZoom } : {})}
+      // The coordinate system is fixed when Leaflet creates the map: switching kinds builds a new one.
+      key={image ? `image:${image.url}` : 'geo'}
+      {...(image ? { crs: L.CRS.Simple } : {})}
+      center={image ? [image.height / 2, image.width / 2] : center}
+      zoom={image ? 0 : zoom}
+      {...(minZoom !== undefined ? { minZoom } : image ? { minZoom: -5 } : {})}
       {...(maxZoom !== undefined ? { maxZoom } : {})}
       zoomControl={false}
       scrollWheelZoom={scrollWheelZoom}
       style={{ width: '100%', height: '100%', background: 'var(--surface-sunken)', fontFamily: 'inherit' }}
       className={cn(CANVAS_CLASS, addMode && 'cursor-crosshair')}
     >
-      <TileLayer key={`${isDark ? 'dark' : 'light'}-${tiles.url}`} attribution={tiles.attribution} url={tiles.url} maxNativeZoom={16} maxZoom={20} />
-      {'labels' in tiles && tiles.labels && (
-        <TileLayer key={`labels-${tiles.labels}`} url={tiles.labels} maxNativeZoom={16} maxZoom={20} zIndex={2} />
+      {image && imageBounds ? (
+        <ImageOverlay url={image.url} bounds={imageBounds} />
+      ) : (
+        <>
+          <TileLayer key={`${isDark ? 'dark' : 'light'}-${tiles.url}`} attribution={tiles.attribution} url={tiles.url} maxNativeZoom={16} maxZoom={20} />
+          {'labels' in tiles && tiles.labels && (
+            <TileLayer key={`labels-${tiles.labels}`} url={tiles.labels} maxNativeZoom={16} maxZoom={20} zIndex={2} />
+          )}
+        </>
       )}
       {zoomControl && ZoomControl && <ZoomControl key={controlsPosition} position={controlsPosition} />}
 

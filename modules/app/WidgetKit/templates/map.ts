@@ -27,6 +27,8 @@ export const MAP: SettingsTemplate = {
   exportable: true,
   cardDefaults: { padding: 0 },
   groups: [
+    // An image (floor-plan) map (next-boilerplate 20.3d): purely additive, so no version bump.
+    { id: 'kind', label: 'Map kind', tab: 'Display', since: 1 },
     { id: 'columns', label: 'Columns', tab: 'Data', since: 1 },
     { id: 'markers', label: 'Markers', tab: 'Display', since: 1 },
     { id: 'colour', label: 'Marker colour', tab: 'Display', since: 1 },
@@ -40,6 +42,17 @@ export const MAP: SettingsTemplate = {
     { id: 'routes', label: 'Routes', tab: 'Data', since: 1 },
   ],
   fields: since(1, {
+    mapKind: {
+      label: 'Map', type: 'select', display: 'segmented', value: 'geo', group: 'kind', required: true,
+      options: [opt('geo', 'Geographic'), opt('image', 'Image (floor plan)')],
+      description: 'An image map draws a picture instead of map tiles; the latitude and longitude columns then hold y and x in the picture\'s pixels, from its top-left corner.',
+    },
+    imageSrc: {
+      label: 'Image', type: 'text', maxLength: 500, placeholder: '/files/floor-1.png', group: 'kind', showIf: { mapKind: 'image' },
+      description: 'An internal path or an https address.',
+    },
+    imageWidth: { label: 'Image width (px)', type: 'number', nullable: true, display: 'input', min: 1, max: 20000, group: 'kind', showIf: { mapKind: 'image' } },
+    imageHeight: { label: 'Image height (px)', type: 'number', nullable: true, display: 'input', min: 1, max: 20000, group: 'kind', showIf: { mapKind: 'image' } },
     latColumn: { label: 'Latitude column', type: 'data-key', slot: 'points', value: 'lat', required: true, group: 'columns' },
     lngColumn: { label: 'Longitude column', type: 'data-key', slot: 'points', value: 'lng', required: true, group: 'columns' },
     labelColumn: { label: 'Label column', type: 'data-key', slot: 'points', value: 'label', group: 'columns', description: 'The marker\'s name: its tooltip title and its label on the map.' },
@@ -99,7 +112,7 @@ export const MAP: SettingsTemplate = {
       description: 'Shown as label / value rows under the title, titled and formatted as the query declares them.',
     },
     tileStyle: {
-      label: 'Map style', type: 'select', value: 'auto', group: 'view', required: true,
+      label: 'Map style', type: 'select', value: 'auto', group: 'view', required: true, showIf: { mapKind: 'geo' },
       options: [
         opt('auto', 'Follow the theme'), opt('light', 'Light'), opt('grey', 'Light, no labels'),
         opt('dark', 'Dark'), opt('streets', 'Streets (colour)'),
@@ -161,7 +174,12 @@ export const MAP: SettingsTemplate = {
     routeWeight: { label: 'Route width (px)', type: 'number', min: 1, max: 12, value: 3, group: 'routes' },
     routeDashed: { label: 'Dashed routes', type: 'boolean', value: false, group: 'routes' },
   }),
-  rules: [minBelowMax('minZoom', 'maxZoom'), internalLinkRule('linkTemplate')],
+  rules: [
+    minBelowMax('minZoom', 'maxZoom'), internalLinkRule('linkTemplate'),
+    // An image map needs its picture and its size: the size places the points, the picture is only drawn.
+    (v: Sparse) => (v.mapKind === 'image' && !(typeof v.imageSrc === 'string' && v.imageSrc.trim() && typeof v.imageWidth === 'number' && typeof v.imageHeight === 'number')
+      ? [{ path: 'imageSrc', message: 'An image map needs an image and its width and height' }] : []),
+  ],
   migrations: [],
 };
 
