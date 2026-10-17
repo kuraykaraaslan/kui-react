@@ -6,6 +6,8 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ### Added
 
+- RulesetEditor canvas: optional theme tokens `--canvas-bg` (background, default `--surface-base`) and `--canvas-dot`
+  (grid dots, default `--border`), as next-boilerplate's vendored copy had by hand.
 - `FlowWorkspace` (RulesetEditor): `showTabs={false}` leaves the flow tab strip out, for a host that lists, creates,
   renames, duplicates and exports its flows on a page of its own (next-boilerplate's automation editor, which carried a
   hand-made tab-less copy). `tabs` is still searched for link jumps and `onOpen` is called for them; the draft, leave
