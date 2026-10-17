@@ -175,7 +175,14 @@ export function AppSidebar({
         </div>
       )}
 
-      <nav className="flex-1 min-h-0 overflow-y-auto px-2 py-3 space-y-4 sidebar-scrollbar-hover" aria-label="Sidebar navigation">
+      <nav
+        className="flex-1 min-h-0 overflow-y-auto px-2 py-3 space-y-4 sidebar-scrollbar-hover"
+        // Icon-only mode is too narrow to spare a reserved scrollbar gutter: the
+        // `scrollbar-gutter: stable` of .sidebar-scrollbar-hover would push the centered
+        // icons left, so the collapsed nav drops the reservation.
+        style={effectiveCollapsed ? { scrollbarGutter: 'auto' } : undefined}
+        aria-label="Sidebar navigation"
+      >
         {groups.map((group, gi) => {
           const groupKey = group.label ?? String(gi);
           const expanded = isGroupExpanded(group);
@@ -232,6 +239,7 @@ export function AppSidebar({
                   <a
                     key={item.id}
                     href={item.href}
+                    aria-current={item.id === activeId ? 'page' : undefined}
                     title={effectiveCollapsed ? item.label : undefined}
                     className={itemClassName}
                   >

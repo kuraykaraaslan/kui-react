@@ -377,7 +377,7 @@ export function AppShell({ logo, compactLogo, sidebarCollapsed = false, sidebar,
       title: 'AppSidebar',
       category: 'App',
       abbr: 'Ab',
-      description: 'Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter; a header slot (above the nav groups) and a footer slot can host a workspace switcher, a user block or any content. Item badges take a count or any node.',
+      description: 'Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter; a header slot (above the nav groups) and a footer slot can host a workspace switcher, a user block or any content. Item badges take a count or any node. The active item, link or button, is marked aria-current="page"; collapsed, the nav reserves no scrollbar gutter, so the icons stay centered.',
       filePath: 'modules/app/AppSidebar.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';

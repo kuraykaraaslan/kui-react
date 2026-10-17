@@ -55,4 +55,34 @@ describe('AppSidebar', () => {
     render(<AppSidebar navItems={ITEMS} searchable={false} />);
     expect(screen.queryByText('Workspace switcher')).not.toBeInTheDocument();
   });
+
+  it('marks the active item as the current page, link or button', () => {
+    render(
+      <AppSidebar
+        navItems={[
+          { id: 'home', label: 'Home', href: '/home' },
+          { id: 'reports', label: 'Reports', href: '/reports' },
+          { id: 'inbox', label: 'Inbox' },
+        ]}
+        activeId="home"
+        searchable={false}
+      />,
+    );
+    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Reports' })).not.toHaveAttribute('aria-current');
+    expect(screen.getByRole('button', { name: 'Inbox' })).not.toHaveAttribute('aria-current');
+  });
+
+  it('an active button item is the current page too', () => {
+    render(<AppSidebar navItems={[{ id: 'inbox', label: 'Inbox' }]} activeId="inbox" searchable={false} />);
+    expect(screen.getByRole('button', { name: 'Inbox' })).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('drops the reserved scrollbar gutter only while collapsed, so icons stay centered', () => {
+    const { rerender } = render(<AppSidebar navItems={ITEMS} collapsed searchable={false} />);
+    const nav = () => screen.getByRole('navigation', { name: 'Sidebar navigation' });
+    expect(nav().style.scrollbarGutter).toBe('auto');
+    rerender(<AppSidebar navItems={ITEMS} collapsed={false} searchable={false} />);
+    expect(nav().style.scrollbarGutter || '').toBe('');
+  });
 });
