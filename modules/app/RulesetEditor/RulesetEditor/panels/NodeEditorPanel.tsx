@@ -7,7 +7,7 @@ import {
 import { Input } from '@/modules/ui/Input';
 import { Textarea } from '@/modules/ui/Textarea';
 import { lookOf } from '../block-visual';
-import { useState } from 'react';
+import { useState, type ComponentType } from 'react';
 import { isNote } from '../../catalog/note';
 import { nodeName } from '../../graph/names';
 import { Markdown } from '../help/markdown';
@@ -22,6 +22,24 @@ import type { GraphIssue } from '../../graph/validate';
 import type { RuleNode } from '../../types';
 
 const SOURCE_TITLE = { kui: 'kui ruleset', 'node-red': 'Node-RED', roltek: 'roltek-automation-1' } as const;
+
+/**
+ * What a host's own param editor for one block type gets (`RulesetEditorProps.paramEditors`): the params being edited and a way to
+ * replace them, in place of the generated form. It edits the same values the form would (a param stored in the script field
+ * included), so validation, the issues list and saving work as for the form; the host still validates on its side.
+ */
+export interface ParamEditorProps {
+  /** the params being edited */
+  params: ParamValues;
+  /** replaces all the params; the panel applies them as the form's own changes are applied */
+  onChange: (params: ParamValues) => void;
+  /** true in a read-only editor: show the values, change nothing */
+  disabled?: boolean;
+  /** the block on the canvas, its declaration and the lists a field may offer, for an editor that needs them */
+  node: RuleNode;
+  decl: BlockDecl;
+  choices?: ParamChoices;
+}
 
 /** Why a placeholder exists, and what it was (read-only). */
 function PlaceholderDetails({ node }: { node: RuleNode }) {
@@ -58,7 +76,7 @@ function PlaceholderDetails({ node }: { node: RuleNode }) {
 
 export function NodeEditorPanel({
   node, decl, layout, readOnly, draftLabel, draftDescription, draftValues, choices, issues = [], showRequired = false,
-  onLabelChange, onDescriptionChange, onValueChange, onClose, onDelete, onResetScript, onDebug,
+  onLabelChange, onDescriptionChange, onValueChange, onValuesChange, paramEditor: ParamEditor, onClose, onDelete, onResetScript, onDebug,
 }: {
   node: RuleNode;
   decl: BlockDecl | undefined;
@@ -76,6 +94,10 @@ export function NodeEditorPanel({
   onLabelChange: (v: string) => void;
   onDescriptionChange: (v: string) => void;
   onValueChange: (key: string, value: unknown) => void;
+  /** replaces all the params at once (a custom `paramEditor`) */
+  onValuesChange?: (values: ParamValues) => void;
+  /** the host's own editor for this block type, shown in place of the generated form */
+  paramEditor?: ComponentType<ParamEditorProps>;
   onClose: () => void; onDelete: () => void;
   /** put the default script back; null when the block has no script param with a default */
   onResetScript: (() => void) | null;
@@ -207,10 +229,16 @@ export function NodeEditorPanel({
                 </button>
               </div>
             )}
-            <ParamForm
-              schema={decl.params ?? {}} values={draftValues} onChange={onValueChange} readOnly={readOnly}
-              choices={choices} idPrefix={`node-${node.nodeId}`} showRequired={showRequired}
-            />
+            {ParamEditor && onValuesChange ? (
+              <div data-param-editor={node.type}>
+                <ParamEditor params={draftValues} onChange={onValuesChange} disabled={readOnly} node={node} decl={decl} choices={choices} />
+              </div>
+            ) : (
+              <ParamForm
+                schema={decl.params ?? {}} values={draftValues} onChange={onValueChange} readOnly={readOnly}
+                choices={choices} idPrefix={`node-${node.nodeId}`} showRequired={showRequired}
+              />
+            )}
           </div>
         )}
         </>}

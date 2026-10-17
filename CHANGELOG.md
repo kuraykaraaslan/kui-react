@@ -6,6 +6,8 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ### Added
 
+- `RulesetEditor` / `FlowWorkspace`: `paramEditors`, the host's own param editor per block type, shown in the node
+  panel in place of the generated form (`ParamEditorProps`: `params`, `onChange`, `disabled`, `node`, `decl`, `choices`).
 - `WidgetKit` `PlacementCard`: `exportData`, an async source for the CSV export, so a host can
   write every page of a server-paged table's current filter instead of the page on screen.
 - `Chart`: `GaugeChart` (half-donut, threshold bands, `role="meter"`), `HeatmapChart` (matrix), a

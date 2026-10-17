@@ -33,7 +33,7 @@ import { ContextMenu, type ContextMenuItem } from './canvas/ContextMenu';
 import { MiniMap } from './canvas/MiniMap';
 import { SelectionFrame } from './canvas/SelectionFrame';
 import { lookOf } from './block-visual';
-import { NodeEditorPanel } from './panels/NodeEditorPanel';
+import { NodeEditorPanel, type ParamEditorProps } from './panels/NodeEditorPanel';
 
 /* the debug modals run the stored scripts of the chain in the browser (`new Function`): loaded only when the editor offers them */
 const NodeDebugModal = lazy(() => import('./modals/NodeDebugModal').then((m) => ({ default: m.NodeDebugModal })));
@@ -58,7 +58,7 @@ import { FindBar } from './canvas/FindBar';
 import { findNodes } from '../graph/search';
 import { NODE_HEADER_H, NODE_W, ZOOM_MIN, ZOOM_MAX, inputAnchor, layoutOf, outputAnchor, revealView, type NodeLayout, type View, type Point as ViewPoint } from './geometry';
 
-export type { RuleNodeStatus, RulesetGraph, ContextMenuItem };
+export type { RuleNodeStatus, RulesetGraph, ContextMenuItem, ParamEditorProps };
 
 /** what the panel edits of a node, as one comparable text */
 const nodeSnap = (n: RuleNode) => stable([n.label, n.description ?? null, n.config ?? null, n.script ?? null]);
@@ -98,6 +98,11 @@ export type RulesetEditorProps = {
   catalog?: Catalog;
   /** the lists a `source` or `list` field offers (devices, brokers …) */
   choices?: ParamChoices;
+  /**
+   * The host's own param editors, by block type: the node panel shows the editor of the edited block's type in place of the
+   * generated form (a block type without one keeps the form). An editor replaces the params as a whole through `onChange`.
+   */
+  paramEditors?: Record<string, React.ComponentType<ParamEditorProps>>;
   /**
    * Blocks of the catalog the host cannot run right now (a missing module, a feature the plan does not have), by type,
    * with the reason. The palette, the block picker and the canvas menu show them greyed out with the reason as their
@@ -159,7 +164,7 @@ type GroupEdit = { kind: 'new'; ids: string[] } | { kind: 'edit'; groupId: strin
 
 export function RulesetEditor({
   initialNodes = [], initialEdges = [], initialGroups, initialSubflows,
-  catalog: catalogProp, choices, unavailable, messages, onSave, active = false, subflowDepthLimit = DEFAULT_SUBFLOW_DEPTH, onChange,
+  catalog: catalogProp, choices, paramEditors, unavailable, messages, onSave, active = false, subflowDepthLimit = DEFAULT_SUBFLOW_DEPTH, onChange,
   readOnly = false, browserDebug = true, className, chainName = 'Rule Chain', nodeStatus, onSelectionChange, nodeMenuItems, toolbarExtra, bannerSlot, ref,
 }: RulesetEditorProps) {
   const m = useMergedMessages(messages);
@@ -941,6 +946,8 @@ export function RulesetEditor({
           onLabelChange={(label) => writePanel({ label })}
           onDescriptionChange={(description) => writePanel({ description })}
           onValueChange={(key, value) => writePanel({ values: setField(panelDraft.current.values, key, value) })}
+          onValuesChange={(values) => writePanel({ values })}
+          paramEditor={paramEditors?.[editingNode.type]}
           onClose={() => setEditingNodeId(null)}
           onDelete={() => deleteNodes([editingNode.nodeId])}
           onResetScript={defaultScriptOf(editingDecl?.params) !== undefined
