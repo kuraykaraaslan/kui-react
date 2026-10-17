@@ -5,6 +5,7 @@
 
 import { useMemo } from 'react';
 import type { CommandItem, ScoredCommand } from '../types';
+import { commandGroupOf } from './useCommandStore';
 
 /**
  * Score a single string against the query.
@@ -78,7 +79,7 @@ export function scoreCommand(item: CommandItem, query: string): ScoredCommand | 
   }
 
   // Category fallback (matches the legacy filter behaviour).
-  const catScore = scoreString(item.category, query);
+  const catScore = scoreString(commandGroupOf(item), query);
   if (catScore) {
     return { item, score: catScore.score * 0.25, matches: [] };
   }

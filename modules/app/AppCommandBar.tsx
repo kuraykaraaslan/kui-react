@@ -9,4 +9,11 @@ export type {
   CommandGroup,
   ScoredCommand,
 } from './CommandPalette';
-export { useRegisterCommand, registerCommand, useCommandStore } from './CommandPalette';
+export {
+  useRegisterCommand,
+  registerCommand,
+  registerCommands,
+  useCommandStore,
+  commandGroupOf,
+  DEMO_COMMANDS,
+} from './CommandPalette';
