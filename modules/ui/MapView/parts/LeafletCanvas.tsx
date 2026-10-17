@@ -181,7 +181,8 @@ function InnerMap({
     <MapContainer
       // The coordinate system is fixed when Leaflet creates the map: switching kinds builds a new one.
       key={image ? `image:${image.url}` : 'geo'}
-      {...(image ? { crs: L.CRS.Simple } : {})}
+      // A picture fills its card: fractional zoom steps (whole steps halve or double it, leaving it small or cropped).
+      {...(image ? { crs: L.CRS.Simple, zoomSnap: 0.1, zoomDelta: 0.5 } : {})}
       center={image ? [image.height / 2, image.width / 2] : center}
       zoom={image ? 0 : zoom}
       {...(minZoom !== undefined ? { minZoom } : image ? { minZoom: -5 } : {})}
