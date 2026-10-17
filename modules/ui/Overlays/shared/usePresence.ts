@@ -35,12 +35,16 @@ export function usePresence(open: boolean): {
     setState(open ? 'open' : state === 'closed' ? 'closed' : 'closing');
   }
 
-  // …and unmount once the exit animation has had time to play.
+  // …and unmount once the exit animation has had time to play. Only a closing
+  // overlay arms the timer, and the update only moves 'closing' on: a timer that
+  // fires just before an open click would otherwise land after the click's
+  // (higher-priority) 'open' update and unmount an overlay that is open.
+  const closing = !open && state === 'closing';
   useEffect(() => {
-    if (open) return;
-    const t = window.setTimeout(() => setState('closed'), EXIT_MS);
+    if (!closing) return;
+    const t = window.setTimeout(() => setState((s) => (s === 'closing' ? 'closed' : s)), EXIT_MS);
     return () => window.clearTimeout(t);
-  }, [open]);
+  }, [closing]);
 
   return {
     mounted: state !== 'closed',
