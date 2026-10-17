@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-10-17T05:49:33.345Z",
+  "generatedAt": "2026-10-17T09:54:10.487Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -1312,6 +1312,35 @@
       "variantCount": 2
     },
     {
+      "id": "contribution-boundary",
+      "name": "ContributionBoundary",
+      "layer": "ui",
+      "category": "Organism",
+      "filePath": "modules/ui/ContributionBoundary.tsx",
+      "abbr": "Eb",
+      "description": "Error boundary for one contribution (a slot item, tab, widget or block): when it throws, only it is replaced by `fallback` (a node or `({ error, reset }) => node`, nothing by default) and its host keeps working. `onError(error, info)` reports; `resetKeys` resets when any value changes.",
+      "status": "stable",
+      "since": "2026-10",
+      "designTokens": [],
+      "variantCount": 2
+    },
+    {
+      "id": "unavailable-contribution",
+      "name": "UnavailableContribution",
+      "layer": "ui",
+      "category": "Organism",
+      "filePath": "modules/ui/UnavailableContribution.tsx",
+      "abbr": "Uc",
+      "description": "Placeholder for a contribution that cannot be shown, for admins and editors (end users see nothing). Nine reasons (disabled, unentitled, blocked, retired, banned, quarantined, failed, missing, no-access), each with a default icon, tone and short text; four sizes (inline, card, tab, node); optional title, detail and action. Texts are overridable for i18n.",
+      "status": "stable",
+      "since": "2026-10",
+      "designTokens": [],
+      "usedBy": [
+        "widget-kit"
+      ],
+      "variantCount": 4
+    },
+    {
       "id": "pagination",
       "name": "Pagination",
       "layer": "ui",
@@ -1331,7 +1360,7 @@
       "category": "Organism",
       "filePath": "modules/ui/TabGroup.tsx",
       "abbr": "Tg",
-      "description": "Accessible tab navigation following the role=\"tablist\" / role=\"tab\" / role=\"tabpanel\" ARIA pattern. Arrow-key navigation; tabIndex=-1 on inactive tabs.",
+      "description": "Accessible tab navigation following the role=\"tablist\" / role=\"tab\" / role=\"tabpanel\" ARIA pattern. Arrow-key navigation; tabIndex=-1 on inactive tabs. Optional per-tab isolation (error boundary + Suspense), `order` and per-tab `lazy` for tabs other modules contribute.",
       "status": "stable",
       "since": "2025-02",
       "designTokens": [
@@ -1345,7 +1374,7 @@
       "usedBy": [
         "widget-kit"
       ],
-      "variantCount": 3
+      "variantCount": 4
     },
     {
       "id": "breadcrumb",
@@ -1497,7 +1526,7 @@
       "category": "Organism",
       "filePath": "modules/ui/DropdownMenu.tsx",
       "abbr": "Dm",
-      "description": "Accessible dropdown using role=\"menu\" + role=\"menuitem\". Closes on Escape and outside click. Supports left/right alignment, icons, separators, danger and disabled items, and arrow-key navigation.",
+      "description": "Accessible dropdown using role=\"menu\" + role=\"menuitem\". Closes on Escape and outside click. Supports left/right alignment, icons, separators, danger and disabled items, and arrow-key navigation. Items take an optional id, href, group, order, hidden and disabledReason so other modules can contribute entries; `portal` escapes clipping parents.",
       "status": "stable",
       "since": "2025-03",
       "designTokens": [
@@ -1509,7 +1538,7 @@
         "--surface-raised",
         "--text-primary"
       ],
-      "variantCount": 2
+      "variantCount": 3
     },
     {
       "id": "popover",
@@ -1553,7 +1582,7 @@
       "category": "Organism",
       "filePath": "modules/ui/Table/DataTable.tsx",
       "abbr": "Dt",
-      "description": "Unified table with `mode=\"static\" | \"paginated\" | \"server\"`. Multi-column sort (Shift+click), global search, per-column filter (text + select), pagination, and unified loading/empty/error state.",
+      "description": "Unified table with `mode=\"static\" | \"paginated\" | \"server\"`. Multi-column sort (Shift+click), global search, per-column filter (text + select), pagination, unified loading/empty/error state, and `rowActions` (a per-row actions menu with id, href, hidden, disabledReason, destructive, group and order).",
       "status": "stable",
       "since": "2025-03",
       "designTokens": [
@@ -1562,7 +1591,7 @@
         "--surface-base",
         "--text-secondary"
       ],
-      "variantCount": 3
+      "variantCount": 4
     },
     {
       "id": "advanced-data-table",
@@ -1679,7 +1708,7 @@
       "category": "App",
       "filePath": "modules/app/AppSidebar.tsx",
       "abbr": "Ab",
-      "description": "Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter and a footer slot can host a user block or any content.",
+      "description": "Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter; a header slot (above the nav groups) and a footer slot can host a workspace switcher, a user block or any content. Item badges take a count or any node.",
       "status": "stable",
       "since": "2025-03",
       "designTokens": [
@@ -1693,7 +1722,7 @@
         "--text-primary",
         "--text-secondary"
       ],
-      "variantCount": 3
+      "variantCount": 4
     },
     {
       "id": "app-top-bar",
@@ -1702,11 +1731,11 @@
       "category": "App",
       "filePath": "modules/app/AppTopBar.tsx",
       "abbr": "AT",
-      "description": "Top bar wrapper passed into AppShell's header slot. The logo slot anchors the left side while children (GlobalSearch, UserMenu, Button, etc.) are arranged in a flex row.",
+      "description": "Top bar wrapper passed into AppShell's header slot. The logo slot anchors the left side while children (GlobalSearch, UserMenu, Button, etc.) are arranged in a flex row. Named regions `start` (after the logo) and `end` (pushed to the far end) take a node or ordered `{ id, node, order, hidden }` items, for controls other modules contribute.",
       "status": "stable",
       "since": "2025-03",
       "designTokens": [],
-      "variantCount": 2
+      "variantCount": 3
     },
     {
       "id": "app-nav",
@@ -1763,11 +1792,11 @@
       "category": "App",
       "filePath": "modules/app/CommandPalette/index.tsx",
       "abbr": "CB",
-      "description": "Keyboard-first command palette. Opens with ⌘K; an items prop accepts custom commands while a default navigation/actions/recent set is included.",
+      "description": "Keyboard-first command palette. Opens with ⌘K. Lists the `items` it gets plus every command registered with `registerCommand` / `registerCommands` / `useRegisterCommand`; commands carry `group`, `order` and `hidden`. Sample commands only with `demo`.",
       "status": "beta",
       "since": "2025-04",
       "designTokens": [],
-      "variantCount": 3
+      "variantCount": 4
     },
     {
       "id": "section-card",
@@ -2609,7 +2638,7 @@
       "category": "App",
       "filePath": "modules/app/WidgetKit/index.ts",
       "abbr": "WK",
-      "description": "Dashboard widget kit (next-boilerplate dashboard phase 21). WidgetCard frames every widget (title row with icon, subtitle and help, card buttons for full screen, CSV and refresh, loading/empty/unconfigured/error/stale states, \"Updated\" footer). Versioned settings templates (core:card, core:format, core:board and one per widget type) give ThingsBoard-depth editing with free colours (any CSS colour or a theme token); stored settings carry $v and migrate with append-only steps. WidgetSettingsEditor edits a placement in tabs with Basic/Advanced; WidgetBoard lays out a whole board with edit mode and JSON export/import that carries every card.",
+      "description": "Dashboard widget kit (next-boilerplate dashboard phase 21). WidgetCard frames every widget (title row with icon, subtitle and help, card buttons for full screen, CSV and refresh, loading/empty/unconfigured/error/stale/unavailable states, \"Updated\" footer; `unavailable` keeps the title and shows an UnavailableContribution). Versioned settings templates (core:card, core:format, core:board and one per widget type) give ThingsBoard-depth editing with free colours (any CSS colour or a theme token); stored settings carry $v and migrate with append-only steps. WidgetSettingsEditor edits a placement in tabs with Basic/Advanced; WidgetBoard lays out a whole board with edit mode and JSON export/import that carries every card.",
       "status": "beta",
       "since": "2026-10",
       "composes": [
@@ -2620,7 +2649,8 @@
         "tooltip",
         "chart",
         "map-view",
-        "control-tile"
+        "control-tile",
+        "unavailable-contribution"
       ],
       "a11y": {
         "wcagLevel": "AA",
@@ -2653,7 +2683,7 @@
         "--warning-fg",
         "--canvas-bg"
       ],
-      "variantCount": 3
+      "variantCount": 4
     },
     {
       "id": "ruleset-editor",
@@ -2785,11 +2815,11 @@
       "category": "Domain",
       "filePath": "modules/domains/common/user/UserMenu.tsx",
       "abbr": "UM",
-      "description": "Avatar + name + role trigger. Dropdown with Profile, Settings, and Sign out items. Closes on outside click.",
+      "description": "Avatar + name + role trigger. Dropdown with Profile, Settings, and Sign out items (hrefs, handlers and labels configurable). `extraItems` (or `items` + `mergeItems`) merge contributed items with the defaults, placed by group and order. Closes on outside click.",
       "status": "stable",
       "since": "2025-03",
       "designTokens": [],
-      "variantCount": 2
+      "variantCount": 3
     },
     {
       "id": "common-price-display",

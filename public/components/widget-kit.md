@@ -7,7 +7,7 @@
 - **status:** beta
 - **since:** 2026-10
 
-Dashboard widget kit (next-boilerplate dashboard phase 21). WidgetCard frames every widget (title row with icon, subtitle and help, card buttons for full screen, CSV and refresh, loading/empty/unconfigured/error/stale states, "Updated" footer). Versioned settings templates (core:card, core:format, core:board and one per widget type) give ThingsBoard-depth editing with free colours (any CSS colour or a theme token); stored settings carry $v and migrate with append-only steps. WidgetSettingsEditor edits a placement in tabs with Basic/Advanced; WidgetBoard lays out a whole board with edit mode and JSON export/import that carries every card.
+Dashboard widget kit (next-boilerplate dashboard phase 21). WidgetCard frames every widget (title row with icon, subtitle and help, card buttons for full screen, CSV and refresh, loading/empty/unconfigured/error/stale/unavailable states, "Updated" footer; `unavailable` keeps the title and shows an UnavailableContribution). Versioned settings templates (core:card, core:format, core:board and one per widget type) give ThingsBoard-depth editing with free colours (any CSS colour or a theme token); stored settings carry $v and migrate with append-only steps. WidgetSettingsEditor edits a placement in tabs with Basic/Advanced; WidgetBoard lays out a whole board with edit mode and JSON export/import that carries every card.
 
 ## Depends on
 
@@ -19,6 +19,7 @@ Dashboard widget kit (next-boilerplate dashboard phase 21). WidgetCard frames ev
 - `chart`
 - `map-view`
 - `control-tile`
+- `unavailable-contribution`
 
 ## Accessibility
 
@@ -48,6 +49,13 @@ Each card is a labelled section; card buttons have aria-labels; loading sets ari
 
 ```tsx
 <WidgetCard title="Load" card={card} stale={stale}>{body}</WidgetCard>
+```
+
+### WidgetCard unavailable (admin view of a widget whose module is off)
+
+```tsx
+<WidgetCard title="Open calls" card={card} state="unavailable"
+  unavailable={{ reason: 'disabled', action: { label: 'Enable telephony', onClick: enable } }} />
 ```
 
 ### PlacementCard + WidgetSettingsEditor

@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Unified table with `mode="static" | "paginated" | "server"`. Multi-column sort (Shift+click), global search, per-column filter (text + select), pagination, and unified loading/empty/error state.
+Unified table with `mode="static" | "paginated" | "server"`. Multi-column sort (Shift+click), global search, per-column filter (text + select), pagination, unified loading/empty/error state, and `rowActions` (a per-row actions menu with id, href, hidden, disabledReason, destructive, group and order).
 
 ## Design tokens consumed
 
@@ -69,6 +69,25 @@ Unified table with `mode="static" | "paginated" | "server"`. Multi-column sort (
       { label: 'Platform', value: 'platform' },
       { label: 'Growth',   value: 'growth' },
     ] } },
+  ]}
+/>
+```
+
+### Row actions (rowActions)
+
+```tsx
+// A trailing column with one menu per row. Every per-row field takes a function of the row.
+<DataTable<Company>
+  rows={companies}
+  columns={columns}
+  rowActionsLabel={(row) => `Actions for ${row.name}`}
+  rowActions={[
+    { id: 'open', label: 'Open', href: (row) => `/companies/${row.id}` },
+    { id: 'call', label: 'Call', group: 'contact', order: 10, onClick: (row) => call(row) },
+    { id: 'sign', label: 'Send for signature', group: 'contact', order: 20,
+      disabled: (row) => !row.email, disabledReason: (row) => (row.email ? undefined : 'Add an email address first') },
+    { id: 'restore', label: 'Restore', hidden: (row) => row.status !== 'Archived' },
+    { id: 'delete', label: 'Delete', group: 'danger', order: 1000, destructive: true, onClick: remove },
   ]}
 />
 ```

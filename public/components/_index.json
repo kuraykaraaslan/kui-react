@@ -293,6 +293,18 @@
     "category": "Organism",
     "file": "empty-state.md"
   },
+  "contribution-boundary": {
+    "name": "ContributionBoundary",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "contribution-boundary.md"
+  },
+  "unavailable-contribution": {
+    "name": "UnavailableContribution",
+    "layer": "ui",
+    "category": "Organism",
+    "file": "unavailable-contribution.md"
+  },
   "pagination": {
     "name": "Pagination",
     "layer": "ui",

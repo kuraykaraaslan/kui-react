@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-02
 
-Accessible tab navigation following the role="tablist" / role="tab" / role="tabpanel" ARIA pattern. Arrow-key navigation; tabIndex=-1 on inactive tabs.
+Accessible tab navigation following the role="tablist" / role="tab" / role="tabpanel" ARIA pattern. Arrow-key navigation; tabIndex=-1 on inactive tabs. Optional per-tab isolation (error boundary + Suspense), `order` and per-tab `lazy` for tabs other modules contribute.
 
 ## Used by
 
@@ -54,6 +54,22 @@ Accessible tab navigation following the role="tablist" / role="tab" / role="tabp
 <TabGroup lazy tabs={[
   { id: 'heavy', label: 'Heavy', content: <HeavyComponent /> },
 ]} />
+```
+
+### Contributed tabs: isolate + order
+
+```tsx
+// Each isolated panel sits in an error boundary + Suspense: a throwing tab shows a
+// "failed" placeholder with Retry (or renderError), the others keep working.
+<TabGroup
+  isolate
+  onTabError={(tabId, error) => report(tabId, error)}
+  tabs={[
+    { id: 'overview', label: 'Overview', content: <Overview /> },             // host: order 0
+    { id: 'tasks', label: 'Tasks', order: 10, lazy: true, content: <Tasks /> },
+    { id: 'calls', label: 'Calls', order: 20, lazy: true, content: <CallLog /> },
+  ]}
+/>
 ```
 
 ## Full source

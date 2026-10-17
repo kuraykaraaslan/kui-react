@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter and a footer slot can host a user block or any content.
+Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter; a header slot (above the nav groups) and a footer slot can host a workspace switcher, a user block or any content. Item badges take a count or any node.
 
 ## Design tokens consumed
 
@@ -61,6 +61,18 @@ Collapsible side navigation. Accepts navGroups or navItems with a built-in colla
   activeId={activeId}
   onSelect={setActiveId}
   defaultCollapsed
+/>
+```
+
+### Header + node badges
+
+```tsx
+<AppSidebar
+  navGroups={[{ label: 'Main', items: [
+    { id: 'analytics', label: 'Analytics', badge: 3 },                                       // a count
+    { id: 'team', label: 'Team', badge: <Badge variant="warning" size="sm" dot>Beta</Badge> }, // any node
+  ] }]}
+  header={({ collapsed }) => <WorkspaceSwitcher compact={collapsed} />}   // above the nav groups
 />
 ```
 

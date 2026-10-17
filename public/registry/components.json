@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-10-17T05:49:33.345Z",
+  "generatedAt": "2026-10-17T09:54:10.487Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -2202,6 +2202,63 @@
       ]
     },
     {
+      "id": "contribution-boundary",
+      "name": "ContributionBoundary",
+      "layer": "ui",
+      "category": "Organism",
+      "filePath": "modules/ui/ContributionBoundary.tsx",
+      "abbr": "Eb",
+      "description": "Error boundary for one contribution (a slot item, tab, widget or block): when it throws, only it is replaced by `fallback` (a node or `({ error, reset }) => node`, nothing by default) and its host keeps working. `onError(error, info)` reports; `resetKeys` resets when any value changes.",
+      "source": "import { ContributionBoundary } from '@/modules/ui/ContributionBoundary';\nimport { UnavailableContribution } from '@/modules/ui/UnavailableContribution';\n\n<ContributionBoundary\n  resetKeys={[contribution.id, contribution.version]}\n  onError={(error, info) => report({ point, contributor, error, info })}\n  fallback={isAdmin ? ({ reset }) => (\n    <UnavailableContribution reason=\"failed\" action={{ label: 'Retry', onClick: reset }} />\n  ) : null}\n>\n  <Contribution {...props} />\n</ContributionBoundary>",
+      "variants": [
+        {
+          "title": "Admin: placeholder with retry",
+          "code": "<ContributionBoundary\n  onError={(error) => report(error)}\n  fallback={({ reset }) => (\n    <UnavailableContribution reason=\"failed\" size=\"node\" title=\"Call log\" action={{ label: 'Retry', onClick: reset }} />\n  )}\n>\n  <CallLog contactId={id} />\n</ContributionBoundary>"
+        },
+        {
+          "title": "End user: nothing",
+          "code": "// No fallback: a broken contribution simply disappears for end users.\n<ContributionBoundary onError={(error) => report(error)}>\n  <CallLog contactId={id} />\n</ContributionBoundary>"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-10",
+      "designTokens": []
+    },
+    {
+      "id": "unavailable-contribution",
+      "name": "UnavailableContribution",
+      "layer": "ui",
+      "category": "Organism",
+      "filePath": "modules/ui/UnavailableContribution.tsx",
+      "abbr": "Uc",
+      "description": "Placeholder for a contribution that cannot be shown, for admins and editors (end users see nothing). Nine reasons (disabled, unentitled, blocked, retired, banned, quarantined, failed, missing, no-access), each with a default icon, tone and short text; four sizes (inline, card, tab, node); optional title, detail and action. Texts are overridable for i18n.",
+      "source": "import { UnavailableContribution } from '@/modules/ui/UnavailableContribution';\n\n<UnavailableContribution\n  reason=\"disabled\"            // disabled | unentitled | blocked | retired | banned | quarantined | failed | missing | no-access\n  size=\"card\"                  // inline | card | tab | node\n  title=\"Call log\"             // optional: what is unavailable\n  label={t('ext.disabled')}    // optional: overrides the reason text\n  detail={t('ext.disabled.detail')}\n  action={{ label: t('ext.enable'), onClick: enable }}\n/>",
+      "variants": [
+        {
+          "title": "Card (dashboard widget, panel)",
+          "code": "<UnavailableContribution reason=\"disabled\" action={{ label: 'Enable', onClick: enable }} />\n<UnavailableContribution reason=\"unentitled\" action={{ label: 'Upgrade', href: '/billing' }} />"
+        },
+        {
+          "title": "Inline (top bar, menu, every reason)",
+          "code": "<UnavailableContribution reason=\"blocked\" size=\"inline\" />"
+        },
+        {
+          "title": "Node (page-builder block, automation node)",
+          "code": "<UnavailableContribution reason=\"quarantined\" size=\"node\" title=\"Product carousel\" action={{ label: 'Retry', onClick: retry }} />"
+        },
+        {
+          "title": "Tab panel",
+          "code": "<UnavailableContribution reason=\"no-access\" size=\"tab\" />"
+        }
+      ],
+      "status": "stable",
+      "since": "2026-10",
+      "designTokens": [],
+      "usedBy": [
+        "widget-kit"
+      ]
+    },
+    {
       "id": "pagination",
       "name": "Pagination",
       "layer": "ui",
@@ -2235,7 +2292,7 @@
       "category": "Organism",
       "filePath": "modules/ui/TabGroup.tsx",
       "abbr": "Tg",
-      "description": "Accessible tab navigation following the role=\"tablist\" / role=\"tab\" / role=\"tabpanel\" ARIA pattern. Arrow-key navigation; tabIndex=-1 on inactive tabs.",
+      "description": "Accessible tab navigation following the role=\"tablist\" / role=\"tab\" / role=\"tabpanel\" ARIA pattern. Arrow-key navigation; tabIndex=-1 on inactive tabs. Optional per-tab isolation (error boundary + Suspense), `order` and per-tab `lazy` for tabs other modules contribute.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\n\nexport function TabGroup({ tabs, defaultTab, label = 'Tabs', className }) {\n  const [active, setActive] = useState(defaultTab ?? tabs[0]?.id ?? '');\n  function handleKeyDown(e, index) {\n    if (e.key === 'ArrowRight') setActive(tabs[(index + 1) % tabs.length].id);\n    else if (e.key === 'ArrowLeft') setActive(tabs[(index - 1 + tabs.length) % tabs.length].id);\n  }\n  return (\n    <div className={cn('w-full', className)}>\n      <div role=\"tablist\" aria-label={label} className=\"flex border-b border-border pb-3\">\n        {tabs.map((tab, i) => (\n          <button key={tab.id} role=\"tab\" id={`tab-btn-${tab.id}`} aria-selected={tab.id === active} aria-controls={`tabpanel-${tab.id}`} tabIndex={tab.id === active ? 0 : -1}\n            onClick={() => setActive(tab.id)} onKeyDown={(e) => handleKeyDown(e, i)}\n            className={cn('px-4 py-2.5 text-sm font-medium border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus', tab.id === active ? 'border-primary text-primary' : 'border-transparent text-text-secondary hover:text-text-primary hover:border-border')}>\n            {tab.label}\n          </button>\n        ))}\n      </div>\n      {tabs.map((tab) => (\n        <div key={tab.id} id={`tabpanel-${tab.id}`} role=\"tabpanel\" aria-labelledby={`tab-btn-${tab.id}`} tabIndex={0} hidden={tab.id !== active} className=\"py-4 focus-visible:outline-none\">\n          {tab.content}\n        </div>\n      ))}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -2249,6 +2306,10 @@
         {
           "title": "Lazy panels",
           "code": "// With lazy=true, panel content is only rendered when first activated:\n<TabGroup lazy tabs={[\n  { id: 'heavy', label: 'Heavy', content: <HeavyComponent /> },\n]} />"
+        },
+        {
+          "title": "Contributed tabs: isolate + order",
+          "code": "// Each isolated panel sits in an error boundary + Suspense: a throwing tab shows a\n// \"failed\" placeholder with Retry (or renderError), the others keep working.\n<TabGroup\n  isolate\n  onTabError={(tabId, error) => report(tabId, error)}\n  tabs={[\n    { id: 'overview', label: 'Overview', content: <Overview /> },             // host: order 0\n    { id: 'tasks', label: 'Tasks', order: 10, lazy: true, content: <Tasks /> },\n    { id: 'calls', label: 'Calls', order: 20, lazy: true, content: <CallLog /> },\n  ]}\n/>"
         }
       ],
       "status": "stable",
@@ -2531,7 +2592,7 @@
       "category": "Organism",
       "filePath": "modules/ui/DropdownMenu.tsx",
       "abbr": "Dm",
-      "description": "Accessible dropdown using role=\"menu\" + role=\"menuitem\". Closes on Escape and outside click. Supports left/right alignment, icons, separators, danger and disabled items, and arrow-key navigation.",
+      "description": "Accessible dropdown using role=\"menu\" + role=\"menuitem\". Closes on Escape and outside click. Supports left/right alignment, icons, separators, danger and disabled items, and arrow-key navigation. Items take an optional id, href, group, order, hidden and disabledReason so other modules can contribute entries; `portal` escapes clipping parents.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useEffect, useRef, useState } from 'react';\n\nexport function DropdownMenu({ trigger, items, align = 'left', className }) {\n  const [open, setOpen] = useState(false);\n  // outside click + Escape handlers\n  return (\n    <div ref={containerRef} className={cn('relative inline-block', className)}>\n      <div onClick={() => setOpen((p) => !p)} aria-haspopup=\"menu\" aria-expanded={open}>{trigger}</div>\n      {open && (\n        <div role=\"menu\" className={cn('absolute z-50 mt-1 min-w-[10rem] rounded-lg border border-border bg-surface-raised shadow-lg py-1', align === 'right' ? 'right-0' : 'left-0')}>\n          {items.map((item, i) => item.type === 'separator' ? <div key={i} role=\"separator\" className=\"my-1 border-t border-border\" /> : (\n            <button key={i} role=\"menuitem\" type=\"button\" disabled={item.disabled} onClick={() => { item.onClick?.(); setOpen(false); }}\n              className={cn('flex w-full items-center gap-2 px-3 py-2 text-sm text-left transition-colors focus-visible:outline-none focus-visible:bg-surface-overlay', item.danger ? 'text-error hover:bg-error-subtle' : 'text-text-primary hover:bg-surface-overlay', item.disabled && 'opacity-50 cursor-not-allowed')}>\n              {item.icon && <span aria-hidden=\"true\">{item.icon}</span>}{item.label}\n            </button>\n          ))}\n        </div>\n      )}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -2541,6 +2602,10 @@
         {
           "title": "Right-aligned",
           "code": "<DropdownMenu align=\"right\"\n  trigger={<Button variant=\"ghost\" size=\"sm\">⋮</Button>}\n  items={[{ label: 'View details' }, { label: 'Remove', danger: true }]}\n/>"
+        },
+        {
+          "title": "Contributed items: group, order, hidden, href, disabledReason",
+          "code": "// Items sort by group (ranked by their lowest order) and order; a separator splits groups.\n<DropdownMenu\n  trigger={<Button variant=\"outline\" size=\"sm\">Contact ▾</Button>}\n  items={[\n    { id: 'edit', label: 'Edit', group: 'record', order: 10 },\n    { id: 'call', label: 'Call', group: 'contact', order: 20, href: '/calls/new?to=…' },\n    { id: 'sign', label: 'Send for signature', group: 'contact', order: 30, disabled: true, disabledReason: 'Add an email address first' },\n    { id: 'campaign', label: 'Add to campaign', group: 'contact', order: 40, hidden: !canMarket },\n    { id: 'delete', label: 'Delete', group: 'danger', order: 1000, danger: true },\n  ]}\n/>\n// Merge contributed items into a base list (same id replaces in place):\nconst items = mergeMenuItems(baseItems, contributedItems);"
         }
       ],
       "status": "stable",
@@ -2625,7 +2690,7 @@
       "category": "Organism",
       "filePath": "modules/ui/Table/DataTable.tsx",
       "abbr": "Dt",
-      "description": "Unified table with `mode=\"static\" | \"paginated\" | \"server\"`. Multi-column sort (Shift+click), global search, per-column filter (text + select), pagination, and unified loading/empty/error state.",
+      "description": "Unified table with `mode=\"static\" | \"paginated\" | \"server\"`. Multi-column sort (Shift+click), global search, per-column filter (text + select), pagination, unified loading/empty/error state, and `rowActions` (a per-row actions menu with id, href, hidden, disabledReason, destructive, group and order).",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useMemo, useState } from 'react';\nimport { SearchBar } from './SearchBar';\nimport { Pagination } from './Pagination';\n\nexport function DataTable({ columns, rows, caption, searchable = true, searchPlaceholder = 'Search…', pageSize: defaultPageSize = 10, pageSizeOptions = [5,10,25,50], emptyMessage = 'No results found.', className }) {\n  const [search, setSearch] = useState('');\n  const [page, setPage] = useState(1);\n  const [pageSize, setPageSize] = useState(defaultPageSize);\n\n  const filtered = useMemo(() => {\n    if (!search.trim()) return rows;\n    const q = search.toLowerCase();\n    return rows.filter((row) => columns.some((col) => !col.render && String(row[col.key] ?? '').toLowerCase().includes(q)));\n  }, [rows, search, columns]);\n\n  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));\n  const paginated  = filtered.slice((page - 1) * pageSize, page * pageSize);\n\n  return (\n    <div className={cn('space-y-3', className)}>\n      {searchable && (\n        <div className=\"flex items-center gap-2 flex-wrap\">\n          <SearchBar value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder={searchPlaceholder} className=\"flex-1 min-w-40\" />\n          <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }} className=\"rounded-md border border-border bg-surface-base px-2 py-1.5 text-sm\">\n            {pageSizeOptions.map((s) => <option key={s} value={s}>{s}</option>)}\n          </select>\n        </div>\n      )}\n      {/* table body ... */}\n      <div className=\"flex items-center justify-between gap-4 flex-wrap\">\n        <p className=\"text-xs text-text-secondary\">Showing {(page-1)*pageSize+1}–{Math.min(page*pageSize, filtered.length)} of {filtered.length}</p>\n        {totalPages > 1 && <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />}\n      </div>\n    </div>\n  );\n}",
       "variants": [
         {
@@ -2639,6 +2704,10 @@
         {
           "title": "Server mode (mode=\"server\")",
           "code": "// Unified server-side data flow — the component owns sort/filter/pagination state\n// and calls `fetchPage` whenever it changes.\n<DataTable<User>\n  mode=\"server\"\n  fetchPage={async ({ page, pageSize, sort, search, filters }) => {\n    const res = await fetch(buildUrl({ page, pageSize, sort, search, filters }));\n    const { rows, total } = await res.json();\n    return { rows, total };\n  }}\n  pageSize={5}\n  searchPlaceholder=\"Search users…\"\n  columns={[\n    { key: 'name',  header: 'Name',  sortable: true },\n    { key: 'email', header: 'Email', sortable: true, filter: { kind: 'text' } },\n    { key: 'team',  header: 'Team',  sortable: true, filter: { kind: 'select', options: [\n      { label: 'Platform', value: 'platform' },\n      { label: 'Growth',   value: 'growth' },\n    ] } },\n  ]}\n/>"
+        },
+        {
+          "title": "Row actions (rowActions)",
+          "code": "// A trailing column with one menu per row. Every per-row field takes a function of the row.\n<DataTable<Company>\n  rows={companies}\n  columns={columns}\n  rowActionsLabel={(row) => `Actions for ${row.name}`}\n  rowActions={[\n    { id: 'open', label: 'Open', href: (row) => `/companies/${row.id}` },\n    { id: 'call', label: 'Call', group: 'contact', order: 10, onClick: (row) => call(row) },\n    { id: 'sign', label: 'Send for signature', group: 'contact', order: 20,\n      disabled: (row) => !row.email, disabledReason: (row) => (row.email ? undefined : 'Add an email address first') },\n    { id: 'restore', label: 'Restore', hidden: (row) => row.status !== 'Archived' },\n    { id: 'delete', label: 'Delete', group: 'danger', order: 1000, destructive: true, onClick: remove },\n  ]}\n/>"
         }
       ],
       "status": "stable",
@@ -2851,7 +2920,7 @@
       "category": "App",
       "filePath": "modules/app/AppSidebar.tsx",
       "abbr": "Ab",
-      "description": "Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter and a footer slot can host a user block or any content.",
+      "description": "Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter; a header slot (above the nav groups) and a footer slot can host a workspace switcher, a user block or any content. Item badges take a count or any node.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\nimport { useState } from 'react';\nimport { Badge } from '@/modules/ui/Badge';\n\nexport function AppSidebar({ navGroups, navItems, activeId, onSelect, collapsed, defaultCollapsed = false, onCollapsedChange, footer, className, ...rest }) {\n  const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed);\n  const isCollapsed = collapsed ?? internalCollapsed;\n  const groups = navGroups ?? (navItems ? [{ items: navItems }] : []);\n  const footerContent = typeof footer === 'function' ? footer({ collapsed: isCollapsed }) : footer;\n\n  const setCollapsed = (next) => {\n    if (collapsed === undefined) setInternalCollapsed(next);\n    onCollapsedChange?.(next);\n  };\n\n  return (\n    <div data-collapsed={isCollapsed ? 'true' : 'false'} className={cn('flex flex-col flex-1 min-h-0 transition-all duration-200', isCollapsed ? 'w-14' : 'w-56', className)} {...rest}>\n      <div className={cn('flex items-center px-2 py-2 border-b border-border', isCollapsed ? 'justify-center' : 'justify-end')}>\n        <button type=\"button\" onClick={() => setCollapsed(!isCollapsed)}\n          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}\n          className=\"p-1.5 rounded text-text-secondary hover:bg-surface-overlay transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus\">\n          <span aria-hidden=\"true\" className={cn('block text-lg transition-transform', isCollapsed ? 'rotate-180' : '')}>‹</span>\n        </button>\n      </div>\n      <nav className=\"flex-1 overflow-y-auto px-2 py-3 space-y-4 sidebar-scrollbar-hover\" aria-label=\"Sidebar navigation\">\n        {groups.map((group, gi) => (\n          <div key={group.label ?? gi}>\n            {group.label && !isCollapsed && (\n              <p className=\"text-[10px] font-semibold uppercase tracking-widest text-text-disabled px-3 mb-1\">{group.label}</p>\n            )}\n            <div className=\"space-y-0.5\">\n              {group.items.map((item) => (\n                <button key={item.id} type=\"button\"\n                  aria-current={item.id === activeId ? 'page' : undefined}\n                  title={isCollapsed ? item.label : undefined}\n                  onClick={() => onSelect?.(item.id)}\n                  className={cn('w-full flex items-center gap-2.5 rounded-lg text-sm transition-colors',\n                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',\n                    isCollapsed ? 'justify-center px-2 py-2' : 'px-3 py-2 text-left',\n                    item.id === activeId ? 'bg-primary-subtle text-primary font-medium' : 'text-text-secondary hover:text-text-primary hover:bg-surface-overlay')}>\n                  {item.icon && <span aria-hidden=\"true\" className=\"shrink-0 w-5 text-center text-[15px] leading-none\">{item.icon}</span>}\n                  {!isCollapsed && <span className=\"flex-1 truncate\">{item.label}</span>}\n                  {!isCollapsed && item.badge > 0 && <Badge variant=\"primary\" size=\"sm\">{item.badge}</Badge>}\n                </button>\n              ))}\n            </div>\n          </div>\n        ))}\n      </nav>\n      {footerContent != null && (\n        <div className={cn('border-t border-border shrink-0', isCollapsed ? 'flex justify-center px-2 py-3' : '')}>{footerContent}</div>\n      )}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -2865,6 +2934,10 @@
         {
           "title": "Daraltılmış (icon-only)",
           "code": "<AppSidebar\n  navGroups={navGroups}\n  activeId={activeId}\n  onSelect={setActiveId}\n  defaultCollapsed\n/>"
+        },
+        {
+          "title": "Header + node badges",
+          "code": "<AppSidebar\n  navGroups={[{ label: 'Main', items: [\n    { id: 'analytics', label: 'Analytics', badge: 3 },                                       // a count\n    { id: 'team', label: 'Team', badge: <Badge variant=\"warning\" size=\"sm\" dot>Beta</Badge> }, // any node\n  ] }]}\n  header={({ collapsed }) => <WorkspaceSwitcher compact={collapsed} />}   // above the nav groups\n/>"
         }
       ],
       "status": "stable",
@@ -2888,7 +2961,7 @@
       "category": "App",
       "filePath": "modules/app/AppTopBar.tsx",
       "abbr": "AT",
-      "description": "Top bar wrapper passed into AppShell's header slot. The logo slot anchors the left side while children (GlobalSearch, UserMenu, Button, etc.) are arranged in a flex row.",
+      "description": "Top bar wrapper passed into AppShell's header slot. The logo slot anchors the left side while children (GlobalSearch, UserMenu, Button, etc.) are arranged in a flex row. Named regions `start` (after the logo) and `end` (pushed to the far end) take a node or ordered `{ id, node, order, hidden }` items, for controls other modules contribute.",
       "source": "'use client';\nimport { cn } from '@/libs/utils/cn';\n\nexport function AppTopBar({ logo, children, className, ...rest }) {\n  return (\n    <div className={cn('flex items-center gap-3 flex-1', className)} {...rest}>\n      {logo && <div className=\"shrink-0\">{logo}</div>}\n      {children}\n    </div>\n  );\n}",
       "variants": [
         {
@@ -2898,6 +2971,10 @@
         {
           "title": "Logo + action + kullanıcı",
           "code": "<AppTopBar logo={<span className=\"font-black text-primary text-lg\">Acme</span>}>\n  <div className=\"ml-auto flex items-center gap-2\">\n    <Button variant=\"primary\" size=\"sm\">Upgrade</Button>\n    <UserMenu user={currentUser} />\n  </div>\n</AppTopBar>"
+        },
+        {
+          "title": "Regions: start + ordered end items",
+          "code": "// Contributed controls arrive as ordered items; hidden ones are left out.\n<AppTopBar\n  logo={<Logo />}\n  start={<EnvironmentBadge />}\n  end={[\n    { id: 'notifications', order: 10, node: <NotificationBell /> },\n    { id: 'calls', order: 20, node: <PresenceToggle />, hidden: !telephonyEnabled },\n    { id: 'user', order: 100, node: <UserMenu user={currentUser} /> },\n  ]}\n/>"
         }
       ],
       "status": "stable",
@@ -2989,12 +3066,12 @@
       "category": "App",
       "filePath": "modules/app/CommandPalette/index.tsx",
       "abbr": "CB",
-      "description": "Keyboard-first command palette. Opens with ⌘K; an items prop accepts custom commands while a default navigation/actions/recent set is included.",
-      "source": "'use client';\nimport { AppCommandBar } from '@/modules/app/CommandPalette';\n\n// With default commands:\n<AppCommandBar onSelect={(item) => router.push(item.href)} />\n\n// With custom commands:\n<AppCommandBar\n  items={[\n    { icon: '🏠', label: 'Dashboard', shortcut: 'G D', category: 'Navigation' },\n    { icon: '➕', label: 'New Project', shortcut: '⌘N', category: 'Actions', onClick: handleNew },\n    { icon: '🕐', label: 'Recent Item', category: 'Recent' },\n  ]}\n  trigger={<Button variant=\"outline\" size=\"sm\">⌘K</Button>}\n  onSelect={handleSelect}\n/>",
+      "description": "Keyboard-first command palette. Opens with ⌘K. Lists the `items` it gets plus every command registered with `registerCommand` / `registerCommands` / `useRegisterCommand`; commands carry `group`, `order` and `hidden`. Sample commands only with `demo`.",
+      "source": "'use client';\nimport { AppCommandBar } from '@/modules/app/CommandPalette';\n\n// With the sample commands (demos only):\n<AppCommandBar demo onSelect={(item) => console.log(item.label)} />\n\n// With custom commands:\n<AppCommandBar\n  items={[\n    { icon: '🏠', label: 'Dashboard', shortcut: 'G D', category: 'Navigation' },\n    { icon: '➕', label: 'New Project', shortcut: '⌘N', category: 'Actions', onClick: handleNew },\n    { icon: '🕐', label: 'Recent Item', category: 'Recent' },\n  ]}\n  trigger={<Button variant=\"outline\" size=\"sm\">⌘K</Button>}\n  onSelect={handleSelect}\n/>",
       "variants": [
         {
-          "title": "Varsayılan komutlar",
-          "code": "<AppCommandBar onSelect={(item) => console.log(item.label)} />"
+          "title": "Sample commands (demo)",
+          "code": "<AppCommandBar demo onSelect={(item) => console.log(item.label)} />"
         },
         {
           "title": "Özel items + trigger",
@@ -3003,6 +3080,10 @@
         {
           "title": "Fuzzy search + özel gruplar",
           "code": "// Try typing \"kbd\", \"asgn\" or \"rls\" to exercise the subsequence matcher.\nconst fuzzyItems = [\n  { icon: '⌨️', label: 'Open Keyboard Shortcuts',  shortcut: '?',   category: 'Help',        keywords: ['kbd'] },\n  { icon: '📚', label: 'Browse Documentation',     shortcut: 'G H', category: 'Help' },\n  { icon: '🔔', label: 'Notification Preferences', shortcut: 'G N', category: 'Preferences' },\n  { icon: '🛠️', label: 'Assign Reviewer to PR-42', shortcut: 'A R', category: 'Workflows',   keywords: ['asgn'] },\n  { icon: '🚀', label: 'Release & Tag v1.4.0',     shortcut: 'R T', category: 'Workflows',   keywords: ['rls'] },\n];\n\n<AppCommandBar items={fuzzyItems} />"
+        },
+        {
+          "title": "Registered commands: group, order, hidden",
+          "code": "// Any module adds commands to the shared registry; the palette lists them with its own items.\nuseEffect(() => registerCommands([\n  { id: 'tel-call', label: 'Call a contact', group: 'Telephony', order: 30, hidden: !canCall },\n  { id: 'tel-log', label: 'Open call log', group: 'Telephony', order: 31 },\n]), [canCall]);\n\n<AppCommandBar items={[\n  { id: 'go-home', label: 'Go to dashboard', group: 'Navigation', order: 0 },\n  { id: 'new-lead', label: 'New lead', group: 'Create', order: 10 },\n]} />"
         }
       ],
       "status": "beta",
@@ -4219,12 +4300,16 @@
       "category": "App",
       "filePath": "modules/app/WidgetKit/index.ts",
       "abbr": "WK",
-      "description": "Dashboard widget kit (next-boilerplate dashboard phase 21). WidgetCard frames every widget (title row with icon, subtitle and help, card buttons for full screen, CSV and refresh, loading/empty/unconfigured/error/stale states, \"Updated\" footer). Versioned settings templates (core:card, core:format, core:board and one per widget type) give ThingsBoard-depth editing with free colours (any CSS colour or a theme token); stored settings carry $v and migrate with append-only steps. WidgetSettingsEditor edits a placement in tabs with Basic/Advanced; WidgetBoard lays out a whole board with edit mode and JSON export/import that carries every card.",
+      "description": "Dashboard widget kit (next-boilerplate dashboard phase 21). WidgetCard frames every widget (title row with icon, subtitle and help, card buttons for full screen, CSV and refresh, loading/empty/unconfigured/error/stale/unavailable states, \"Updated\" footer; `unavailable` keeps the title and shows an UnavailableContribution). Versioned settings templates (core:card, core:format, core:board and one per widget type) give ThingsBoard-depth editing with free colours (any CSS colour or a theme token); stored settings carry $v and migrate with append-only steps. WidgetSettingsEditor edits a placement in tabs with Basic/Advanced; WidgetBoard lays out a whole board with edit mode and JSON export/import that carries every card.",
       "source": "import { WidgetBoard, BUILTIN_KINDS, BUILTIN_VIEWS } from '@/modules/app/WidgetKit';\n\n<WidgetBoard doc={doc} onChange={setDoc} data={data} kinds={BUILTIN_KINDS} views={BUILTIN_VIEWS} />",
       "variants": [
         {
           "title": "WidgetCard",
           "code": "<WidgetCard title=\"Load\" card={card} stale={stale}>{body}</WidgetCard>"
+        },
+        {
+          "title": "WidgetCard unavailable (admin view of a widget whose module is off)",
+          "code": "<WidgetCard title=\"Open calls\" card={card} state=\"unavailable\"\n  unavailable={{ reason: 'disabled', action: { label: 'Enable telephony', onClick: enable } }} />"
         },
         {
           "title": "PlacementCard + WidgetSettingsEditor",
@@ -4245,7 +4330,8 @@
         "tooltip",
         "chart",
         "map-view",
-        "control-tile"
+        "control-tile",
+        "unavailable-contribution"
       ],
       "a11y": {
         "wcagLevel": "AA",
@@ -4483,7 +4569,7 @@
       "category": "Domain",
       "filePath": "modules/domains/common/user/UserMenu.tsx",
       "abbr": "UM",
-      "description": "Avatar + name + role trigger. Dropdown with Profile, Settings, and Sign out items. Closes on outside click.",
+      "description": "Avatar + name + role trigger. Dropdown with Profile, Settings, and Sign out items (hrefs, handlers and labels configurable). `extraItems` (or `items` + `mergeItems`) merge contributed items with the defaults, placed by group and order. Closes on outside click.",
       "source": "'use client';\nimport { UserMenu } from '@/modules/domains/common/user/UserMenu';\n\n<UserMenu user={currentUser} align=\"right\" />",
       "variants": [
         {
@@ -4493,6 +4579,10 @@
         {
           "title": "Custom items",
           "code": "<UserMenu user={authorUser} items={[\n  { type: 'item', label: 'My Posts', icon: '📝' },\n  { type: 'separator' },\n  { type: 'item', label: 'Sign Out', icon: '↩️', danger: true },\n]} />"
+        },
+        {
+          "title": "Contributed items (merged)",
+          "code": "// extraItems merge with Profile / Settings / Sign out instead of replacing them.\n// No group: joins the account items. No order: after them, before sign out (order 1000).\n<UserMenu\n  user={currentUser}\n  profileHref=\"/me\"\n  onSignOut={signOut}\n  extraItems={[\n    { id: 'dnd', label: 'Do not disturb', group: 'status', order: 10 },\n    { id: 'preferences', label: 'Preferences' },\n    { id: 'switch-tenant', label: 'Switch workspace', group: 'workspace', order: 600 },\n    { id: 'stop-impersonating', label: 'Stop impersonating', group: 'session', order: 900, hidden: !impersonating },\n  ]}\n/>"
         }
       ],
       "status": "stable",
