@@ -7,6 +7,10 @@ export type MapCanvasProps = {
   markers?: MapMarker[];
   zones?: MapZone[];
   routes?: MapRoute[];
+  /** Layer visibility (default all shown). A hidden layer still counts for fitting the view. */
+  showMarkers?: boolean;
+  showZones?: boolean;
+  showRoutes?: boolean;
   center?: [number, number];
   zoom?: number;
   /** One tile layer for both themes, or a light/dark pair. Default: Esri Light Gray / Dark Gray Canvas. */
@@ -36,6 +40,9 @@ export function MapCanvas({
   markers = [],
   zones = [],
   routes = [],
+  showMarkers = true,
+  showZones = true,
+  showRoutes = true,
   center = [39.9334, 32.8597],
   zoom = 6,
   tiles,
@@ -55,8 +62,9 @@ export function MapCanvas({
         markers={markers}
         zones={zones}
         routes={routes}
-        showZones
-        showRoutes
+        showZones={showZones}
+        showRoutes={showRoutes}
+        showMarkers={showMarkers}
         addMode={false}
         fitBoundsPadding={fitBounds ? fitBoundsPadding : undefined}
         onMapClick={noop}

@@ -121,6 +121,14 @@ export const MAP: SettingsTemplate = {
       label: 'Zoom buttons corner', type: 'select', value: 'topleft', group: 'controls', required: true, showIf: { zoomButtons: true },
       options: [opt('topleft', 'Top left'), opt('topright', 'Top right'), opt('bottomleft', 'Bottom left'), opt('bottomright', 'Bottom right')],
     },
+    layerToggles: {
+      label: 'Layer switch', type: 'boolean', value: true, group: 'controls',
+      description: 'Lets viewers show or hide markers, zones and routes. Shown only when the map has more than one of them.',
+    },
+    layerTogglesPosition: {
+      label: 'Layer switch corner', type: 'select', value: 'topright', group: 'controls', required: true, showIf: { layerToggles: true },
+      options: [opt('topright', 'Top right'), opt('topleft', 'Top left'), opt('bottomright', 'Bottom right'), opt('bottomleft', 'Bottom left')],
+    },
     scrollZoom: {
       label: 'Zoom with the mouse wheel', type: 'boolean', value: false, group: 'controls',
       description: 'Off: the wheel scrolls the board past the map; use the buttons or a pinch to zoom.',

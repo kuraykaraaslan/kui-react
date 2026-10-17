@@ -1,5 +1,5 @@
 'use client';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { cn } from '@/libs/utils/cn';
 import { MapCanvas, type MapMarker, type MapRoute, type MapTilesConfig, type MapZone } from '@/modules/ui/MapView';
 import { cssColor, rangeFor, type ColorRange, type RangeEdges } from '../settings/style';
@@ -36,6 +36,8 @@ type S = {
   maxZoom?: number | null;
   scrollZoom?: boolean;
   zoomButtons?: boolean;
+  layerToggles?: boolean;
+  layerTogglesPosition?: 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
   controlsPosition?: 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
   tileStyle?: 'auto' | 'light' | 'grey' | 'dark' | 'streets';
   legend?: boolean;
@@ -220,6 +222,8 @@ export type MapWidgetViewProps = WidgetViewProps & {
   loadingLabel?: string;
   ariaLabel?: string;
   legendLabel?: string;
+  /** The layer switch's texts (its group name and the three layers). */
+  layerLabels?: { layers?: string; markers?: string; zones?: string; routes?: string };
 };
 
 const VARIANTS = new Set<MapZone['variant']>(['primary', 'info', 'success', 'warning', 'error', 'neutral']);
@@ -281,13 +285,18 @@ export function buildRoutes(slot: SlotData | undefined, settings: Sparse): MapRo
 
 /** `map`: bound rows as markers on a card-less map that fills the card, with an optional colour legend. */
 export function MapWidgetView({
-  settings, data, locale, renderLink, onMarkerClick, onNavigate, tiles, loadingLabel, ariaLabel, legendLabel = 'Legend',
+  settings, data, locale, renderLink, onMarkerClick, onNavigate, tiles, loadingLabel, ariaLabel, legendLabel = 'Legend', layerLabels,
 }: MapWidgetViewProps) {
   const s = settings as S;
   const { markers, rows } = useMemo(() => buildMarkers(data.points, settings, locale), [data.points, settings, locale]);
   const legend = useMemo(() => (s.legend === false ? [] : mapLegend(data.points, settings)), [data.points, settings, s.legend]);
   const zones = useMemo(() => buildZones(data.zones, settings), [data.zones, settings]);
   const routes = useMemo(() => buildRoutes(data.routes, settings), [data.routes, settings]);
+  // The layer switch (20.3d): which layers are on. Hidden ones still frame the view, so switching never moves the map.
+  const [shown, setShown] = useState({ markers: true, zones: true, routes: true });
+  const layers = ([['markers', markers.length], ['zones', zones.length], ['routes', routes.length]] as const).filter(([, n]) => n > 0).map(([k]) => k);
+  const showSwitch = s.layerToggles !== false && layers.length > 1;
+  const layerText = { layers: 'Layers', markers: 'Markers', zones: 'Zones', routes: 'Routes', ...layerLabels };
   const fit = s.fitBounds !== false;
   const center: [number, number] | undefined = typeof s.centerLat === 'number' && typeof s.centerLng === 'number'
     ? [s.centerLat, s.centerLng] : undefined;
@@ -300,6 +309,12 @@ export function MapWidgetView({
   const legendCorner = legendAt === controls && s.zoomButtons !== false
     ? (legendAt.startsWith('top') ? legendAt.replace('top', 'bottom') : legendAt.replace('bottom', 'top')) as typeof legendAt
     : legendAt;
+
+  // The switch never sits under the zoom buttons or on the legend: it moves to the other top/bottom corner.
+  const wantSwitch = (s.layerTogglesPosition ?? 'topright') as typeof legendAt;
+  const taken = new Set<string>([...(s.zoomButtons !== false ? [controls] : []), ...(legend.length > 0 ? [legendCorner] : [])]);
+  const flip = (c: string) => (c.startsWith('top') ? c.replace('top', 'bottom') : c.replace('bottom', 'top'));
+  const switchCorner = (taken.has(wantSwitch) ? flip(wantSwitch) : wantSwitch) as typeof legendAt;
 
   const handleClick = (id: string) => {
     const row = rows.get(id);
@@ -315,6 +330,9 @@ export function MapWidgetView({
         markers={markers}
         zones={zones}
         routes={routes}
+        showMarkers={shown.markers}
+        showZones={shown.zones}
+        showRoutes={shown.routes}
         tiles={tileSet}
         fitBounds={fit}
         fitBoundsPadding={typeof s.fitPadding === 'number' ? s.fitPadding : 32}
@@ -334,6 +352,28 @@ export function MapWidgetView({
         loadingLabel={loadingLabel}
         ariaLabel={ariaLabel}
       />
+      {showSwitch && (
+        <fieldset
+          data-part="layers"
+          className={cn(
+            'absolute z-10 flex flex-col gap-1 rounded-lg border border-border bg-surface-raised/90 px-2.5 py-2 shadow-sm backdrop-blur-sm',
+            LEGEND_POS[switchCorner] ?? LEGEND_POS.topright,
+          )}
+        >
+          <legend className="sr-only">{layerText.layers}</legend>
+          {layers.map((k) => (
+            <label key={k} className="flex items-center gap-2 text-[11px] leading-4 text-text-primary">
+              <input
+                type="checkbox"
+                className="h-3 w-3 rounded border-border focus-visible:ring-2 focus-visible:ring-border-focus"
+                checked={shown[k]}
+                onChange={(e) => setShown((v) => ({ ...v, [k]: e.target.checked }))}
+              />
+              {layerText[k]}
+            </label>
+          ))}
+        </fieldset>
+      )}
       {legend.length > 0 && (
         <ul
           aria-label={legendLabel}

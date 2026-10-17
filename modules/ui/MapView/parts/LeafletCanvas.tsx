@@ -19,6 +19,8 @@ type LeafletCanvasProps = {
   routes: MapRoute[];
   showZones: boolean;
   showRoutes: boolean;
+  /** Hide the markers (a layer toggle); hidden ones still count for fitting, so toggling never moves the view. */
+  showMarkers?: boolean;
   addMode: boolean;
   fitBoundsPadding?: number;
   onMapClick: (lat: number, lng: number) => void;
@@ -134,6 +136,7 @@ function InnerMap({
   routes,
   showZones,
   showRoutes,
+  showMarkers,
   addMode,
   fitBoundsPadding,
   onMapClick,
@@ -201,7 +204,7 @@ function InnerMap({
         <RouteShape key={route.id} route={route} Polyline={Polyline} Tooltip={Tooltip} />
       ))}
 
-      {cluster ? (
+      {showMarkers === false ? null : cluster ? (
         <ClusteredMarkers
           bundle={bundle}
           markers={markers}
