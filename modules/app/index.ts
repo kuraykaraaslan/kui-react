@@ -9,8 +9,10 @@ export type {
   AppSidebarNavItem,
   AppSidebarNavGroup,
   AppSidebarFooterRenderContext,
+  AppSidebarSlotRenderContext,
 } from './AppSidebar';
 export { AppTopBar } from './AppTopBar';
+export type { AppTopBarItem, AppTopBarRegion } from './AppTopBar';
 export { AppDrawer } from './AppDrawer';
 export { AppFooter } from './AppFooter';
 export { AppBreadcrumbs } from './AppBreadcrumbs';
