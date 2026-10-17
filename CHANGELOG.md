@@ -72,8 +72,10 @@ All notable changes to this project will be documented here. Format follows [Kee
 ### Fixed
 
 - `AppSidebar` (from next-boilerplate's fork): an active `href` item is marked `aria-current="page"`, as a
-  button item and kui-ejs's links already were; collapsed, the nav drops the scrollbar gutter that
-  `.sidebar-scrollbar-hover` reserves, so the icon-only items sit centered.
+  button item already was; collapsed, the nav drops the scrollbar gutter that `.sidebar-scrollbar-hover`
+  reserves, so the icon-only items sit centered. kui-ejs's AppSidebar meant to mark both but wrote the
+  attribute through escaped output (`aria-current=&#34;page&#34;`); it is fixed there in the same change set,
+  and its nav reserves no gutter.
 - `usePresence` (Modal, Drawer, Popover): an overlay opened within 250 ms of mounting could stay unmounted
   while open, because the mount-time close timer's update landed after the open click's. The timer now only
   runs while closing and only moves `closing` on. (This was the flaky `CommandPalette` focus test.)
