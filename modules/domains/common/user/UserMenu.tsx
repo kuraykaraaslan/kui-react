@@ -2,7 +2,7 @@
 import { Avatar } from '@/modules/ui/Avatar';
 import { Button } from '@/modules/ui/Button';
 import { DropdownMenu, mergeMenuItems, type DropdownItem } from '@/modules/ui/DropdownMenu';
-import { SafeUser } from '../types';
+import type { SafeUser, UserProfile } from '../types';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faUser, faGear, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
@@ -11,6 +11,15 @@ import { faChevronDown, faUser, faGear, faArrowRightFromBracket } from '@fortawe
 export type UserMenuDefaultItemId = 'profile' | 'settings' | 'sign-out';
 
 export type UserMenuLabels = { profile?: string; settings?: string; signOut?: string };
+
+/**
+ * What the menu shows of the user, for a host that has no full `SafeUser` at hand (a session
+ * with an email and a profile). Without a `userRole` the trigger shows the name alone.
+ */
+export type UserMenuUser = Pick<SafeUser, 'email'> & {
+  userRole?: string | null;
+  userProfile?: Pick<UserProfile, 'name' | 'profilePicture'> | null;
+};
 
 /**
  * Where the built-in items sit. Contributed items without a `group` join `account`, and
@@ -34,8 +43,10 @@ export function UserMenu({
   labels,
   align = 'right',
   onlyAvatar = false,
+  portal = false,
+  className,
 }: {
-  user: SafeUser;
+  user: SafeUser | UserMenuUser;
   /** Replaces the built-in items, unless `mergeItems` is set. */
   items?: DropdownItem[];
   /** Items other modules contribute; always merged with the menu's items, never replacing them. */
@@ -51,6 +62,12 @@ export function UserMenu({
   labels?: UserMenuLabels;
   align?: 'left' | 'right';
   onlyAvatar?: boolean;
+  /**
+   * Render the open menu in `document.body` (fixed under the trigger), so a clipping or
+   * stacking parent, such as a sticky top bar, cannot cut it off.
+   */
+  portal?: boolean;
+  className?: string;
 }) {
   const displayName = user.userProfile?.name ?? user.email;
   const avatar      = user.userProfile?.profilePicture ?? null;
@@ -87,16 +104,21 @@ export function UserMenu({
       variant="ghost"
       size="sm"
       aria-label={`User menu for ${displayName}`}
-      className={cn("gap-2 px-2")}
+      className={cn('group gap-2 px-2')}
     >
       <Avatar src={avatar} name={displayName} size="sm" />
       {!onlyAvatar && (
         <div className="hidden sm:block text-left min-w-0">
           <p className="text-sm font-medium text-text-primary truncate max-w-[8rem]">{displayName}</p>
-          <p className="text-xs text-text-secondary truncate">{user.userRole}</p>
+          {user.userRole && <p className="text-xs text-text-secondary truncate">{user.userRole}</p>}
         </div>
       )}
-      <FontAwesomeIcon icon={faChevronDown} className="w-3 h-3 text-text-disabled hidden sm:block" aria-hidden="true" />
+      {/* DropdownMenu sets aria-expanded on the trigger: the chevron turns over while the menu is open. */}
+      <FontAwesomeIcon
+        icon={faChevronDown}
+        className="w-3 h-3 text-text-disabled hidden sm:block transition-transform group-aria-expanded:rotate-180"
+        aria-hidden="true"
+      />
     </Button>
   );
 
@@ -107,5 +129,7 @@ export function UserMenu({
     </div>
   );
 
-  return <DropdownMenu trigger={trigger} items={menuItems} header={header} align={align} />;
+  return (
+    <DropdownMenu trigger={trigger} items={menuItems} header={header} align={align} portal={portal} className={className} />
+  );
 }

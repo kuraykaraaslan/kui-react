@@ -64,6 +64,62 @@ describe('UserMenu', () => {
     expect(labels()).toEqual(['Profile', 'Settings', 'Sign out']);
   });
 
+  it('a hidden item with a built-in id leaves that item out', async () => {
+    await openMenu(<UserMenu user={USER} mergeItems items={[{ id: 'settings', label: 'Settings', hidden: true }]} />);
+    expect(labels()).toEqual(['Profile', 'Sign out']);
+  });
+
+  it('shows the role under the name, and the name alone without a role', () => {
+    const { unmount } = render(<UserMenu user={USER} />);
+    expect(screen.getByRole('button', { name: 'User menu for Jane Doe' })).toHaveTextContent('ADMIN');
+    unmount();
+    render(<UserMenu user={{ email: 'sam@acme.com', userProfile: { name: 'Sam' } }} />);
+    const trigger = screen.getByRole('button', { name: 'User menu for Sam' });
+    expect(trigger.querySelectorAll('p')).toHaveLength(1);
+  });
+
+  it('takes the email as the name when the profile has none', () => {
+    render(<UserMenu user={{ email: 'sam@acme.com', userProfile: null }} />);
+    expect(screen.getByRole('button', { name: 'User menu for sam@acme.com' })).toBeInTheDocument();
+  });
+
+  it('the chevron turns over while the menu is open', async () => {
+    const user = userEvent.setup();
+    render(<UserMenu user={USER} />);
+    const trigger = screen.getByRole('button', { name: 'User menu for Jane Doe' });
+    const chevron = trigger.querySelector('svg:last-of-type')!;
+    expect(trigger).toHaveClass('group');
+    expect(chevron).toHaveClass('group-aria-expanded:rotate-180', 'transition-transform');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('portal renders the open menu in document.body, outside a clipping parent', async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <div className="overflow-hidden">
+        <UserMenu user={USER} portal />
+      </div>,
+    );
+    await user.click(screen.getByRole('button', { name: 'User menu for Jane Doe' }));
+    const menu = screen.getByRole('menu');
+    expect(container.contains(menu)).toBe(false);
+    expect(menu).toHaveClass('fixed');
+    expect(menu.style.right).not.toBe('');
+  });
+
+  it('renders the menu in place without portal', async () => {
+    const { container } = render(<UserMenu user={USER} />);
+    await userEvent.setup().click(screen.getByRole('button', { name: 'User menu for Jane Doe' }));
+    expect(container.contains(screen.getByRole('menu'))).toBe(true);
+  });
+
+  it('passes className to the root', () => {
+    const { container } = render(<UserMenu user={USER} className="ml-auto" />);
+    expect(container.firstElementChild).toHaveClass('relative', 'inline-block', 'ml-auto');
+  });
+
   it('wires hrefs, handlers and labels of the built-in items', async () => {
     const onSignOut = vi.fn();
     const user = await openMenu(
