@@ -60,6 +60,21 @@ describe('SchemaForm', () => {
     expect(onChange).toHaveBeenLastCalledWith({ items: [{ name: '' }] });
   });
 
+  it('keeps the repeater item buttons out of the item <summary> (no nested interactive controls)', () => {
+    vi.useFakeTimers();
+    const onChange = vi.fn();
+    const values = { items: [{ name: 'First' }, { name: 'Second' }] };
+    const { container } = render(<SchemaForm schema={{ items: schema.items }} values={values} onChange={onChange} debounceMs={0} />);
+    for (const summary of container.querySelectorAll('summary')) {
+      expect(summary.querySelector('button, a, input, select, textarea')).toBeNull();
+    }
+    fireEvent.click(screen.getAllByRole('button', { name: 'Move down' })[0]);
+    expect(onChange).toHaveBeenLastCalledWith({ items: [{ name: 'Second' }, { name: 'First' }] });
+    // The form keeps the reordered list: removing the second item drops "First".
+    fireEvent.click(screen.getAllByRole('button', { name: 'Remove item' })[1]);
+    expect(onChange).toHaveBeenLastCalledWith({ items: [{ name: 'Second' }] });
+  });
+
   it('shows external errors', () => {
     render(<SchemaForm schema={schema} values={{}} onChange={() => {}} errors={{ title: 'Title is required' }} />);
     expect(screen.getByRole('alert').textContent).toBe('Title is required');

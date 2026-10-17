@@ -299,29 +299,34 @@ function RepeaterControl({ id, field, value, onChange, overrides, depth = 0 }: F
   return (
     <div id={id} className="space-y-2">
       {items.map((it, i) => (
-        <details key={i} open={i === items.length - 1} className="rounded-lg border border-border">
-          <summary className="flex items-center justify-between px-3 py-2 cursor-pointer select-none bg-surface-overlay">
-            <span className="text-xs font-medium text-text-secondary truncate">{title(it, i)}</span>
-            <span className="flex gap-0.5">
-              <button type="button" className={btn} disabled={i === 0} aria-label="Move up" onClick={(e) => { e.preventDefault(); move(i, -1); }}>Up</button>
-              <button type="button" className={btn} disabled={i === items.length - 1} aria-label="Move down" onClick={(e) => { e.preventDefault(); move(i, 1); }}>Down</button>
-              <button type="button" className={cn(btn, 'hover:text-error')} aria-label="Remove item" onClick={(e) => { e.preventDefault(); onChange(items.filter((_, j) => j !== i)); }}>Remove</button>
-            </span>
-          </summary>
-          <div className="p-3 space-y-3 border-t border-border">
-            {Object.entries(sub).map(([k, f]) => {
-              const cid = `${id}-${i}-${k}`;
-              if (f.type === 'repeater' && depth >= 1) return null; // nesting is capped at two levels
-              if (!shouldShow(f, it)) return null; // an item field's showIf reads its own item
-              return (
-                <div key={k}>
-                  <label htmlFor={cid} className="block mb-1 text-[11px] text-text-secondary">{f.label}</label>
-                  <FieldControl id={cid} field={f} value={it[k]} onChange={(v) => set(i, k, v)} overrides={overrides} depth={depth + 1} />
-                </div>
-              );
-            })}
-          </div>
-        </details>
+        // The item's buttons sit over the right end of its <summary> instead of inside it: a
+        // summary is itself interactive, and controls nested in it are an a11y error
+        // (nested-interactive). min-h-9 keeps the header the height the buttons gave it.
+        <div key={i} className="relative">
+          <span className="absolute top-px right-px z-10 flex items-center gap-0.5 h-9 px-3">
+            <button type="button" className={btn} disabled={i === 0} aria-label="Move up" onClick={() => move(i, -1)}>Up</button>
+            <button type="button" className={btn} disabled={i === items.length - 1} aria-label="Move down" onClick={() => move(i, 1)}>Down</button>
+            <button type="button" className={cn(btn, 'hover:text-error')} aria-label="Remove item" onClick={() => onChange(items.filter((_, j) => j !== i))}>Remove</button>
+          </span>
+          <details open={i === items.length - 1} className="rounded-lg border border-border">
+            <summary className="flex items-center min-h-9 px-3 pr-36 cursor-pointer select-none bg-surface-overlay">
+              <span className="text-xs font-medium text-text-secondary truncate">{title(it, i)}</span>
+            </summary>
+            <div className="p-3 space-y-3 border-t border-border">
+              {Object.entries(sub).map(([k, f]) => {
+                const cid = `${id}-${i}-${k}`;
+                if (f.type === 'repeater' && depth >= 1) return null; // nesting is capped at two levels
+                if (!shouldShow(f, it)) return null; // an item field's showIf reads its own item
+                return (
+                  <div key={k}>
+                    <label htmlFor={cid} className="block mb-1 text-[11px] text-text-secondary">{f.label}</label>
+                    <FieldControl id={cid} field={f} value={it[k]} onChange={(v) => set(i, k, v)} overrides={overrides} depth={depth + 1} />
+                  </div>
+                );
+              })}
+            </div>
+          </details>
+        </div>
       ))}
       <button type="button" onClick={add}
         className="w-full py-2 text-xs rounded-md border border-dashed border-border text-text-secondary hover:text-text-primary hover:border-border-strong focus-visible:ring-2 focus-visible:ring-border-focus">

@@ -71,6 +71,9 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ### Fixed
 
+- `SchemaForm` repeater items: the Up / Down / Remove buttons sat inside the item's `<summary>`, an interactive
+  element, which axe reports as a serious `nested-interactive` violation (the widget-kit showcase failed its a11y
+  check). They now sit over the summary's right end instead of inside it; the header looks and works the same.
 - `AppSidebar` (from next-boilerplate's fork): an active `href` item is marked `aria-current="page"`, as a
   button item already was; collapsed, the nav drops the scrollbar gutter that `.sidebar-scrollbar-hover`
   reserves, so the icon-only items sit centered. kui-ejs's AppSidebar meant to mark both but wrote the
