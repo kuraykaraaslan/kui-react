@@ -143,12 +143,61 @@ describe('TimeWindowSelect: switching kinds keeps only the settings', () => {
   });
 });
 
+describe('TimeWindowSelect: review 2026-10-17', () => {
+  it('back to Realtime from History resets to the "Last" choice, and what is shown is what Update stores', async () => {
+    const { onChange, user, open } = setup({ mode: 'calendar', period: 'current.day' });
+    await open();
+    expect(screen.getByRole('radio', { name: 'Current period' })).toBeChecked();
+    await user.click(screen.getByRole('tab', { name: 'History' }));
+    await user.click(screen.getByRole('tab', { name: 'Realtime' }));
+    expect(screen.getByRole('radio', { name: 'Last' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: '24h' })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getAllByRole('spinbutton', { name: 'Amount' })[0]).toHaveValue(24);
+    await user.click(screen.getByRole('button', { name: 'Update' }));
+    expect(onChange).toHaveBeenLastCalledWith({ mode: 'relative', last: '24h' });
+  });
+
+  it('a board without avg shows and applies an aggregation it offers', async () => {
+    const { onChange, user, open } = setup({ mode: 'relative', last: '24h' }, { aggregations: ['max', 'sum'] });
+    await open();
+    expect(screen.getByRole('combobox', { name: 'Aggregation' })).toHaveValue('max');
+    await user.click(screen.getByRole('button', { name: 'Update' }));
+    expect(onChange).toHaveBeenLastCalledWith({ mode: 'relative', last: '24h', aggregation: 'max' });
+  });
+
+  it('a window longer than the consumer accepts cannot be applied, and says why', async () => {
+    const { user, open } = setup({ mode: 'relative', last: '24h' });
+    await open();
+    const amount = screen.getAllByRole('spinbutton', { name: 'Amount' })[0];
+    await user.clear(amount);
+    await user.type(amount, '400');
+    await user.selectOptions(screen.getAllByRole('combobox', { name: 'Unit' })[0], 'd');
+    expect(screen.getByRole('alert')).toHaveTextContent('A window can be at most 366 days long');
+    expect(screen.getByRole('button', { name: 'Update' })).toBeDisabled();
+    await user.click(screen.getByRole('tab', { name: 'History' }));
+    await user.click(screen.getByRole('radio', { name: 'Last' }));
+    expect(screen.getByRole('button', { name: 'Update' })).toBeDisabled();
+  });
+
+  it('an invalid realtime amount disables Update instead of applying the old window', async () => {
+    const { user, open } = setup({ mode: 'relative', last: '24h' });
+    await open();
+    const amount = screen.getAllByRole('spinbutton', { name: 'Amount' })[0];
+    await user.clear(amount);
+    await user.type(amount, '0');
+    expect(screen.getByRole('button', { name: 'Update' })).toBeDisabled();
+  });
+});
+
 describe('TimeWindowSelect helpers', () => {
   it('zoned datetime-local values round-trip, across a DST change', () => {
     expect(toZonedInput('2026-10-16T00:00:00.000Z', 'Europe/Istanbul')).toBe('2026-10-16T03:00');
     expect(fromZonedInput('2026-10-16T03:00', 'Europe/Istanbul')).toBe('2026-10-16T00:00:00.000Z');
     expect(fromZonedInput('2026-11-01T12:00', 'America/New_York')).toBe('2026-11-01T17:00:00.000Z');
     expect(fromZonedInput('2026-10-31T12:00', 'America/New_York')).toBe('2026-10-31T16:00:00.000Z');
+    // A time in a DST gap moves forward in every zone (review 2026-10-17).
+    expect(fromZonedInput('2026-03-08T02:30', 'America/New_York')).toBe('2026-03-08T07:30:00.000Z');
+    expect(fromZonedInput('2026-03-29T02:30', 'Europe/Berlin')).toBe('2026-03-29T01:30:00.000Z');
   });
   it('spans and the summary', () => {
     expect(windowSpanMs({ mode: 'relative', last: '3d' })).toBe(3 * 86_400_000);

@@ -51,6 +51,8 @@ export type TimeWindowSelectMessages = TimeWindowMessages & {
   /** `{count}` is replaced. */
   bucketsTooMany: string;
   open: string;
+  /** `{days}` is replaced. */
+  tooLong: string;
 };
 
 export const DEFAULT_TIME_WINDOW_SELECT_MESSAGES: TimeWindowSelectMessages = {
@@ -69,6 +71,7 @@ export const DEFAULT_TIME_WINDOW_SELECT_MESSAGES: TimeWindowSelectMessages = {
   buckets: '≈ {count} buckets',
   bucketsTooMany: '≈ {count} buckets: the server will use a coarser interval',
   open: 'Change time window',
+  tooLong: 'A window can be at most {days} days long',
 };
 
 // ── zoned wall-clock helpers: a `datetime-local` value is a wall time in the window's zone ──────────────────────
@@ -99,7 +102,10 @@ export function fromZonedInput(v: string, timeZone?: string): string {
     return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - Math.floor(t / 1000) * 1000;
   };
   const first = guess - offset(guess);
-  return new Date(guess - offset(first)).toISOString();
+  const second = guess - offset(first);
+  // In a DST gap the wall time does not exist and the two readings disagree: the later one is the first real instant,
+  // in every zone (review 2026-10-17: New York moved back, Berlin forward).
+  return new Date(second === first ? second : Math.max(first, second)).toISOString();
 }
 
 /** The span a window covers, in ms (a calendar period approximately), or null when it cannot be told. */
@@ -152,6 +158,7 @@ export function TimeWindowSelect({
   showTimezone = true,
   tabs = ['realtime', 'history'],
   maxBuckets = 500,
+  maxSpanMs = 366 * 86_400_000,
   idPrefix = 'tws',
   className,
   messages,
@@ -171,6 +178,8 @@ export function TimeWindowSelect({
   tabs?: Array<'realtime' | 'history'>;
   /** Above this many buckets the panel says the server will coarsen the interval (match the server's cap). */
   maxBuckets?: number;
+  /** The longest window a consumer accepts (default 366 days, the dashboard server's); a longer one cannot be applied. */
+  maxSpanMs?: number;
   idPrefix?: string;
   className?: string;
   messages?: Partial<TimeWindowSelectMessages>;
@@ -192,8 +201,13 @@ export function TimeWindowSelect({
   const [amount, setAmount] = useState('1');
   const [unit, setUnit] = useState('h');
 
+  /** The aggregation shown and applied: the window's own when offered, else `avg` when offered, else the first one offered. */
+  const aggregationFor = (a: string | undefined) => (a && aggregations.includes(a) ? a : aggregations.includes('avg') ? undefined : aggregations[0]);
   const begin = () => {
-    const v = value ?? fallback;
+    const raw = value ?? fallback;
+    // A board that does not offer the window's aggregation (or `avg`, the default) shows and applies one it offers.
+    const agg = aggregationFor(raw.aggregation);
+    const v = (agg === raw.aggregation ? raw : { ...raw, aggregation: agg }) as TimeWindowValue;
     setDraft(v);
     setTab(startTab(v));
     // A window of a kind this board does not offer opens on the kind it does, starting from a default of that kind.
@@ -214,11 +228,20 @@ export function TimeWindowSelect({
 
   const extras = { interval: draft.interval, aggregation: draft.aggregation, timezone: draft.timezone };
   const put = (next: TimeWindowValue) => setDraft({ ...next, ...extras } as TimeWindowValue);
-  const durationValid = DURATION.test(`${amount}${unit}`);
+  const durationMs = DURATION.test(`${amount}${unit}`) ? Number(amount) * UNIT_MS[unit] : null;
+  const durationValid = durationMs !== null && durationMs <= maxSpanMs;
 
   const switchTab = (next: Tab) => {
     setTab(next);
-    if (next === 'realtime' && tabOf(draft) !== 'realtime') put({ mode: 'relative', last: fallback.mode === 'relative' ? fallback.last : '24h' });
+    if (next === 'realtime' && tabOf(draft) !== 'realtime') {
+      // Back to the "Last" choice on the default preset, with the inputs showing it (review 2026-10-17: the current
+      // period stayed ticked while Update stored the preset).
+      const last = fallback.mode === 'relative' ? fallback.last : '24h';
+      const d = DURATION.exec(last);
+      setRtKind('last');
+      if (d) { setAmount(d[1]); setUnit(d[2]); }
+      put({ mode: 'relative', last });
+    }
     if (next === 'history' && tabOf(draft) !== 'history') {
       const to = new Date(now()); to.setSeconds(0, 0);
       put({ mode: 'absolute', from: new Date(to.getTime() - 86_400_000).toISOString(), to: to.toISOString() });
@@ -227,7 +250,12 @@ export function TimeWindowSelect({
   };
 
   const historyLast = tab === 'history' && hKind === 'last';
-  const canApply = historyLast ? durationValid : !(draft.mode === 'absolute' && !(Date.parse(draft.to) > Date.parse(draft.from)));
+  const realtimeLast = tab === 'realtime' && rtKind === 'last';
+  const draftSpan = windowSpanMs(draft);
+  const tooLong = historyLast || realtimeLast ? durationMs !== null && durationMs > maxSpanMs : draftSpan !== null && draftSpan > maxSpanMs;
+  const canApply = historyLast || realtimeLast
+    ? durationValid
+    : !tooLong && !(draft.mode === 'absolute' && !(Date.parse(draft.to) > Date.parse(draft.from)));
   /** What Update stores: a History "last N" is anchored to the moment it is applied (the clock is read only here). */
   const apply = () => {
     if (!canApply) return;
@@ -377,7 +405,7 @@ export function TimeWindowSelect({
           <div className="space-y-2 border-t border-border pt-3">
             <div className="flex flex-wrap items-center gap-2">
               {showAggregation && (
-                <select aria-label={m.aggregation} className={field} value={draft.aggregation ?? 'avg'}
+                <select aria-label={m.aggregation} className={field} value={draft.aggregation ?? (aggregations.includes('avg') ? 'avg' : aggregations[0])}
                   onChange={(e) => setDraft({ ...draft, aggregation: e.target.value })}>
                   {aggregations.map((a) => <option key={a} value={a}>{m.aggregationValue.replace('{value}', a)}</option>)}
                 </select>
@@ -399,6 +427,9 @@ export function TimeWindowSelect({
                 </select>
               )}
             </div>
+            {tooLong && (
+              <p className="text-xs text-error" role="alert">{m.tooLong.replace('{days}', String(Math.floor(maxSpanMs / 86_400_000)))}</p>
+            )}
             {bucketCount !== null && (
               <p className={cn('text-xs', bucketCount > maxBuckets ? 'text-warning' : 'text-text-secondary')} role="status">
                 {(bucketCount > maxBuckets ? m.bucketsTooMany : m.buckets).replace('{count}', String(bucketCount))}
