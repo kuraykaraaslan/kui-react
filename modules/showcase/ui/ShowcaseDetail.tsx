@@ -312,12 +312,15 @@ export function ShowcaseDetail({ slug }: { slug: string }) {
         <PropsEditor key={selected.id} {...selected.playground} />
       )}
 
-      <div className={cn(
-        'grid gap-4',
-        variantLayout === 'grid'
-          ? 'grid-cols-1 xl:grid-cols-2'
-          : 'grid-cols-1'
-      )}>
+      <div
+        data-variant-layout={variantLayout}
+        className={cn(
+          'grid gap-4',
+          variantLayout === 'grid'
+            ? 'grid-cols-1 xl:grid-cols-2'
+            : 'grid-cols-1'
+        )}
+      >
         {selected.variants.map((variant: ShowcaseVariant, index: number) => (
           <div
             key={variant.title}

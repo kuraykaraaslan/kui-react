@@ -24,8 +24,22 @@ export default defineConfig({
   // on failure, so a nightly/PR failure is debuggable without rerunning.
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   timeout: 30_000,
+  // Comparison tolerances. The defaults (threshold 0.2, maxDiffPixelRatio
+  // 0.02) let real regressions through: a swapped primary colour (blue
+  // #3b82f6 vs purple #8b5cf6, close in luminance) is below a 0.2 per-pixel
+  // YIQ threshold, and a misplaced pale panel or a recoloured button stays
+  // under 2% of the image (both happened in kui-ejs's identical suite).
+  // Measured on this suite (2026-10-17), with the browser clock fixed in the
+  // specs: two consecutive full renders differ in no pixel at threshold 0.1
+  // (only the RichTextEditor variants differ, below 0.1, by caret-level
+  // shading). threshold 0.1 counts the colour swap; maxDiffPixelRatio
+  // 0.0005 (0.05%) fails the smallest swapped-colour changes measured in
+  // kui-ejs (0.11% of an image) with a 2x margin and leaves a little room
+  // for anti-aliasing drift from a Chromium update. If a browser or font
+  // update moves many baselines at once, regenerate them rather than
+  // loosening these.
   expect: {
-    toHaveScreenshot: { maxDiffPixelRatio: 0.02 },
+    toHaveScreenshot: { threshold: 0.1, maxDiffPixelRatio: 0.0005 },
   },
   use: {
     baseURL: 'http://localhost:3002',

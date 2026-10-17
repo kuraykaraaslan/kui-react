@@ -20,6 +20,10 @@ const registry = JSON.parse(
 );
 
 const themes: { id: string; route: string }[] = registry.themes;
+// The browser's clock for every screenshot (see the page.clock call below).
+const FIXED_NOW = new Date('2026-05-13T09:00:00Z');
+const REAL_CLOCK_THEMES = new Set(['social']);
+
 // Leaflet's own tiles and marker images are left out of the img mask: their boxes reach far past the
 // map they are clipped to, so masking them painted over neighbouring content (the code panel, the
 // rest of the page). The .leaflet-container mask already covers the map.
@@ -48,6 +52,12 @@ function writeAxeFailure(id: string, violations: unknown) {
 test.describe('theme landing pages', () => {
   for (const theme of themes) {
     test(theme.id, async ({ page }) => {
+      // A fixed clock, as in showcase.spec.ts: the iot page's live chart axis reads the time. Not
+      // for the social page: its posts are stamped when the page is prerendered (Date.now() in
+      // social.data.ts) and shown relative to the viewer's clock, so a fixed clock would show
+      // them as negative ages that change with every build. With the real clock its hour- and
+      // day-grained labels are stable.
+      if (!REAL_CLOCK_THEMES.has(theme.id)) await page.clock.setFixedTime(FIXED_NOW);
       await page.goto(theme.route);
       await expect(page).toHaveScreenshot(`${theme.id}.png`, {
         fullPage: true,

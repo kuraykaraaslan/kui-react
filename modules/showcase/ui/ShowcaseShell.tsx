@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { AppShell } from '@/modules/app/AppShell';
 import { AppSidebar } from '@/modules/app/AppSidebar';
@@ -12,7 +12,7 @@ import { SHOWCASE_BRAND } from '@/libs/config/showcase.config';
 import { BrandMark } from './BrandMark';
 import { GithubButton } from './GithubButton';
 import { SidebarBrand } from './SidebarBrand';
-import { LayoutSwitcher, type VariantLayout } from './LayoutSwitcher';
+import { LayoutSwitcher, layoutFromSearch, type VariantLayout } from './LayoutSwitcher';
 import { VariantLayoutContext } from './VariantLayoutContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse } from '@fortawesome/free-solid-svg-icons';
@@ -24,6 +24,14 @@ export function ShowcaseShell({ children }: { children: React.ReactNode }) {
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [variantLayout, setVariantLayout] = useState<VariantLayout>('side');
+
+  // ?layout=side|stack|grid|variant picks the layout on load (after hydration, so the server and
+  // the first client render agree on 'side').
+  useEffect(() => {
+    const fromUrl = layoutFromSearch(window.location.search);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (fromUrl) setVariantLayout(fromUrl);
+  }, []);
 
   const navGroups = useMemo(() => [
     {

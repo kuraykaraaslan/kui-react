@@ -3,7 +3,20 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTableColumns, faTableList, faBorderAll } from '@fortawesome/free-solid-svg-icons';
 import { cn } from '@/libs/utils/cn';
 
-export type VariantLayout = 'side' | 'stack' | 'grid';
+/**
+ * 'variant' is not in the switcher: one column, each variant in the layout it declares
+ * (`layout: 'stack'`, else side by side). The visual regression suite opens pages with
+ * `?layout=variant`, so a variant that needs the full width is captured the way its author laid it out.
+ */
+export type VariantLayout = 'side' | 'stack' | 'grid' | 'variant';
+
+const URL_LAYOUTS: readonly VariantLayout[] = ['side', 'stack', 'grid', 'variant'];
+
+/** The layout a `?layout=` query parameter asks for, if it names one. */
+export function layoutFromSearch(search: string): VariantLayout | null {
+  const value = new URLSearchParams(search).get('layout');
+  return (URL_LAYOUTS as readonly string[]).includes(value ?? '') ? (value as VariantLayout) : null;
+}
 
 const OPTIONS: { value: VariantLayout; icon: typeof faTableColumns; title: string }[] = [
   { value: 'side',  icon: faTableColumns, title: 'Side layout'  },

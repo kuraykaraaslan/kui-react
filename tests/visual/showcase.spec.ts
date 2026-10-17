@@ -138,6 +138,20 @@ const registry = JSON.parse(
 );
 
 const components: { id: string; variantCount: number }[] = registry.components;
+// The browser's clock for every screenshot (see the page.clock call below).
+const FIXED_NOW = new Date('2026-05-13T09:00:00Z');
+
+// The showcase page scrolls inside <main> (an h-screen shell with overflow hidden), so a variant
+// taller than that scroller was captured only as far as the scroller showed it: the rest came out
+// white, and the sticky top bar could sit over the variant. For the screenshots the page grows to
+// its content and the top bar stays in the flow (same as kui-ejs's suite). Widths do not change.
+const WHOLE_PAGE = `
+  body { overflow: visible !important; }
+  .h-screen { height: auto !important; min-height: 100vh; overflow: visible !important; }
+  #main-content { overflow: visible !important; }
+  header.sticky { position: static !important; }
+`;
+
 // Leaflet's own tiles and marker images are left out of the img mask: their boxes reach far past the
 // map they are clipped to, so masking them painted over neighbouring content (the code panel, the
 // rest of the page). The .leaflet-container mask already covers the map.
@@ -169,9 +183,24 @@ function writeAxeFailure(id: string, violations: unknown) {
 test.describe('showcase component variants', () => {
   for (const component of components) {
     test(component.id, async ({ page }) => {
-      await page.goto(`/${component.id}`);
+      // A fixed clock: countdowns, "in 14 min" estimates and live chart axes read the time, and
+      // two runs a minute apart rendered them differently (food-eta-countdown-card, the iot page).
+      await page.clock.setFixedTime(FIXED_NOW);
+      await page.addInitScript((css) => {
+        document.addEventListener('DOMContentLoaded', () => {
+          const style = document.createElement('style');
+          style.id = 'visual-whole-page';
+          style.textContent = css;
+          document.head.appendChild(style);
+        });
+      }, WHOLE_PAGE);
+      // ?layout=variant: each variant in the layout it declares, so a `layout: 'stack'` variant (a wide
+      // table, a toolbar) is captured full width instead of squeezed beside its code panel. The
+      // showcase applies it after hydration; wait for it.
+      await page.goto(`/${component.id}?layout=variant`);
 
       const variantCount = component.variantCount ?? 0;
+      if (variantCount > 0) await page.locator('[data-variant-layout="variant"]').waitFor();
       for (let i = 0; i < variantCount; i++) {
         const variant = page.locator(`[data-variant-index="${i}"]`);
         await expect(variant).toBeVisible();
@@ -180,6 +209,9 @@ test.describe('showcase component variants', () => {
         });
       }
 
+      // axe runs on the page as users get it (scrolling inside <main>), so its counts stay comparable
+      // with the ratcheted baselines.
+      await page.evaluate(() => document.getElementById('visual-whole-page')?.remove());
       const results = await new AxeBuilder({ page }).analyze();
       const bad = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
 
