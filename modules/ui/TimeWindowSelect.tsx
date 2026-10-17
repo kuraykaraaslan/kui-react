@@ -197,9 +197,12 @@ export function TimeWindowSelect({
     setDraft(v);
     setTab(startTab(v));
     // A window of a kind this board does not offer opens on the kind it does, starting from a default of that kind.
+    // Only the settings carry over: the old kind's own keys (`last`, `from`/`to`, `period`) must not ride along, a strict
+    // consumer refuses a window with keys of two kinds.
     if (!allowed.includes(tabOf(v))) {
-      if (allowed[0] === 'realtime') setDraft({ ...v, ...fallback } as TimeWindowValue);
-      else { const to = new Date(now()); to.setSeconds(0, 0); setDraft({ ...v, mode: 'absolute', from: new Date(to.getTime() - 86_400_000).toISOString(), to: to.toISOString() } as TimeWindowValue); }
+      const carry = { ...(v.interval ? { interval: v.interval } : {}), ...(v.aggregation ? { aggregation: v.aggregation } : {}), ...(v.timezone ? { timezone: v.timezone } : {}) };
+      if (allowed[0] === 'realtime') setDraft({ ...fallback, ...carry } as TimeWindowValue);
+      else { const to = new Date(now()); to.setSeconds(0, 0); setDraft({ mode: 'absolute', from: new Date(to.getTime() - 86_400_000).toISOString(), to: to.toISOString(), ...carry }); }
     }
     setRtKind(v.mode === 'calendar' && v.period.startsWith('current.') ? 'current' : 'last');
     setHKind(v.mode === 'calendar' ? 'period' : 'range');

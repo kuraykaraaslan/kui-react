@@ -121,7 +121,8 @@ describe('TimeWindowSelect: what a board lets viewers change', () => {
     await open();
     expect(screen.getByRole('radio', { name: 'Fixed range' })).toBeChecked();
     await user.click(screen.getByRole('button', { name: 'Update' }));
-    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ mode: 'absolute', to: new Date(NOW - (NOW % 60_000)).toISOString() }));
+    // Exactly an absolute window: the relative value's `last` must not ride along (a strict consumer refuses it).
+    expect(onChange).toHaveBeenLastCalledWith({ mode: 'absolute', from: new Date(NOW - (NOW % 60_000) - 86_400_000).toISOString(), to: new Date(NOW - (NOW % 60_000)).toISOString() });
   });
 
   it('hidden controls and a narrowed aggregation list', async () => {
@@ -130,6 +131,15 @@ describe('TimeWindowSelect: what a board lets viewers change', () => {
     expect(screen.queryByRole('combobox', { name: 'Interval' })).toBeNull();
     expect(screen.queryByRole('combobox', { name: 'Time zone' })).toBeNull();
     expect(screen.getAllByRole('option').filter((o) => (o.textContent ?? '').startsWith('Aggregate')).map((o) => o.textContent)).toEqual(['Aggregate: avg', 'Aggregate: max']);
+  });
+});
+
+describe('TimeWindowSelect: switching kinds keeps only the settings', () => {
+  it('a fixed range on a realtime-only select becomes the default preset, keeping its interval and zone', async () => {
+    const { onChange, user, open } = setup({ mode: 'absolute', from: '2026-10-16T00:00:00.000Z', to: '2026-10-17T00:00:00.000Z', interval: '1h', timezone: 'Asia/Tokyo' }, { tabs: ['realtime'] });
+    await open();
+    await user.click(screen.getByRole('button', { name: 'Update' }));
+    expect(onChange).toHaveBeenLastCalledWith({ mode: 'relative', last: '24h', interval: '1h', timezone: 'Asia/Tokyo' });
   });
 });
 
