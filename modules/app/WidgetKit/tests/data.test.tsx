@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, within, fireEvent } from '@testing-library/react';
+import { render, screen, within, fireEvent, cleanup } from '@testing-library/react';
 import { effective, templateDefaults, validate } from '../settings/engine';
 import type { SettingsTemplate, Sparse } from '../settings/types';
 import type { SlotData } from '../kind';
@@ -255,6 +255,47 @@ describe('DataTableView', () => {
     fireEvent.click(screen.getByRole('button', { name: /Temperature/ }));
     expect(set).toHaveBeenCalledWith({ sort: { key: 'temp', dir: 'asc' } });
     expect(screen.queryByRole('button', { name: /Name/ })).toBeNull();
+  });
+
+  describe('server paging: the saved default sort (next-boilerplate decision 2026-10-17 #5b)', () => {
+    type Echo = { page: number; pageSize: number; sortable: string[]; searchable: boolean; sort?: { key: string; dir: 'asc' | 'desc' }; q?: string };
+    const echoOf = (over: Partial<Echo> = {}) => ({ ...table, total: 30, paging: { page: 1, pageSize: 3, sortable: ['temp'], searchable: true, ...over } }) as SlotData;
+    const view = (settings: Record<string, unknown>, rows: SlotData, paging: { set: (patch: object) => void; key?: string }) =>
+      <DataTableView settings={tableSettings(settings)} format={{}} data={{ rows }} paging={paging} />;
+
+    it('asks the server for it once, only for a key the query can sort by', () => {
+      const set = vi.fn();
+      const { rerender } = render(view({ defaultSort: 'temp', defaultSortDir: 'asc' }, echoOf(), { set }));
+      expect(set).toHaveBeenCalledWith({ sort: { key: 'temp', dir: 'asc' } });
+      rerender(view({ defaultSort: 'temp', defaultSortDir: 'asc' }, echoOf({ sort: { key: 'temp', dir: 'asc' }, page: 2 }), { set }));
+      expect(set).toHaveBeenCalledTimes(1);
+      cleanup();
+      const other = vi.fn();
+      render(view({ defaultSort: 'name' }, echoOf(), { set: other }));
+      expect(other).not.toHaveBeenCalled();
+    });
+
+    it("keeps a sort, search or page the viewer already chose for this query", () => {
+      for (const over of [{ sort: { key: 'temp', dir: 'desc' as const } }, { q: 'boil' }, { page: 3 }]) {
+        const set = vi.fn();
+        render(view({ defaultSort: 'temp', defaultSortDir: 'asc' }, echoOf(over), { set }));
+        expect(set).not.toHaveBeenCalled();
+        cleanup();
+      }
+    });
+
+    it('asks again for another query, follows a changed setting, and removes its own sort when the setting goes', () => {
+      const set = vi.fn();
+      const { rerender } = render(view({ defaultSort: 'temp' }, echoOf(), { set, key: 'q1' }));
+      expect(set).toHaveBeenLastCalledWith({ sort: { key: 'temp', dir: 'desc' } });
+      rerender(view({ defaultSort: 'temp', defaultSortDir: 'asc' }, echoOf({ sort: { key: 'temp', dir: 'desc' } }), { set, key: 'q1' }));
+      expect(set).toHaveBeenLastCalledWith({ sort: { key: 'temp', dir: 'asc' } });
+      rerender(view({}, echoOf({ sort: { key: 'temp', dir: 'asc' } }), { set, key: 'q1' }));
+      expect(set).toHaveBeenLastCalledWith({ sort: undefined });
+      set.mockClear();
+      rerender(view({ defaultSort: 'temp' }, echoOf(), { set, key: 'q2' }));
+      expect(set).toHaveBeenCalledWith({ sort: { key: 'temp', dir: 'desc' } });
+    });
   });
 
   it('isEmpty and toCsv follow the effective columns with raw values', () => {

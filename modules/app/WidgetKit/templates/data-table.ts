@@ -121,7 +121,7 @@ export const DATA_TABLE: SettingsTemplate = {
     },
     maxRows: {
       label: 'Rows per page', type: 'number', display: 'input', min: 1, max: 100, value: 10, group: 'rows',
-      description: 'Rows per page with page buttons, or the most rows shown without them. For a query that pages on the server, the server decides.',
+      description: 'Rows per page with page buttons, or the most rows shown without them. A query that pages on the server is asked for this many rows per page, up to its own maximum.',
     },
     paging: {
       label: 'More rows', type: 'select', display: 'segmented', value: 'none', group: 'rows', required: true,

@@ -1,10 +1,10 @@
 'use client';
-import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { cn } from '@/libs/utils/cn';
 import type { FontValue } from '../../SchemaForm/types';
 import { cssColor, fontStyle, formatValue, rangeFor, type RangeEdges, type ValueFormat } from '../settings/style';
 import type { Sparse } from '../settings/types';
-import type { SlotData, WidgetKindView, WidgetViewProps } from '../kind';
+import type { PagedEcho, SlotData, WidgetKindView, WidgetViewProps } from '../kind';
 import { isInternalPath } from '../templates/map';
 import { SettingIcon, useWidgetKit } from '../WidgetKitContext';
 import { useNow } from '../useNow';
@@ -458,8 +458,15 @@ const MESSAGES: TableMessages = {
 export type DataTableViewProps = WidgetViewProps & {
   /** Row / cell / button actions (16.4). */
   rowActions?: TableRowActions;
-  /** Set when the host can page the `rows` slot on the server; used only when the result echoes `paging`. */
-  paging?: { set: (patch: { page?: number; sort?: { key: string; dir: 'asc' | 'desc' } | undefined; q?: string }) => void };
+  /**
+   * Set when the host can page the `rows` slot on the server; used only when the result echoes `paging`. The table
+   * asks for the saved "Sort by" itself (once per query, when the echo says it can sort by it). `key` names the
+   * query: a new key (the slot bound to another query) is a fresh table that gets the default sort again.
+   */
+  paging?: {
+    set: (patch: { page?: number; sort?: { key: string; dir: 'asc' | 'desc' } | undefined; q?: string }) => void;
+    key?: string;
+  };
   messages?: Partial<TableMessages>;
   /** Fixed "now" for relative dates (tests, snapshots). */
   now?: number;
@@ -509,6 +516,47 @@ function Pager({ info, page, pages, onPage, canNext, m }: {
   );
 }
 
+/**
+ * A server-paged table's saved "Sort by" (`defaultSort` / `defaultSortDir`), asked of the server: the rows arrive
+ * sorted, so the table cannot sort them itself. It asks once per query (`paging.key`), when the echo says the key is
+ * sortable (asking for another would be refused), and again when the setting changes. A query the viewer has already
+ * sorted, searched or paged keeps the viewer's choice. Clearing the setting, or naming a key the query cannot sort by,
+ * removes the sort this asked for, unless the viewer has sorted since.
+ */
+function useServerDefaultSort(
+  echo: PagedEcho | undefined,
+  paging: DataTableViewProps['paging'],
+  defaultSort: string | undefined,
+  defaultSortDir: 'asc' | 'desc' | undefined,
+): void {
+  const setting = `${defaultSort ?? ''}|${defaultSortDir ?? ''}`;
+  const key = paging?.key ?? '';
+  const considered = useRef<{ key: string; setting: string } | null>(null);
+  const seeded = useRef<string | null>(null);
+  const active = !!echo && !!paging;
+  useEffect(() => {
+    if (!echo || !paging) return;
+    const last = considered.current;
+    if (last && last.key === key && last.setting === setting) return;
+    const fresh = !last || last.key !== key;
+    considered.current = { key, setting };
+    if (fresh) seeded.current = null;
+    if (fresh && (echo.sort || echo.q || echo.page > 1)) return;
+    const want = defaultSort && echo.sortable.includes(defaultSort)
+      ? { key: defaultSort, dir: defaultSortDir === 'asc' ? 'asc' as const : 'desc' as const }
+      : null;
+    if (want) {
+      if (echo.sort?.key !== want.key || echo.sort.dir !== want.dir) paging.set({ sort: want });
+      seeded.current = JSON.stringify(want);
+    } else if (seeded.current && JSON.stringify(echo.sort ?? null) === seeded.current) {
+      paging.set({ sort: undefined });
+      seeded.current = null;
+    }
+    // The echo and the setter are read when the setting or the query changes: a new page must not ask again.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, setting, key]);
+}
+
 /** `data.table`: the bound rows with per-column display, viewer sort/search/paging and full styling. */
 export function DataTableView({
   settings, format, data, locale, renderLink, rowActions, paging, messages, now,
@@ -529,6 +577,7 @@ export function DataTableView({
   );
   const [query, setQuery] = useState('');
   const [serverQuery, setServerQuery] = useState(echo?.q ?? '');
+  useServerDefaultSort(paged ? echo : undefined, paged ? paging : undefined, s.defaultSort, s.defaultSortDir);
   const [page, setPage] = useState(1);
 
   const dateOf = (c: TableColumn): DateOptions => ({
