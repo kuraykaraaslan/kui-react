@@ -1,7 +1,7 @@
 'use client';
 import { useMemo } from 'react';
 import { cn } from '@/libs/utils/cn';
-import { MapCanvas, type MapMarker, type MapTilesConfig } from '@/modules/ui/MapView';
+import { MapCanvas, type MapMarker, type MapRoute, type MapTilesConfig, type MapZone } from '@/modules/ui/MapView';
 import { cssColor, rangeFor, type ColorRange, type RangeEdges } from '../settings/style';
 import type { Sparse } from '../settings/types';
 import type { SlotData, WidgetKindView, WidgetViewProps } from '../kind';
@@ -222,6 +222,63 @@ export type MapWidgetViewProps = WidgetViewProps & {
   legendLabel?: string;
 };
 
+const VARIANTS = new Set<MapZone['variant']>(['primary', 'info', 'success', 'warning', 'error', 'neutral']);
+
+/** A list of [lat, lng] pairs from a cell: an array, or that array as JSON text; null when it is not one. */
+export function readPositions(cell: unknown): [number, number][] | null {
+  let v = cell;
+  if (typeof v === 'string') { try { v = JSON.parse(v); } catch { return null; } }
+  if (!Array.isArray(v)) return null;
+  const out: [number, number][] = [];
+  for (const p of v) {
+    if (!Array.isArray(p) || p.length < 2) return null;
+    const lat = Number(p[0]); const lng = Number(p[1]);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+    out.push([lat, lng]);
+  }
+  return out;
+}
+
+/** The zones a slot's rows describe (rows without three valid corners are skipped). */
+export function buildZones(slot: SlotData | undefined, settings: Sparse): MapZone[] {
+  const s = settings as Record<string, unknown>;
+  const col = (k: string, d: string) => (typeof s[k] === 'string' && s[k] ? (s[k] as string) : d);
+  const fixed = VARIANTS.has(s.zoneVariant as MapZone['variant']) ? (s.zoneVariant as MapZone['variant']) : 'info';
+  const opacity = typeof s.zoneOpacity === 'number' ? s.zoneOpacity : 0.2;
+  const out: MapZone[] = [];
+  (slot?.rows ?? []).forEach((row, n) => {
+    const positions = readPositions(row[col('zonePositionsColumn', 'positions')]);
+    if (!positions || positions.length < 3) return;
+    const label = row[col('zoneLabelColumn', 'name')];
+    const v = typeof s.zoneVariantColumn === 'string' && s.zoneVariantColumn ? String(row[s.zoneVariantColumn] ?? '') : '';
+    out.push({
+      id: String(row.id ?? n), positions, fillOpacity: opacity,
+      variant: VARIANTS.has(v as MapZone['variant']) ? (v as MapZone['variant']) : fixed,
+      ...(label !== undefined && label !== null && label !== '' ? { label: String(label) } : {}),
+    });
+  });
+  return out;
+}
+
+/** The routes a slot's rows describe (rows without two valid points are skipped). */
+export function buildRoutes(slot: SlotData | undefined, settings: Sparse): MapRoute[] {
+  const s = settings as Record<string, unknown>;
+  const col = (k: string, d: string) => (typeof s[k] === 'string' && s[k] ? (s[k] as string) : d);
+  const color = cssColor(s.routeColor) ?? 'var(--primary)';
+  const weight = typeof s.routeWeight === 'number' ? s.routeWeight : 3;
+  const out: MapRoute[] = [];
+  (slot?.rows ?? []).forEach((row, n) => {
+    const positions = readPositions(row[col('routePositionsColumn', 'positions')]);
+    if (!positions || positions.length < 2) return;
+    const label = row[col('routeLabelColumn', 'name')];
+    out.push({
+      id: String(row.id ?? n), positions, color, weight, dashed: s.routeDashed === true,
+      ...(label !== undefined && label !== null && label !== '' ? { label: String(label) } : {}),
+    });
+  });
+  return out;
+}
+
 /** `map`: bound rows as markers on a card-less map that fills the card, with an optional colour legend. */
 export function MapWidgetView({
   settings, data, locale, renderLink, onMarkerClick, onNavigate, tiles, loadingLabel, ariaLabel, legendLabel = 'Legend',
@@ -229,6 +286,8 @@ export function MapWidgetView({
   const s = settings as S;
   const { markers, rows } = useMemo(() => buildMarkers(data.points, settings, locale), [data.points, settings, locale]);
   const legend = useMemo(() => (s.legend === false ? [] : mapLegend(data.points, settings)), [data.points, settings, s.legend]);
+  const zones = useMemo(() => buildZones(data.zones, settings), [data.zones, settings]);
+  const routes = useMemo(() => buildRoutes(data.routes, settings), [data.routes, settings]);
   const fit = s.fitBounds !== false;
   const center: [number, number] | undefined = typeof s.centerLat === 'number' && typeof s.centerLng === 'number'
     ? [s.centerLat, s.centerLng] : undefined;
@@ -254,6 +313,8 @@ export function MapWidgetView({
     <div className="relative h-full min-h-40 w-full">
       <MapCanvas
         markers={markers}
+        zones={zones}
+        routes={routes}
         tiles={tileSet}
         fitBounds={fit}
         fitBoundsPadding={typeof s.fitPadding === 'number' ? s.fitPadding : 32}
@@ -297,7 +358,8 @@ export function MapWidgetView({
 
 export const MAP_VIEW: WidgetKindView = {
   View: MapWidgetView,
-  isEmpty: (data, settings) => buildMarkers(data.points, settings).markers.length === 0,
+  isEmpty: (data, settings) => buildMarkers(data.points, settings).markers.length === 0
+    && buildZones(data.zones, settings).length === 0 && buildRoutes(data.routes, settings).length === 0,
   toCsv: (data, settings) => {
     const s = settings as S;
     const by = s.colorBy ?? 'column';

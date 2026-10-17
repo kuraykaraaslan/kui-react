@@ -17,7 +17,7 @@ export const internalLinkRule = (key: string) => (v: Sparse) =>
     ? [{ path: key, message: 'The link must be an internal path that starts with a single /' }]
     : [];
 
-/** `map`: bound rows with coordinates as markers. */
+/** `map`: bound rows with coordinates as markers, plus optional zones (polygons) and routes (lines). */
 export const MAP: SettingsTemplate = {
   id: 'builtin:map',
   version: 1,
@@ -35,6 +35,9 @@ export const MAP: SettingsTemplate = {
     { id: 'view', label: 'View', tab: 'Display', since: 1 },
     { id: 'controls', label: 'Map controls', tab: 'Behaviour', since: 1 },
     { id: 'click', label: 'Click', tab: 'Behaviour', since: 1 },
+    // Zones and routes (next-boilerplate 20.3d): purely additive optional slots, so no version bump.
+    { id: 'zones', label: 'Zones', tab: 'Data', since: 1 },
+    { id: 'routes', label: 'Routes', tab: 'Data', since: 1 },
   ],
   fields: since(1, {
     latColumn: { label: 'Latitude column', type: 'data-key', slot: 'points', value: 'lat', required: true, group: 'columns' },
@@ -127,6 +130,28 @@ export const MAP: SettingsTemplate = {
       description: 'Internal path only; {column} is replaced by the clicked row\'s value. Empty = markers are not links. Click actions run either way.',
     },
     linkLabel: { label: 'Link text', type: 'text', maxLength: 40, placeholder: 'Open', group: 'click', advanced: true },
+    zonePositionsColumn: {
+      label: 'Zone outline column', type: 'data-key', slot: 'zones', value: 'positions', group: 'zones',
+      description: 'A list of [latitude, longitude] corners (or that list as JSON text). Rows without three valid corners are skipped.',
+    },
+    zoneLabelColumn: { label: 'Zone name column', type: 'data-key', slot: 'zones', value: 'name', group: 'zones' },
+    zoneVariant: {
+      label: 'Zone colour', type: 'select', value: 'info', group: 'zones', required: true,
+      options: [opt('primary', 'Primary'), opt('info', 'Info'), opt('success', 'Success'), opt('warning', 'Warning'), opt('error', 'Error'), opt('neutral', 'Neutral')],
+    },
+    zoneVariantColumn: {
+      label: 'Zone colour column', type: 'data-key', slot: 'zones', group: 'zones', advanced: true,
+      description: 'A column whose value is one of primary, info, success, warning, error or neutral; anything else uses the zone colour.',
+    },
+    zoneOpacity: { label: 'Zone fill opacity', type: 'number', min: 0, max: 1, step: 0.05, value: 0.2, group: 'zones' },
+    routePositionsColumn: {
+      label: 'Route path column', type: 'data-key', slot: 'routes', value: 'positions', group: 'routes',
+      description: 'A list of [latitude, longitude] points in order (or that list as JSON text). Rows without two valid points are skipped.',
+    },
+    routeLabelColumn: { label: 'Route name column', type: 'data-key', slot: 'routes', value: 'name', group: 'routes' },
+    routeColor: colorField('Route colour', 'routes', 'var(--primary)'),
+    routeWeight: { label: 'Route width (px)', type: 'number', min: 1, max: 12, value: 3, group: 'routes' },
+    routeDashed: { label: 'Dashed routes', type: 'boolean', value: false, group: 'routes' },
   }),
   rules: [minBelowMax('minZoom', 'maxZoom'), internalLinkRule('linkTemplate')],
   migrations: [],
@@ -140,6 +165,10 @@ export const MAP_KIND: BuiltinKindSpec = {
   icon: 'fas fa-map-location-dot',
   defaultW: 6,
   defaultH: 5,
-  slots: [{ key: 'points', label: 'Points', shape: 'table', required: true }],
+  slots: [
+    { key: 'points', label: 'Points', shape: 'table', required: true },
+    { key: 'zones', label: 'Zones', shape: 'table', required: false },
+    { key: 'routes', label: 'Routes', shape: 'table', required: false },
+  ],
   template: MAP,
 };

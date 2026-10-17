@@ -157,6 +157,13 @@ function InnerMap({
   const set = tilesProp ? ('url' in tilesProp ? { light: tilesProp, dark: tilesProp } : tilesProp) : LEAFLET_TILES;
   const tiles = isDark ? set.dark : set.light;
 
+  // Fitting frames the zones' and routes' vertices too, not only the markers: a map of zones alone was not framed.
+  const fitPoints: MapMarker[] = [
+    ...markers,
+    ...zones.flatMap((z) => z.positions.map((position, n) => ({ id: `zone:${z.id}:${n}`, position }))),
+    ...routes.flatMap((r) => r.positions.map((position, n) => ({ id: `route:${r.id}:${n}`, position }))),
+  ];
+
   return (
     <MapContainer
       center={center}
@@ -175,12 +182,12 @@ function InnerMap({
       {zoomControl && ZoomControl && <ZoomControl key={controlsPosition} position={controlsPosition} />}
 
       <ClickHandler bundle={bundle} addMode={addMode} onMapClick={onMapClick} />
-      <FitBounds bundle={bundle} markers={markers} padding={fitBoundsPadding} maxZoom={fitMaxZoom} />
+      <FitBounds bundle={bundle} markers={fitPoints} padding={fitBoundsPadding} maxZoom={fitMaxZoom} />
       <ViewSync
         bundle={bundle}
         center={center}
         zoom={zoom}
-        fitting={fitBoundsPadding !== undefined && markers.length > 0}
+        fitting={fitBoundsPadding !== undefined && fitPoints.length > 0}
         minZoom={minZoom}
         maxZoom={maxZoom}
         scrollWheelZoom={scrollWheelZoom}

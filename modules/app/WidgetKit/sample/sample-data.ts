@@ -111,6 +111,33 @@ export function sampleSources(now = Date.now()): SampleSource[] {
       },
     },
     {
+      key: 'sample.zones', label: 'Sample · Service regions (zones)',
+      data: {
+        shape: 'table', fetchedAt: at(1),
+        columns: [
+          { key: 'id', label: 'Id', type: 'text' }, { key: 'name', label: 'Region', type: 'text' },
+          { key: 'positions', label: 'Outline', type: 'text' }, { key: 'state', label: 'State', type: 'badge' },
+        ],
+        rows: [
+          { id: 'marmara', name: 'Marmara', state: 'success', positions: [[41.4, 27.6], [41.4, 30.2], [39.9, 30.2], [39.9, 27.6]] },
+          { id: 'central', name: 'Central Anatolia', state: 'warning', positions: [[40.4, 31.8], [40.4, 33.6], [37.4, 33.6], [37.4, 31.8]] },
+        ],
+      },
+    },
+    {
+      key: 'sample.routes', label: 'Sample · Delivery routes',
+      data: {
+        shape: 'table', fetchedAt: at(1),
+        columns: [
+          { key: 'id', label: 'Id', type: 'text' }, { key: 'name', label: 'Route', type: 'text' }, { key: 'positions', label: 'Path', type: 'text' },
+        ],
+        rows: [
+          { id: 'west', name: 'Istanbul → Bursa → Izmir', positions: [[41.0082, 28.9784], [40.1885, 29.061], [38.4237, 27.1428]] },
+          { id: 'south', name: 'Ankara → Konya → Antalya', positions: [[39.9334, 32.8597], [37.8746, 32.4932], [36.8969, 30.7133]] },
+        ],
+      },
+    },
+    {
       key: 'sample.events', label: 'Sample · Recent events',
       data: {
         shape: 'table', fetchedAt: at(1),

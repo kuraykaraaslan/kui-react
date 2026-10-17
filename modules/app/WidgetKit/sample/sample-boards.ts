@@ -183,7 +183,7 @@ export const SAMPLE_INFRA_BOARD = board('Infrastructure health', [
 
 /** Where the devices are and what state they are in. */
 export const SAMPLE_SITES_BOARD = board('Sites and devices', [
-  P('map', 'map', 'Sites', 0, 0, 8, 10, { points: 'sample.sites' }, { tooltipColumns: ['devices', 'uptime'], legend: true }),
+  P('map', 'map', 'Sites', 0, 0, 8, 10, { points: 'sample.sites', zones: 'sample.zones', routes: 'sample.routes' }, { tooltipColumns: ['devices', 'uptime'], legend: true, zoneVariantColumn: 'state' }),
   P('device', 'stat.attributes', 'Selected device', 8, 0, 4, 5, { record: 'sample.device' }, {
     fields: [{ key: 'model' }, { key: 'firmware' }, { key: 'site' }, { key: 'temperature', unit: '°C', ranges: [{ from: 26, color: BAD }] }, { key: 'battery', unit: '%', ranges: [{ to: 20, color: BAD }] }],
   }),
