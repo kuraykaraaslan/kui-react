@@ -2,7 +2,7 @@ import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { RulesetEditor, type RulesetEditorRef, type RulesetGraph } from './index';
+import { RulesetEditor, type ParamEditorProps, type RulesetEditorRef, type RulesetGraph } from './index';
 import { catalogFromBlocks } from '../catalog';
 import type { RuleEdge, RuleNode } from '../types';
 
@@ -198,6 +198,47 @@ describe('RulesetEditor: the node panel', () => {
     expect(last()?.nodes.find((n) => n.nodeId === 'n2')?.script).toBe('return false;');
     await user.click(within(panel).getByRole('button', { name: /Reset script/ }));
     expect((within(panel).getByRole('textbox', { name: 'Script' }) as HTMLTextAreaElement).value).toContain('//');
+  });
+
+  it('shows the host\'s own editor of a block type in place of the form, and stores what it writes as the params', async () => {
+    const user = userEvent.setup();
+    const catalog = catalogFromBlocks([[
+      { type: 'trigger.quota', title: 'Quota', params: { level: { type: 'enum', options: ['exceeded', 'warning'], default: 'exceeded' } } },
+      { type: 'trigger.other', title: 'Other', params: { level: { type: 'enum', options: ['exceeded', 'warning'], default: 'exceeded' } } },
+    ]]);
+    const seen: Array<{ type: string; disabled?: boolean }> = [];
+    const QuotaEditor = ({ params, onChange, disabled, node: n, decl }: ParamEditorProps) => {
+      seen.push({ type: `${n.type}/${decl.type}`, disabled });
+      return (
+        <button type="button" disabled={disabled} onClick={() => onChange({ ...params, level: 'warning', custom: true })}>
+          custom {String(params.level)}
+        </button>
+      );
+    };
+    const { last } = setup({
+      catalog, paramEditors: { 'trigger.quota': QuotaEditor },
+      initialNodes: [node('a', 'trigger.quota', 'Quota', 0, 0, { config: { level: 'exceeded' } }), node('b', 'trigger.other', 'Other', 300, 0, { config: { level: 'exceeded' } })], initialEdges: [],
+    });
+    clickNode('Quota');
+    const panel = screen.getByRole('complementary', { name: 'Quota settings' });
+    expect(within(panel).queryByLabelText('Level')).not.toBeInTheDocument(); // no generated form
+    await user.click(within(panel).getByRole('button', { name: 'custom exceeded' }));
+    expect(last()?.nodes[0].config).toEqual({ level: 'warning', custom: true });
+    expect(within(panel).getByRole('button', { name: 'custom warning' })).toBeInTheDocument();
+    expect(seen[0]).toEqual({ type: 'trigger.quota/trigger.quota', disabled: false });
+    // a type without an editor keeps the form
+    clickNode('Other');
+    expect(within(screen.getByRole('complementary', { name: 'Other settings' })).getByLabelText('Level')).toBeInTheDocument();
+  });
+
+  it('hands the custom editor `disabled` in a read-only editor', async () => {
+    const user = userEvent.setup();
+    const catalog = catalogFromBlocks([[{ type: 'trigger.quota', title: 'Quota', params: { level: { type: 'enum', options: ['exceeded'], default: 'exceeded' } } }]]);
+    const Editor = ({ disabled }: ParamEditorProps) => <p>{disabled ? 'locked' : 'open'}</p>;
+    setup({ catalog, readOnly: true, paramEditors: { 'trigger.quota': Editor }, initialNodes: [node('a', 'trigger.quota', 'Quota', 0, 0)], initialEdges: [] });
+    fireEvent.contextMenu(nodeEl('Quota'));
+    await user.click(within(await screen.findByRole('menu')).getByRole('menuitem', { name: 'View' }));
+    expect(within(screen.getByRole('complementary', { name: 'Quota settings' })).getByText('locked')).toBeInTheDocument();
   });
 
   it('shows the form of a block of another catalog and stores the values as the params of the node', async () => {

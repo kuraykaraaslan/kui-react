@@ -1,6 +1,6 @@
 // The rule editor: a flow canvas for blocks of any catalog (IoT, automation, notifications …). Not tied to a domain.
 export { RulesetEditor } from './RulesetEditor';
-export type { RulesetEditorRef, RulesetEditorProps, RulesetGraph, NodeMenuContext, ContextMenuItem } from './RulesetEditor';
+export type { RulesetEditorRef, RulesetEditorProps, RulesetGraph, NodeMenuContext, ContextMenuItem, ParamEditorProps } from './RulesetEditor';
 export { FlowWorkspace } from './RulesetEditor/workspace/FlowWorkspace';
 export type { FlowWorkspaceProps, FlowWorkspaceRef } from './RulesetEditor/workspace/FlowWorkspace';
 export { InsightPanel } from './RulesetEditor/insight/InsightPanel';
