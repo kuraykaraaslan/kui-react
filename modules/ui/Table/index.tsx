@@ -29,8 +29,10 @@ export type {
   DataTableFetchArgs,
   DataTableFetchResult,
   DataTableMessages,
+  DataTableRowAction,
 } from './types';
 export { DEFAULT_MESSAGES } from './types';
+export { resolveRowActions } from './parts/RowActionsCell';
 
 // Core hooks — exposed for advanced consumers building bespoke layouts.
 export { useTable } from './core/useTable';

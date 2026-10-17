@@ -10,10 +10,13 @@ export function BodyRow<T extends Record<string, unknown>>({
   row,
   columns,
   onClick,
+  actions,
 }: {
   row: T;
   columns: Column<T>[];
   onClick?: (row: T) => void;
+  /** A trailing cell (the row-actions menu). */
+  actions?: React.ReactNode;
 }) {
   return (
     <tr
@@ -33,6 +36,7 @@ export function BodyRow<T extends Record<string, unknown>>({
             : String(row[col.key as keyof T] ?? '')}
         </td>
       ))}
+      {actions}
     </tr>
   );
 }

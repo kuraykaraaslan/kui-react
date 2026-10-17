@@ -91,6 +91,10 @@ export type DataTableMessages = {
   filter: string;
   clearFilter: string;
   apply: string;
+  /** Accessible label of each row's actions button. */
+  rowActions?: string;
+  /** Screen-reader heading of the row-actions column. */
+  actionsColumn?: string;
 };
 
 export const DEFAULT_MESSAGES: DataTableMessages = {
@@ -102,4 +106,29 @@ export const DEFAULT_MESSAGES: DataTableMessages = {
   filter: 'Filter',
   clearFilter: 'Clear',
   apply: 'Apply',
+  rowActions: 'Row actions',
+  actionsColumn: 'Actions',
+};
+
+/**
+ * One entry of a row's actions menu (`DataTable` `rowActions`). Every per-row field also takes
+ * a function of the row, so one descriptor list serves the whole table.
+ */
+export type DataTableRowAction<T> = {
+  id: string;
+  label: string;
+  icon?: ReactNode;
+  onClick?: (row: T) => void;
+  /** Makes the action a link. */
+  href?: string | ((row: T) => string | undefined);
+  hidden?: boolean | ((row: T) => boolean);
+  disabled?: boolean | ((row: T) => boolean);
+  /** Shown under the label (and as its tooltip) while the action is disabled. */
+  disabledReason?: string | ((row: T) => string | undefined);
+  /** Danger styling, for delete-like actions. */
+  destructive?: boolean;
+  /** Position in the menu, like CSS `order`: missing counts as 0. */
+  order?: number;
+  /** Actions of a group sit together, split from other groups by a separator. */
+  group?: string;
 };
