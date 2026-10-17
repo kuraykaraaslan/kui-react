@@ -150,6 +150,7 @@ export function TimeWindowSelect({
   showInterval = true,
   showAggregation = true,
   showTimezone = true,
+  tabs = ['realtime', 'history'],
   maxBuckets = 500,
   idPrefix = 'tws',
   className,
@@ -166,6 +167,8 @@ export function TimeWindowSelect({
   showInterval?: boolean;
   showAggregation?: boolean;
   showTimezone?: boolean;
+  /** Which kinds of window may be picked (default both). With one, the panel shows only that one and no tab list. */
+  tabs?: Array<'realtime' | 'history'>;
   /** Above this many buckets the panel says the server will coarsen the interval (match the server's cap). */
   maxBuckets?: number;
   idPrefix?: string;
@@ -181,7 +184,9 @@ export function TimeWindowSelect({
 
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<TimeWindowValue>(value ?? fallback);
-  const [tab, setTab] = useState<Tab>(tabOf(value));
+  const allowed = tabs.length > 0 ? tabs : (['realtime', 'history'] as Tab[]);
+  const startTab = (v: TimeWindowValue | null): Tab => (allowed.includes(tabOf(v)) ? tabOf(v) : allowed[0]);
+  const [tab, setTab] = useState<Tab>(startTab(value));
   const [rtKind, setRtKind] = useState<RealtimeKind>('last');
   const [hKind, setHKind] = useState<HistoryKind>('range');
   const [amount, setAmount] = useState('1');
@@ -190,7 +195,12 @@ export function TimeWindowSelect({
   const begin = () => {
     const v = value ?? fallback;
     setDraft(v);
-    setTab(tabOf(v));
+    setTab(startTab(v));
+    // A window of a kind this board does not offer opens on the kind it does, starting from a default of that kind.
+    if (!allowed.includes(tabOf(v))) {
+      if (allowed[0] === 'realtime') setDraft({ ...v, ...fallback } as TimeWindowValue);
+      else { const to = new Date(now()); to.setSeconds(0, 0); setDraft({ ...v, mode: 'absolute', from: new Date(to.getTime() - 86_400_000).toISOString(), to: to.toISOString() } as TimeWindowValue); }
+    }
     setRtKind(v.mode === 'calendar' && v.period.startsWith('current.') ? 'current' : 'last');
     setHKind(v.mode === 'calendar' ? 'period' : 'range');
     const d = v.mode === 'relative' ? DURATION.exec(v.last) : null;
@@ -257,6 +267,7 @@ export function TimeWindowSelect({
       }
     >
       <div className="space-y-3" aria-label={m.label} role="group">
+        {allowed.length > 1 && (
         <div role="tablist" aria-label={m.label} className="flex gap-1 rounded-lg bg-surface-sunken p-1">
           {(['realtime', 'history'] as const).map((t) => (
             <button
@@ -275,9 +286,10 @@ export function TimeWindowSelect({
             </button>
           ))}
         </div>
+        )}
 
         {tab === 'realtime' && (
-          <div id={`${idPrefix}-panel-realtime`} role="tabpanel" aria-labelledby={`${idPrefix}-tab-realtime`} className="space-y-3">
+          <div id={`${idPrefix}-panel-realtime`} {...(allowed.length > 1 ? { role: 'tabpanel', 'aria-labelledby': `${idPrefix}-tab-realtime` } : {})} className="space-y-3">
             <Option name={`${idPrefix}-rt`} checked={rtKind === 'last'} label={m.last} onSelect={() => { setRtKind('last'); if (durationValid) put({ mode: 'relative', last: `${amount}${unit}` }); }}>
               <div className="flex flex-wrap gap-1" role="radiogroup" aria-label={m.presets}>
                 {presets.map((p) => {
@@ -315,7 +327,7 @@ export function TimeWindowSelect({
         )}
 
         {tab === 'history' && (
-          <div id={`${idPrefix}-panel-history`} role="tabpanel" aria-labelledby={`${idPrefix}-tab-history`} className="space-y-3">
+          <div id={`${idPrefix}-panel-history`} {...(allowed.length > 1 ? { role: 'tabpanel', 'aria-labelledby': `${idPrefix}-tab-history` } : {})} className="space-y-3">
             <Option name={`${idPrefix}-h`} checked={hKind === 'last'} label={m.last} onSelect={() => setHKind('last')}>
               <DurationInputs idPrefix={`${idPrefix}-h`} m={m} amount={amount} unit={unit} disabled={hKind !== 'last'}
                 onChange={(a, u) => { setAmount(a); setUnit(u); }} />

@@ -127,6 +127,7 @@ export const CORE_BOARD: SettingsTemplate = {
     { id: 'background', label: 'Background', tab: 'Look', since: 1 },
     { id: 'cards', label: 'Card defaults', tab: 'Look', since: 1 },
     { id: 'toolbar', label: 'Toolbar', tab: 'Toolbar', since: 1 },
+    { id: 'timeWindow', label: 'Time window for viewers', tab: 'Toolbar', since: 1 },
     { id: 'behaviour', label: 'Behaviour', tab: 'Behaviour', since: 1 },
   ],
   fields: since(1, {
@@ -155,6 +156,22 @@ export const CORE_BOARD: SettingsTemplate = {
       label: 'Toolbar items', type: 'multi-select', group: 'toolbar',
       value: ['timeWindow', 'params', 'fullscreen', 'refresh', 'export'],
       options: [opt('timeWindow', 'Time window'), opt('params', 'Parameters'), opt('fullscreen', 'Full screen'), opt('refresh', 'Refresh'), opt('export', 'Export')],
+    },
+    // What a viewer may change in the time window (ThingsBoard's "hide" options, finer): purely additive, so no version bump.
+    windowTabs: {
+      label: 'Window kinds viewers can pick', type: 'multi-select', group: 'timeWindow',
+      value: ['realtime', 'history'],
+      options: [opt('realtime', 'Realtime'), opt('history', 'History')],
+    },
+    windowControls: {
+      label: 'Window settings viewers can change', type: 'multi-select', group: 'timeWindow',
+      value: ['interval', 'aggregation', 'timezone'],
+      options: [opt('interval', 'Grouping interval'), opt('aggregation', 'Aggregation'), opt('timezone', 'Time zone')],
+    },
+    windowAggregations: {
+      label: 'Aggregations viewers can pick', type: 'multi-select', group: 'timeWindow',
+      value: ['avg', 'min', 'max', 'sum', 'count', 'none'],
+      options: [opt('avg', 'Average'), opt('min', 'Minimum'), opt('max', 'Maximum'), opt('sum', 'Sum'), opt('count', 'Count'), opt('none', 'None (raw values)')],
     },
     defaultRefreshSeconds: { label: 'Refresh every (seconds)', type: 'number', nullable: true, min: 5, max: 86400, group: 'behaviour',
       placeholder: 'Never', description: 'Cards without their own refresh interval use this.' },

@@ -107,6 +107,32 @@ describe('TimeWindowSelect', () => {
   });
 });
 
+describe('TimeWindowSelect: what a board lets viewers change', () => {
+  it('with one kind of window there is no tab list, only that kind', async () => {
+    const { open } = setup({ mode: 'relative', last: '24h' }, { tabs: ['realtime'] });
+    await open();
+    expect(screen.queryByRole('tablist')).toBeNull();
+    expect(screen.getByRole('radio', { name: 'Current period' })).toBeInTheDocument();
+    expect(screen.queryByRole('radio', { name: 'Fixed range' })).toBeNull();
+  });
+
+  it('a window of a kind the board does not offer opens on the kind it does', async () => {
+    const { onChange, user, open } = setup({ mode: 'relative', last: '24h' }, { tabs: ['history'] });
+    await open();
+    expect(screen.getByRole('radio', { name: 'Fixed range' })).toBeChecked();
+    await user.click(screen.getByRole('button', { name: 'Update' }));
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ mode: 'absolute', to: new Date(NOW - (NOW % 60_000)).toISOString() }));
+  });
+
+  it('hidden controls and a narrowed aggregation list', async () => {
+    const { open } = setup({ mode: 'relative', last: '24h' }, { showInterval: false, showTimezone: false, aggregations: ['avg', 'max'] });
+    await open();
+    expect(screen.queryByRole('combobox', { name: 'Interval' })).toBeNull();
+    expect(screen.queryByRole('combobox', { name: 'Time zone' })).toBeNull();
+    expect(screen.getAllByRole('option').filter((o) => (o.textContent ?? '').startsWith('Aggregate')).map((o) => o.textContent)).toEqual(['Aggregate: avg', 'Aggregate: max']);
+  });
+});
+
 describe('TimeWindowSelect helpers', () => {
   it('zoned datetime-local values round-trip, across a DST change', () => {
     expect(toZonedInput('2026-10-16T00:00:00.000Z', 'Europe/Istanbul')).toBe('2026-10-16T03:00');
