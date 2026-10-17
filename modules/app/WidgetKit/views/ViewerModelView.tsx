@@ -1,5 +1,6 @@
 'use client';
-import { Component, lazy, Suspense, useMemo, useSyncExternalStore, type ReactNode } from 'react';
+import { lazy, Suspense, useMemo, useSyncExternalStore, type ReactNode } from 'react';
+import { ContributionBoundary } from '@/modules/ui/ContributionBoundary';
 import { cn } from '@/libs/utils/cn';
 import { useDarkMode } from '@/modules/ui/MapView/hooks/useDarkMode';
 import { cssColor, rangeFor, type RangeEdges } from '../settings/style';
@@ -183,17 +184,6 @@ export function ViewerStatus({ kind, text, className }: { kind: 'loading' | 'err
   );
 }
 
-/** Catches the viewer failing to start (no WebGL context, a broken chunk) and shows the error state. */
-class ViewerBoundary extends Component<{ fallback: (error: Error) => ReactNode; children: ReactNode }, { error: Error | null }> {
-  state: { error: Error | null } = { error: null };
-  static getDerivedStateFromError(error: unknown) {
-    return { error: error instanceof Error ? error : new Error(String(error)) };
-  }
-  render() {
-    return this.state.error ? this.props.fallback(this.state.error) : this.props.children;
-  }
-}
-
 // The viewer (three.js, web-ifc, workers) loads only in the browser, only when a card shows it.
 const ViewerModelCanvas = lazy(() => import('./ViewerModelCanvas').then((m) => ({ default: m.ViewerModelCanvas })));
 
@@ -231,12 +221,13 @@ export function ViewerModelWidgetView({
   if (!client) body = <ViewerStatus kind="loading" text={loadingLabel} />;
   else if (!webgl) body = <ViewerStatus kind="error" text="This browser cannot show 3D models: WebGL is switched off or not supported." />;
   else {
+    // Catches the viewer failing to start (no WebGL context, a broken chunk) and shows the error state.
     body = (
-      <ViewerBoundary fallback={(e) => <ViewerStatus kind="error" text={`The 3D viewer could not start. ${e.message}`.trim()} />}>
+      <ContributionBoundary fallback={({ error: e }) => <ViewerStatus kind="error" text={`The 3D viewer could not start. ${e.message}`.trim()} />}>
         <Suspense fallback={<ViewerStatus kind="loading" text={loadingLabel} />}>
           <ViewerModelCanvas models={models} sensors={sensors} settings={s} dark={dark} />
         </Suspense>
-      </ViewerBoundary>
+      </ContributionBoundary>
     );
   }
 

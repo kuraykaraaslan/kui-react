@@ -4,14 +4,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExpand, faDownload, faRotateRight, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { cn } from '@/libs/utils/cn';
 import { Tooltip } from '@/modules/ui/Tooltip';
+import { UnavailableContribution, type UnavailableContributionContent } from '@/modules/ui/UnavailableContribution';
 import { cssColor, fontStyle } from './settings/style';
 import type { CardSettings } from './settings/types';
 import { SettingIcon } from './WidgetKitContext';
 
 export type { CardSettings };
 
-/** What the card body is showing. */
-export type WidgetCardState = 'ready' | 'loading' | 'empty' | 'unconfigured' | 'error';
+/** What the card body is showing. `unavailable`: the widget's provider cannot be shown (see `unavailable`). */
+export type WidgetCardState = 'ready' | 'loading' | 'empty' | 'unconfigured' | 'error' | 'unavailable';
 
 export type WidgetCardProps = {
   title?: string;
@@ -25,6 +26,11 @@ export type WidgetCardProps = {
   unconfiguredText?: string;
   errorText?: string;
   onRetry?: () => void;
+  /**
+   * The reason, texts and action of the `unavailable` state (an `UnavailableContribution` in the
+   * card body; the card keeps its title). Defaults to reason `missing`.
+   */
+  unavailable?: UnavailableContributionContent;
   onFullscreen?: () => void;
   /** Present only when the widget can export; the button shows when `card.buttons` asks for it. */
   onExport?: () => void;
@@ -106,17 +112,19 @@ const iconBtn = cn(
  */
 export function WidgetCard({
   title, card, state = 'ready', stale = false, updatedAt, unconfiguredText = 'Not configured yet.',
-  errorText = 'This widget could not load its data.', onRetry, onFullscreen, onExport, onRefresh, refreshing = false,
+  errorText = 'This widget could not load its data.', onRetry, unavailable, onFullscreen, onExport, onRefresh, refreshing = false,
   headerRight, badges, footer, children, className, style, locale, fixedHeight = false, ...rest
 }: WidgetCardProps) {
   const variant = card.variant ?? 'raised';
   const bgMode = card.background ?? 'default';
   const image = bgMode === 'image' ? safeImageUrl(card.backgroundImage) : undefined;
-  const buttons = card.buttons ?? [];
+  const isUnavailable = state === 'unavailable';
+  // An unavailable widget has no data to refresh, export or enlarge, and nothing to call old.
+  const buttons = isUnavailable ? [] : card.buttons ?? [];
   const showTitle = card.showTitle !== false && !!title;
-  const staleMode = stale ? card.staleDisplay ?? 'badge' : null;
+  const staleMode = stale && !isUnavailable ? card.staleDisplay ?? 'badge' : null;
   const bodyState: WidgetCardState = staleMode === 'hide' ? 'empty' : state;
-  const updated = formatUpdated(updatedAt, card.showUpdated, locale);
+  const updated = isUnavailable ? null : formatUpdated(updatedAt, card.showUpdated, locale);
 
   const frame: CSSProperties = {
     borderRadius: typeof card.radius === 'number' ? card.radius : undefined,
@@ -213,7 +221,14 @@ export function WidgetCard({
       {/* A container for the views' auto-sizing: width only, plus height from lg up when the card sits in
           a fixed-height cell (`fixedHeight`). */}
       <div className={cn('relative @container min-h-0 flex-1 overflow-auto', fixedHeight && 'lg:[container-type:size]')} style={{ padding: pad === 0 ? 0 : `${pad}px ${pad}px ${Math.max(pad, 16)}px` }}>
-        {bodyState === 'loading' ? (
+        {bodyState === 'unavailable' ? (
+          <UnavailableContribution
+            size="card"
+            framed={false}
+            {...(unavailable ?? { reason: 'missing' })}
+            title={unavailable?.title ?? (showTitle ? undefined : title)}
+          />
+        ) : bodyState === 'loading' ? (
           <div className="flex h-full min-h-16 flex-col gap-2" role="status" aria-label="Loading">
             <div className="h-4 w-1/3 animate-pulse rounded bg-surface-sunken" />
             <div className="h-full min-h-8 w-full animate-pulse rounded bg-surface-sunken" />

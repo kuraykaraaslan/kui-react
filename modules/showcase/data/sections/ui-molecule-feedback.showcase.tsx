@@ -3,7 +3,70 @@ import { Button } from '@/modules/ui/Button';
 import { AlertBanner } from '@/modules/ui/AlertBanner';
 import { Toaster, toast, useToastStore } from '@/modules/ui/Toast';
 import { EmptyState } from '@/modules/ui/EmptyState';
+import { ContributionBoundary } from '@/modules/ui/ContributionBoundary';
+import {
+  UnavailableContribution,
+  UNAVAILABLE_REASON_IDS,
+  type UnavailableContributionSize,
+  type UnavailableReason,
+} from '@/modules/ui/UnavailableContribution';
+import { useState } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
+
+function FlakyContribution({ broken }: { broken: boolean }) {
+  if (broken) throw new Error('The call log could not reach the telephony API.');
+  return <p className="text-sm text-text-secondary">Call log: 3 missed calls today.</p>;
+}
+
+function ContributionBoundaryDemo({ silent = false }: { silent?: boolean }) {
+  const [broken, setBroken] = useState(false);
+  const [reported, setReported] = useState<string | null>(null);
+  return (
+    <div className="w-full max-w-md space-y-3">
+      <div className="rounded-lg border border-border p-4 space-y-2">
+        <p className="text-sm font-semibold text-text-primary">Contact: Jane Doe</p>
+        <ContributionBoundary
+          resetKeys={[broken]}
+          onError={(error) => setReported(error.message)}
+          fallback={silent ? undefined : ({ reset }) => (
+            <UnavailableContribution reason="failed" size="node" title="Call log" action={{ label: 'Retry', onClick: () => { setBroken(false); reset(); } }} />
+          )}
+        >
+          <FlakyContribution broken={broken} />
+        </ContributionBoundary>
+        <p className="text-xs text-text-secondary">The host keeps rendering whatever the contribution does.</p>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button size="sm" variant="outline" onClick={() => setBroken(true)} disabled={broken}>Break the contribution</Button>
+        {silent && broken && <Button size="sm" variant="ghost" onClick={() => setBroken(false)}>Fix it</Button>}
+      </div>
+      {reported && <p className="text-xs text-text-secondary">onError reported: {reported}</p>}
+    </div>
+  );
+}
+
+function UnavailableSizesDemo({ size }: { size: UnavailableContributionSize }) {
+  const reasons: UnavailableReason[] = size === 'inline' ? UNAVAILABLE_REASON_IDS : ['disabled', 'unentitled', 'quarantined', 'failed'];
+  const actions: Partial<Record<UnavailableReason, { label: string }>> = {
+    disabled: { label: 'Enable' },
+    unentitled: { label: 'Upgrade' },
+    quarantined: { label: 'Retry' },
+    failed: { label: 'Retry' },
+  };
+  return (
+    <div className={size === 'inline' ? 'flex flex-wrap gap-3' : size === 'node' ? 'grid w-full max-w-md gap-3' : 'grid w-full gap-3 sm:grid-cols-2'}>
+      {reasons.map((reason) => (
+        <UnavailableContribution
+          key={reason}
+          reason={reason}
+          size={size}
+          title={size === 'node' ? 'Product carousel' : undefined}
+          action={size === 'inline' ? undefined : actions[reason]}
+        />
+      ))}
+    </div>
+  );
+}
 
 function ToastVariantsDemo() {
   const { clear } = useToastStore();
@@ -351,6 +414,95 @@ export function EmptyState({ icon, title, description, action, className }) {
           title: 'Minimal',
           preview: <EmptyState title="No results found" description="Try adjusting your search or filters." />,
           code: `<EmptyState title="No results found" description="Try adjusting your search or filters." />`,
+        },
+      ],
+    },
+    {
+      id: 'contribution-boundary',
+      title: 'ContributionBoundary',
+      category: 'Organism',
+      abbr: 'Eb',
+      description: 'Error boundary for one contribution (a slot item, tab, widget or block): when it throws, only it is replaced by `fallback` (a node or `({ error, reset }) => node`, nothing by default) and its host keeps working. `onError(error, info)` reports; `resetKeys` resets when any value changes.',
+      filePath: 'modules/ui/ContributionBoundary.tsx',
+      sourceCode: `import { ContributionBoundary } from '@/modules/ui/ContributionBoundary';
+import { UnavailableContribution } from '@/modules/ui/UnavailableContribution';
+
+<ContributionBoundary
+  resetKeys={[contribution.id, contribution.version]}
+  onError={(error, info) => report({ point, contributor, error, info })}
+  fallback={isAdmin ? ({ reset }) => (
+    <UnavailableContribution reason="failed" action={{ label: 'Retry', onClick: reset }} />
+  ) : null}
+>
+  <Contribution {...props} />
+</ContributionBoundary>`,
+      variants: [
+        {
+          title: 'Admin: placeholder with retry',
+          layout: 'stack' as const,
+          preview: <ContributionBoundaryDemo />,
+          code: `<ContributionBoundary
+  onError={(error) => report(error)}
+  fallback={({ reset }) => (
+    <UnavailableContribution reason="failed" size="node" title="Call log" action={{ label: 'Retry', onClick: reset }} />
+  )}
+>
+  <CallLog contactId={id} />
+</ContributionBoundary>`,
+        },
+        {
+          title: 'End user: nothing',
+          layout: 'stack' as const,
+          preview: <ContributionBoundaryDemo silent />,
+          code: `// No fallback: a broken contribution simply disappears for end users.
+<ContributionBoundary onError={(error) => report(error)}>
+  <CallLog contactId={id} />
+</ContributionBoundary>`,
+        },
+      ],
+    },
+    {
+      id: 'unavailable-contribution',
+      title: 'UnavailableContribution',
+      category: 'Organism',
+      abbr: 'Uc',
+      description: 'Placeholder for a contribution that cannot be shown, for admins and editors (end users see nothing). Nine reasons (disabled, unentitled, blocked, retired, banned, quarantined, failed, missing, no-access), each with a default icon, tone and short text; four sizes (inline, card, tab, node); optional title, detail and action. Texts are overridable for i18n.',
+      filePath: 'modules/ui/UnavailableContribution.tsx',
+      sourceCode: `import { UnavailableContribution } from '@/modules/ui/UnavailableContribution';
+
+<UnavailableContribution
+  reason="disabled"            // disabled | unentitled | blocked | retired | banned | quarantined | failed | missing | no-access
+  size="card"                  // inline | card | tab | node
+  title="Call log"             // optional: what is unavailable
+  label={t('ext.disabled')}    // optional: overrides the reason text
+  detail={t('ext.disabled.detail')}
+  action={{ label: t('ext.enable'), onClick: enable }}
+/>`,
+      variants: [
+        {
+          title: 'Card (dashboard widget, panel)',
+          layout: 'stack' as const,
+          preview: <UnavailableSizesDemo size="card" />,
+          code: `<UnavailableContribution reason="disabled" action={{ label: 'Enable', onClick: enable }} />
+<UnavailableContribution reason="unentitled" action={{ label: 'Upgrade', href: '/billing' }} />`,
+        },
+        {
+          title: 'Inline (top bar, menu, every reason)',
+          layout: 'stack' as const,
+          preview: <UnavailableSizesDemo size="inline" />,
+          code: `<UnavailableContribution reason="blocked" size="inline" />`,
+        },
+        {
+          title: 'Node (page-builder block, automation node)',
+          layout: 'stack' as const,
+          preview: <UnavailableSizesDemo size="node" />,
+          code: `<UnavailableContribution reason="quarantined" size="node" title="Product carousel" action={{ label: 'Retry', onClick: retry }} />`,
+        },
+        {
+          title: 'Tab panel',
+          layout: 'stack' as const,
+          preview: <UnavailableContribution reason="no-access" size="tab" />,
+          code: `<UnavailableContribution reason="no-access" size="tab" />`,
         },
       ],
     },
