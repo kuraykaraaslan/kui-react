@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-10-16T06:51:52.834Z",
+  "generatedAt": "2026-10-17T04:14:06.706Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -1618,12 +1618,16 @@
       "category": "Molecule",
       "filePath": "modules/ui/TimeWindowPicker.tsx",
       "abbr": "Tw",
-      "description": "Relative presets (\"1h\", \"7d\"), an absolute UTC range and the interval / aggregation that go with a window. Controlled: the value is a structural `TimeWindowValue`, nothing here knows about dashboards. Every label is overridable through `messages`.",
+      "description": "Relative presets (\"1h\", \"7d\"), an optional custom \"last N minutes / hours / days\", calendar periods (\"today\", \"previous month\", optionally \"so far\"), an absolute UTC range, and the interval / aggregation / time zone that go with a window. Controlled: the value is a structural `TimeWindowValue`, nothing here knows about dashboards. Every label, period names included, is overridable through `messages`.",
       "source": "'use client';\nimport { TimeWindowPicker, type TimeWindowValue } from '@/modules/ui/TimeWindowPicker';\n\nconst [win, setWin] = useState<TimeWindowValue | null>({ mode: 'relative', last: '24h' });\n<TimeWindowPicker value={win} onChange={setWin} />",
       "variants": [
         {
           "title": "Default",
           "code": "<TimeWindowPicker value={win} onChange={setWin} />"
+        },
+        {
+          "title": "Calendar periods, custom duration and time zone",
+          "code": "<TimeWindowPicker value={win} onChange={setWin} calendarPeriods={DEFAULT_CALENDAR_PERIODS} allowDuration showTimezone />"
         },
         {
           "title": "Presets only",
@@ -1642,7 +1646,7 @@
           "radiogroup",
           "group"
         ],
-        "notes": "Presets form a radiogroup; the date inputs and the selects carry accessible names from `messages`."
+        "notes": "Presets, Last, Calendar and Custom form one radiogroup; the inputs, the period select, the so-far checkbox (disabled for a past period) and the selects carry accessible names from `messages`."
       },
       "designTokens": [
         "--primary",
