@@ -33,6 +33,15 @@ All notable changes to this project will be documented here. Format follows [Kee
     `commandGroupOf`; `CommandPalette`, the registry hooks and `DEMO_COMMANDS` are exported from the app barrel.
   - `libs/utils/orderItems`: `sortByOrder` / `groupByOrder`, the CSS-`order`-like ordering every surface uses.
 
+- From next-boilerplate's `UserMenu` fork, which now uses this one (kui-ejs's `UserMenu` takes the same):
+  - `UserMenu` `portal` renders the open menu in `document.body` (fixed under the trigger), so a sticky or
+    clipping top bar cannot cut it off; `className` goes to the root.
+  - `UserMenu` `user` takes a `SafeUser` or just what the menu shows (`UserMenuUser`: `email`, optional
+    `userRole`, optional `userProfile` with `name` / `profilePicture`). Without a role the trigger shows the
+    name alone, as kui-ejs already did.
+  - The `UserMenu` chevron turns over while the menu is open (`group-aria-expanded:rotate-180` on the trigger
+    `DropdownMenu` marks expanded).
+
 - `RulesetEditor` / `FlowWorkspace`: `paramEditors`, the host's own param editor per block type, shown in the node
   panel in place of the generated form (`ParamEditorProps`: `params`, `onChange`, `disabled`, `node`, `decl`, `choices`).
 - `WidgetKit` `PlacementCard`: `exportData`, an async source for the CSV export, so a host can
@@ -62,6 +71,9 @@ All notable changes to this project will be documented here. Format follows [Kee
 
 ### Fixed
 
+- `AppSidebar` (from next-boilerplate's fork): an active `href` item is marked `aria-current="page"`, as a
+  button item and kui-ejs's links already were; collapsed, the nav drops the scrollbar gutter that
+  `.sidebar-scrollbar-hover` reserves, so the icon-only items sit centered.
 - `usePresence` (Modal, Drawer, Popover): an overlay opened within 250 ms of mounting could stay unmounted
   while open, because the mount-time close timer's update landed after the open click's. The timer now only
   runs while closing and only moves `closing` on. (This was the flaky `CommandPalette` focus test.)

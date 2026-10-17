@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter; a header slot (above the nav groups) and a footer slot can host a workspace switcher, a user block or any content. Item badges take a count or any node.
+Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter; a header slot (above the nav groups) and a footer slot can host a workspace switcher, a user block or any content. Item badges take a count or any node. The active item, link or button, is marked aria-current="page"; collapsed, the nav reserves no scrollbar gutter, so the icons stay centered.
 
 ## Design tokens consumed
 

@@ -7,7 +7,7 @@
 - **status:** stable
 - **since:** 2025-03
 
-Avatar + name + role trigger. Dropdown with Profile, Settings, and Sign out items (hrefs, handlers and labels configurable). `extraItems` (or `items` + `mergeItems`) merge contributed items with the defaults, placed by group and order. Closes on outside click.
+Avatar + name + role trigger (the role line only when the user has one); the chevron turns over while the menu is open. Dropdown with Profile, Settings, and Sign out items (hrefs, handlers and labels configurable). `extraItems` (or `items` + `mergeItems`) merge contributed items with the defaults, placed by group and order; a hidden item with a built-in id leaves that item out. `user` takes a SafeUser or just an email, an optional role and a profile. `portal` renders the open menu in document.body so a sticky or clipping top bar cannot cut it off. Closes on outside click and Escape.
 
 ## Variants
 
@@ -42,6 +42,22 @@ Avatar + name + role trigger. Dropdown with Profile, Settings, and Sign out item
     { id: 'switch-tenant', label: 'Switch workspace', group: 'workspace', order: 600 },
     { id: 'stop-impersonating', label: 'Stop impersonating', group: 'session', order: 900, hidden: !impersonating },
   ]}
+/>
+```
+
+### Session user, no Settings, in a portal
+
+```tsx
+// A session user (email + profile, no role): the trigger shows the name alone.
+// A hidden item with a built-in id leaves Settings out; portal opens the menu in
+// document.body so a sticky top bar cannot clip it.
+<UserMenu
+  user={{ email: 'sam@acme.com', userProfile: { name: 'Sam Lee' } }}
+  profileHref="/me"
+  signOutHref="/logout"
+  mergeItems
+  items={[{ id: 'settings', label: 'Settings', hidden: true }]}
+  portal
 />
 ```
 

@@ -3,7 +3,7 @@
   "name": "kui-react",
   "version": "0.1.0",
   "registryVersion": "1.0.0",
-  "generatedAt": "2026-10-17T09:54:10.487Z",
+  "generatedAt": "2026-10-17T13:38:51.985Z",
   "description": "Machine-readable catalog of every component, theme, design token, and convention in the kui-react library. Consume this from an AI assistant to know what exists, where it lives, and how to use it.",
   "layers": {
     "ui": "modules/ui/ — Primitive, locally-stateful components (atoms + molecules). No business logic. Every file starts with 'use client' and imports cn from @/libs/utils/cn.",
@@ -1708,7 +1708,7 @@
       "category": "App",
       "filePath": "modules/app/AppSidebar.tsx",
       "abbr": "Ab",
-      "description": "Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter; a header slot (above the nav groups) and a footer slot can host a workspace switcher, a user block or any content. Item badges take a count or any node.",
+      "description": "Collapsible side navigation. Accepts navGroups or navItems with a built-in collapse toggle. The searchable prop adds an inline filter; a header slot (above the nav groups) and a footer slot can host a workspace switcher, a user block or any content. Item badges take a count or any node. The active item, link or button, is marked aria-current=\"page\"; collapsed, the nav reserves no scrollbar gutter, so the icons stay centered.",
       "status": "stable",
       "since": "2025-03",
       "designTokens": [
@@ -2815,11 +2815,11 @@
       "category": "Domain",
       "filePath": "modules/domains/common/user/UserMenu.tsx",
       "abbr": "UM",
-      "description": "Avatar + name + role trigger. Dropdown with Profile, Settings, and Sign out items (hrefs, handlers and labels configurable). `extraItems` (or `items` + `mergeItems`) merge contributed items with the defaults, placed by group and order. Closes on outside click.",
+      "description": "Avatar + name + role trigger (the role line only when the user has one); the chevron turns over while the menu is open. Dropdown with Profile, Settings, and Sign out items (hrefs, handlers and labels configurable). `extraItems` (or `items` + `mergeItems`) merge contributed items with the defaults, placed by group and order; a hidden item with a built-in id leaves that item out. `user` takes a SafeUser or just an email, an optional role and a profile. `portal` renders the open menu in document.body so a sticky or clipping top bar cannot cut it off. Closes on outside click and Escape.",
       "status": "stable",
       "since": "2025-03",
       "designTokens": [],
-      "variantCount": 3
+      "variantCount": 4
     },
     {
       "id": "common-price-display",
