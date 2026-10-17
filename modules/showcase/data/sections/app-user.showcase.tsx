@@ -1,7 +1,7 @@
 'use client';
 import { GlobalSearch, type SearchResult } from '@/modules/app/GlobalSearch';
-import { AppCommandBar, type CommandItem } from '@/modules/app/AppCommandBar';
-import { useState } from 'react';
+import { AppCommandBar, registerCommands, type CommandItem } from '@/modules/app/AppCommandBar';
+import { useEffect, useState } from 'react';
 import type { ShowcaseComponent } from '../showcase.types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHouse, faUsers, faCreditCard, faReceipt, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -57,6 +57,34 @@ function GlobalSearchLoadingDemo() {
   );
 }
 
+function AppCommandBarContributedDemo() {
+  const [canCall, setCanCall] = useState(false);
+  // Another module registers its commands; hidden ones stay registered but unlisted.
+  useEffect(
+    () =>
+      registerCommands([
+        { id: 'tel-call', label: 'Call a contact', group: 'Telephony', order: 30, keywords: ['phone', 'dial'], hidden: !canCall },
+        { id: 'tel-log', label: 'Open call log', group: 'Telephony', order: 31 },
+      ]),
+    [canCall],
+  );
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <AppCommandBar
+        items={[
+          { id: 'new-lead', label: 'New lead', group: 'Create', order: 10 },
+          { id: 'new-contact', label: 'New contact', group: 'Create', order: 11 },
+          { id: 'go-home', label: 'Go to dashboard', group: 'Navigation', order: 0 },
+        ]}
+      />
+      <label className="flex items-center gap-2 text-xs text-text-secondary">
+        <input type="checkbox" checked={canCall} onChange={(e) => setCanCall(e.target.checked)} />
+        Viewer may place calls
+      </label>
+    </div>
+  );
+}
+
 function AppCommandBarDemo({ variant }: { variant?: 'default' | 'custom' | 'fuzzy' }) {
   const customItems: CommandItem[] = [
     { icon: '🛍️', label: 'View Orders',    shortcut: 'G O', category: 'Navigation' },
@@ -85,6 +113,7 @@ function AppCommandBarDemo({ variant }: { variant?: 'default' | 'custom' | 'fuzz
 
   return (
     <AppCommandBar
+      demo={variant === undefined || variant === 'default'}
       items={items}
       onSelect={() => {}}
     />
@@ -138,13 +167,13 @@ export function Demo() {
       title: 'AppCommandBar',
       category: 'App',
       abbr: 'CB',
-      description: 'Keyboard-first command palette. Opens with ⌘K; an items prop accepts custom commands while a default navigation/actions/recent set is included.',
+      description: 'Keyboard-first command palette. Opens with ⌘K. Lists the `items` it gets plus every command registered with `registerCommand` / `registerCommands` / `useRegisterCommand`; commands carry `group`, `order` and `hidden`. Sample commands only with `demo`.',
       filePath: 'modules/app/CommandPalette/index.tsx',
       sourceCode: `'use client';
 import { AppCommandBar } from '@/modules/app/CommandPalette';
 
-// With default commands:
-<AppCommandBar onSelect={(item) => router.push(item.href)} />
+// With the sample commands (demos only):
+<AppCommandBar demo onSelect={(item) => console.log(item.label)} />
 
 // With custom commands:
 <AppCommandBar
@@ -158,9 +187,9 @@ import { AppCommandBar } from '@/modules/app/CommandPalette';
 />`,
       variants: [
         {
-          title: 'Varsayılan komutlar',
+          title: 'Sample commands (demo)',
           preview: <AppCommandBarDemo />,
-          code: `<AppCommandBar onSelect={(item) => console.log(item.label)} />`,
+          code: `<AppCommandBar demo onSelect={(item) => console.log(item.label)} />`,
         },
         {
           title: 'Özel items + trigger',
@@ -184,6 +213,20 @@ const fuzzyItems = [
 ];
 
 <AppCommandBar items={fuzzyItems} />`,
+        },
+        {
+          title: 'Registered commands: group, order, hidden',
+          preview: <AppCommandBarContributedDemo />,
+          code: `// Any module adds commands to the shared registry; the palette lists them with its own items.
+useEffect(() => registerCommands([
+  { id: 'tel-call', label: 'Call a contact', group: 'Telephony', order: 30, hidden: !canCall },
+  { id: 'tel-log', label: 'Open call log', group: 'Telephony', order: 31 },
+]), [canCall]);
+
+<AppCommandBar items={[
+  { id: 'go-home', label: 'Go to dashboard', group: 'Navigation', order: 0 },
+  { id: 'new-lead', label: 'New lead', group: 'Create', order: 10 },
+]} />`,
         },
       ],
     },

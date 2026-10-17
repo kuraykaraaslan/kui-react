@@ -25,7 +25,8 @@ import type {
   ScoredCommand,
 } from './types';
 import { useFuzzySearch } from './hooks/useFuzzySearch';
-import { useMergedCommands } from './hooks/useCommandStore';
+import { commandGroupOf, useMergedCommands } from './hooks/useCommandStore';
+import { groupByOrder } from '@/libs/utils/orderItems';
 import { useShortcuts } from './hooks/useShortcuts';
 import { CommandPaletteInput } from './parts/Input';
 import { ResultList } from './parts/ResultList';
@@ -33,10 +34,11 @@ import { EmptyState } from './parts/EmptyState';
 import { Footer } from './parts/Footer';
 
 export type { CommandItem, CommandPaletteProps, CommandGroup, ScoredCommand } from './types';
-export { useRegisterCommand, registerCommand, useCommandStore } from './hooks/useCommandStore';
+export { useRegisterCommand, registerCommand, registerCommands, useCommandStore, commandGroupOf } from './hooks/useCommandStore';
 export { scoreCommand, highlightMatches } from './hooks/useFuzzySearch';
 
-const DEFAULT_COMMANDS: CommandItem[] = [
+/** Sample commands for demos and the showcase; listed only with `demo` (or passed as `items`). */
+export const DEMO_COMMANDS: CommandItem[] = [
   { id: 'nav-dashboard', icon: <FontAwesomeIcon icon={faHouse} className="w-3.5 h-3.5" aria-hidden="true" />,      label: 'Go to Dashboard',  shortcut: 'G D', category: 'Navigation' },
   { id: 'nav-projects',  icon: <FontAwesomeIcon icon={faFolder} className="w-3.5 h-3.5" aria-hidden="true" />,     label: 'Go to Projects',   shortcut: 'G P', category: 'Navigation' },
   { id: 'nav-team',      icon: <FontAwesomeIcon icon={faUsers} className="w-3.5 h-3.5" aria-hidden="true" />,      label: 'Go to Team',       shortcut: 'G T', category: 'Navigation' },
@@ -51,24 +53,27 @@ const DEFAULT_COMMANDS: CommandItem[] = [
   { id: 'rec-review',    icon: <FontAwesomeIcon icon={faClock} className="w-3.5 h-3.5" aria-hidden="true" />,      label: 'Design Review',                     category: 'Recent' },
 ];
 
-function groupByCategory(scored: ScoredCommand[]): CommandGroup[] {
-  const order: string[] = [];
-  const map = new Map<string, ScoredCommand[]>();
-  for (const s of scored) {
-    if (!map.has(s.item.category)) {
-      order.push(s.item.category);
-      map.set(s.item.category, []);
-    }
-    map.get(s.item.category)!.push(s);
-  }
-  return order.map((category) => ({ category, items: map.get(category)! }));
+const NO_COMMANDS: CommandItem[] = [];
+
+/**
+ * Groups for display. An empty query lays commands out by `order` (groups ranked by their
+ * lowest order); a typed query keeps the match-score ranking, groups in order of their best match.
+ */
+function groupCommands(scored: ScoredCommand[], query: string): CommandGroup[] {
+  const ranked = !query.trim();
+  return groupByOrder(
+    scored,
+    (s) => commandGroupOf(s.item),
+    (s) => (ranked ? s.item.order : undefined),
+  ).map((g) => ({ category: g.group ?? 'Commands', items: g.items }));
 }
 
 export function CommandPalette({
-  items = DEFAULT_COMMANDS,
+  items,
   onSelect,
   trigger,
   placeholder = 'Type a command or search…',
+  demo = false,
 }: CommandPaletteProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -80,11 +85,12 @@ export function CommandPalette({
   const itemIdPrefix = `${reactId}-opt`;
   const inputId = `${reactId}-input`;
 
-  const merged = useMergedCommands(items);
+  const merged = useMergedCommands(items ?? (demo ? DEMO_COMMANDS : NO_COMMANDS));
   const scored = useFuzzySearch(merged, query);
-  const groups = useMemo(() => groupByCategory(scored), [scored]);
+  const groups = useMemo(() => groupCommands(scored, query), [scored, query]);
 
-  const flat = scored;
+  // Keyboard order follows what is on screen: group by group.
+  const flat = useMemo(() => groups.flatMap((g) => g.items), [groups]);
   const hasResults = flat.length > 0;
 
   const activeDescendantId = hasResults ? `${itemIdPrefix}-${activeIndex}` : undefined;
@@ -134,8 +140,11 @@ export function CommandPalette({
     setActiveIndex(0);
   }
 
-  // Suggestions for the empty state: the first 4 items of the (unfiltered) merged set.
-  const suggestions = useMemo(() => merged.slice(0, 4), [merged]);
+  // Suggestions for the empty state: the first 4 commands in their listed order.
+  const suggestions = useMemo(
+    () => groupByOrder(merged, commandGroupOf).flatMap((g) => g.items).slice(0, 4),
+    [merged],
+  );
 
   return (
     <>

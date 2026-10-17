@@ -1,6 +1,9 @@
 'use client';
 // Tiny global command registry (M1).
 // Additive: defaults from <CommandPalette items={...} /> still merge in.
+// Any module can add commands with registerCommand / registerCommands /
+// useRegisterCommand; a command with `hidden: true` stays registered but is
+// not listed, so gating (module off, no permission) is a flag, not a re-register.
 // TODO M2: per-scope subscriptions, route-aware mount/unmount, enabled() gating.
 // TODO M5: feed in `onSearch` async results.
 
@@ -43,8 +46,13 @@ function getServerSnapshot(): CommandItem[] {
   return [];
 }
 
+/** The group a command is listed under. */
+export function commandGroupOf(cmd: CommandItem): string {
+  return cmd.group ?? cmd.category ?? 'Commands';
+}
+
 function commandKey(cmd: CommandItem): string {
-  return cmd.id ?? `${cmd.category}::${cmd.label}`;
+  return cmd.id ?? `${commandGroupOf(cmd)}::${cmd.label}`;
 }
 
 /** Imperative add — returns a teardown to remove on unmount. */
@@ -54,6 +62,20 @@ export function registerCommand(cmd: CommandItem): () => void {
   emit();
   return () => {
     registry.delete(key);
+    emit();
+  };
+}
+
+/** Imperative batch add — one teardown removes them all. */
+export function registerCommands(cmds: readonly CommandItem[]): () => void {
+  const keys = cmds.map((cmd) => {
+    const key = commandKey(cmd);
+    registry.set(key, cmd);
+    return key;
+  });
+  emit();
+  return () => {
+    for (const key of keys) registry.delete(key);
     emit();
   };
 }
@@ -76,16 +98,16 @@ export function useRegisterCommand(cmd: CommandItem | null | undefined): void {
     const dispose = registerCommand(cmd);
     return dispose;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, cmd?.shortcut, cmd?.onClick]);
+  }, [key, cmd?.shortcut, cmd?.onClick, cmd?.hidden, cmd?.order, cmd?.group, cmd?.category]);
 }
 
-/** Merge default + dynamically registered commands (dedupe by key). */
+/** Merge default + dynamically registered commands (dedupe by key), without hidden ones. */
 export function useMergedCommands(defaults: CommandItem[]): CommandItem[] {
   const dynamic = useCommandStore();
   return useMemo(() => {
     const seen = new Map<string, CommandItem>();
     for (const c of defaults) seen.set(commandKey(c), c);
     for (const c of dynamic) seen.set(commandKey(c), c);
-    return Array.from(seen.values());
+    return Array.from(seen.values()).filter((c) => !c.hidden);
   }, [defaults, dynamic]);
 }

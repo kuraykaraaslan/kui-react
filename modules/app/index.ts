@@ -24,8 +24,17 @@ export type { AppNavItem } from './AppNav';
 export { NavDrawer } from './NavDrawer';
 export { GlobalSearch } from './GlobalSearch';
 export type { SearchResult } from './GlobalSearch';
-export { AppCommandBar } from './AppCommandBar';
-export type { CommandItem } from './AppCommandBar';
+export {
+  AppCommandBar,
+  CommandPalette,
+  registerCommand,
+  registerCommands,
+  useRegisterCommand,
+  useCommandStore,
+  commandGroupOf,
+  DEMO_COMMANDS,
+} from './AppCommandBar';
+export type { CommandItem, CommandPaletteProps, CommandGroup } from './AppCommandBar';
 
 // Theming
 export { ThemeSwitcher } from './ThemeSwitcher';
