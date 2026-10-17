@@ -422,7 +422,7 @@ export function Tooltip({ content, placement = 'top', children, className }) {
       title: 'DropdownMenu',
       category: 'Organism',
       abbr: 'Dm',
-      description: 'Accessible dropdown using role="menu" + role="menuitem". Closes on Escape and outside click. Supports left/right alignment, icons, separators, danger and disabled items, and arrow-key navigation.',
+      description: 'Accessible dropdown using role="menu" + role="menuitem". Closes on Escape and outside click. Supports left/right alignment, icons, separators, danger and disabled items, and arrow-key navigation. Items take an optional id, href, group, order, hidden and disabledReason so other modules can contribute entries; `portal` escapes clipping parents.',
       filePath: 'modules/ui/DropdownMenu.tsx',
       sourceCode: `'use client';
 import { cn } from '@/libs/utils/cn';
@@ -481,6 +481,34 @@ export function DropdownMenu({ trigger, items, align = 'left', className }) {
             </div>
           ),
           code: `<DropdownMenu align="right"\n  trigger={<Button variant="ghost" size="sm">⋮</Button>}\n  items={[{ label: 'View details' }, { label: 'Remove', danger: true }]}\n/>`,
+        },
+        {
+          title: 'Contributed items: group, order, hidden, href, disabledReason',
+          preview: (
+            <DropdownMenu
+              trigger={<Button variant="outline" size="sm">Contact ▾</Button>}
+              items={[
+                { id: 'delete', label: 'Delete', group: 'danger', order: 1000, danger: true },
+                { id: 'edit', label: 'Edit', group: 'record', order: 10 },
+                { id: 'call', label: 'Call', group: 'contact', order: 20, href: '#call' },
+                { id: 'sign', label: 'Send for signature', group: 'contact', order: 30, disabled: true, disabledReason: 'Add an email address first' },
+                { id: 'campaign', label: 'Add to campaign', group: 'contact', order: 40, hidden: true },
+              ]}
+            />
+          ),
+          code: `// Items sort by group (ranked by their lowest order) and order; a separator splits groups.
+<DropdownMenu
+  trigger={<Button variant="outline" size="sm">Contact ▾</Button>}
+  items={[
+    { id: 'edit', label: 'Edit', group: 'record', order: 10 },
+    { id: 'call', label: 'Call', group: 'contact', order: 20, href: '/calls/new?to=…' },
+    { id: 'sign', label: 'Send for signature', group: 'contact', order: 30, disabled: true, disabledReason: 'Add an email address first' },
+    { id: 'campaign', label: 'Add to campaign', group: 'contact', order: 40, hidden: !canMarket },
+    { id: 'delete', label: 'Delete', group: 'danger', order: 1000, danger: true },
+  ]}
+/>
+// Merge contributed items into a base list (same id replaces in place):
+const items = mergeMenuItems(baseItems, contributedItems);`,
         },
       ],
     },

@@ -1,32 +1,86 @@
 'use client';
 import { Avatar } from '@/modules/ui/Avatar';
 import { Button } from '@/modules/ui/Button';
-import { DropdownMenu, type DropdownItem } from '@/modules/ui/DropdownMenu';
+import { DropdownMenu, mergeMenuItems, type DropdownItem } from '@/modules/ui/DropdownMenu';
 import { SafeUser } from '../types';
 import { cn } from '@/libs/utils/cn';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faUser, faGear, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
+/** Ids of the built-in items; an extra item with one of these ids replaces it. */
+export type UserMenuDefaultItemId = 'profile' | 'settings' | 'sign-out';
+
+export type UserMenuLabels = { profile?: string; settings?: string; signOut?: string };
+
+/**
+ * Where the built-in items sit. Contributed items without a `group` join `account`, and
+ * without an `order` land at {@link USER_MENU_EXTRA_ORDER}: after the account items, before
+ * sign out. A group whose lowest order is 1000 or more sits after sign out.
+ */
+export const USER_MENU_ORDER = { profile: 100, settings: 200, signOut: 1000 } as const;
+export const USER_MENU_EXTRA_ORDER = 500;
+
 export function UserMenu({
   user,
   items,
+  extraItems,
+  mergeItems = false,
+  profileHref,
+  settingsHref,
+  signOutHref,
+  onProfile,
+  onSettings,
+  onSignOut,
+  labels,
   align = 'right',
   onlyAvatar = false,
 }: {
   user: SafeUser;
+  /** Replaces the built-in items, unless `mergeItems` is set. */
   items?: DropdownItem[];
+  /** Items other modules contribute; always merged with the menu's items, never replacing them. */
+  extraItems?: DropdownItem[];
+  /** Treat `items` as additions to the built-in items instead of a replacement. */
+  mergeItems?: boolean;
+  profileHref?: string;
+  settingsHref?: string;
+  signOutHref?: string;
+  onProfile?: () => void;
+  onSettings?: () => void;
+  onSignOut?: () => void;
+  labels?: UserMenuLabels;
   align?: 'left' | 'right';
   onlyAvatar?: boolean;
 }) {
   const displayName = user.userProfile?.name ?? user.email;
   const avatar      = user.userProfile?.profilePicture ?? null;
 
-  const defaultItems: DropdownItem[] = items ?? [
-    { type: 'item', label: 'Profile',  icon: <FontAwesomeIcon icon={faUser} className="w-3.5 h-3.5" aria-hidden="true" /> },
-    { type: 'item', label: 'Settings', icon: <FontAwesomeIcon icon={faGear} className="w-3.5 h-3.5" aria-hidden="true" /> },
-    { type: 'separator' },
-    { type: 'item', label: 'Sign out', icon: <FontAwesomeIcon icon={faArrowRightFromBracket} className="w-3.5 h-3.5" aria-hidden="true" />, danger: true },
+  const builtIn: DropdownItem[] = [
+    { type: 'item', id: 'profile',  group: 'account', order: USER_MENU_ORDER.profile,  label: labels?.profile ?? 'Profile',   href: profileHref,  onClick: onProfile,  icon: <FontAwesomeIcon icon={faUser} className="w-3.5 h-3.5" aria-hidden="true" /> },
+    { type: 'item', id: 'settings', group: 'account', order: USER_MENU_ORDER.settings, label: labels?.settings ?? 'Settings', href: settingsHref, onClick: onSettings, icon: <FontAwesomeIcon icon={faGear} className="w-3.5 h-3.5" aria-hidden="true" /> },
+    { type: 'item', id: 'sign-out', group: 'session', order: USER_MENU_ORDER.signOut,  label: labels?.signOut ?? 'Sign out', href: signOutHref,  onClick: onSignOut,  icon: <FontAwesomeIcon icon={faArrowRightFromBracket} className="w-3.5 h-3.5" aria-hidden="true" />, danger: true },
   ];
+
+  // Contributed items fit around the built-in ones unless they say where they go; one that
+  // replaces a built-in item (same id) keeps that item's place.
+  const placed = (list: DropdownItem[] = []) =>
+    list.map((item) => {
+      if (item.type === 'separator') return item;
+      const replaced = builtIn.find((b) => b.id !== undefined && b.id === item.id);
+      const slot = replaced && replaced.type !== 'separator' ? replaced : undefined;
+      return {
+        ...item,
+        group: item.group ?? slot?.group ?? 'account',
+        order: item.order ?? slot?.order ?? USER_MENU_EXTRA_ORDER,
+      };
+    });
+
+  let menuItems: DropdownItem[];
+  if (items && !mergeItems) {
+    menuItems = extraItems?.length ? mergeMenuItems(items, extraItems) : items;
+  } else {
+    menuItems = mergeMenuItems(builtIn, placed([...(items ?? []), ...(extraItems ?? [])]));
+  }
 
   const trigger = (
     <Button
@@ -53,5 +107,5 @@ export function UserMenu({
     </div>
   );
 
-  return <DropdownMenu trigger={trigger} items={defaultItems} header={header} align={align} />;
+  return <DropdownMenu trigger={trigger} items={menuItems} header={header} align={align} />;
 }
